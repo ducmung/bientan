@@ -70,20 +70,34 @@
             mix-blend-mode: multiply; 
         }
 
-        /* ----- ĐỒNG HỒ NẰM TRÊN ĐỈNH BIẾN TẦN ----- */
+        /* ----- ĐỒNG HỒ 2 DÒNG TRÊN ĐỈNH BIẾN TẦN ----- */
         #live-clock {
             position: absolute;
-            top: -20px; 
-            font-size: 14px;
-            font-weight: 900;
-            color: #d97706; 
-            background: rgba(255,255,255,0.9); 
-            padding: 4px 12px;
+            top: -42px; /* Đẩy hộp lên cao hơn để nhường chỗ cho 2 dòng text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255,255,255,0.95); 
+            padding: 6px 15px;
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            font-family: monospace; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             z-index: 20;
+            white-space: nowrap;
+        }
+
+        .clock-time {
+            font-size: 15px;
+            font-weight: 900;
+            color: #d97706; /* Màu vàng đậm */
+            font-family: monospace; 
             letter-spacing: 1px;
+        }
+
+        .clock-date {
+            font-size: 10px;
+            color: #666;
+            font-weight: 800;
+            margin-top: 3px;
         }
 
         /* Chữ trạng thái nằm dưới biến tần */
@@ -198,7 +212,11 @@
             </div>
 
             <div class="node node-center pos-inv">
-                <div id="live-clock">--:--:--</div>
+                <div id="live-clock">
+                    <div class="clock-time">--:--:--</div>
+                    <div class="clock-date">Đang tải ngày...</div>
+                </div>
+                
                 <img src="png100-t3-scale100.png" alt="Inverter">
                 <div id="lbl-status">Đang tải...</div>
             </div>
@@ -236,11 +254,33 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ================= XỬ LÝ ĐỒNG HỒ =================
+        // ================= XỬ LÝ ĐỒNG HỒ & LỊCH ÂM =================
         function updateClock() {
             const now = new Date();
+            
+            // 1. Lấy Giờ
             const timeString = now.toLocaleTimeString('vi-VN', { hour12: false });
-            document.getElementById('live-clock').innerText = timeString;
+            
+            // 2. Lấy Thứ và Ngày Dương Lịch
+            const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+            const dayOfWeek = days[now.getDay()];
+            const solarDate = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            
+            // 3. Lấy Ngày Âm Lịch (Dùng API tích hợp của trình duyệt)
+            let lunarString = "";
+            try {
+                const lunarFormatter = new Intl.DateTimeFormat('vi-VN-u-ca-chinese', {day: 'numeric', month: 'numeric'});
+                lunarString = " - ÂL: " + lunarFormatter.format(now);
+            } catch(e) {
+                // Trình duyệt cũ không hỗ trợ thì bỏ qua phần Âm lịch
+            }
+
+            // Cập nhật DOM
+            const clockHtml = `
+                <div class="clock-time">${timeString}</div>
+                <div class="clock-date">${dayOfWeek}, ${solarDate}${lunarString}</div>
+            `;
+            document.getElementById('live-clock').innerHTML = clockHtml;
         }
         setInterval(updateClock, 1000); 
         updateClock(); 
@@ -273,14 +313,13 @@
                 document.getElementById('lbl-load').innerText = loadInW; 
                 document.getElementById('lbl-batt').innerText = Math.abs(battInW);
                 
-                // Cập nhật text % Pin
                 lblSoc.innerText = data.Batt_SOC + '%';
                 
                 document.getElementById('stat-v').innerText = data.Batt_Voltage.toFixed(1) + ' V';
                 document.getElementById('stat-a').innerText = data.Batt_Current.toFixed(1) + ' A';
                 document.getElementById('bar-soc').style.width = data.Batt_SOC + '%';
 
-                // ----- CẬP NHẬT CHỮ TRẠNG THÁI (ĐANG SẠC / ĐANG XẢ) -----
+                // CẬP NHẬT CHỮ TRẠNG THÁI
                 lblStatus.innerText = data.Batt_Status;
                 if (data.Batt_Status === "Đang Sạc") {
                     lblStatus.style.color = '#00cc66'; 
@@ -290,17 +329,17 @@
                     lblStatus.style.color = '#888'; 
                 }
 
-                // ----- CẬP NHẬT MÀU SẮC % PIN THEO DUNG LƯỢNG -----
+                // CẬP NHẬT MÀU SẮC % PIN
                 let soc = data.Batt_SOC;
                 if (soc >= 60) {
                     lblSoc.style.color = '#00cc66'; // Xanh lá
                 } else if (soc >= 30) {
-                    lblSoc.style.color = '#ffaa00'; // Vàng cam
+                    lblSoc.style.color = '#ffaa00'; // Vàng
                 } else {
                     lblSoc.style.color = '#ff4444'; // Đỏ
                 }
 
-                // ----- LOGIC CHẤM CHẠY (Ngưỡng 20W) -----
+                // LOGIC CHẤM CHẠY
                 if(pvInW > 20) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
                 else { dotPV.style.display = 'none'; }
 
