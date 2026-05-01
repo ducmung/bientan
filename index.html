@@ -29,7 +29,7 @@
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            aspect-ratio: 1 / 1; /* Ép thành hình vuông để tỷ lệ chéo luôn chuẩn 45 độ */
+            aspect-ratio: 1 / 1; 
             background: rgba(255, 255, 255, 0.6);
             border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
@@ -38,7 +38,7 @@
 
         .node {
             position: absolute;
-            transform: translate(-50%, -50%); /* Căn tâm chính xác */
+            transform: translate(-50%, -50%); 
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             padding: 10px 5px;
@@ -48,26 +48,57 @@
             z-index: 10;
         }
 
-        .node-center { width: 110px; height: 110px; padding-top: 25px; border-radius: 25px; }
+        .node-center { 
+            width: 130px; 
+            height: 130px; 
+            padding: 0px; 
+            border-radius: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .node-center img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            border-radius: 20px;
+            transform: scale(1.15); 
+            mix-blend-mode: multiply; 
+        }
+
+        #lbl-status {
+            position: absolute;
+            bottom: -28px; 
+            font-size: 13px;
+            font-weight: 800;
+            background: rgba(255,255,255,0.9); 
+            padding: 4px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: #888;
+            white-space: nowrap; 
+            z-index: 20;
+        }
 
         .node h3 { font-size: 11px; color: #666; font-weight: 700; margin-bottom: 2px; }
         .node .val { font-size: 16px; font-weight: 800; color: #111; }
         .node .unit { font-size: 10px; color: #888; }
         .icon { font-size: 20px; margin-bottom: 2px; }
 
-        /* Tọa độ các khối (Responsive bằng % ) */
         .pos-pv { top: 20%; left: 20%; }
         .pos-grid { top: 20%; left: 80%; }
         .pos-batt { top: 80%; left: 20%; }
         .pos-load { top: 80%; left: 80%; }
         .pos-inv { top: 50%; left: 50%; }
 
-        /* Đường dây điện */
         .line {
             position: absolute;
             height: 3px;
             background: #cbd5e1;
-            width: 42.42%; /* Cạnh huyền của tam giác vuông cân 30% x 30% */
+            width: 42.42%; 
             z-index: 1;
         }
 
@@ -76,54 +107,33 @@
         .line-batt { top: 80%; left: 20%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 80%; right: 20%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* Chấm tròn chạy */
         .dot {
             position: absolute;
             width: 10px; height: 10px;
             border-radius: 50%;
             top: -3.5px;
-            display: none; /* Ẩn đi nếu không có điện */
+            display: none; 
         }
 
-        /* Hoạt ảnh chạy tới Inverter (Left to Right) */
         @keyframes flowInL { 0% { left: 0%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
-        /* Hoạt ảnh chạy từ Inverter ra (Right to Left) */
         @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { left: 0%; opacity: 0; } }
-        
-        /* Hoạt ảnh bên Phải (Right side - do origin đảo ngược) */
         @keyframes flowInR { 0% { right: 0%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
         @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { right: 0%; opacity: 0; } }
 
-        /* ================= KHUNG THỐNG KÊ (DƯỚI) ================= */
-        .stats-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-
+        /* ================= KHUNG THỐNG KÊ ================= */
+        .stats-panel { display: flex; flex-direction: column; gap: 15px; }
+        .stat-card { background: rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .stat-header h2 { font-size: 16px; color: #444; }
-        .big-number { font-size: 32px; font-weight: 800; color: #222; }
 
-        /* Thanh Tiến Trình */
         .progress-bar { width: 100%; height: 12px; background: #eee; border-radius: 10px; display: flex; overflow: hidden; margin-bottom: 15px; }
-        .bar-pv { background: #ffaa00; width: 0%; transition: width 1s; }
         .bar-batt { background: #00cc66; width: 0%; transition: width 1s; }
-        .bar-grid { background: #ff4444; width: 0%; transition: width 1s; }
 
         .list-detail { font-size: 13px; color: #555; }
         .list-detail div { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #ddd; padding-bottom: 4px;}
         .list-detail div:last-child { border: none; }
         .list-detail span { font-weight: 800; color: #111; }
 
-        /* Giao diện màn hình ngang/Desktop */
         @media (min-width: 768px) {
             .app-container { flex-direction: row; align-items: stretch; }
             .diagram-panel { flex: 1; max-width: none; }
@@ -135,61 +145,56 @@
 
     <div class="app-container">
         <div class="diagram-panel">
-            
             <div class="line line-pv"><div class="dot" id="dot-pv" style="background: #ffaa00;"></div></div>
             <div class="line line-grid"><div class="dot" id="dot-grid"></div></div>
             <div class="line line-batt"><div class="dot" id="dot-batt"></div></div>
-            <div class="line line-load"><div class="dot" id="dot-load" style="background: #0088ff; animation: flowOutR 2s infinite linear; display: block;"></div></div>
+            <div class="line line-load"><div class="dot" id="dot-load" style="background: #0088ff;"></div></div>
 
             <div class="node pos-pv">
                 <div class="icon">☀️</div>
                 <h3>MẶT TRỜI</h3>
-                <div class="val" id="lbl-pv">0.00</div>
-                <div class="unit">kW</div>
+                <div class="val" id="lbl-pv">0</div>
+                <div class="unit">W</div>
             </div>
 
             <div class="node pos-grid">
                 <div class="icon">🗼</div>
                 <h3>LƯỚI EVN</h3>
-                <div class="val" id="lbl-grid">0.00</div>
-                <div class="unit">kW</div>
+                <div class="val" id="lbl-grid">0</div>
+                <div class="unit">W</div>
             </div>
 
             <div class="node pos-batt">
                 <div class="icon">🔋</div>
                 <h3>PIN LƯU TRỮ</h3>
-                <div class="val" id="lbl-batt">0.00</div>
-                <div class="unit">kW</div>
+                <div class="val" id="lbl-batt">0</div>
+                <div class="unit">W</div>
                 <div style="font-size: 11px; color: #00cc66; font-weight:bold; margin-top: 3px;" id="lbl-soc">0%</div>
             </div>
 
             <div class="node pos-load">
                 <div class="icon">🏠</div>
                 <h3>TIÊU THỤ</h3>
-                <div class="val" id="lbl-load">0.00</div>
-                <div class="unit">kW</div>
+                <div class="val" id="lbl-load">0</div> 
+                <div class="unit">W</div>
             </div>
 
             <div class="node node-center pos-inv">
-                <div class="icon">⚡</div>
-                <h3 style="font-size: 14px;">INVERTER</h3>
-                <div style="font-size: 11px; color: #888; margin-top: 10px;" id="lbl-status">Đang tải...</div>
+                <img src="png100-t3-scale100.png" alt="Inverter">
+                <div id="lbl-status">Đang tải...</div>
             </div>
-
         </div>
 
         <div class="stats-panel">
-            
             <div class="stat-card">
                 <div class="stat-header">
                     <h2>📊 THỐNG KÊ HÔM NAY</h2>
                 </div>
-                
                 <div class="list-detail">
                     <div>☀️ Sản lượng PV: <span id="stat-pv-today">0 kWh</span></div>
                     <div>🔋 Pin đã xả: <span id="stat-bat-dis">0 kWh</span></div>
                     <div>⚡ Pin đã sạc: <span id="stat-bat-chg">0 kWh</span></div>
-                    <div style="color: #d35400;">🌐 PV Trọn đời: <span id="stat-pv-total">0 kWh</span></div>
+                    <div style="color: #d35400;">🏠 Tổng tiêu thụ: <span id="stat-load-total">0 kWh</span></div>
                 </div>
             </div>
 
@@ -205,7 +210,6 @@
                     <div>Dòng điện: <span id="stat-a">0 A</span></div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -213,69 +217,80 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Cấu hình Firebase
         const firebaseConfig = {
             databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Lấy các elements DOM
         const dotPV = document.getElementById('dot-pv');
         const dotGrid = document.getElementById('dot-grid');
         const dotBatt = document.getElementById('dot-batt');
         const dotLoad = document.getElementById('dot-load');
+        const lblStatus = document.getElementById('lbl-status');
 
         // LẮNG NGHE DỮ LIỆU TỨC THỜI
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
-                // Tính toán công suất Pin (kW) từ Áp và Dòng (W = V * A / 1000)
-                let battKw = (data.Batt_Voltage * data.Batt_Current) / 1000;
+                // ĐỔI TOÀN BỘ SANG ĐƠN VỊ W (LÀM TRÒN SỐ NGUYÊN)
+                let pvInW = Math.round(data.PV_Power * 1000); // Từ kW ra W
+                let gridInW = Math.round(data.Grid_Power);    // ESP32 đang gửi W
+                let loadInW = Math.round(data.Load_Power);    // ESP32 đang gửi W
+                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); // V * A = W
 
-                // Điền số
-                document.getElementById('lbl-pv').innerText = data.PV_Power.toFixed(2);
-                document.getElementById('lbl-grid').innerText = Math.abs(data.Grid_Power).toFixed(2);
-                document.getElementById('lbl-load').innerText = data.Load_Power.toFixed(2);
-                document.getElementById('lbl-batt').innerText = Math.abs(battKw).toFixed(2);
+                // Hiển thị lên HTML
+                document.getElementById('lbl-pv').innerText = pvInW;
+                document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
+                document.getElementById('lbl-load').innerText = loadInW; 
+                document.getElementById('lbl-batt').innerText = Math.abs(battInW);
                 document.getElementById('lbl-soc').innerText = data.Batt_SOC + '%';
-                document.getElementById('lbl-status').innerText = data.Batt_Status;
                 
                 document.getElementById('stat-v').innerText = data.Batt_Voltage.toFixed(1) + ' V';
                 document.getElementById('stat-a').innerText = data.Batt_Current.toFixed(1) + ' A';
                 document.getElementById('bar-soc').style.width = data.Batt_SOC + '%';
 
-                // ----- ĐIỀU KHIỂN LOGIC CHẤM CHẠY -----
-                
-                // PV: Luôn chạy vào Inverter nếu có điện
-                if(data.PV_Power > 0.05) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
-                else { dotPV.style.display = 'none'; }
-
-                // Tải: Luôn chạy ra khỏi Inverter nếu có dùng
-                if(data.Load_Power > 0.05) { dotLoad.style.display = 'block'; } 
-                else { dotLoad.style.display = 'none'; }
-
-                // Pin: Âm là đang Sạc (Dòng < 0) -> Chấm chạy vào Pin
-                if (data.Batt_Current < -0.5) {
-                    dotBatt.style.display = 'block';
-                    dotBatt.style.background = '#ff4444'; // Đỏ = Sạc
-                    dotBatt.style.animation = 'flowOutL 1.5s infinite linear';
-                } else if (data.Batt_Current > 0.5) { // Dương là đang Xả -> Chấm chạy ra Inverter
-                    dotBatt.style.display = 'block';
-                    dotBatt.style.background = '#00cc66'; // Xanh = Xả
-                    dotBatt.style.animation = 'flowInL 1.5s infinite linear';
+                // ----- CẬP NHẬT CHỮ TRẠNG THÁI -----
+                lblStatus.innerText = data.Batt_Status;
+                if (data.Batt_Status === "Đang Sạc") {
+                    lblStatus.style.color = '#00cc66'; // Xanh lá
+                } else if (data.Batt_Status === "Đang Xả") {
+                    lblStatus.style.color = '#ff4444'; // Đỏ
                 } else {
-                    dotBatt.style.display = 'none'; // Chờ
+                    lblStatus.style.color = '#888'; // Xám
                 }
 
-                // Lưới: Dương là Mua điện (Chạy vào Inv) - Âm là Bán điện (Chạy ra Lưới)
-                if (data.Grid_Power > 0.05) {
+                // ----- LOGIC CHẤM CHẠY (Ngưỡng 20W để tránh nhiễu) -----
+                
+                // PV
+                if(pvInW > 20) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
+                else { dotPV.style.display = 'none'; }
+
+                // Tải
+                if(loadInW > 20) { dotLoad.style.display = 'block'; dotLoad.style.animation = 'flowOutR 1.5s infinite linear'; } 
+                else { dotLoad.style.display = 'none'; }
+
+                // Pin
+                if (data.Batt_Current < -0.5) { // Đang sạc
+                    dotBatt.style.display = 'block';
+                    dotBatt.style.background = '#ff4444'; 
+                    dotBatt.style.animation = 'flowOutL 1.5s infinite linear';
+                } else if (data.Batt_Current > 0.5) { // Đang xả
+                    dotBatt.style.display = 'block';
+                    dotBatt.style.background = '#00cc66'; 
+                    dotBatt.style.animation = 'flowInL 1.5s infinite linear';
+                } else {
+                    dotBatt.style.display = 'none'; 
+                }
+
+                // Lưới EVN
+                if (gridInW > 20) { // Đang mua
                     dotGrid.style.display = 'block';
-                    dotGrid.style.background = '#ff4444'; // Đỏ = Đang mua
+                    dotGrid.style.background = '#ff4444'; 
                     dotGrid.style.animation = 'flowInR 1.5s infinite linear';
-                } else if (data.Grid_Power < -0.05) {
+                } else if (gridInW < -20) { // Đang bán
                     dotGrid.style.display = 'block';
-                    dotGrid.style.background = '#00cc66'; // Xanh = Đang bán
+                    dotGrid.style.background = '#00cc66'; 
                     dotGrid.style.animation = 'flowOutR 1.5s infinite linear';
                 } else {
                     dotGrid.style.display = 'none';
@@ -290,7 +305,9 @@
                 document.getElementById('stat-pv-today').innerText = data.PV_Today.toFixed(1) + ' kWh';
                 document.getElementById('stat-bat-dis').innerText = data.Bat_Discharge_Today.toFixed(1) + ' kWh';
                 document.getElementById('stat-bat-chg').innerText = data.Bat_Charge_Today.toFixed(1) + ' kWh';
-                document.getElementById('stat-pv-total').innerText = data.PV_Total.toFixed(1) + ' kWh';
+                
+                let loadTotal = data.Load_Total !== undefined ? data.Load_Total : 0;
+                document.getElementById('stat-load-total').innerText = loadTotal.toFixed(1) + ' kWh';
             }
         });
     </script>
