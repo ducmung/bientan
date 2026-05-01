@@ -18,7 +18,7 @@
         .app-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 20px; 
             max-width: 1000px;
             margin: 0 auto;
         }
@@ -48,6 +48,7 @@
             z-index: 10;
         }
 
+        /* Khối Inverter ở giữa */
         .node-center { 
             width: 130px; 
             height: 130px; 
@@ -69,6 +70,23 @@
             mix-blend-mode: multiply; 
         }
 
+        /* ----- ĐỒNG HỒ NẰM TRÊN ĐỈNH BIẾN TẦN ----- */
+        #live-clock {
+            position: absolute;
+            top: -28px; /* Tọa độ âm để đẩy hẳn lên trên viền ảnh */
+            font-size: 14px;
+            font-weight: 900;
+            color: #d97706; /* Màu vàng đậm */
+            background: rgba(255,255,255,0.9); /* Nền mờ bo góc cho số nổi bật */
+            padding: 4px 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-family: monospace; 
+            z-index: 20;
+            letter-spacing: 1px;
+        }
+
+        /* Chữ trạng thái nằm dưới biến tần */
         #lbl-status {
             position: absolute;
             bottom: -28px; 
@@ -135,7 +153,7 @@
         .list-detail span { font-weight: 800; color: #111; }
 
         @media (min-width: 768px) {
-            .app-container { flex-direction: row; align-items: stretch; }
+            .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
             .diagram-panel { flex: 1; max-width: none; }
             .stats-panel { flex: 1; justify-content: center; }
         }
@@ -180,7 +198,10 @@
             </div>
 
             <div class="node node-center pos-inv">
+                <div id="live-clock">--:--:--</div>
+                
                 <img src="png100-t3-scale100.png" alt="Inverter">
+                
                 <div id="lbl-status">Đang tải...</div>
             </div>
         </div>
@@ -217,6 +238,16 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // ================= XỬ LÝ ĐỒNG HỒ =================
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('vi-VN', { hour12: false });
+            document.getElementById('live-clock').innerText = timeString;
+        }
+        setInterval(updateClock, 1000); 
+        updateClock(); 
+
+        // ================= KẾT NỐI FIREBASE =================
         const firebaseConfig = {
             databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
@@ -233,13 +264,11 @@
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
-                // ĐỔI TOÀN BỘ SANG ĐƠN VỊ W (LÀM TRÒN SỐ NGUYÊN)
-                let pvInW = Math.round(data.PV_Power * 1000); // Từ kW ra W
-                let gridInW = Math.round(data.Grid_Power);    // ESP32 đang gửi W
-                let loadInW = Math.round(data.Load_Power);    // ESP32 đang gửi W
-                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); // V * A = W
+                let pvInW = Math.round(data.PV_Power * 1000); 
+                let gridInW = Math.round(data.Grid_Power);    
+                let loadInW = Math.round(data.Load_Power);    
+                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); 
 
-                // Hiển thị lên HTML
                 document.getElementById('lbl-pv').innerText = pvInW;
                 document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
                 document.getElementById('lbl-load').innerText = loadInW; 
@@ -253,29 +282,25 @@
                 // ----- CẬP NHẬT CHỮ TRẠNG THÁI -----
                 lblStatus.innerText = data.Batt_Status;
                 if (data.Batt_Status === "Đang Sạc") {
-                    lblStatus.style.color = '#00cc66'; // Xanh lá
+                    lblStatus.style.color = '#00cc66'; 
                 } else if (data.Batt_Status === "Đang Xả") {
-                    lblStatus.style.color = '#ff4444'; // Đỏ
+                    lblStatus.style.color = '#ff4444'; 
                 } else {
-                    lblStatus.style.color = '#888'; // Xám
+                    lblStatus.style.color = '#888'; 
                 }
 
-                // ----- LOGIC CHẤM CHẠY (Ngưỡng 20W để tránh nhiễu) -----
-                
-                // PV
+                // ----- LOGIC CHẤM CHẠY (Ngưỡng 20W) -----
                 if(pvInW > 20) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
                 else { dotPV.style.display = 'none'; }
 
-                // Tải
                 if(loadInW > 20) { dotLoad.style.display = 'block'; dotLoad.style.animation = 'flowOutR 1.5s infinite linear'; } 
                 else { dotLoad.style.display = 'none'; }
 
-                // Pin
-                if (data.Batt_Current < -0.5) { // Đang sạc
+                if (data.Batt_Current < -0.5) { 
                     dotBatt.style.display = 'block';
                     dotBatt.style.background = '#ff4444'; 
                     dotBatt.style.animation = 'flowOutL 1.5s infinite linear';
-                } else if (data.Batt_Current > 0.5) { // Đang xả
+                } else if (data.Batt_Current > 0.5) { 
                     dotBatt.style.display = 'block';
                     dotBatt.style.background = '#00cc66'; 
                     dotBatt.style.animation = 'flowInL 1.5s infinite linear';
@@ -283,12 +308,11 @@
                     dotBatt.style.display = 'none'; 
                 }
 
-                // Lưới EVN
-                if (gridInW > 20) { // Đang mua
+                if (gridInW > 20) { 
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#ff4444'; 
                     dotGrid.style.animation = 'flowInR 1.5s infinite linear';
-                } else if (gridInW < -20) { // Đang bán
+                } else if (gridInW < -20) { 
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#00cc66'; 
                     dotGrid.style.animation = 'flowOutR 1.5s infinite linear';
