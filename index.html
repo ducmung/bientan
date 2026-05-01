@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sosen Energy Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
         
@@ -50,22 +50,22 @@
 
         /* Khối Inverter ở giữa */
         .node-center { 
-            width: 130px; 
-            height: 130px; 
+            width: 140px; 
+            height: 140px; 
             padding: 0px; 
-            border-radius: 20px; 
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            background: rgba(255, 255, 255, 0.95);
+            background: transparent; 
+            box-shadow: none; 
+            z-index: 15;
         }
         
         .node-center img {
             width: 100%;
             height: 100%;
-            object-fit: cover; 
-            border-radius: 20px;
+            object-fit: contain; 
             transform: scale(1.15); 
             mix-blend-mode: multiply; 
         }
@@ -73,11 +73,11 @@
         /* ----- ĐỒNG HỒ NẰM TRÊN ĐỈNH BIẾN TẦN ----- */
         #live-clock {
             position: absolute;
-            top: -28px; /* Tọa độ âm để đẩy hẳn lên trên viền ảnh */
+            top: -20px; 
             font-size: 14px;
             font-weight: 900;
-            color: #d97706; /* Màu vàng đậm */
-            background: rgba(255,255,255,0.9); /* Nền mờ bo góc cho số nổi bật */
+            color: #d97706; 
+            background: rgba(255,255,255,0.9); 
             padding: 4px 12px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
@@ -89,7 +89,7 @@
         /* Chữ trạng thái nằm dưới biến tần */
         #lbl-status {
             position: absolute;
-            bottom: -28px; 
+            bottom: -20px; 
             font-size: 13px;
             font-weight: 800;
             background: rgba(255,255,255,0.9); 
@@ -187,7 +187,7 @@
                 <h3>PIN LƯU TRỮ</h3>
                 <div class="val" id="lbl-batt">0</div>
                 <div class="unit">W</div>
-                <div style="font-size: 11px; color: #00cc66; font-weight:bold; margin-top: 3px;" id="lbl-soc">0%</div>
+                <div style="font-size: 24px; font-weight:900; margin-top: 5px; transition: color 0.5s;" id="lbl-soc">0%</div>
             </div>
 
             <div class="node pos-load">
@@ -199,9 +199,7 @@
 
             <div class="node node-center pos-inv">
                 <div id="live-clock">--:--:--</div>
-                
                 <img src="png100-t3-scale100.png" alt="Inverter">
-                
                 <div id="lbl-status">Đang tải...</div>
             </div>
         </div>
@@ -259,6 +257,7 @@
         const dotBatt = document.getElementById('dot-batt');
         const dotLoad = document.getElementById('dot-load');
         const lblStatus = document.getElementById('lbl-status');
+        const lblSoc = document.getElementById('lbl-soc'); 
 
         // LẮNG NGHE DỮ LIỆU TỨC THỜI
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
@@ -273,13 +272,15 @@
                 document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
                 document.getElementById('lbl-load').innerText = loadInW; 
                 document.getElementById('lbl-batt').innerText = Math.abs(battInW);
-                document.getElementById('lbl-soc').innerText = data.Batt_SOC + '%';
+                
+                // Cập nhật text % Pin
+                lblSoc.innerText = data.Batt_SOC + '%';
                 
                 document.getElementById('stat-v').innerText = data.Batt_Voltage.toFixed(1) + ' V';
                 document.getElementById('stat-a').innerText = data.Batt_Current.toFixed(1) + ' A';
                 document.getElementById('bar-soc').style.width = data.Batt_SOC + '%';
 
-                // ----- CẬP NHẬT CHỮ TRẠNG THÁI -----
+                // ----- CẬP NHẬT CHỮ TRẠNG THÁI (ĐANG SẠC / ĐANG XẢ) -----
                 lblStatus.innerText = data.Batt_Status;
                 if (data.Batt_Status === "Đang Sạc") {
                     lblStatus.style.color = '#00cc66'; 
@@ -287,6 +288,16 @@
                     lblStatus.style.color = '#ff4444'; 
                 } else {
                     lblStatus.style.color = '#888'; 
+                }
+
+                // ----- CẬP NHẬT MÀU SẮC % PIN THEO DUNG LƯỢNG -----
+                let soc = data.Batt_SOC;
+                if (soc >= 60) {
+                    lblSoc.style.color = '#00cc66'; // Xanh lá
+                } else if (soc >= 30) {
+                    lblSoc.style.color = '#ffaa00'; // Vàng cam
+                } else {
+                    lblSoc.style.color = '#ff4444'; // Đỏ
                 }
 
                 // ----- LOGIC CHẤM CHẠY (Ngưỡng 20W) -----
