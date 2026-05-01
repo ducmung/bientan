@@ -186,6 +186,80 @@
         </div>
 
     </div>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
+    <script>
+        // Cấu hình kết nối tới Database của bạn
+        const firebaseConfig = {
+            // Dán đường link Host có chữ https:// vào đây
+            databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
+
+        // Khởi tạo Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // ================= LẮNG NGHE DỮ LIỆU TỨC THỜI (LIVE) =================
+        database.ref('/SosenSystem/Live').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if(data) {
+                // Đổ số liệu vào các thẻ HTML
+                document.getElementById('val-pv').innerText = data.PV_Power.toFixed(2);
+                document.getElementById('val-load').innerText = data.Load_Power.toFixed(2);
+                document.getElementById('val-soc').innerText = data.Batt_SOC;
+                
+                // Hiển thị công suất Pin và Lưới (dùng Math.abs để luôn hiện số dương trên màn hình)
+                document.getElementById('val-batt').innerText = Math.abs(data.Batt_Power).toFixed(2);
+                document.getElementById('val-grid').innerText = Math.abs(data.Grid_Power).toFixed(2);
+
+                // --- ĐẢO CHIỀU HIỆU ỨNG LUỒNG ĐIỆN ---
+                
+                // 1. Logic Pin: Âm là sạc (điện chạy vào pin), Dương là xả (chạy ra Inverter)
+                const battDot = document.querySelector('.dot-batt');
+                if (data.Batt_Power < 0) { 
+                    battDot.style.animation = "moveFlowRev 2s linear infinite"; // Chạy ngược vào Pin
+                    battDot.style.background = "#ff4444"; // Đổi màu đỏ khi sạc (tùy chọn)
+                } else { 
+                    battDot.style.animation = "moveFlow 2s linear infinite"; // Chạy ra Inverter
+                    battDot.style.background = "#00cc66"; // Màu xanh khi xả
+                }
+
+                // 2. Logic Lưới điện: (Giả sử Âm là bán điện ra lưới, Dương là mua từ lưới)
+                const gridDot = document.querySelector('.dot-grid');
+                if (data.Grid_Power < 0) {
+                    gridDot.style.animation = "moveFlowRev 2s linear infinite"; // Đẩy ra lưới
+                } else {
+                    gridDot.style.animation = "moveFlow 2s linear infinite"; // Hút từ lưới
+                }
+                
+                // Tắt chấm sáng mặt trời nếu không có nắng
+                const pvDot = document.querySelector('.dot-pv');
+                if(data.PV_Power <= 0) pvDot.style.display = "none";
+                else pvDot.style.display = "block";
+            }
+        });
+
+        // ================= LẮNG NGHE THỐNG KÊ NGÀY (DAILY) =================
+        database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if(data) {
+                // Cập nhật số to
+                document.getElementById('stat-pv-today').innerText = data.PV_Today.toFixed(1);
+                
+                // Thuật toán cập nhật Thanh tiến trình (Tiêu thụ)
+                // Tính % cho Mặt trời và Pin
+                let totalConsumed = data.Bat_Discharge_Today + data.PV_Today; // Tổng dùng (ví dụ đơn giản)
+                if(totalConsumed > 0) {
+                    let pctPV = (data.PV_Today / totalConsumed) * 100;
+                    let pctBat = (data.Bat_Discharge_Today / totalConsumed) * 100;
+                    
+                    // Kéo dài thanh màu tương ứng
+                    document.querySelector('.progress-bar-container .progress-pv').style.width = pctPV + "%";
+                    document.querySelector('.progress-bar-container .progress-batt').style.width = pctBat + "%";
+                }
+            }
+        });
+    </script>
 </body>
 </html>
