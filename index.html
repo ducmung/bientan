@@ -70,15 +70,15 @@
             mix-blend-mode: multiply; 
         }
 
-        /* ----- ĐỒNG HỒ 2 DÒNG TRÊN ĐỈNH BIẾN TẦN ----- */
+        /* ----- ĐỒNG HỒ 3 DÒNG THU GỌN CHIỀU NGANG ----- */
         #live-clock {
             position: absolute;
-            top: -42px; /* Đẩy hộp lên cao hơn để nhường chỗ cho 2 dòng text */
+            top: -55px; /* Đẩy lên cao hơn để nhường chỗ cho 3 dòng */
             display: flex;
             flex-direction: column;
             align-items: center;
             background: rgba(255,255,255,0.95); 
-            padding: 6px 15px;
+            padding: 5px 12px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             z-index: 20;
@@ -88,16 +88,23 @@
         .clock-time {
             font-size: 15px;
             font-weight: 900;
-            color: #d97706; /* Màu vàng đậm */
+            color: #d97706; 
             font-family: monospace; 
             letter-spacing: 1px;
+            margin-bottom: 2px;
         }
 
-        .clock-date {
+        .clock-date-solar {
             font-size: 10px;
-            color: #666;
+            color: #444;
             font-weight: 800;
-            margin-top: 3px;
+        }
+
+        .clock-date-lunar {
+            font-size: 10px;
+            color: #888;
+            font-weight: 700;
+            margin-top: 1px;
         }
 
         /* Chữ trạng thái nằm dưới biến tần */
@@ -213,9 +220,7 @@
 
             <div class="node node-center pos-inv">
                 <div id="live-clock">
-                    <div class="clock-time">--:--:--</div>
-                    <div class="clock-date">Đang tải ngày...</div>
-                </div>
+                    </div>
                 
                 <img src="png100-t3-scale100.png" alt="Inverter">
                 <div id="lbl-status">Đang tải...</div>
@@ -254,31 +259,32 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ================= XỬ LÝ ĐỒNG HỒ & LỊCH ÂM =================
+        // ================= XỬ LÝ ĐỒNG HỒ 3 DÒNG =================
         function updateClock() {
             const now = new Date();
             
-            // 1. Lấy Giờ
+            // 1. Giờ
             const timeString = now.toLocaleTimeString('vi-VN', { hour12: false });
             
-            // 2. Lấy Thứ và Ngày Dương Lịch
-            const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+            // 2. Dương lịch + Thứ
+            const days = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
             const dayOfWeek = days[now.getDay()];
             const solarDate = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
             
-            // 3. Lấy Ngày Âm Lịch (Dùng API tích hợp của trình duyệt)
+            // 3. Âm lịch
             let lunarString = "";
             try {
                 const lunarFormatter = new Intl.DateTimeFormat('vi-VN-u-ca-chinese', {day: 'numeric', month: 'numeric'});
-                lunarString = " - ÂL: " + lunarFormatter.format(now);
+                lunarString = "Âm lịch: " + lunarFormatter.format(now);
             } catch(e) {
-                // Trình duyệt cũ không hỗ trợ thì bỏ qua phần Âm lịch
+                lunarString = ""; // Trình duyệt không hỗ trợ thì ẩn đi
             }
 
-            // Cập nhật DOM
+            // Xuất HTML
             const clockHtml = `
                 <div class="clock-time">${timeString}</div>
-                <div class="clock-date">${dayOfWeek}, ${solarDate}${lunarString}</div>
+                <div class="clock-date-solar">${dayOfWeek}, ${solarDate}</div>
+                <div class="clock-date-lunar">${lunarString}</div>
             `;
             document.getElementById('live-clock').innerHTML = clockHtml;
         }
@@ -332,11 +338,11 @@
                 // CẬP NHẬT MÀU SẮC % PIN
                 let soc = data.Batt_SOC;
                 if (soc >= 60) {
-                    lblSoc.style.color = '#00cc66'; // Xanh lá
+                    lblSoc.style.color = '#00cc66'; 
                 } else if (soc >= 30) {
-                    lblSoc.style.color = '#ffaa00'; // Vàng
+                    lblSoc.style.color = '#ffaa00'; 
                 } else {
-                    lblSoc.style.color = '#ff4444'; // Đỏ
+                    lblSoc.style.color = '#ff4444'; 
                 }
 
                 // LOGIC CHẤM CHẠY
