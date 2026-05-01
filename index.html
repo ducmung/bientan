@@ -1,1 +1,191 @@
-<h1>Hello World</h1>.
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sosen Inverter Dashboard</title>
+    <style>
+        /* --- CÀI ĐẶT CHUNG --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #e0eafc, #cfdef3); /* Nền gradient xanh dương nhạt */
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        .dashboard {
+            width: 95%; max-width: 1200px; height: 90vh; background: rgba(255, 255, 255, 0.4);
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex; overflow: hidden; backdrop-filter: blur(10px);
+        }
+
+        /* --- BẢNG TRÁI (SƠ ĐỒ) --- */
+        .left-panel {
+            width: 60%; position: relative; padding: 20px; border-right: 2px solid rgba(255,255,255,0.6);
+        }
+        
+        /* Các khối thiết bị (Node) */
+        .node {
+            position: absolute; text-align: center; background: rgba(255, 255, 255, 0.8);
+            padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            width: 120px; z-index: 10;
+        }
+        .node h3 { font-size: 14px; color: #555; margin-bottom: 5px; }
+        .node .value { font-size: 20px; font-weight: bold; color: #111; }
+        .node .unit { font-size: 12px; color: #888; }
+        
+        /* Vị trí các thiết bị */
+        #node-pv { top: 10%; left: 10%; }
+        #node-grid { top: 10%; right: 10%; }
+        #node-batt { bottom: 10%; left: 10%; }
+        #node-load { bottom: 10%; right: 10%; }
+        #node-inverter {
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 160px; height: 120px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+
+        /* Vẽ các đường dây kết nối */
+        .line {
+            position: absolute; background: #b0c4de; z-index: 1;
+        }
+        .line-h { height: 4px; top: 50%; transform: translateY(-50%); }
+        .line-v { width: 4px; left: 50%; transform: translateX(-50%); }
+
+        /* Vị trí đường dây (Vẽ cơ bản nối vào trung tâm) */
+        #line-pv-inv { top: 18%; left: 15%; width: 35%; height: 4px; transform-origin: left; transform: rotate(35deg); }
+        #line-grid-inv { top: 18%; right: 15%; width: 35%; height: 4px; transform-origin: right; transform: rotate(-35deg); }
+        #line-batt-inv { bottom: 18%; left: 15%; width: 35%; height: 4px; transform-origin: left; transform: rotate(-35deg); }
+        #line-load-inv { bottom: 18%; right: 15%; width: 35%; height: 4px; transform-origin: right; transform: rotate(35deg); }
+
+        /* Chấm tròn chạy trên dây (Animation) */
+        .dot {
+            width: 12px; height: 12px; border-radius: 50%; position: absolute;
+            top: -4px; z-index: 5;
+        }
+        .dot-pv { background: #ffaa00; animation: moveFlow 2s linear infinite; }
+        .dot-grid { background: #ff4444; animation: moveFlowRev 2s linear infinite; } /* Đỏ: Bán/Mua lưới */
+        .dot-batt { background: #00cc66; animation: moveFlow 2s linear infinite; } /* Xanh lá: Pin */
+        .dot-load { background: #0088ff; animation: moveFlowRev 2s linear infinite; } /* Xanh dương: Tải */
+
+        @keyframes moveFlow {
+            0% { left: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
+        }
+        @keyframes moveFlowRev {
+            0% { left: 100%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 0%; opacity: 0; }
+        }
+
+        /* --- BẢNG PHẢI (THỐNG KÊ) --- */
+        .right-panel {
+            width: 40%; padding: 40px; display: flex; flex-direction: column; gap: 30px;
+        }
+        .stat-card { background: rgba(255,255,255,0.7); padding: 20px; border-radius: 15px; }
+        .stat-card h2 { font-size: 18px; color: #333; margin-bottom: 15px; display: flex; align-items: center; }
+        
+        .stat-main { display: flex; justify-content: space-between; align-items: baseline; }
+        .stat-main .big-number { font-size: 40px; font-weight: bold; color: #222; }
+        
+        .progress-bar-container {
+            width: 100%; height: 15px; background: #eee; border-radius: 10px; margin-top: 15px;
+            display: flex; overflow: hidden;
+        }
+        .progress-pv { background: #ffd700; width: 40%; }
+        .progress-batt { background: #00bfff; width: 59%; }
+        .progress-grid { background: #ff6347; width: 1%; }
+
+        .details-list { margin-top: 15px; font-size: 14px; color: #555; line-height: 1.8; }
+        .details-list span { float: right; font-weight: bold; color: #111; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        
+        <div class="left-panel">
+            
+            <div class="node" id="node-pv">
+                <h3>PV (Mặt trời)</h3>
+                <div class="value" id="val-pv">0.00</div>
+                <div class="unit">kW</div>
+            </div>
+
+            <div class="node" id="node-grid">
+                <h3>Lưới EVN</h3>
+                <div class="value" id="val-grid">0.00</div>
+                <div class="unit">kW</div>
+            </div>
+
+            <div class="node" id="node-inverter">
+                <h3>INVERTER</h3>
+                <div style="font-size: 12px; color: #888; margin-top: 10px;">
+                    Nhiệt độ: <span id="val-temp-inv">46.4</span>°C
+                </div>
+            </div>
+
+            <div class="node" id="node-batt">
+                <h3>Pin Lưu Trữ</h3>
+                <div class="value" id="val-batt">0.00</div>
+                <div class="unit">kW</div>
+                <div style="font-size: 12px; color: #00cc66; margin-top: 5px;">SOC: <span id="val-soc">0</span>%</div>
+            </div>
+
+            <div class="node" id="node-load">
+                <h3>Sử Dụng</h3>
+                <div class="value" id="val-load">0.00</div>
+                <div class="unit">kW</div>
+            </div>
+
+            <div class="line" id="line-pv-inv"><div class="dot dot-pv"></div></div>
+            <div class="line" id="line-grid-inv"><div class="dot dot-grid"></div></div>
+            <div class="line" id="line-batt-inv"><div class="dot dot-batt"></div></div>
+            <div class="line" id="line-load-inv"><div class="dot dot-load"></div></div>
+
+        </div>
+
+        <div class="right-panel">
+            
+            <div class="stat-card">
+                <h2>Sản xuất</h2>
+                <div class="stat-main">
+                    <span class="big-number" id="stat-pv-today">43.7</span>
+                    <span class="unit">kWh</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-pv"></div>
+                    <div class="progress-batt"></div>
+                    <div class="progress-grid"></div>
+                </div>
+                <div class="details-list">
+                    <div>🟡 Tự sử dụng <span>17.6 kWh</span></div>
+                    <div>🔵 Sạc Pin <span>26.0 kWh</span></div>
+                    <div>🔴 Đẩy lưới <span>0.1 kWh</span></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h2>Tiêu thụ</h2>
+                <div class="stat-main">
+                    <span class="big-number" id="stat-load-today">33.3</span>
+                    <span class="unit">kWh</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-pv" style="width: 53%;"></div>
+                    <div class="progress-batt" style="background: #32cd32; width: 46%;"></div>
+                </div>
+                <div class="details-list">
+                    <div>🟡 Mặt trời <span>17.6 kWh</span></div>
+                    <div>🟢 Xả pin <span>15.4 kWh</span></div>
+                    <div>🟣 Mua lưới <span>0.3 kWh</span></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
