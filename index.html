@@ -48,7 +48,7 @@
             z-index: 10;
         }
 
-        /* Khối Inverter ở giữa */
+        /* Khối Inverter ở giữa (Trong suốt, không khung) */
         .node-center { 
             width: 140px; 
             height: 140px; 
@@ -70,10 +70,10 @@
             mix-blend-mode: multiply; 
         }
 
-        /* ----- ĐỒNG HỒ 3 DÒNG THU GỌN CHIỀU NGANG ----- */
+        /* ----- ĐỒNG HỒ 3 DÒNG THU GỌN ----- */
         #live-clock {
             position: absolute;
-            top: -55px; /* Đẩy lên cao hơn để nhường chỗ cho 3 dòng */
+            top: -55px; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -236,7 +236,7 @@
                     <div>☀️ Sản lượng PV: <span id="stat-pv-today">0 kWh</span></div>
                     <div>🔋 Pin đã xả: <span id="stat-bat-dis">0 kWh</span></div>
                     <div>⚡ Pin đã sạc: <span id="stat-bat-chg">0 kWh</span></div>
-                    <div style="color: #d35400;">🏠 Tổng tiêu thụ: <span id="stat-load-total">0 kWh</span></div>
+                    <div style="color: #d35400;">🌐 E_Total (PV Trọn đời): <span id="stat-load-total">0 kWh</span></div>
                 </div>
             </div>
 
@@ -277,10 +277,9 @@
                 const lunarFormatter = new Intl.DateTimeFormat('vi-VN-u-ca-chinese', {day: 'numeric', month: 'numeric'});
                 lunarString = "Âm lịch: " + lunarFormatter.format(now);
             } catch(e) {
-                lunarString = ""; // Trình duyệt không hỗ trợ thì ẩn đi
+                lunarString = ""; 
             }
 
-            // Xuất HTML
             const clockHtml = `
                 <div class="clock-time">${timeString}</div>
                 <div class="clock-date-solar">${dayOfWeek}, ${solarDate}</div>
@@ -312,7 +311,17 @@
                 let pvInW = Math.round(data.PV_Power * 1000); 
                 let gridInW = Math.round(data.Grid_Power);    
                 let loadInW = Math.round(data.Load_Power);    
-                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); 
+                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); // Dương là xả, Âm là sạc
+
+                // ----- THUẬT TOÁN BÙ TRỪ TẢI THÔNG MINH -----
+                // PV + Lưới (mua là dương, bán là âm) + Pin (xả là dương, sạc là âm) = Tải thực tế
+                let calculatedLoad = pvInW + gridInW + battInW;
+                
+                // Nếu tải về 0 vô lý do lỗi đọc của Inverter, bù số tự tính vào
+                if (loadInW <= 0 && calculatedLoad > 10) {
+                    loadInW = calculatedLoad;
+                }
+                // ---------------------------------------------
 
                 document.getElementById('lbl-pv').innerText = pvInW;
                 document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
@@ -335,7 +344,7 @@
                     lblStatus.style.color = '#888'; 
                 }
 
-                // CẬP NHẬT MÀU SẮC % PIN
+                // CẬP NHẬT MÀU SẮC % PIN THEO MỨC DUNG LƯỢNG
                 let soc = data.Batt_SOC;
                 if (soc >= 60) {
                     lblSoc.style.color = '#00cc66'; 
@@ -345,18 +354,18 @@
                     lblSoc.style.color = '#ff4444'; 
                 }
 
-                // LOGIC CHẤM CHẠY
-                if(pvInW > 20) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
+                // LOGIC CHẤM CHẠY (Bỏ giới hạn 20W, chạy siêu nhạy)
+                if(pvInW > 0) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
                 else { dotPV.style.display = 'none'; }
 
-                if(loadInW > 20) { dotLoad.style.display = 'block'; dotLoad.style.animation = 'flowOutR 1.5s infinite linear'; } 
+                if(loadInW > 0) { dotLoad.style.display = 'block'; dotLoad.style.animation = 'flowOutR 1.5s infinite linear'; } 
                 else { dotLoad.style.display = 'none'; }
 
-                if (data.Batt_Current < -0.5) { 
+                if (data.Batt_Current < -0.1) { 
                     dotBatt.style.display = 'block';
                     dotBatt.style.background = '#ff4444'; 
                     dotBatt.style.animation = 'flowOutL 1.5s infinite linear';
-                } else if (data.Batt_Current > 0.5) { 
+                } else if (data.Batt_Current > 0.1) { 
                     dotBatt.style.display = 'block';
                     dotBatt.style.background = '#00cc66'; 
                     dotBatt.style.animation = 'flowInL 1.5s infinite linear';
@@ -364,11 +373,11 @@
                     dotBatt.style.display = 'none'; 
                 }
 
-                if (gridInW > 20) { 
+                if (gridInW > 0) { // Đang MUA
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#ff4444'; 
                     dotGrid.style.animation = 'flowInR 1.5s infinite linear';
-                } else if (gridInW < -20) { 
+                } else if (gridInW < 0) { // Đang BÁN
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#00cc66'; 
                     dotGrid.style.animation = 'flowOutR 1.5s infinite linear';
