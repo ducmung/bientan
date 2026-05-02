@@ -50,8 +50,9 @@
 
         /* Khối Inverter ở giữa (Trong suốt, không khung) */
         .node-center { 
-            width: 140px; 
-            height: 140px; 
+            /* ĐÃ CHỈNH SỬA: Giảm kích thước khung chứa ảnh trên điện thoại để hài hòa hơn */
+            width: 100px; 
+            height: 100px; 
             padding: 0px; 
             display: flex; 
             flex-direction: column; 
@@ -66,14 +67,16 @@
             width: 100%;
             height: 100%;
             object-fit: contain; 
-            transform: scale(1.15); 
+            /* ĐÃ CHỈNH SỬA: Giảm tỷ lệ phóng to ảnh để không che khuất luồng chạy */
+            transform: scale(1.1); 
             mix-blend-mode: multiply; 
         }
 
         /* ----- ĐỒNG HỒ 3 DÒNG THU GỌN ----- */
         #live-clock {
             position: absolute;
-            top: -85px; /* ĐÃ CHỈNH SỬA: Đẩy lên cao hơn nữa để không chạm đỉnh ảnh */
+            /* ĐÃ CHỈNH SỬA: Điều chỉnh vị trí top cho cân đối với kích thước ảnh mới */
+            top: -70px; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -110,7 +113,8 @@
         /* Chữ trạng thái nằm dưới biến tần */
         #lbl-status {
             position: absolute;
-            bottom: -70px; /* ĐÃ CHỈNH SỬA: Kéo xuống thấp hơn nữa để tránh phần chân ảnh */
+            /* ĐÃ CHỈNH SỬA: Điều chỉnh vị trí bottom cho cân đối với kích thước ảnh mới */
+            bottom: -55px; 
             font-size: 13px;
             font-weight: 800;
             background: rgba(255,255,255,0.9); 
