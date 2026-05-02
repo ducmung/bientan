@@ -36,7 +36,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* ĐÃ CHỈNH SỬA: Nới nhẹ chiều rộng thành 82px, chỉnh đệm dọc cho thoáng */
         .node {
             position: absolute;
             transform: translate(-50%, -50%); 
@@ -49,7 +48,6 @@
             z-index: 10;
         }
 
-        /* Khối Inverter ở giữa */
         .node-center { 
             width: 100px; 
             height: 100px; 
@@ -109,7 +107,6 @@
             text-shadow: 0px 1px 2px rgba(255,255,255,0.9);
         }
 
-        /* ĐÃ CHỈNH SỬA: Đẩy lên cao để không bị đè vào chấm đang chạy */
         #lbl-status {
             position: absolute;
             bottom: -35px; 
@@ -124,30 +121,32 @@
             z-index: 20;
         }
 
-        /* ĐÃ CHỈNH SỬA: Ép nhẹ khoảng cách chữ để 3 chữ "PIN LƯU TRỮ" đứng gọn 1 hàng */
         .node h3 { font-size: 9px; color: #666; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; }
         .node .val { font-size: 15px; font-weight: 900; color: #111; }
         .node .unit { font-size: 9px; color: #888; }
         .icon { font-size: 16px; margin-bottom: 2px; }
 
-        .pos-pv { top: 12%; left: 12%; }
-        .pos-grid { top: 12%; left: 88%; }
-        .pos-batt { top: 88%; left: 12%; }
-        .pos-load { top: 88%; left: 88%; }
+        /* ĐÃ CHỈNH SỬA: Lùi vào vị trí 16% và 84% để khối nằm trọn trong khung trắng mờ */
+        .pos-pv { top: 16%; left: 16%; }
+        .pos-grid { top: 16%; left: 84%; }
+        .pos-batt { top: 84%; left: 16%; }
+        .pos-load { top: 84%; left: 84%; }
         .pos-inv { top: 50%; left: 50%; }
 
         .line {
             position: absolute;
             height: 3px;
             background: #cbd5e1;
-            width: 53.74%; 
+            /* ĐÃ CHỈNH SỬA: Rút ngắn chiều dài đường dây cho khớp vị trí mới */
+            width: 48%; 
             z-index: 1;
         }
 
-        .line-pv { top: 12%; left: 12%; transform-origin: left center; transform: rotate(45deg); }
-        .line-grid { top: 12%; right: 12%; transform-origin: right center; transform: rotate(-45deg); }
-        .line-batt { top: 88%; left: 12%; transform-origin: left center; transform: rotate(-45deg); }
-        .line-load { top: 88%; right: 12%; transform-origin: right center; transform: rotate(45deg); }
+        /* ĐÃ CHỈNH SỬA: Tọa độ bắt đầu của dây cũng lùi vào theo khối */
+        .line-pv { top: 16%; left: 16%; transform-origin: left center; transform: rotate(45deg); }
+        .line-grid { top: 16%; right: 16%; transform-origin: right center; transform: rotate(-45deg); }
+        .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
+        .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
         .dot {
             position: absolute;
@@ -313,10 +312,9 @@
                 let gridInW = Math.round(data.Grid_Power);    
                 let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); 
 
-                // THUẬT TOÁN BẢO TOÀN NĂNG LƯỢNG (Khắc phục lỗi Tải sai của biến tần)
-                // Tải nhà = PV + Lưới + Pin
+                // THUẬT TOÁN BẢO TOÀN NĂNG LƯỢNG
                 let loadInW = pvInW + gridInW + battInW;
-                if (loadInW < 0) loadInW = 0; // Đảm bảo tải không bị âm
+                if (loadInW < 0) loadInW = 0; 
 
                 document.getElementById('lbl-pv').innerText = pvInW;
                 document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
@@ -349,7 +347,7 @@
                     lblSoc.style.color = '#ff4444'; 
                 }
 
-                // LOGIC CHẤM CHẠY (Siêu nhạy, >0W là chạy)
+                // LOGIC CHẤM CHẠY
                 if(pvInW > 0) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
                 else { dotPV.style.display = 'none'; }
 
@@ -382,13 +380,12 @@
             }
         });
 
-        // LẮNG NGHE DỮ LIỆU THỐNG KÊ NGÀY (DAILY ENERGY)
+        // LẮNG NGHE DỮ LIỆU THỐNG KÊ NGÀY
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
                 document.getElementById('stat-pv-today').innerText = data.PV_Today.toFixed(1) + ' kWh';
                 
-                // Cập nhật Lấy lưới hôm nay
                 let gridBuyToday = data.Grid_Buy_Today !== undefined ? data.Grid_Buy_Today : 0;
                 document.getElementById('stat-grid-buy').innerText = gridBuyToday.toFixed(1) + ' kWh';
 
