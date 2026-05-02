@@ -50,7 +50,6 @@
 
         /* Khối Inverter ở giữa (Trong suốt, không khung) */
         .node-center { 
-            /* ĐÃ CHỈNH SỬA: Giảm kích thước khung chứa ảnh trên điện thoại để hài hòa hơn */
             width: 100px; 
             height: 100px; 
             padding: 0px; 
@@ -67,54 +66,55 @@
             width: 100%;
             height: 100%;
             object-fit: contain; 
-            /* ĐÃ CHỈNH SỬA: Giảm tỷ lệ phóng to ảnh để không che khuất luồng chạy */
             transform: scale(1.1); 
             mix-blend-mode: multiply; 
         }
 
-        /* ----- ĐỒNG HỒ 3 DÒNG THU GỌN ----- */
+        /* ----- ĐỒNG HỒ 3 DÒNG KHÔNG KHUNG ----- */
         #live-clock {
             position: absolute;
-            /* ĐÃ CHỈNH SỬA: Điều chỉnh vị trí top cho cân đối với kích thước ảnh mới */
-            top: -70px; 
+            top: -85px; 
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(255,255,255,0.95); 
-            padding: 5px 12px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            /* ĐÃ CHỈNH SỬA: Xóa nền, xóa padding, xóa bóng mờ */
+            background: transparent; 
+            box-shadow: none;
+            padding: 0;
             z-index: 20;
             white-space: nowrap;
         }
 
         .clock-time {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 900;
             color: #d97706; 
             font-family: monospace; 
             letter-spacing: 1px;
             margin-bottom: 2px;
+            /* Thêm viền sáng nhẹ để chữ không bị chìm vào nền */
+            text-shadow: 0px 1px 3px rgba(255,255,255,0.9);
         }
 
         .clock-date-solar {
-            font-size: 10px;
-            color: #444;
-            font-weight: 800;
+            font-size: 11px;
+            color: #333;
+            font-weight: 900;
+            text-shadow: 0px 1px 2px rgba(255,255,255,0.9);
         }
 
         .clock-date-lunar {
-            font-size: 10px;
-            color: #888;
-            font-weight: 700;
+            font-size: 11px;
+            color: #555;
+            font-weight: 800;
             margin-top: 1px;
+            text-shadow: 0px 1px 2px rgba(255,255,255,0.9);
         }
 
         /* Chữ trạng thái nằm dưới biến tần */
         #lbl-status {
             position: absolute;
-            /* ĐÃ CHỈNH SỬA: Điều chỉnh vị trí bottom cho cân đối với kích thước ảnh mới */
-            bottom: -55px; 
+            bottom: -70px; 
             font-size: 13px;
             font-weight: 800;
             background: rgba(255,255,255,0.9); 
