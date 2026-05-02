@@ -36,19 +36,19 @@
             backdrop-filter: blur(10px);
         }
 
+        /* ĐÃ CHỈNH SỬA: Thu nhỏ 4 node và viền */
         .node {
             position: absolute;
             transform: translate(-50%, -50%); 
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 10px 5px;
+            border-radius: 12px;
+            padding: 8px 2px;
             text-align: center;
-            width: 85px;
+            width: 76px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             z-index: 10;
         }
 
-        /* Khối Inverter ở giữa (Trong suốt, không khung) */
         .node-center { 
             width: 100px; 
             height: 100px; 
@@ -70,14 +70,12 @@
             mix-blend-mode: multiply; 
         }
 
-        /* ----- ĐỒNG HỒ 3 DÒNG KHÔNG KHUNG ----- */
         #live-clock {
             position: absolute;
             top: -85px; 
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* ĐÃ CHỈNH SỬA: Xóa nền, xóa padding, xóa bóng mờ */
             background: transparent; 
             box-shadow: none;
             padding: 0;
@@ -92,7 +90,6 @@
             font-family: monospace; 
             letter-spacing: 1px;
             margin-bottom: 2px;
-            /* Thêm viền sáng nhẹ để chữ không bị chìm vào nền */
             text-shadow: 0px 1px 3px rgba(255,255,255,0.9);
         }
 
@@ -111,7 +108,6 @@
             text-shadow: 0px 1px 2px rgba(255,255,255,0.9);
         }
 
-        /* Chữ trạng thái nằm dưới biến tần */
         #lbl-status {
             position: absolute;
             bottom: -70px; 
@@ -126,29 +122,32 @@
             z-index: 20;
         }
 
-        .node h3 { font-size: 11px; color: #666; font-weight: 700; margin-bottom: 2px; }
-        .node .val { font-size: 16px; font-weight: 800; color: #111; }
-        .node .unit { font-size: 10px; color: #888; }
-        .icon { font-size: 20px; margin-bottom: 2px; }
+        /* ĐÃ CHỈNH SỬA: Giảm kích cỡ font trong khối */
+        .node h3 { font-size: 9px; color: #666; font-weight: 800; margin-bottom: 2px; }
+        .node .val { font-size: 15px; font-weight: 900; color: #111; }
+        .node .unit { font-size: 9px; color: #888; }
+        .icon { font-size: 16px; margin-bottom: 2px; }
 
-        .pos-pv { top: 20%; left: 20%; }
-        .pos-grid { top: 20%; left: 80%; }
-        .pos-batt { top: 80%; left: 20%; }
-        .pos-load { top: 80%; left: 80%; }
+        /* ĐÃ CHỈNH SỬA: Ép 4 khối ra sát góc 12% và 88% */
+        .pos-pv { top: 12%; left: 12%; }
+        .pos-grid { top: 12%; left: 88%; }
+        .pos-batt { top: 88%; left: 12%; }
+        .pos-load { top: 88%; left: 88%; }
         .pos-inv { top: 50%; left: 50%; }
 
+        /* ĐÃ CHỈNH SỬA: Kéo dài đường truyền để nối vào góc xa */
         .line {
             position: absolute;
             height: 3px;
             background: #cbd5e1;
-            width: 42.42%; 
+            width: 53.74%; 
             z-index: 1;
         }
 
-        .line-pv { top: 20%; left: 20%; transform-origin: left center; transform: rotate(45deg); }
-        .line-grid { top: 20%; right: 20%; transform-origin: right center; transform: rotate(-45deg); }
-        .line-batt { top: 80%; left: 20%; transform-origin: left center; transform: rotate(-45deg); }
-        .line-load { top: 80%; right: 20%; transform-origin: right center; transform: rotate(45deg); }
+        .line-pv { top: 12%; left: 12%; transform-origin: left center; transform: rotate(45deg); }
+        .line-grid { top: 12%; right: 12%; transform-origin: right center; transform: rotate(-45deg); }
+        .line-batt { top: 88%; left: 12%; transform-origin: left center; transform: rotate(-45deg); }
+        .line-load { top: 88%; right: 12%; transform-origin: right center; transform: rotate(45deg); }
 
         .dot {
             position: absolute;
@@ -212,7 +211,7 @@
                 <h3>PIN LƯU TRỮ</h3>
                 <div class="val" id="lbl-batt">0</div>
                 <div class="unit">W</div>
-                <div style="font-size: 24px; font-weight:900; margin-top: 5px; transition: color 0.5s;" id="lbl-soc">0%</div>
+                <div style="font-size: 18px; font-weight:900; margin-top: 3px; transition: color 0.5s;" id="lbl-soc">0%</div>
             </div>
 
             <div class="node pos-load">
@@ -312,12 +311,11 @@
             if(data) {
                 let pvInW = Math.round(data.PV_Power * 1000); 
                 let gridInW = Math.round(data.Grid_Power);    
-                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); // Dương là xả, Âm là sạc
+                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); 
 
-                // THUẬT TOÁN BẢO TOÀN NĂNG LƯỢNG (Khắc phục lỗi Tải sai của biến tần)
-                // Tải nhà = PV + Lưới + Pin
+                // THUẬT TOÁN BẢO TOÀN NĂNG LƯỢNG
                 let loadInW = pvInW + gridInW + battInW;
-                if (loadInW < 0) loadInW = 0; // Đảm bảo tải không bị âm
+                if (loadInW < 0) loadInW = 0; 
 
                 document.getElementById('lbl-pv').innerText = pvInW;
                 document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
@@ -350,7 +348,7 @@
                     lblSoc.style.color = '#ff4444'; 
                 }
 
-                // LOGIC CHẤM CHẠY (Siêu nhạy, >0W là chạy)
+                // LOGIC CHẤM CHẠY
                 if(pvInW > 0) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
                 else { dotPV.style.display = 'none'; }
 
@@ -369,11 +367,11 @@
                     dotBatt.style.display = 'none'; 
                 }
 
-                if (gridInW > 0) { // Đang mua điện lưới
+                if (gridInW > 0) { 
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#ff4444'; 
                     dotGrid.style.animation = 'flowInR 1.5s infinite linear';
-                } else if (gridInW < 0) { // Đang đẩy bán lưới
+                } else if (gridInW < 0) { 
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#00cc66'; 
                     dotGrid.style.animation = 'flowOutR 1.5s infinite linear';
@@ -383,13 +381,12 @@
             }
         });
 
-        // LẮNG NGHE DỮ LIỆU THỐNG KÊ NGÀY (DAILY ENERGY)
+        // LẮNG NGHE DỮ LIỆU THỐNG KÊ NGÀY
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
                 document.getElementById('stat-pv-today').innerText = data.PV_Today.toFixed(1) + ' kWh';
                 
-                // Cập nhật Lấy lưới hôm nay
                 let gridBuyToday = data.Grid_Buy_Today !== undefined ? data.Grid_Buy_Today : 0;
                 document.getElementById('stat-grid-buy').innerText = gridBuyToday.toFixed(1) + ' kWh';
 
