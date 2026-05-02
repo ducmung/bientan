@@ -263,15 +263,12 @@
         function updateClock() {
             const now = new Date();
             
-            // 1. Giờ
             const timeString = now.toLocaleTimeString('vi-VN', { hour12: false });
             
-            // 2. Dương lịch + Thứ
             const days = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
             const dayOfWeek = days[now.getDay()];
             const solarDate = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
             
-            // 3. Âm lịch
             let lunarString = "";
             try {
                 const lunarFormatter = new Intl.DateTimeFormat('vi-VN-u-ca-chinese', {day: 'numeric', month: 'numeric'});
@@ -310,18 +307,12 @@
             if(data) {
                 let pvInW = Math.round(data.PV_Power * 1000); 
                 let gridInW = Math.round(data.Grid_Power);    
-                let loadInW = Math.round(data.Load_Power);    
-                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); // Dương là xả, Âm là sạc
+                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); 
 
-                // ----- THUẬT TOÁN BÙ TRỪ TẢI THÔNG MINH -----
-                // PV + Lưới (mua là dương, bán là âm) + Pin (xả là dương, sạc là âm) = Tải thực tế
-                let calculatedLoad = pvInW + gridInW + battInW;
-                
-                // Nếu tải về 0 vô lý do lỗi đọc của Inverter, bù số tự tính vào
-                if (loadInW <= 0 && calculatedLoad > 10) {
-                    loadInW = calculatedLoad;
-                }
-                // ---------------------------------------------
+                // THUẬT TOÁN BẢO TOÀN NĂNG LƯỢNG (Khắc phục lỗi Tải sai)
+                // Tải nhà = PV + Lưới + Pin
+                let loadInW = pvInW + gridInW + battInW;
+                if (loadInW < 0) loadInW = 0; // Đảm bảo số không bị âm
 
                 document.getElementById('lbl-pv').innerText = pvInW;
                 document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
@@ -344,7 +335,7 @@
                     lblStatus.style.color = '#888'; 
                 }
 
-                // CẬP NHẬT MÀU SẮC % PIN THEO MỨC DUNG LƯỢNG
+                // CẬP NHẬT MÀU SẮC % PIN
                 let soc = data.Batt_SOC;
                 if (soc >= 60) {
                     lblSoc.style.color = '#00cc66'; 
@@ -354,7 +345,7 @@
                     lblSoc.style.color = '#ff4444'; 
                 }
 
-                // LOGIC CHẤM CHẠY (Bỏ giới hạn 20W, chạy siêu nhạy)
+                // LOGIC CHẤM CHẠY (Bỏ giới hạn nhiễu 20W)
                 if(pvInW > 0) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
                 else { dotPV.style.display = 'none'; }
 
@@ -373,11 +364,11 @@
                     dotBatt.style.display = 'none'; 
                 }
 
-                if (gridInW > 0) { // Đang MUA
+                if (gridInW > 0) { 
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#ff4444'; 
                     dotGrid.style.animation = 'flowInR 1.5s infinite linear';
-                } else if (gridInW < 0) { // Đang BÁN
+                } else if (gridInW < 0) { 
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#00cc66'; 
                     dotGrid.style.animation = 'flowOutR 1.5s infinite linear';
