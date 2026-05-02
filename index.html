@@ -234,6 +234,7 @@
                 </div>
                 <div class="list-detail">
                     <div>☀️ Sản lượng PV: <span id="stat-pv-today">0 kWh</span></div>
+                    <div>🗼 Lấy lưới hôm nay: <span id="stat-grid-buy">0 kWh</span></div>
                     <div>🔋 Pin đã xả: <span id="stat-bat-dis">0 kWh</span></div>
                     <div>⚡ Pin đã sạc: <span id="stat-bat-chg">0 kWh</span></div>
                     <div style="color: #d35400;">🌐 E_Total (PV Trọn đời): <span id="stat-load-total">0 kWh</span></div>
@@ -301,18 +302,18 @@
         const lblStatus = document.getElementById('lbl-status');
         const lblSoc = document.getElementById('lbl-soc'); 
 
-        // LẮNG NGHE DỮ LIỆU TỨC THỜI
+        // LẮNG NGHE DỮ LIỆU TỨC THỜI (LIVE)
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
                 let pvInW = Math.round(data.PV_Power * 1000); 
                 let gridInW = Math.round(data.Grid_Power);    
-                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); 
+                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); // Dương là xả, Âm là sạc
 
-                // THUẬT TOÁN BẢO TOÀN NĂNG LƯỢNG (Khắc phục lỗi Tải sai)
+                // THUẬT TOÁN BẢO TOÀN NĂNG LƯỢNG (Khắc phục lỗi Tải sai của biến tần)
                 // Tải nhà = PV + Lưới + Pin
                 let loadInW = pvInW + gridInW + battInW;
-                if (loadInW < 0) loadInW = 0; // Đảm bảo số không bị âm
+                if (loadInW < 0) loadInW = 0; // Đảm bảo tải không bị âm
 
                 document.getElementById('lbl-pv').innerText = pvInW;
                 document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
@@ -345,7 +346,7 @@
                     lblSoc.style.color = '#ff4444'; 
                 }
 
-                // LOGIC CHẤM CHẠY (Bỏ giới hạn nhiễu 20W)
+                // LOGIC CHẤM CHẠY (Siêu nhạy, >0W là chạy)
                 if(pvInW > 0) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
                 else { dotPV.style.display = 'none'; }
 
@@ -364,11 +365,11 @@
                     dotBatt.style.display = 'none'; 
                 }
 
-                if (gridInW > 0) { 
+                if (gridInW > 0) { // Đang mua điện lưới
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#ff4444'; 
                     dotGrid.style.animation = 'flowInR 1.5s infinite linear';
-                } else if (gridInW < 0) { 
+                } else if (gridInW < 0) { // Đang đẩy bán lưới
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#00cc66'; 
                     dotGrid.style.animation = 'flowOutR 1.5s infinite linear';
@@ -378,11 +379,16 @@
             }
         });
 
-        // LẮNG NGHE DỮ LIỆU THỐNG KÊ NGÀY
+        // LẮNG NGHE DỮ LIỆU THỐNG KÊ NGÀY (DAILY ENERGY)
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
                 document.getElementById('stat-pv-today').innerText = data.PV_Today.toFixed(1) + ' kWh';
+                
+                // Cập nhật Lấy lưới hôm nay
+                let gridBuyToday = data.Grid_Buy_Today !== undefined ? data.Grid_Buy_Today : 0;
+                document.getElementById('stat-grid-buy').innerText = gridBuyToday.toFixed(1) + ' kWh';
+
                 document.getElementById('stat-bat-dis').innerText = data.Bat_Discharge_Today.toFixed(1) + ' kWh';
                 document.getElementById('stat-bat-chg').innerText = data.Bat_Charge_Today.toFixed(1) + ' kWh';
                 
