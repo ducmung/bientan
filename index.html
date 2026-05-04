@@ -9,7 +9,13 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
         
         body {
-            background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%);
+            /* Cập nhật ảnh nền ở đây */
+            background-image: url('1279_High_Defination_(HDTV).jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            
             color: #333;
             min-height: 100vh;
             padding: 10px;
@@ -126,7 +132,6 @@
         .node .unit { font-size: 9px; color: #888; }
         .icon { font-size: 16px; margin-bottom: 2px; }
 
-        /* ĐÃ CHỈNH SỬA: Lùi vào vị trí 16% và 84% để khối nằm trọn trong khung trắng mờ */
         .pos-pv { top: 16%; left: 16%; }
         .pos-grid { top: 16%; left: 84%; }
         .pos-batt { top: 84%; left: 16%; }
@@ -137,12 +142,10 @@
             position: absolute;
             height: 3px;
             background: #cbd5e1;
-            /* ĐÃ CHỈNH SỬA: Rút ngắn chiều dài đường dây cho khớp vị trí mới */
             width: 48%; 
             z-index: 1;
         }
 
-        /* ĐÃ CHỈNH SỬA: Tọa độ bắt đầu của dây cũng lùi vào theo khối */
         .line-pv { top: 16%; left: 16%; transform-origin: left center; transform: rotate(45deg); }
         .line-grid { top: 16%; right: 16%; transform-origin: right center; transform: rotate(-45deg); }
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
