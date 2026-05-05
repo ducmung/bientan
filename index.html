@@ -73,14 +73,14 @@
             mix-blend-mode: multiply; 
         }
 
-        /* ================= WIDGET THỜI TIẾT ================= */
+        /* ================= WIDGET THỜI TIẾT DỮ LIỆU THỰC ================= */
         .weather-container {
             position: absolute;
             top: 14%; 
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
-            width: 145px; 
+            width: 145px; /* Trả lại kích thước nhỏ gọn 145px */
         }
 
         .weather-widget {
@@ -305,8 +305,8 @@
                 const curRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&lang=vi`);
                 const curData = await curRes.json();
 
-                // 2. Lấy dự báo cho biểu đồ
-                const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&cnt=5&lang=vi`);
+                // 2. Lấy dự báo (cnt=3 là đủ để lấy dữ liệu 6 giờ tới)
+                const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&cnt=3&lang=vi`);
                 const foreData = await foreRes.json();
 
                 if (curData.main && foreData.list) {
@@ -321,6 +321,22 @@
             }
         }
 
+        // Logic phân biệt biểu tượng thời tiết chính xác cả ngày/đêm
+        function getWeatherEmoji(iconCode) {
+            const map = {
+                '01d': '☀️', '01n': '🌙',
+                '02d': '⛅', '02n': '☁️',
+                '03d': '☁️', '03n': '☁️',
+                '04d': '☁️', '04n': '☁️',
+                '09d': '🌧️', '09n': '🌧️',
+                '10d': '🌦️', '10n': '🌧️',
+                '11d': '⛈️', '11n': '⛈️',
+                '13d': '❄️', '13n': '❄️',
+                '50d': '🌫️', '50n': '🌫️'
+            };
+            return map[iconCode] || '☁️';
+        }
+
         function updateWeatherUI(current, forecast) {
             document.getElementById('now-temp').innerText = Math.round(current.main.temp) + '°';
             document.getElementById('now-desc').innerText = current.weather[0].description.toUpperCase();
@@ -330,24 +346,53 @@
             const cols = container.querySelectorAll('.w-col');
             cols.forEach(c => c.remove());
 
+            // Tự động nội suy từ dữ liệu 3-giờ sang dữ liệu 1-giờ
+            let hourlyData = [];
+            for (let i = 0; i < forecast.length - 1; i++) {
+                let f1 = forecast[i];
+                let f2 = forecast[i+1];
+                let temp1 = f1.main.temp;
+                let temp2 = f2.main.temp;
+                
+                // Mốc ban đầu (vd: 15h)
+                hourlyData.push({ dt: f1.dt, temp: temp1, icon: f1.weather[0].icon });
+                // Mốc + 1 giờ (vd: 16h)
+                hourlyData.push({ dt: f1.dt + 3600, temp: temp1 + (temp2 - temp1) / 3, icon: f1.weather[0].icon });
+                // Mốc + 2 giờ (vd: 17h)
+                hourlyData.push({ dt: f1.dt + 7200, temp: temp1 + (temp2 - temp1) * 2 / 3, icon: f2.weather[0].icon });
+                
+                if (hourlyData.length >= 5) break;
+            }
+            // Chỉ lấy đúng 5 cột
+            hourlyData = hourlyData.slice(0, 5);
+
             let pathData = "";
             let dotsHtml = "";
-            const temps = forecast.map(f => f.main.temp);
+            const temps = hourlyData.map(f => f.temp);
             const minT = Math.min(...temps) - 2;
             const maxT = Math.max(...temps) + 2;
 
-            forecast.forEach((f, i) => {
+            hourlyData.forEach((f, i) => {
                 const time = new Date(f.dt * 1000).getHours() + ":00";
-                const icon = getWeatherEmoji(f.weather[0].main);
-                const temp = Math.round(f.main.temp);
+                
+                // Cố định icon ngày/đêm theo thời gian nội suy thực tế
+                let hour = new Date(f.dt * 1000).getHours();
+                let isNight = (hour >= 18 || hour < 6);
+                let fixIcon = f.icon;
+                if(isNight) fixIcon = fixIcon.replace('d', 'n');
+                else fixIcon = fixIcon.replace('n', 'd');
+
+                const icon = getWeatherEmoji(fixIcon);
+                const temp = Math.round(f.temp);
 
                 const col = document.createElement('div');
                 col.className = 'w-col';
                 col.innerHTML = `<span>${time}</span><span>${icon}</span><span>${temp}°</span>`;
                 container.appendChild(col);
 
+                // Biểu đồ cho 5 cột
                 const x = 10 + (i * 20);
-                const y = 18 - ((f.main.temp - minT) / (maxT - minT) * 14);
+                const y = 18 - ((f.temp - minT) / (maxT - minT) * 14);
                 
                 pathData += (i === 0 ? "M" : "L") + ` ${x} ${y}`;
                 dotsHtml += `<circle cx="${x}" cy="${y}" r="1.5" fill="#ff0000"/>`;
@@ -355,11 +400,6 @@
 
             document.getElementById('curve-path').setAttribute('d', pathData);
             document.getElementById('curve-dots').innerHTML = dotsHtml;
-        }
-
-        function getWeatherEmoji(main) {
-            const map = { 'Clear': '☀️', 'Clouds': '⛅', 'Rain': '🌧️', 'Drizzle': '🌦️', 'Thunderstorm': '⛈️', 'Snow': '❄️' };
-            return map[main] || '☁️';
         }
 
         setInterval(fetchWeather, 30 * 60 * 1000);
@@ -398,7 +438,7 @@
                 document.getElementById('stat-a').innerText = data.Batt_Current.toFixed(1) + ' A';
                 document.getElementById('bar-soc').style.width = data.Batt_SOC + '%';
 
-                // 2. KHÔI PHỤC MÀU SẮC CHỮ TRẠNG THÁI
+                // 2. LOGIC MÀU SẮC CHỮ TRẠNG THÁI
                 lblStatus.innerText = data.Batt_Status;
                 if (data.Batt_Status === "Đang Sạc") {
                     lblStatus.style.color = '#00cc66'; 
@@ -408,7 +448,7 @@
                     lblStatus.style.color = '#888'; 
                 }
 
-                // 3. KHÔI PHỤC MÀU SẮC % PIN
+                // 3. LOGIC MÀU SẮC % PIN
                 let soc = data.Batt_SOC;
                 if (soc >= 60) {
                     lblSoc.style.color = '#00cc66'; 
@@ -418,7 +458,7 @@
                     lblSoc.style.color = '#ff4444'; 
                 }
 
-                // 4. KHÔI PHỤC LOGIC CHẤM CHẠY (ANIMATION)
+                // 4. LOGIC CHẤM CHẠY (ANIMATION)
                 if(pvInW > 0) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
                 else { dotPV.style.display = 'none'; }
 
