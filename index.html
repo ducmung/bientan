@@ -73,7 +73,7 @@
             mix-blend-mode: multiply; 
         }
 
-        /* ================= WIDGET THỜI TIẾT DỮ LIỆU THỰC ================= */
+        /* ================= WIDGET THỜI TIẾT ================= */
         .weather-container {
             position: absolute;
             top: 14%; 
@@ -259,12 +259,12 @@
 
             <div class="node pos-pv"><div class="icon">☀️</div><h3>MẶT TRỜI</h3><div class="val" id="lbl-pv">0</div><div class="unit">W</div></div>
             <div class="node pos-grid"><div class="icon">🗼</div><h3>LƯỚI EVN</h3><div class="val" id="lbl-grid">0</div><div class="unit">W</div></div>
-            <div class="node pos-batt"><div class="icon">🔋</div><h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div><div style="font-size: 16px; font-weight:900; margin-top: 2px;" id="lbl-soc">0%</div></div>
+            <div class="node pos-batt"><div class="icon">🔋</div><h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div><div style="font-size: 16px; font-weight:900; margin-top: 2px; transition: color 0.5s;" id="lbl-soc">0%</div></div>
             <div class="node pos-load"><div class="icon">🏠</div><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
 
             <div class="node node-center pos-inv">
                 <img src="68.jpg" alt="Inverter">
-                <div id="lbl-status">Đang tải...</div>
+                <div id="lbl-status" style="transition: color 0.5s;">Đang tải...</div>
             </div>
         </div>
 
@@ -309,7 +309,6 @@
                 const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&cnt=5&lang=vi`);
                 const foreData = await foreRes.json();
 
-                // Kiểm tra xem dữ liệu có lấy được thành công hay không
                 if (curData.main && foreData.list) {
                     updateWeatherUI(curData, foreData.list);
                 } else {
@@ -328,7 +327,6 @@
             document.getElementById('now-hl').innerText = `↑ ${Math.round(current.main.temp_max)}° / ↓ ${Math.round(current.main.temp_min)}°`;
 
             const container = document.getElementById('forecast-cols');
-            // Xóa các cột cũ nhưng giữ lại SVG
             const cols = container.querySelectorAll('.w-col');
             cols.forEach(c => c.remove());
 
@@ -343,13 +341,11 @@
                 const icon = getWeatherEmoji(f.weather[0].main);
                 const temp = Math.round(f.main.temp);
 
-                // Tạo cột HTML
                 const col = document.createElement('div');
                 col.className = 'w-col';
                 col.innerHTML = `<span>${time}</span><span>${icon}</span><span>${temp}°</span>`;
                 container.appendChild(col);
 
-                // Tính toán tọa độ biểu đồ (Y từ 0 đến 20 trong SVG)
                 const x = 10 + (i * 20);
                 const y = 18 - ((f.main.temp - minT) / (maxT - minT) * 14);
                 
@@ -366,29 +362,92 @@
             return map[main] || '☁️';
         }
 
-        // Chạy cập nhật mỗi 30 phút
         setInterval(fetchWeather, 30 * 60 * 1000);
         fetchWeather();
 
-        // ================= KẾT NỐI FIREBASE =================
+        // ================= KẾT NỐI FIREBASE & ANIMATION =================
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        const dotPV = document.getElementById('dot-pv');
+        const dotGrid = document.getElementById('dot-grid');
+        const dotBatt = document.getElementById('dot-batt');
+        const dotLoad = document.getElementById('dot-load');
+        const lblStatus = document.getElementById('lbl-status');
+        const lblSoc = document.getElementById('lbl-soc'); 
+
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
-                let pv = Math.round(data.PV_Power * 1000), grid = Math.round(data.Grid_Power), batt = Math.round(data.Batt_Voltage * data.Batt_Current);
-                let load = Math.max(0, pv + grid + batt);
-                document.getElementById('lbl-pv').innerText = pv;
-                document.getElementById('lbl-grid').innerText = Math.abs(grid);
-                document.getElementById('lbl-load').innerText = load;
-                document.getElementById('lbl-batt').innerText = Math.abs(batt);
-                document.getElementById('lbl-soc').innerText = data.Batt_SOC + '%';
-                document.getElementById('bar-soc').style.width = data.Batt_SOC + '%';
+                let pvInW = Math.round(data.PV_Power * 1000); 
+                let gridInW = Math.round(data.Grid_Power);    
+                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); 
+
+                let loadInW = pvInW + gridInW + battInW;
+                if (loadInW < 0) loadInW = 0; 
+
+                // 1. Cập nhật Text
+                document.getElementById('lbl-pv').innerText = pvInW;
+                document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
+                document.getElementById('lbl-load').innerText = loadInW; 
+                document.getElementById('lbl-batt').innerText = Math.abs(battInW);
+                
+                lblSoc.innerText = data.Batt_SOC + '%';
                 document.getElementById('stat-v').innerText = data.Batt_Voltage.toFixed(1) + ' V';
                 document.getElementById('stat-a').innerText = data.Batt_Current.toFixed(1) + ' A';
-                document.getElementById('lbl-status').innerText = data.Batt_Status;
+                document.getElementById('bar-soc').style.width = data.Batt_SOC + '%';
+
+                // 2. KHÔI PHỤC MÀU SẮC CHỮ TRẠNG THÁI
+                lblStatus.innerText = data.Batt_Status;
+                if (data.Batt_Status === "Đang Sạc") {
+                    lblStatus.style.color = '#00cc66'; 
+                } else if (data.Batt_Status === "Đang Xả") {
+                    lblStatus.style.color = '#ff4444'; 
+                } else {
+                    lblStatus.style.color = '#888'; 
+                }
+
+                // 3. KHÔI PHỤC MÀU SẮC % PIN
+                let soc = data.Batt_SOC;
+                if (soc >= 60) {
+                    lblSoc.style.color = '#00cc66'; 
+                } else if (soc >= 30) {
+                    lblSoc.style.color = '#ffaa00'; 
+                } else {
+                    lblSoc.style.color = '#ff4444'; 
+                }
+
+                // 4. KHÔI PHỤC LOGIC CHẤM CHẠY (ANIMATION)
+                if(pvInW > 0) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
+                else { dotPV.style.display = 'none'; }
+
+                if(loadInW > 0) { dotLoad.style.display = 'block'; dotLoad.style.animation = 'flowOutR 1.5s infinite linear'; } 
+                else { dotLoad.style.display = 'none'; }
+
+                if (data.Batt_Current < -0.1) { 
+                    dotBatt.style.display = 'block';
+                    dotBatt.style.background = '#ff4444'; 
+                    dotBatt.style.animation = 'flowOutL 1.5s infinite linear';
+                } else if (data.Batt_Current > 0.1) { 
+                    dotBatt.style.display = 'block';
+                    dotBatt.style.background = '#00cc66'; 
+                    dotBatt.style.animation = 'flowInL 1.5s infinite linear';
+                } else {
+                    dotBatt.style.display = 'none'; 
+                }
+
+                if (gridInW > 0) { 
+                    dotGrid.style.display = 'block';
+                    dotGrid.style.background = '#ff4444'; 
+                    dotGrid.style.animation = 'flowInR 1.5s infinite linear';
+                } else if (gridInW < 0) { 
+                    dotGrid.style.display = 'block';
+                    dotGrid.style.background = '#00cc66'; 
+                    dotGrid.style.animation = 'flowOutR 1.5s infinite linear';
+                } else {
+                    dotGrid.style.display = 'none';
+                }
             }
         });
         
