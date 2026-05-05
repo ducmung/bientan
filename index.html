@@ -80,7 +80,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
-            width: 145px; /* Trả lại kích thước nhỏ gọn 145px */
+            width: 145px; 
         }
 
         .weather-widget {
@@ -305,8 +305,8 @@
                 const curRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&lang=vi`);
                 const curData = await curRes.json();
 
-                // 2. Lấy dự báo (cnt=3 là đủ để lấy dữ liệu 6 giờ tới)
-                const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&cnt=3&lang=vi`);
+                // 2. Lấy dự báo (cnt=5 để lấy 5 mốc, mỗi mốc cách nhau 3 giờ)
+                const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&cnt=5&lang=vi`);
                 const foreData = await foreRes.json();
 
                 if (curData.main && foreData.list) {
@@ -346,53 +346,33 @@
             const cols = container.querySelectorAll('.w-col');
             cols.forEach(c => c.remove());
 
-            // Tự động nội suy từ dữ liệu 3-giờ sang dữ liệu 1-giờ
-            let hourlyData = [];
-            for (let i = 0; i < forecast.length - 1; i++) {
-                let f1 = forecast[i];
-                let f2 = forecast[i+1];
-                let temp1 = f1.main.temp;
-                let temp2 = f2.main.temp;
-                
-                // Mốc ban đầu (vd: 15h)
-                hourlyData.push({ dt: f1.dt, temp: temp1, icon: f1.weather[0].icon });
-                // Mốc + 1 giờ (vd: 16h)
-                hourlyData.push({ dt: f1.dt + 3600, temp: temp1 + (temp2 - temp1) / 3, icon: f1.weather[0].icon });
-                // Mốc + 2 giờ (vd: 17h)
-                hourlyData.push({ dt: f1.dt + 7200, temp: temp1 + (temp2 - temp1) * 2 / 3, icon: f2.weather[0].icon });
-                
-                if (hourlyData.length >= 5) break;
-            }
-            // Chỉ lấy đúng 5 cột
-            hourlyData = hourlyData.slice(0, 5);
-
             let pathData = "";
             let dotsHtml = "";
-            const temps = hourlyData.map(f => f.temp);
+            const temps = forecast.map(f => f.main.temp);
             const minT = Math.min(...temps) - 2;
             const maxT = Math.max(...temps) + 2;
 
-            hourlyData.forEach((f, i) => {
+            forecast.forEach((f, i) => {
                 const time = new Date(f.dt * 1000).getHours() + ":00";
                 
-                // Cố định icon ngày/đêm theo thời gian nội suy thực tế
+                // Cố định icon ngày/đêm dựa theo giờ khu vực
                 let hour = new Date(f.dt * 1000).getHours();
                 let isNight = (hour >= 18 || hour < 6);
-                let fixIcon = f.icon;
+                let fixIcon = f.weather[0].icon;
                 if(isNight) fixIcon = fixIcon.replace('d', 'n');
                 else fixIcon = fixIcon.replace('n', 'd');
 
                 const icon = getWeatherEmoji(fixIcon);
-                const temp = Math.round(f.temp);
+                const temp = Math.round(f.main.temp);
 
                 const col = document.createElement('div');
                 col.className = 'w-col';
                 col.innerHTML = `<span>${time}</span><span>${icon}</span><span>${temp}°</span>`;
                 container.appendChild(col);
 
-                // Biểu đồ cho 5 cột
+                // Biểu đồ cho 5 cột (10, 30, 50, 70, 90)
                 const x = 10 + (i * 20);
-                const y = 18 - ((f.temp - minT) / (maxT - minT) * 14);
+                const y = 18 - ((f.main.temp - minT) / (maxT - minT) * 14);
                 
                 pathData += (i === 0 ? "M" : "L") + ` ${x} ${y}`;
                 dotsHtml += `<circle cx="${x}" cy="${y}" r="1.5" fill="#ff0000"/>`;
