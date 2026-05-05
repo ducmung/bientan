@@ -73,14 +73,14 @@
             mix-blend-mode: multiply; 
         }
 
-        /* ================= WIDGET THỜI TIẾT (THU GỌN LỌT GIỮA + CHỮ ĐỎ) ================= */
+        /* ================= WIDGET THỜI TIẾT (KÉO LÊN CAO) ================= */
         .weather-container {
             position: absolute;
-            top: 26%; /* Căn dịch xuống một chút để nằm giữa hàng trên và biến tần */
+            top: 14%; /* Đã đẩy lên cao ngang hàng với Mặt Trời và Lưới EVN */
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
-            width: 145px; /* Chiều ngang vừa đúng lọt thỏm giữa khoảng trống của Mặt Trời và EVN */
+            width: 145px; 
         }
 
         .weather-widget {
@@ -88,14 +88,14 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            color: #ff0000; /* Đổi tất cả sang màu đỏ */
+            color: #ff0000; 
         }
 
         .w-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 0, 0, 0.3); /* Viền ngăn cách màu đỏ mờ */
+            border-bottom: 1px solid rgba(255, 0, 0, 0.3); 
             padding-bottom: 3px;
             margin-bottom: 3px;
         }
@@ -104,7 +104,6 @@
             font-size: 24px; 
             font-weight: 900;
             line-height: 1;
-            /* Bóng đổ màu trắng để chữ đỏ không bị chìm vào nền */
             text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
         }
 
@@ -136,7 +135,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 8px; /* Cỡ chữ thu nhỏ cho gọn */
+            font-size: 8px; 
             font-weight: 800;
             z-index: 2;
             text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
