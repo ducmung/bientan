@@ -9,13 +9,11 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
         
         body {
-            /* Hình nền tổng của trang */
             background-image: url('1279_High_Defination_(HDTV).jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
-            
             color: #333;
             min-height: 100vh;
             padding: 10px;
@@ -75,49 +73,40 @@
             mix-blend-mode: multiply; 
         }
 
-        /* ================= WIDGET THỜI TIẾT & ĐỒNG HỒ ================= */
-        #live-clock {
+        /* ================= WIDGET THỜI TIẾT (KHÔNG KHUNG) ================= */
+        .weather-container {
             position: absolute;
-            top: -125px; /* Giảm độ đẩy lên trên để vừa vặn hơn với khối thời tiết nhỏ gọn */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: transparent; 
-            box-shadow: none;
-            padding: 0;
-            z-index: 20;
-            white-space: nowrap;
+            top: 22%; /* Nằm lọt giữa Mặt Trời và Lưới EVN */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 15;
+            width: 220px;
         }
 
-        /* Khối hiển thị hình thời tiết đã được thu gọn */
         .weather-widget {
-            background: linear-gradient(135deg, rgba(92, 177, 229, 0.9) 0%, rgba(65, 150, 201, 0.9) 100%);
-            border-radius: 14px;
-            padding: 8px 10px; /* Giảm lề trong */
-            margin-bottom: 6px;
-            width: 200px; /* Thu hẹp chiều rộng để không đè lên 2 khối 2 bên */
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.4);
+            /* Xóa background, box-shadow, viền để chữ nổi trực tiếp lên nền trời */
+            background: transparent;
+            padding: 0;
             display: flex;
             flex-direction: column;
             color: #fff;
-            backdrop-filter: blur(5px);
         }
 
         .w-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.4); /* Đường kẻ mờ ngăn cách */
             padding-bottom: 5px;
             margin-bottom: 5px;
         }
 
         .w-temp {
-            font-size: 26px; /* Chữ nhiệt độ nhỏ hơn một chút */
+            font-size: 28px; 
             font-weight: 900;
             line-height: 1;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            /* Đổ bóng đậm hơn chút để chữ trắng không chìm vào mây trắng */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
 
         .w-right { text-align: right; }
@@ -126,10 +115,14 @@
             font-size: 11px;
             font-weight: 800;
             margin-bottom: 2px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
 
-        .w-hl { font-size: 9px; opacity: 0.9; }
+        .w-hl { 
+            font-size: 9px; 
+            opacity: 0.9; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
 
         .w-chart-container {
             position: relative;
@@ -144,11 +137,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 9px; /* Thu nhỏ cỡ chữ giờ */
+            font-size: 9px; 
             z-index: 2;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
 
-        .w-col span:nth-child(2) { font-size: 12px; margin: 2px 0 10px 0; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .w-col span:nth-child(2) { font-size: 12px; margin: 2px 0 10px 0; text-shadow: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
         .w-col span:nth-child(3) { font-weight: 800; font-size: 10px; }
 
         .w-svg-curve {
@@ -156,26 +150,11 @@
             bottom: 20px; 
             left: 0;
             width: 100%;
-            height: 18px; /* Đường cong gọn hơn */
+            height: 18px; 
             z-index: 1;
             overflow: visible;
-        }
-
-        .clock-time {
-            font-size: 16px;
-            font-weight: 900;
-            color: #d97706; 
-            font-family: monospace; 
-            letter-spacing: 1px;
-            margin-bottom: 2px;
-            text-shadow: 0px 1px 3px rgba(255,255,255,0.9);
-        }
-
-        .clock-date-solar {
-            font-size: 11px;
-            color: #333;
-            font-weight: 900;
-            text-shadow: 0px 1px 2px rgba(255,255,255,0.9);
+            /* Đổ bóng cho đường cong biểu đồ */
+            filter: drop-shadow(0px 1px 2px rgba(0,0,0,0.4));
         }
 
         /* ================= CÁC THÀNH PHẦN KHÁC ================= */
@@ -255,6 +234,35 @@
 
     <div class="app-container">
         <div class="diagram-panel">
+            
+            <div class="weather-container">
+                <div class="weather-widget">
+                    <div class="w-top">
+                        <div class="w-temp">25°</div>
+                        <div class="w-right">
+                            <div class="w-desc">Một Phần Có Mây</div>
+                            <div class="w-hl">↑ 30° / ↓ 24°</div>
+                        </div>
+                    </div>
+                    <div class="w-chart-container">
+                        <div class="w-col"><span>09:00</span><span>☁️</span><span>26°</span></div>
+                        <div class="w-col"><span>10:00</span><span>⛅</span><span>27°</span></div>
+                        <div class="w-col"><span>11:00</span><span>⛅</span><span>28°</span></div>
+                        <div class="w-col"><span>12:00</span><span>☀️</span><span>28°</span></div>
+                        <div class="w-col"><span>13:00</span><span>☀️</span><span>29°</span></div>
+                        
+                        <svg class="w-svg-curve" viewBox="0 0 100 20" preserveAspectRatio="none">
+                             <path d="M 10 16 L 30 13 L 50 9 L 70 9 L 90 5" fill="none" stroke="#fde047" stroke-width="1.5"/>
+                             <circle cx="10" cy="16" r="1.5" fill="#fff"/>
+                             <circle cx="30" cy="13" r="1.5" fill="#fff"/>
+                             <circle cx="50" cy="9" r="1.5" fill="#fff"/>
+                             <circle cx="70" cy="9" r="1.5" fill="#fff"/>
+                             <circle cx="90" cy="5" r="1.5" fill="#fff"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
             <div class="line line-pv"><div class="dot" id="dot-pv" style="background: #ffaa00;"></div></div>
             <div class="line line-grid"><div class="dot" id="dot-grid"></div></div>
             <div class="line line-batt"><div class="dot" id="dot-batt"></div></div>
@@ -290,9 +298,6 @@
             </div>
 
             <div class="node node-center pos-inv">
-                <div id="live-clock">
-                    </div>
-                
                 <img src="68.jpg" alt="Inverter">
                 <div id="lbl-status">Đang tải...</div>
             </div>
@@ -331,48 +336,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ================= XỬ LÝ ĐỒNG HỒ & THỜI TIẾT =================
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('vi-VN', { hour12: false });
-            const days = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
-            const dayOfWeek = days[now.getDay()];
-            const solarDate = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            
-            const clockHtml = `
-                <div class="weather-widget">
-                    <div class="w-top">
-                        <div class="w-temp">25°</div>
-                        <div class="w-right">
-                            <div class="w-desc">Một Phần Có Mây</div>
-                            <div class="w-hl">↑ 30° / ↓ 24°</div>
-                        </div>
-                    </div>
-                    <div class="w-chart-container">
-                        <div class="w-col"><span>09:00</span><span>☁️</span><span>26°</span></div>
-                        <div class="w-col"><span>10:00</span><span>⛅</span><span>27°</span></div>
-                        <div class="w-col"><span>11:00</span><span>⛅</span><span>28°</span></div>
-                        <div class="w-col"><span>12:00</span><span>☀️</span><span>28°</span></div>
-                        <div class="w-col"><span>13:00</span><span>☀️</span><span>29°</span></div>
-                        
-                        <svg class="w-svg-curve" viewBox="0 0 100 20" preserveAspectRatio="none">
-                             <path d="M 10 16 L 30 13 L 50 9 L 70 9 L 90 5" fill="none" stroke="#fde047" stroke-width="1.5"/>
-                             <circle cx="10" cy="16" r="1.5" fill="#fff"/>
-                             <circle cx="30" cy="13" r="1.5" fill="#fff"/>
-                             <circle cx="50" cy="9" r="1.5" fill="#fff"/>
-                             <circle cx="70" cy="9" r="1.5" fill="#fff"/>
-                             <circle cx="90" cy="5" r="1.5" fill="#fff"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="clock-time">${timeString}</div>
-                <div class="clock-date-solar">${dayOfWeek}, ${solarDate}</div>
-            `;
-            document.getElementById('live-clock').innerHTML = clockHtml;
-        }
-        setInterval(updateClock, 1000); 
-        updateClock(); 
-
         // ================= KẾT NỐI FIREBASE =================
         const firebaseConfig = {
             databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app"
