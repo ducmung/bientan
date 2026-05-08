@@ -9,11 +9,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
         
         body {
-            background-image: url('1279_High_Defination_(HDTV).jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
+            background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%);
             color: #333;
             min-height: 100vh;
             padding: 10px;
@@ -73,91 +69,44 @@
             mix-blend-mode: multiply; 
         }
 
-        /* ================= WIDGET THỜI TIẾT DỮ LIỆU THỰC ================= */
-        .weather-container {
+        #live-clock {
             position: absolute;
-            top: 14%; 
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 15;
-            width: 145px; 
-        }
-
-        .weather-widget {
-            background: transparent;
-            padding: 0;
+            top: -75px; 
             display: flex;
             flex-direction: column;
-            color: #ff0000; 
-        }
-
-        .w-top {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 0, 0, 0.3); 
-            padding-bottom: 3px;
-            margin-bottom: 3px;
-        }
-
-        .w-temp {
-            font-size: 24px; 
-            font-weight: 900;
-            line-height: 1;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
-        }
-
-        .w-right { text-align: right; }
-        
-        .w-desc {
-            font-size: 9px;
-            font-weight: 900;
-            margin-bottom: 1px;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+            background: transparent; 
+            box-shadow: none;
+            padding: 0;
+            z-index: 20;
             white-space: nowrap;
         }
 
-        .w-hl { 
-            font-size: 8px; 
+        .clock-time {
+            font-size: 16px;
+            font-weight: 900;
+            color: #d97706; 
+            font-family: monospace; 
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+            text-shadow: 0px 1px 3px rgba(255,255,255,0.9);
+        }
+
+        .clock-date-solar {
+            font-size: 11px;
+            color: #333;
+            font-weight: 900;
+            text-shadow: 0px 1px 2px rgba(255,255,255,0.9);
+        }
+
+        .clock-date-lunar {
+            font-size: 11px;
+            color: #555;
             font-weight: 800;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+            margin-top: 1px;
+            text-shadow: 0px 1px 2px rgba(255,255,255,0.9);
         }
 
-        .w-chart-container {
-            position: relative;
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 2px;
-            padding-bottom: 2px;
-            min-height: 45px;
-        }
-
-        .w-col {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 8px; 
-            font-weight: 800;
-            z-index: 2;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
-        }
-
-        .w-col span:nth-child(2) { font-size: 11px; margin: 2px 0 8px 0; text-shadow: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3)); }
-        .w-col span:nth-child(3) { font-weight: 900; font-size: 9px; }
-
-        .w-svg-curve {
-            position: absolute;
-            bottom: 16px; 
-            left: 0;
-            width: 100%;
-            height: 16px; 
-            z-index: 1;
-            overflow: visible;
-            filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3));
-        }
-
-        /* ================= CÁC THÀNH PHẦN KHÁC ================= */
         #lbl-status {
             position: absolute;
             bottom: -35px; 
@@ -176,6 +125,53 @@
         .node .val { font-size: 15px; font-weight: 900; color: #111; }
         .node .unit { font-size: 9px; color: #888; }
         .icon { font-size: 16px; margin-bottom: 2px; }
+
+        /* ================= CSS VẼ QUẢ PIN ================= */
+        .battery-box {
+            width: 34px;
+            height: 16px;
+            border: 2px solid #555;
+            border-radius: 4px;
+            position: relative;
+            margin: 0 auto 5px auto;
+            background: #fff;
+            padding: 1px;
+        }
+        .battery-box::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: -4px;
+            width: 3px;
+            height: 7px;
+            background: #555;
+            border-radius: 0 2px 2px 0;
+        }
+        .battery-level {
+            height: 100%;
+            width: 0%;
+            border-radius: 1px;
+            transition: width 0.5s;
+        }
+
+        /* 3 HIỆU ỨNG NHẤP NHÁY (Nháy màu + Phát sáng) */
+        @keyframes flash-red {
+            0%, 100% { background-color: #ff4444; box-shadow: 0 0 5px #ff4444; }
+            50% { background-color: #ffcccc; box-shadow: none; }
+        }
+        @keyframes flash-yellow {
+            0%, 100% { background-color: #ffaa00; box-shadow: 0 0 5px #ffaa00; }
+            50% { background-color: #ffeeb3; box-shadow: none; }
+        }
+        @keyframes flash-green {
+            0%, 100% { background-color: #00cc66; box-shadow: 0 0 5px #00cc66; }
+            50% { background-color: #b3ffd9; box-shadow: none; }
+        }
+        
+        .blink-red { animation: flash-red 1.2s infinite; }
+        .blink-yellow { animation: flash-yellow 1.2s infinite; }
+        .blink-green { animation: flash-green 1.2s infinite; }
+        /* ================================================= */
 
         .pos-pv { top: 16%; left: 16%; }
         .pos-grid { top: 16%; left: 84%; }
@@ -209,6 +205,7 @@
         @keyframes flowInR { 0% { right: 0%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
         @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { right: 0%; opacity: 0; } }
 
+        /* ================= KHUNG THỐNG KÊ ================= */
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
         .stat-card { background: rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -233,44 +230,56 @@
 
     <div class="app-container">
         <div class="diagram-panel">
-            
-            <div class="weather-container">
-                <div class="weather-widget">
-                    <div class="w-top">
-                        <div class="w-temp" id="now-temp">--°</div>
-                        <div class="w-right">
-                            <div class="w-desc" id="now-desc">Đang tải...</div>
-                            <div class="w-hl" id="now-hl">↑ --° / ↓ --°</div>
-                        </div>
-                    </div>
-                    <div class="w-chart-container" id="forecast-cols">
-                        <svg class="w-svg-curve" viewBox="0 0 100 20" preserveAspectRatio="none">
-                             <path id="curve-path" d="" fill="none" stroke="#fde047" stroke-width="1.5"/>
-                             <g id="curve-dots"></g>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
             <div class="line line-pv"><div class="dot" id="dot-pv" style="background: #ffaa00;"></div></div>
             <div class="line line-grid"><div class="dot" id="dot-grid"></div></div>
             <div class="line line-batt"><div class="dot" id="dot-batt"></div></div>
             <div class="line line-load"><div class="dot" id="dot-load" style="background: #0088ff;"></div></div>
 
-            <div class="node pos-pv"><div class="icon">☀️</div><h3>MẶT TRỜI</h3><div class="val" id="lbl-pv">0</div><div class="unit">W</div></div>
-            <div class="node pos-grid"><div class="icon">🗼</div><h3>LƯỚI EVN</h3><div class="val" id="lbl-grid">0</div><div class="unit">W</div></div>
-            <div class="node pos-batt"><div class="icon">🔋</div><h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div><div style="font-size: 16px; font-weight:900; margin-top: 2px; transition: color 0.5s;" id="lbl-soc">0%</div></div>
-            <div class="node pos-load"><div class="icon">🏠</div><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
+            <div class="node pos-pv">
+                <div class="icon">☀️</div>
+                <h3>MẶT TRỜI</h3>
+                <div class="val" id="lbl-pv">0</div>
+                <div class="unit">W</div>
+            </div>
+
+            <div class="node pos-grid">
+                <div class="icon">🗼</div>
+                <h3>LƯỚI EVN</h3>
+                <div class="val" id="lbl-grid">0</div>
+                <div class="unit">W</div>
+            </div>
+
+            <div class="node pos-batt">
+                <div class="battery-box">
+                    <div class="battery-level" id="batt-level"></div>
+                </div>
+                <h3>PIN LƯU TRỮ</h3>
+                <div class="val" id="lbl-batt">0</div>
+                <div class="unit">W</div>
+                <div style="font-size: 16px; font-weight:900; margin-top: 2px; transition: color 0.5s;" id="lbl-soc">0%</div>
+            </div>
+
+            <div class="node pos-load">
+                <div class="icon">🏠</div>
+                <h3>TIÊU THỤ</h3>
+                <div class="val" id="lbl-load">0</div> 
+                <div class="unit">W</div>
+            </div>
 
             <div class="node node-center pos-inv">
+                <div id="live-clock">
+                </div>
+                
                 <img src="68.jpg" alt="Inverter">
-                <div id="lbl-status" style="transition: color 0.5s;">Đang tải...</div>
+                <div id="lbl-status">Đang tải...</div>
             </div>
         </div>
 
         <div class="stats-panel">
             <div class="stat-card">
-                <div class="stat-header"><h2>📊 THỐNG KÊ HÔM NAY</h2></div>
+                <div class="stat-header">
+                    <h2>📊 THỐNG KÊ HÔM NAY</h2>
+                </div>
                 <div class="list-detail">
                     <div>☀️ Sản lượng PV: <span id="stat-pv-today">0 kWh</span></div>
                     <div>🗼 Lấy lưới hôm nay: <span id="stat-grid-buy">0 kWh</span></div>
@@ -279,9 +288,14 @@
                     <div style="color: #d35400;">🌐 E_Total (PV Trọn đời): <span id="stat-load-total">0 kWh</span></div>
                 </div>
             </div>
+
             <div class="stat-card">
-                <div class="stat-header"><h2>Dung lượng Pin & Áp</h2></div>
-                <div class="progress-bar"><div class="bar-batt" id="bar-soc"></div></div>
+                <div class="stat-header">
+                    <h2>Dung lượng Pin & Áp</h2>
+                </div>
+                <div class="progress-bar">
+                    <div class="bar-batt" id="bar-soc"></div>
+                </div>
                 <div class="list-detail">
                     <div>Điện áp Pin: <span id="stat-v">0 V</span></div>
                     <div>Dòng điện: <span id="stat-a">0 A</span></div>
@@ -294,99 +308,36 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ================= XỬ LÝ THỜI TIẾT TỰ ĐỘNG =================
-        const API_KEY = "55aad83cd5e765d6cf3439de1040eb4f"; 
-        const LAT = 21.127; // Hoàn Sơn, Tiên Du
-        const LON = 106.023;
-
-        async function fetchWeather() {
+        // ================= XỬ LÝ ĐỒNG HỒ 3 DÒNG =================
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('vi-VN', { hour12: false });
+            const days = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+            const dayOfWeek = days[now.getDay()];
+            const solarDate = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            
+            let lunarString = "";
             try {
-                // 1. Lấy thời tiết hiện tại
-                const curRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&lang=vi`);
-                const curData = await curRes.json();
-
-                // 2. Lấy dự báo (cnt=5 để lấy 5 mốc, mỗi mốc cách nhau 3 giờ)
-                const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&cnt=5&lang=vi`);
-                const foreData = await foreRes.json();
-
-                if (curData.main && foreData.list) {
-                    updateWeatherUI(curData, foreData.list);
-                } else {
-                    console.error("Lỗi API Thời tiết:", curData.message || foreData.message);
-                    document.getElementById('now-desc').innerText = "Lỗi Key/API";
-                }
-            } catch (e) { 
-                console.error("Lỗi kết nối thời tiết:", e); 
-                document.getElementById('now-desc').innerText = "Lỗi Kết Nối";
+                const lunarFormatter = new Intl.DateTimeFormat('vi-VN-u-ca-chinese', {day: 'numeric', month: 'numeric'});
+                lunarString = "Âm lịch: " + lunarFormatter.format(now);
+            } catch(e) {
+                lunarString = ""; 
             }
+
+            const clockHtml = `
+                <div class="clock-time">${timeString}</div>
+                <div class="clock-date-solar">${dayOfWeek}, ${solarDate}</div>
+                <div class="clock-date-lunar">${lunarString}</div>
+            `;
+            document.getElementById('live-clock').innerHTML = clockHtml;
         }
+        setInterval(updateClock, 1000); 
+        updateClock(); 
 
-        // Logic phân biệt biểu tượng thời tiết chính xác cả ngày/đêm
-        function getWeatherEmoji(iconCode) {
-            const map = {
-                '01d': '☀️', '01n': '🌙',
-                '02d': '⛅', '02n': '☁️',
-                '03d': '☁️', '03n': '☁️',
-                '04d': '☁️', '04n': '☁️',
-                '09d': '🌧️', '09n': '🌧️',
-                '10d': '🌦️', '10n': '🌧️',
-                '11d': '⛈️', '11n': '⛈️',
-                '13d': '❄️', '13n': '❄️',
-                '50d': '🌫️', '50n': '🌫️'
-            };
-            return map[iconCode] || '☁️';
-        }
-
-        function updateWeatherUI(current, forecast) {
-            document.getElementById('now-temp').innerText = Math.round(current.main.temp) + '°';
-            document.getElementById('now-desc').innerText = current.weather[0].description.toUpperCase();
-            document.getElementById('now-hl').innerText = `↑ ${Math.round(current.main.temp_max)}° / ↓ ${Math.round(current.main.temp_min)}°`;
-
-            const container = document.getElementById('forecast-cols');
-            const cols = container.querySelectorAll('.w-col');
-            cols.forEach(c => c.remove());
-
-            let pathData = "";
-            let dotsHtml = "";
-            const temps = forecast.map(f => f.main.temp);
-            const minT = Math.min(...temps) - 2;
-            const maxT = Math.max(...temps) + 2;
-
-            forecast.forEach((f, i) => {
-                const time = new Date(f.dt * 1000).getHours() + ":00";
-                
-                // Cố định icon ngày/đêm dựa theo giờ khu vực
-                let hour = new Date(f.dt * 1000).getHours();
-                let isNight = (hour >= 18 || hour < 6);
-                let fixIcon = f.weather[0].icon;
-                if(isNight) fixIcon = fixIcon.replace('d', 'n');
-                else fixIcon = fixIcon.replace('n', 'd');
-
-                const icon = getWeatherEmoji(fixIcon);
-                const temp = Math.round(f.main.temp);
-
-                const col = document.createElement('div');
-                col.className = 'w-col';
-                col.innerHTML = `<span>${time}</span><span>${icon}</span><span>${temp}°</span>`;
-                container.appendChild(col);
-
-                // Biểu đồ cho 5 cột (10, 30, 50, 70, 90)
-                const x = 10 + (i * 20);
-                const y = 18 - ((f.main.temp - minT) / (maxT - minT) * 14);
-                
-                pathData += (i === 0 ? "M" : "L") + ` ${x} ${y}`;
-                dotsHtml += `<circle cx="${x}" cy="${y}" r="1.5" fill="#ff0000"/>`;
-            });
-
-            document.getElementById('curve-path').setAttribute('d', pathData);
-            document.getElementById('curve-dots').innerHTML = dotsHtml;
-        }
-
-        setInterval(fetchWeather, 30 * 60 * 1000);
-        fetchWeather();
-
-        // ================= KẾT NỐI FIREBASE & ANIMATION =================
-        const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        // ================= KẾT NỐI FIREBASE =================
+        const firebaseConfig = {
+            databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
@@ -396,7 +347,9 @@
         const dotLoad = document.getElementById('dot-load');
         const lblStatus = document.getElementById('lbl-status');
         const lblSoc = document.getElementById('lbl-soc'); 
+        const battLevel = document.getElementById('batt-level'); // Gọi lõi pin
 
+        // LẮNG NGHE DỮ LIỆU TỨC THỜI (LIVE)
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
@@ -404,21 +357,27 @@
                 let gridInW = Math.round(data.Grid_Power);    
                 let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); 
 
+                // THUẬT TOÁN BẢO TOÀN NĂNG LƯỢNG
                 let loadInW = pvInW + gridInW + battInW;
                 if (loadInW < 0) loadInW = 0; 
 
-                // 1. Cập nhật Text
                 document.getElementById('lbl-pv').innerText = pvInW;
                 document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
                 document.getElementById('lbl-load').innerText = loadInW; 
                 document.getElementById('lbl-batt').innerText = Math.abs(battInW);
                 
-                lblSoc.innerText = data.Batt_SOC + '%';
+                // Lấy % Pin
+                let soc = data.Batt_SOC;
+                lblSoc.innerText = soc + '%';
+                
+                // Chiều dài lõi pin thay đổi theo %
+                battLevel.style.width = soc + '%';
+
                 document.getElementById('stat-v').innerText = data.Batt_Voltage.toFixed(1) + ' V';
                 document.getElementById('stat-a').innerText = data.Batt_Current.toFixed(1) + ' A';
-                document.getElementById('bar-soc').style.width = data.Batt_SOC + '%';
+                document.getElementById('bar-soc').style.width = soc + '%';
 
-                // 2. LOGIC MÀU SẮC CHỮ TRẠNG THÁI
+                // CẬP NHẬT CHỮ TRẠNG THÁI
                 lblStatus.innerText = data.Batt_Status;
                 if (data.Batt_Status === "Đang Sạc") {
                     lblStatus.style.color = '#00cc66'; 
@@ -428,17 +387,32 @@
                     lblStatus.style.color = '#888'; 
                 }
 
-                // 3. LOGIC MÀU SẮC % PIN
-                let soc = data.Batt_SOC;
-                if (soc >= 60) {
-                    lblSoc.style.color = '#00cc66'; 
-                } else if (soc >= 30) {
-                    lblSoc.style.color = '#ffaa00'; 
-                } else {
+                // Xóa hiệu ứng nháy cũ trước khi gán hiệu ứng mới
+                battLevel.classList.remove('blink-red', 'blink-yellow', 'blink-green');
+
+                // CHIA 5 MỨC NHÁY MÀU & ĐỔI MÀU CHỮ SỐ
+                if (soc >= 0 && soc <= 20) {
+                    battLevel.classList.add('blink-red');
                     lblSoc.style.color = '#ff4444'; 
+                } 
+                else if (soc >= 21 && soc <= 40) {
+                    battLevel.classList.add('blink-yellow');
+                    lblSoc.style.color = '#ffaa00'; 
+                } 
+                else if (soc >= 41 && soc <= 60) {
+                    battLevel.classList.add('blink-green');
+                    lblSoc.style.color = '#00cc66'; 
+                } 
+                else if (soc >= 61 && soc <= 80) {
+                    battLevel.classList.add('blink-green');
+                    lblSoc.style.color = '#00cc66'; 
+                } 
+                else if (soc >= 81 && soc <= 100) {
+                    battLevel.classList.add('blink-green');
+                    lblSoc.style.color = '#00cc66'; 
                 }
 
-                // 4. LOGIC CHẤM CHẠY (ANIMATION)
+                // LOGIC CHẤM CHẠY
                 if(pvInW > 0) { dotPV.style.display = 'block'; dotPV.style.animation = 'flowInL 1.5s infinite linear'; } 
                 else { dotPV.style.display = 'none'; }
 
@@ -457,11 +431,11 @@
                     dotBatt.style.display = 'none'; 
                 }
 
-                if (gridInW > 0) { 
+                if (gridInW > 0) { // Đang mua điện lưới
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#ff4444'; 
                     dotGrid.style.animation = 'flowInR 1.5s infinite linear';
-                } else if (gridInW < 0) { 
+                } else if (gridInW < 0) { // Đang đẩy bán lưới
                     dotGrid.style.display = 'block';
                     dotGrid.style.background = '#00cc66'; 
                     dotGrid.style.animation = 'flowOutR 1.5s infinite linear';
@@ -470,15 +444,21 @@
                 }
             }
         });
-        
+
+        // LẮNG NGHE DỮ LIỆU THỐNG KÊ NGÀY
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
                 document.getElementById('stat-pv-today').innerText = data.PV_Today.toFixed(1) + ' kWh';
-                document.getElementById('stat-grid-buy').innerText = (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh';
+                
+                let gridBuyToday = data.Grid_Buy_Today !== undefined ? data.Grid_Buy_Today : 0;
+                document.getElementById('stat-grid-buy').innerText = gridBuyToday.toFixed(1) + ' kWh';
+
                 document.getElementById('stat-bat-dis').innerText = data.Bat_Discharge_Today.toFixed(1) + ' kWh';
                 document.getElementById('stat-bat-chg').innerText = data.Bat_Charge_Today.toFixed(1) + ' kWh';
-                document.getElementById('stat-load-total').innerText = (data.Load_Total || 0).toFixed(1) + ' kWh';
+                
+                let loadTotal = data.Load_Total !== undefined ? data.Load_Total : 0;
+                document.getElementById('stat-load-total').innerText = loadTotal.toFixed(1) + ' kWh';
             }
         });
     </script>
