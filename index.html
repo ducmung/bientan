@@ -50,30 +50,32 @@
             border-radius: 12px;
             padding: 10px 4px;
             text-align: center;
-            width: 86px; /* Đã đưa kích thước về chuẩn gọn gàng */
+            width: 86px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             z-index: 10;
         }
 
+        /* ĐÃ CHỈNH SỬA BIẾN TẦN NẰM GỌN VÀ CHE KHUNG PHÍA SAU */
         .node-center { 
-            width: 100px; 
-            height: 100px; 
+            width: 110px; 
+            height: 120px; 
             padding: 0px; 
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            background: transparent; 
-            box-shadow: none; border: none;
+            background: #fff; /* Thêm nền trắng đục để che đường dây */
+            border-radius: 12px; /* Bo góc đồng bộ */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            border: 1px solid rgba(255,255,255,0.6);
             z-index: 15;
+            overflow: hidden; /* Cắt ảnh thừa ra ngoài khung */
         }
         
         .node-center img {
             width: 100%;
             height: 100%;
-            object-fit: contain; 
-            transform: scale(1.1); 
-            mix-blend-mode: multiply; 
+            object-fit: cover; /* Đảm bảo hình ảnh lấp đầy khung */
         }
 
         /* ================= HIỆU ỨNG MẶT TRỜI (THU GỌN) ================= */
@@ -176,7 +178,7 @@
 
         .line {
             position: absolute; 
-            height: 10px; /* Tăng chiều cao vùng chứa để bóng đổ không bị cắt */
+            height: 10px; 
             margin-top: -3.5px;
             background: transparent; 
             width: 48%; z-index: 1;
@@ -190,39 +192,35 @@
         /* ================= HIỆU ỨNG LUỒNG CHẠY NHƯ VIDEO (TRACK & DASHES) ================= */
         .flow-group {
             display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;
-            overflow: hidden; /* Cắt các vệt sáng khi chạy tới đầu/cuối dây */
+            overflow: hidden; 
             --c: #fff; 
         }
 
-        /* 1. Đường ray mờ làm nền */
         .flow-track {
             position: absolute;
             top: 50%; left: 0;
             transform: translateY(-50%);
             width: 100%; height: 1px;
-            background: rgba(255, 255, 255, 0.3); /* Đường kẻ mờ tĩnh */
+            background: rgba(255, 255, 255, 0.3); 
         }
 
-        /* 2. Các vệt sáng chuyển động (Capsules) */
         .flow-dash {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 18px; /* Chiều dài vệt sáng */
-            height: 3px; /* Độ dày */
+            width: 18px; 
+            height: 3px; 
             border-radius: 3px;
             background: var(--c);
-            box-shadow: 0 0 6px 1px var(--c); /* Hào quang sáng xung quanh */
+            box-shadow: 0 0 6px 1px var(--c); 
             opacity: 0; 
         }
 
-        /* Điều phối 4 vệt sáng nối đuôi nhau */
         .flow-dash:nth-child(2) { animation-delay: 0s; }
         .flow-dash:nth-child(3) { animation-delay: 0.75s; }
         .flow-dash:nth-child(4) { animation-delay: 1.5s; }
         .flow-dash:nth-child(5) { animation-delay: 2.25s; }
 
-        /* Animation định hướng (Trái/Phải) */
         @keyframes flowInL { 0% { left: -20%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
         @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: -20%; opacity: 0; } }
         @keyframes flowInR { 0% { right: -20%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
@@ -444,7 +442,6 @@
                 progress = 0; 
             }
 
-            // Tọa độ mới cho viewBox 80 40
             const P0 = {x: 10, y: 35};
             const P1 = {x: 40, y: -5};
             const P2 = {x: 70, y: 35};
@@ -463,14 +460,12 @@
         setInterval(updateSunArc, 60000); 
         fetchWeather();
 
-        // ================= HÀM KÍCH HOẠT DÒNG CHẢY NHƯ VIDEO =================
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId);
             if (isActive) {
                 group.style.display = 'block';
                 group.style.setProperty('--c', color);
                 
-                // Animation 3 giây chậm rãi, liền mạch
                 const dashes = group.querySelectorAll('.flow-dash');
                 dashes.forEach((d) => {
                     d.style.animationName = animName;
@@ -483,7 +478,6 @@
             }
         }
 
-        // ================= KẾT NỐI FIREBASE & LOGIC =================
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -535,7 +529,6 @@
                     else if (soc > lowerBound && soc <= upperBound) seg.classList.add('blink-' + colorTheme); 
                 }
 
-                // Kích hoạt các dòng năng lượng
                 if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00');
                 else setFlow('flow-pv', false);
 
