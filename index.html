@@ -34,21 +34,24 @@
             max-width: 500px;
             margin: 0 auto;
             aspect-ratio: 1 / 1; 
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.4);
             border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.4);
         }
 
         .node {
             position: absolute;
             transform: translate(-50%, -50%); 
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255,255,255,0.6);
+            backdrop-filter: blur(8px);
             border-radius: 12px;
             padding: 10px 4px;
             text-align: center;
-            width: 82px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 86px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             z-index: 10;
         }
 
@@ -61,7 +64,7 @@
             justify-content: center; 
             align-items: center; 
             background: transparent; 
-            box-shadow: none; 
+            box-shadow: none; border: none;
             z-index: 15;
         }
         
@@ -73,18 +76,36 @@
             mix-blend-mode: multiply; 
         }
 
-        /* ================= ĐỒNG HỒ CẬP NHẬT DATA (BỎ NỀN, KHUNG, CHỈNH CAO LÊN) ================= */
+        /* ================= HIỆU ỨNG MẶT TRỜI QUỸ ĐẠO ================= */
+        .sun-arc-mini {
+            position: relative;
+            width: 100%;
+            height: 40px;
+            margin-bottom: 2px;
+        }
+        .sun-arc-mini svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+        #moving-sun {
+            position: absolute;
+            font-size: 14px;
+            transform: translate(-50%, -50%);
+            text-shadow: 0 0 10px #ffaa00;
+            transition: all 1s ease-out;
+            left: 15%; top: 100%; /* Vị trí chờ ban đầu */
+        }
+
+        /* ================= ĐỒNG HỒ CẬP NHẬT DATA ================= */
         #update-clock {
             position: absolute;
-            top: -35px; /* Đẩy cao lên để cân đối (cũ là -20px) */
+            top: -35px; 
             font-size: 11px;
             font-weight: 900;
             color: #0088ff; 
             font-family: monospace;
-            background: transparent; /* Bỏ nền trắng */
-            padding: 0; /* Bỏ padding */
-            border-radius: 0; /* Bỏ bo góc */
-            box-shadow: none; /* Bỏ bóng đổ */
+            background: transparent;
             z-index: 25;
             letter-spacing: 1px;
             white-space: nowrap;
@@ -100,79 +121,17 @@
             width: 145px; 
         }
 
-        .weather-widget {
-            background: transparent;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            color: #ff0000; 
-        }
-
-        .w-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 0, 0, 0.3); 
-            padding-bottom: 3px;
-            margin-bottom: 3px;
-        }
-
-        .w-temp {
-            font-size: 24px; 
-            font-weight: 900;
-            line-height: 1;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
-        }
-
+        .weather-widget { background: transparent; padding: 0; display: flex; flex-direction: column; color: #ff0000; }
+        .w-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 0, 0, 0.3); padding-bottom: 3px; margin-bottom: 3px; }
+        .w-temp { font-size: 24px; font-weight: 900; line-height: 1; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9); }
         .w-right { text-align: right; }
-        
-        .w-desc {
-            font-size: 9px;
-            font-weight: 900;
-            margin-bottom: 1px;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
-            white-space: nowrap;
-        }
-
-        .w-hl { 
-            font-size: 8px; 
-            font-weight: 800;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
-        }
-
-        .w-chart-container {
-            position: relative;
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 2px;
-            padding-bottom: 2px;
-            min-height: 45px;
-        }
-
-        .w-col {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 8px; 
-            font-weight: 800;
-            z-index: 2;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
-        }
-
+        .w-desc { font-size: 9px; font-weight: 900; margin-bottom: 1px; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9); white-space: nowrap; }
+        .w-hl { font-size: 8px; font-weight: 800; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9); }
+        .w-chart-container { position: relative; display: flex; justify-content: space-between; width: 100%; margin-top: 2px; padding-bottom: 2px; min-height: 45px; }
+        .w-col { display: flex; flex-direction: column; align-items: center; font-size: 8px; font-weight: 800; z-index: 2; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9); }
         .w-col span:nth-child(2) { font-size: 11px; margin: 2px 0 8px 0; text-shadow: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3)); }
         .w-col span:nth-child(3) { font-weight: 900; font-size: 9px; }
-
-        .w-svg-curve {
-            position: absolute;
-            bottom: 16px; 
-            left: 0;
-            width: 100%;
-            height: 16px; 
-            z-index: 1;
-            overflow: visible;
-            filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3));
-        }
+        .w-svg-curve { position: absolute; bottom: 16px; left: 0; width: 100%; height: 16px; z-index: 1; overflow: visible; filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3)); }
 
         #lbl-status {
             position: absolute;
@@ -195,58 +154,29 @@
 
         /* ================= CSS VẼ QUẢ PIN 5 VẠCH ================= */
         .battery-box {
-            width: 38px;
-            height: 18px;
-            border: 2px solid #555;
-            border-radius: 4px;
-            position: relative;
-            margin: 0 auto 5px auto;
-            background: #fff;
-            padding: 1px;
-            display: flex;
-            gap: 1px; 
+            width: 38px; height: 18px; border: 2px solid #555; border-radius: 4px; position: relative;
+            margin: 0 auto 5px auto; background: #fff; padding: 1px; display: flex; gap: 1px; 
         }
-        .battery-box::after {
-            content: '';
-            position: absolute;
-            top: 3px;
-            right: -4px;
-            width: 3px;
-            height: 8px;
-            background: #555;
-            border-radius: 0 2px 2px 0;
-        }
-        .batt-seg {
-            flex: 1;
-            border-radius: 1px;
-            background: transparent; 
-        }
+        .battery-box::after { content: ''; position: absolute; top: 3px; right: -4px; width: 3px; height: 8px; background: #555; border-radius: 0 2px 2px 0; }
+        .batt-seg { flex: 1; border-radius: 1px; background: transparent; }
 
-        .solid-red { background-color: #ff4444; }
-        .solid-yellow { background-color: #ffaa00; }
-        .solid-green { background-color: #00cc66; }
-
+        .solid-red { background-color: #ff4444; } .solid-yellow { background-color: #ffaa00; } .solid-green { background-color: #00cc66; }
         @keyframes flash-red { 0%, 100% { background-color: #ff4444; box-shadow: 0 0 4px #ff4444; } 50% { background-color: transparent; box-shadow: none; } }
         @keyframes flash-yellow { 0%, 100% { background-color: #ffaa00; box-shadow: 0 0 4px #ffaa00; } 50% { background-color: transparent; box-shadow: none; } }
         @keyframes flash-green { 0%, 100% { background-color: #00cc66; box-shadow: 0 0 4px #00cc66; } 50% { background-color: transparent; box-shadow: none; } }
         
-        .blink-red { animation: flash-red 1.2s infinite; }
-        .blink-yellow { animation: flash-yellow 1.2s infinite; }
-        .blink-green { animation: flash-green 1.2s infinite; }
+        .blink-red { animation: flash-red 1.2s infinite; } .blink-yellow { animation: flash-yellow 1.2s infinite; } .blink-green { animation: flash-green 1.2s infinite; }
 
         /* ================= VỊ TRÍ & ĐƯỜNG DÂY ================= */
-        .pos-pv { top: 16%; left: 16%; }
+        .pos-pv { top: 16%; left: 16%; width: 120px; } /* Mở rộng nút PV để chứa quỹ đạo */
         .pos-grid { top: 16%; left: 84%; }
         .pos-batt { top: 84%; left: 16%; }
         .pos-load { top: 84%; left: 84%; }
         .pos-inv { top: 50%; left: 50%; }
 
         .line {
-            position: absolute;
-            height: 3px;
-            background: #cbd5e1;
-            width: 48%; 
-            z-index: 1;
+            position: absolute; height: 3px; background: rgba(203, 213, 225, 0.6); /* Dây mờ hơn một chút */
+            width: 48%; z-index: 1;
         }
 
         .line-pv { top: 16%; left: 16%; transform-origin: left center; transform: rotate(45deg); }
@@ -254,41 +184,38 @@
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* ================= ANIMATION 3 CHẤM CHẠY ================= */
+        /* ================= ANIMATION NĂNG LƯỢNG PLASMA ================= */
         .flow-group {
-            display: none;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0; left: 0;
+            display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;
         }
         .flow-group .dot {
             position: absolute;
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            top: -2.5px;
+            width: 16px; height: 4px; /* Dài ra tạo hiệu ứng vệt sáng */
+            border-radius: 2px;
+            top: -0.5px;
             opacity: 0; 
         }
+        /* Độ trễ để 3 tia sáng rượt đuổi nhau */
         .flow-group .d1 { animation-delay: 0s; }
-        .flow-group .d2 { animation-delay: 0.5s; }
-        .flow-group .d3 { animation-delay: 1.0s; }
+        .flow-group .d2 { animation-delay: 0.4s; }
+        .flow-group .d3 { animation-delay: 0.8s; }
 
-        @keyframes flowInL { 0% { left: 0%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
-        @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 0%; opacity: 0; } }
-        @keyframes flowInR { 0% { right: 0%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
-        @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { right: 0%; opacity: 0; } }
+        @keyframes flowInL { 0% { left: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+        @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 0%; opacity: 0; } }
+        @keyframes flowInR { 0% { right: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
+        @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { right: 0%; opacity: 0; } }
 
         /* ================= KHUNG THỐNG KÊ ================= */
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
-        .stat-card { background: rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .stat-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .stat-header h2 { font-size: 16px; color: #444; }
 
-        .progress-bar { width: 100%; height: 12px; background: #eee; border-radius: 10px; display: flex; overflow: hidden; margin-bottom: 15px; }
-        .bar-batt { background: #00cc66; width: 0%; transition: width 1s; }
+        .progress-bar { width: 100%; height: 12px; background: rgba(0,0,0,0.05); border-radius: 10px; display: flex; overflow: hidden; margin-bottom: 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .bar-batt { background: linear-gradient(90deg, #00cc66, #33ff99); width: 0%; transition: width 1s; }
 
         .list-detail { font-size: 13px; color: #555; }
-        .list-detail div { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #ddd; padding-bottom: 4px;}
+        .list-detail div { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;}
         .list-detail div:last-child { border: none; }
         .list-detail span { font-weight: 800; color: #111; }
 
@@ -335,7 +262,18 @@
                 <div class="flow-group" id="flow-load"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
             </div>
 
-            <div class="node pos-pv"><div class="icon">☀️</div><h3>MẶT TRỜI</h3><div class="val" id="lbl-pv">0</div><div class="unit">W</div></div>
+            <div class="node pos-pv">
+                <div class="sun-arc-mini">
+                    <svg viewBox="0 0 100 40">
+                         <path d="M 15 35 Q 50 -10 85 35" fill="none" stroke="#ffaa00" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.6"/>
+                    </svg>
+                    <div id="moving-sun">☀️</div>
+                </div>
+                <h3>MẶT TRỜI</h3>
+                <div class="val" id="lbl-pv">0</div>
+                <div class="unit">W</div>
+            </div>
+
             <div class="node pos-grid"><div class="icon">🗼</div><h3>LƯỚI EVN</h3><div class="val" id="lbl-grid">0</div><div class="unit">W</div></div>
             
             <div class="node pos-batt">
@@ -356,7 +294,6 @@
 
             <div class="node node-center pos-inv">
                 <div id="update-clock">--:--:--</div>
-                
                 <img src="68.jpg" alt="Inverter">
                 <div id="lbl-status" style="transition: color 0.5s;">Đang tải...</div>
             </div>
@@ -388,10 +325,13 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ================= XỬ LÝ THỜI TIẾT TỰ ĐỘNG =================
+        // ================= XỬ LÝ THỜI TIẾT TỰ ĐỘNG & MẶT TRỜI =================
         const API_KEY = "55aad83cd5e765d6cf3439de1040eb4f"; 
         const LAT = 21.127; 
         const LON = 106.023;
+
+        let globalSunrise = 0;
+        let globalSunset = 0;
 
         async function fetchWeather() {
             try {
@@ -403,26 +343,21 @@
 
                 if (curData.main && foreData.list) {
                     updateWeatherUI(curData, foreData.list);
-                } else {
-                    console.error("Lỗi API Thời tiết:", curData.message || foreData.message);
-                    document.getElementById('now-desc').innerText = "Lỗi Key/API";
+                    
+                    // Lưu lại giờ mọc/lặn từ API để vẽ quỹ đạo mặt trời
+                    globalSunrise = curData.sys.sunrise;
+                    globalSunset = curData.sys.sunset;
+                    updateSunArc();
                 }
-            } catch (e) { 
-                console.error("Lỗi kết nối thời tiết:", e); 
-                document.getElementById('now-desc').innerText = "Lỗi Kết Nối";
-            }
+            } catch (e) { console.error("Lỗi kết nối thời tiết:", e); }
         }
 
         function getWeatherEmoji(iconCode) {
             const map = {
-                '01d': '☀️', '01n': '🌙',
-                '02d': '⛅', '02n': '☁️',
-                '03d': '☁️', '03n': '☁️',
-                '04d': '☁️', '04n': '☁️',
-                '09d': '🌧️', '09n': '🌧️',
-                '10d': '🌦️', '10n': '🌧️',
-                '11d': '⛈️', '11n': '⛈️',
-                '13d': '❄️', '13n': '❄️',
+                '01d': '☀️', '01n': '🌙', '02d': '⛅', '02n': '☁️',
+                '03d': '☁️', '03n': '☁️', '04d': '☁️', '04n': '☁️',
+                '09d': '🌧️', '09n': '🌧️', '10d': '🌦️', '10n': '🌧️',
+                '11d': '⛈️', '11n': '⛈️', '13d': '❄️', '13n': '❄️',
                 '50d': '🌫️', '50n': '🌫️'
             };
             return map[iconCode] || '☁️';
@@ -434,35 +369,26 @@
             document.getElementById('now-hl').innerText = `↑ ${Math.round(current.main.temp_max)}° / ↓ ${Math.round(current.main.temp_min)}°`;
 
             const container = document.getElementById('forecast-cols');
-            const cols = container.querySelectorAll('.w-col');
-            cols.forEach(c => c.remove());
+            container.querySelectorAll('.w-col').forEach(c => c.remove());
 
-            let pathData = "";
-            let dotsHtml = "";
+            let pathData = "", dotsHtml = "";
             const temps = forecast.map(f => f.main.temp);
             const minT = Math.min(...temps) - 2;
             const maxT = Math.max(...temps) + 2;
 
             forecast.forEach((f, i) => {
                 const time = new Date(f.dt * 1000).getHours() + ":00";
-                
-                let hour = new Date(f.dt * 1000).getHours();
-                let isNight = (hour >= 18 || hour < 6);
+                let isNight = (new Date(f.dt * 1000).getHours() >= 18 || new Date(f.dt * 1000).getHours() < 6);
                 let fixIcon = f.weather[0].icon;
-                if(isNight) fixIcon = fixIcon.replace('d', 'n');
-                else fixIcon = fixIcon.replace('n', 'd');
-
-                const icon = getWeatherEmoji(fixIcon);
-                const temp = Math.round(f.main.temp);
+                fixIcon = isNight ? fixIcon.replace('d', 'n') : fixIcon.replace('n', 'd');
 
                 const col = document.createElement('div');
                 col.className = 'w-col';
-                col.innerHTML = `<span>${time}</span><span>${icon}</span><span>${temp}°</span>`;
+                col.innerHTML = `<span>${time}</span><span>${getWeatherEmoji(fixIcon)}</span><span>${Math.round(f.main.temp)}°</span>`;
                 container.appendChild(col);
 
                 const x = 10 + (i * 20);
                 const y = 18 - ((f.main.temp - minT) / (maxT - minT) * 14);
-                
                 pathData += (i === 0 ? "M" : "L") + ` ${x} ${y}`;
                 dotsHtml += `<circle cx="${x}" cy="${y}" r="1.5" fill="#ff0000"/>`;
             });
@@ -471,18 +397,50 @@
             document.getElementById('curve-dots').innerHTML = dotsHtml;
         }
 
-        setInterval(fetchWeather, 30 * 60 * 1000);
+        // --- HÀM TÍNH TOÁN QUỸ ĐẠO MẶT TRỜI ---
+        function updateSunArc() {
+            if (!globalSunrise || !globalSunset) return;
+            const nowUnix = Math.floor(Date.now() / 1000);
+            let progress = 0;
+            
+            if (nowUnix > globalSunrise && nowUnix < globalSunset) {
+                progress = (nowUnix - globalSunrise) / (globalSunset - globalSunrise);
+            } else if (nowUnix >= globalSunset) {
+                progress = 1; // Mặt trời lặn hẳn
+            } else {
+                progress = 0; // Chưa mọc
+            }
+
+            // Đường cong Bezier tương ứng với viewBox 0 0 100 40
+            const P0 = {x: 15, y: 35};
+            const P1 = {x: 50, y: -10};
+            const P2 = {x: 85, y: 35};
+            
+            const t = progress;
+            const x = Math.pow(1-t, 2)*P0.x + 2*(1-t)*t*P1.x + Math.pow(t, 2)*P2.x;
+            const y = Math.pow(1-t, 2)*P0.y + 2*(1-t)*t*P1.y + Math.pow(t, 2)*P2.y;
+
+            const sun = document.getElementById('moving-sun');
+            sun.style.left = x + '%'; 
+            sun.style.top = (y / 40 * 100) + '%';
+            sun.style.opacity = (progress <= 0 || progress >= 1) ? "0.3" : "1"; // Mờ đi nếu đã lặn
+        }
+
+        setInterval(fetchWeather, 30 * 60 * 1000); // API 30p/lần
+        setInterval(updateSunArc, 60000); // Cập nhật vị trí mặt trời 1p/lần
         fetchWeather();
 
-        // ================= HÀM KÍCH HOẠT 3 CHẤM CHẠY =================
+        // ================= HÀM KÍCH HOẠT NĂNG LƯỢNG PLASMA =================
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId);
             if (isActive) {
                 group.style.display = 'block';
                 group.querySelectorAll('.dot').forEach(d => {
                     d.style.background = color;
+                    // Tạo hiệu ứng tỏa sáng bằng box-shadow theo màu
+                    d.style.boxShadow = `0 0 8px 2px ${color}`; 
                     d.style.animationName = animName;
-                    d.style.animationDuration = '1.5s';
+                    d.style.animationDuration = '1.6s';
                     d.style.animationIterationCount = 'infinite';
                     d.style.animationTimingFunction = 'linear';
                 });
@@ -502,21 +460,16 @@
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
-                
-                // --- CẬP NHẬT ĐỒNG HỒ "NHỊP TIM" MỖI KHI CÓ DATA MỚI ---
+                // Nhịp tim đồng hồ
                 const now = new Date();
-                const timeString = now.toLocaleTimeString('vi-VN', { hour12: false });
-                document.getElementById('update-clock').innerText = timeString;
-                // -----------------------------------------------------
+                document.getElementById('update-clock').innerText = now.toLocaleTimeString('vi-VN', { hour12: false });
 
                 let pvInW = Math.round(data.PV_Power * 1000); 
                 let gridInW = Math.round(data.Grid_Power);    
                 let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); 
-
                 let loadInW = pvInW + gridInW + battInW;
                 if (loadInW < 0) loadInW = 0; 
 
-                // 1. Cập nhật Số Liệu
                 document.getElementById('lbl-pv').innerText = pvInW;
                 document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
                 document.getElementById('lbl-load').innerText = loadInW; 
@@ -524,26 +477,18 @@
                 
                 let soc = data.Batt_SOC;
                 lblSoc.innerText = soc + '%';
-                
                 document.getElementById('stat-v').innerText = data.Batt_Voltage.toFixed(1) + ' V';
                 document.getElementById('stat-a').innerText = data.Batt_Current.toFixed(1) + ' A';
                 document.getElementById('bar-soc').style.width = soc + '%';
 
-                // 2. MÀU SẮC CHỮ TRẠNG THÁI BIẾN TẦN
                 lblStatus.innerText = data.Batt_Status;
-                if (data.Batt_Status === "Đang Sạc") {
-                    lblStatus.style.color = '#00cc66'; 
-                } else if (data.Batt_Status === "Đang Xả") {
-                    lblStatus.style.color = '#ff4444'; 
-                } else {
-                    lblStatus.style.color = '#888'; 
-                }
+                if (data.Batt_Status === "Đang Sạc") lblStatus.style.color = '#00cc66'; 
+                else if (data.Batt_Status === "Đang Xả") lblStatus.style.color = '#ff4444'; 
+                else lblStatus.style.color = '#888'; 
 
-                // 3. MÀU SẮC & NHẤP NHÁY QUẢ PIN (5 VẠCH)
                 let colorTheme = 'green';
                 if (soc <= 20) colorTheme = 'red';
                 else if (soc <= 40) colorTheme = 'yellow';
-                
                 lblSoc.style.color = (colorTheme === 'red') ? '#ff4444' : (colorTheme === 'yellow') ? '#ffaa00' : '#00cc66';
 
                 for (let i = 0; i < 5; i++) {
@@ -552,37 +497,25 @@
                     let lowerBound = i * 20;
                     let upperBound = (i + 1) * 20;
 
-                    if (soc == 0 && i == 0) {
-                        seg.classList.add('blink-red'); 
-                    } else if (soc > upperBound || (soc == 100 && i == 4)) {
-                        seg.classList.add('solid-' + colorTheme); 
-                    } else if (soc > lowerBound && soc <= upperBound) {
-                        seg.classList.add('blink-' + colorTheme); 
-                    }
+                    if (soc == 0 && i == 0) seg.classList.add('blink-red'); 
+                    else if (soc > upperBound || (soc == 100 && i == 4)) seg.classList.add('solid-' + colorTheme); 
+                    else if (soc > lowerBound && soc <= upperBound) seg.classList.add('blink-' + colorTheme); 
                 }
 
-                // 4. KÍCH HOẠT HIỆU ỨNG 3 CHẤM CHẠY
+                // Chạy Plasma ánh sáng
                 if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00');
                 else setFlow('flow-pv', false);
 
                 if(loadInW > 0) setFlow('flow-load', true, 'flowOutR', '#0088ff');
                 else setFlow('flow-load', false);
 
-                if (data.Batt_Current < -0.1) { 
-                    setFlow('flow-batt', true, 'flowOutL', '#ff4444');
-                } else if (data.Batt_Current > 0.1) { 
-                    setFlow('flow-batt', true, 'flowInL', '#00cc66');
-                } else {
-                    setFlow('flow-batt', false); 
-                }
+                if (data.Batt_Current < -0.1) setFlow('flow-batt', true, 'flowOutL', '#ff4444');
+                else if (data.Batt_Current > 0.1) setFlow('flow-batt', true, 'flowInL', '#00cc66');
+                else setFlow('flow-batt', false); 
 
-                if (gridInW > 0) { 
-                    setFlow('flow-grid', true, 'flowInR', '#ff4444');
-                } else if (gridInW < 0) { 
-                    setFlow('flow-grid', true, 'flowOutR', '#00cc66');
-                } else {
-                    setFlow('flow-grid', false);
-                }
+                if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444');
+                else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66');
+                else setFlow('flow-grid', false);
             }
         });
         
