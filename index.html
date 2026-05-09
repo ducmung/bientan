@@ -50,35 +50,33 @@
             border-radius: 12px;
             padding: 10px 4px;
             text-align: center;
-            width: 86px;
+            width: 86px; /* Đã đưa kích thước về chuẩn gọn gàng */
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             z-index: 10;
         }
 
-        /* --- CHỈNH SỬA BIẾN TẦN TRUNG TÂM --- */
         .node-center { 
-            width: 110px; /* Tăng bề ngang một chút để lấp đầy khung thừa */
-            height: 120px; /* Đặt chiều cao cụ thể */
+            width: 100px; 
+            height: 100px; 
             padding: 0px; 
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            background: #fff; /* Node trắng chứa hình ảnh */
-            border-radius: 12px; /* Giữ bo góc */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Giữ bóng mờ */
+            background: transparent; 
+            box-shadow: none; border: none;
             z-index: 15;
-            overflow: hidden; /* Cắt bỏ phần hình ảnh thừa ra ngoài khung */
         }
         
-        .pos-inv img {
-            width: 100%; /* Hình ảnh lấp đầy chiều rộng node */
-            height: 100%; /* Hình ảnh lấp đầy chiều cao node */
-            object-fit: cover; /* Đảm bảo hình ảnh lấp đầy khung mà không bị méo */
-            mix-blend-mode: multiply; /* Hòa trộn nếu cần */
+        .node-center img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; 
+            transform: scale(1.1); 
+            mix-blend-mode: multiply; 
         }
 
-        /* ================= HIỆU ỨNG MẶT TRỜI QUỸ ĐẠO ================= */
+        /* ================= HIỆU ỨNG MẶT TRỜI (THU GỌN) ================= */
         .sun-arc-mini {
             position: relative;
             width: 100%;
@@ -177,7 +175,10 @@
         .pos-inv { top: 50%; left: 50%; }
 
         .line {
-            position: absolute; height: 3px; background: rgba(203, 213, 225, 0.6); 
+            position: absolute; 
+            height: 10px; /* Tăng chiều cao vùng chứa để bóng đổ không bị cắt */
+            margin-top: -3.5px;
+            background: transparent; 
             width: 48%; z-index: 1;
         }
 
@@ -186,29 +187,46 @@
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* ================= CHỈNH SỬA HIỆU ỨNG LUỒNG CHẠY GIỌT NƯỚC ================= */
+        /* ================= HIỆU ỨNG LUỒNG CHẠY NHƯ VIDEO (TRACK & DASHES) ================= */
         .flow-group {
             display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;
-            --flow-color: #fff; /* Biến CSS để đổi màu giọt nước */
+            overflow: hidden; /* Cắt các vệt sáng khi chạy tới đầu/cuối dây */
+            --c: #fff; 
         }
-        .flow-group .dot {
+
+        /* 1. Đường ray mờ làm nền */
+        .flow-track {
             position: absolute;
-            width: 8px; height: 12px; /* Kích thước giọt nước tinh tế */
-            background: var(--flow-color);
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; /* Tạo hình giọt nước */
-            box-shadow: 0 0 5px var(--flow-color); /* Hào quang giọt nước tinh tế */
-            top: -5px; /* Điều chỉnh vị trí để hạt nằm giữa đường dây */
+            top: 50%; left: 0;
+            transform: translateY(-50%);
+            width: 100%; height: 1px;
+            background: rgba(255, 255, 255, 0.3); /* Đường kẻ mờ tĩnh */
+        }
+
+        /* 2. Các vệt sáng chuyển động (Capsules) */
+        .flow-dash {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px; /* Chiều dài vệt sáng */
+            height: 3px; /* Độ dày */
+            border-radius: 3px;
+            background: var(--c);
+            box-shadow: 0 0 6px 1px var(--c); /* Hào quang sáng xung quanh */
             opacity: 0; 
         }
-        /* Tạo độ trễ chuyển động cho hiệu ứng "mưa suối" */
-        .flow-group .d1 { animation-delay: 0s; }
-        .flow-group .d2 { animation-delay: 0.5s; }
-        .flow-group .d3 { animation-delay: 1.0s; }
 
-        @keyframes flowInL { 0% { left: 0%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
-        @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 0%; opacity: 0; } }
-        @keyframes flowInR { 0% { right: 0%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
-        @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { right: 0%; opacity: 0; } }
+        /* Điều phối 4 vệt sáng nối đuôi nhau */
+        .flow-dash:nth-child(2) { animation-delay: 0s; }
+        .flow-dash:nth-child(3) { animation-delay: 0.75s; }
+        .flow-dash:nth-child(4) { animation-delay: 1.5s; }
+        .flow-dash:nth-child(5) { animation-delay: 2.25s; }
+
+        /* Animation định hướng (Trái/Phải) */
+        @keyframes flowInL { 0% { left: -20%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+        @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: -20%; opacity: 0; } }
+        @keyframes flowInR { 0% { right: -20%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
+        @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { right: -20%; opacity: 0; } }
 
         /* ================= KHUNG THỐNG KÊ ================= */
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
@@ -255,16 +273,28 @@
             </div>
 
             <div class="line line-pv">
-                <div class="flow-group" id="flow-pv"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+                <div class="flow-group" id="flow-pv">
+                    <div class="flow-track"></div>
+                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
+                </div>
             </div>
             <div class="line line-grid">
-                <div class="flow-group" id="flow-grid"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+                <div class="flow-group" id="flow-grid">
+                    <div class="flow-track"></div>
+                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
+                </div>
             </div>
             <div class="line line-batt">
-                <div class="flow-group" id="flow-batt"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+                <div class="flow-group" id="flow-batt">
+                    <div class="flow-track"></div>
+                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
+                </div>
             </div>
             <div class="line line-load">
-                <div class="flow-group" id="flow-load"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+                <div class="flow-group" id="flow-load">
+                    <div class="flow-track"></div>
+                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
+                </div>
             </div>
 
             <div class="node pos-pv">
@@ -414,7 +444,7 @@
                 progress = 0; 
             }
 
-            // Tọa độ Bezier đã được thu gọn để lọt vừa khung
+            // Tọa độ mới cho viewBox 80 40
             const P0 = {x: 10, y: 35};
             const P1 = {x: 40, y: -5};
             const P2 = {x: 70, y: 35};
@@ -433,17 +463,18 @@
         setInterval(updateSunArc, 60000); 
         fetchWeather();
 
-        // ================= CHỈNH SỬA HÀM setFlow ĐỂ HỖ TRỢ GIỌT NƯỚC =================
+        // ================= HÀM KÍCH HOẠT DÒNG CHẢY NHƯ VIDEO =================
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId);
             if (isActive) {
                 group.style.display = 'block';
-                // Đặt màu giọt nước qua biến CSS để bo mờ đồng nhất
-                group.style.setProperty('--flow-color', color); 
+                group.style.setProperty('--c', color);
                 
-                group.querySelectorAll('.dot').forEach(d => {
+                // Animation 3 giây chậm rãi, liền mạch
+                const dashes = group.querySelectorAll('.flow-dash');
+                dashes.forEach((d) => {
                     d.style.animationName = animName;
-                    d.style.animationDuration = '1.5s'; // Tốc độ suối chảy chậm tinh tế
+                    d.style.animationDuration = '3s'; 
                     d.style.animationIterationCount = 'infinite';
                     d.style.animationTimingFunction = 'linear';
                 });
@@ -504,7 +535,7 @@
                     else if (soc > lowerBound && soc <= upperBound) seg.classList.add('blink-' + colorTheme); 
                 }
 
-                // Chạy giọt nước chảy tinh tế theo hướng dòng điện
+                // Kích hoạt các dòng năng lượng
                 if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00');
                 else setFlow('flow-pv', false);
 
