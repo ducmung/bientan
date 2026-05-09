@@ -41,17 +41,16 @@
             border: 1px solid rgba(255,255,255,0.4);
         }
 
+        /* ĐÃ BỎ KHUNG, NỀN, VÀ BÓNG ĐỔ CHO CÁC NODE XUNG QUANH */
         .node {
             position: absolute;
             transform: translate(-50%, -50%); 
-            background: rgba(255, 255, 255, 0.85);
-            border: 1px solid rgba(255,255,255,0.6);
-            backdrop-filter: blur(8px);
-            border-radius: 12px;
+            background: transparent; /* Nền trong suốt giống thời tiết */
+            border: none; /* Xóa viền */
+            box-shadow: none; /* Xóa bóng đổ */
             padding: 10px 4px;
             text-align: center;
             width: 86px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             z-index: 10;
         }
 
@@ -63,7 +62,7 @@
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            background: #fff; 
+            background: #fff; /* Biến tần vẫn giữ nền trắng che dây */
             border-radius: 12px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
             border: 1px solid rgba(255,255,255,0.6);
@@ -216,7 +215,6 @@
             opacity: 0; 
         }
 
-        /* Chia chu kỳ 3 giây cho 5 thanh, mỗi thanh cách nhau 0.6s */
         .flow-dash:nth-child(2) { animation-delay: 0s; }
         .flow-dash:nth-child(3) { animation-delay: 0.6s; }
         .flow-dash:nth-child(4) { animation-delay: 1.2s; }
@@ -471,7 +469,6 @@
                 const dashes = group.querySelectorAll('.flow-dash');
                 dashes.forEach((d) => {
                     d.style.animationName = animName;
-                    // Đã điều chỉnh tốc độ chu kỳ thành 3 giây
                     d.style.animationDuration = '3s'; 
                     d.style.animationIterationCount = 'infinite';
                     d.style.animationTimingFunction = 'linear';
