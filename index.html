@@ -99,6 +99,20 @@
             left: 15%; top: 100%; 
         }
 
+        /* ================= ĐỒNG HỒ CẬP NHẬT DATA ================= */
+        #update-clock {
+            position: absolute;
+            bottom: -55px; 
+            font-size: 11px;
+            font-weight: 900;
+            color: #0088ff; 
+            font-family: monospace;
+            background: transparent;
+            z-index: 25;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
         /* ================= WIDGET THỜI TIẾT ================= */
         .weather-container {
             position: absolute;
@@ -121,7 +135,6 @@
         .w-col span:nth-child(3) { font-weight: 900; font-size: 9px; }
         .w-svg-curve { position: absolute; bottom: 16px; left: 0; width: 100%; height: 16px; z-index: 1; overflow: visible; filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3)); }
 
-        /* ================= CÁC TRẠNG THÁI BIẾN TẦN & ĐỒNG HỒ ================= */
         #lbl-status {
             position: absolute;
             bottom: -32px; 
@@ -136,26 +149,12 @@
             z-index: 20;
         }
 
-        /* ĐỒNG HỒ ĐƯỢC CHUYỂN XUỐNG DƯỚI LBL-STATUS */
-        #update-clock {
-            position: absolute;
-            bottom: -55px; /* Nằm ngay dưới chữ Đang Sạc / Đang Xả */
-            font-size: 11px;
-            font-weight: 900;
-            color: #0088ff; 
-            font-family: monospace;
-            background: transparent;
-            z-index: 25;
-            letter-spacing: 1px;
-            white-space: nowrap;
-        }
-
         .node h3 { font-size: 9px; color: #666; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; }
         .node .val { font-size: 15px; font-weight: 900; color: #111; }
         .node .unit { font-size: 9px; color: #888; }
         .icon { font-size: 16px; margin-bottom: 2px; }
 
-        /* ================= CSS VẼ QUẢ PIN 5 VẠCH ================= */
+        /* ================= CSS VẼ QUẢ PIN ================= */
         .battery-box {
             width: 38px; height: 18px; border: 2px solid #555; border-radius: 4px; position: relative;
             margin: 0 auto 5px auto; background: #fff; padding: 1px; display: flex; gap: 1px; 
@@ -190,41 +189,44 @@
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* ================= HIỆU ỨNG LUỒNG NĂNG LƯỢNG MƯA SAO BĂNG ================= */
+        /* ================= HIỆU ỨNG LUỒNG CHẠY (5 VỆT NGẮN & CHẬM RÃI) ================= */
         .flow-group {
             display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+            overflow: hidden; 
             --c: #fff; 
         }
 
-        .stream {
+        .flow-track {
             position: absolute;
-            top: -3px; 
-            width: 60px; 
-            height: 6px;
+            top: 50%; left: 0;
+            transform: translateY(-50%);
+            width: 100%; height: 1px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .flow-dash {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px; /* Thanh luồng ngắn lại */
+            height: 3px; 
+            border-radius: 3px;
+            background: var(--c);
+            box-shadow: 0 0 6px 1px var(--c); 
             opacity: 0; 
         }
 
-        .f-glow {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--c); filter: blur(3px); opacity: 0.5; border-radius: 4px;
-        }
-        .f-core {
-            position: absolute; top: 2.5px; left: 10%; width: 80%; height: 1px;
-            background: var(--c); border-radius: 1px; box-shadow: 0 0 3px var(--c);
-        }
-        .f-dust {
-            position: absolute; background: var(--c); border-radius: 50%; box-shadow: 0 0 2px var(--c);
-        }
-        .f-dust.d1 { top: -2px; left: 5%; width: 2px; height: 2px; opacity: 0.9; }
-        .f-dust.d2 { top: 6px; left: 25%; width: 1.5px; height: 1.5px; opacity: 0.7; }
-        .f-dust.d3 { top: -1px; left: 45%; width: 1px; height: 1px; opacity: 0.8; }
-        .f-dust.d4 { top: 5px; left: 65%; width: 2px; height: 2px; opacity: 0.6; }
-        .f-dust.d5 { top: 0px; left: 85%; width: 1.5px; height: 1.5px; opacity: 1; }
+        /* 5 thanh chạy nối tiếp nhau, khoảng cách delay được chia đều cho 4 giây */
+        .flow-dash:nth-child(2) { animation-delay: 0s; }
+        .flow-dash:nth-child(3) { animation-delay: 0.8s; }
+        .flow-dash:nth-child(4) { animation-delay: 1.6s; }
+        .flow-dash:nth-child(5) { animation-delay: 2.4s; }
+        .flow-dash:nth-child(6) { animation-delay: 3.2s; }
 
-        @keyframes flowInL { 0% { left: -15%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
-        @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: -15%; opacity: 0; } }
-        @keyframes flowInR { 0% { right: -15%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
-        @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { right: -15%; opacity: 0; } }
+        @keyframes flowInL { 0% { left: -20%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+        @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: -20%; opacity: 0; } }
+        @keyframes flowInR { 0% { right: -20%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
+        @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { right: -20%; opacity: 0; } }
 
         /* ================= KHUNG THỐNG KÊ ================= */
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
@@ -272,30 +274,26 @@
 
             <div class="line line-pv">
                 <div class="flow-group" id="flow-pv">
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
+                    <div class="flow-track"></div>
+                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
                 </div>
             </div>
             <div class="line line-grid">
                 <div class="flow-group" id="flow-grid">
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
+                    <div class="flow-track"></div>
+                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
                 </div>
             </div>
             <div class="line line-batt">
                 <div class="flow-group" id="flow-batt">
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
+                    <div class="flow-track"></div>
+                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
                 </div>
             </div>
             <div class="line line-load">
                 <div class="flow-group" id="flow-load">
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
-                    <div class="stream"><div class="f-glow"></div><div class="f-core"></div><div class="f-dust d1"></div><div class="f-dust d2"></div><div class="f-dust d3"></div><div class="f-dust d4"></div><div class="f-dust d5"></div></div>
+                    <div class="flow-track"></div>
+                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
                 </div>
             </div>
 
@@ -332,7 +330,6 @@
             <div class="node node-center pos-inv">
                 <img src="68.jpg" alt="Inverter">
                 <div id="lbl-status" style="transition: color 0.5s;">Đang tải...</div>
-                
                 <div id="update-clock">--:--:--</div>
             </div>
         </div>
@@ -465,27 +462,25 @@
         setInterval(updateSunArc, 60000); 
         fetchWeather();
 
-        // ================= HÀM KÍCH HOẠT NĂNG LƯỢNG MƯA SAO BĂNG =================
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId);
             if (isActive) {
                 group.style.display = 'block';
                 group.style.setProperty('--c', color);
                 
-                const streams = group.querySelectorAll('.stream');
-                streams.forEach((s, idx) => {
-                    s.style.animationName = animName;
-                    s.style.animationDuration = '3s'; 
-                    s.style.animationIterationCount = 'infinite';
-                    s.style.animationTimingFunction = 'linear';
-                    s.style.animationDelay = (idx * 1.0) + 's'; 
+                const dashes = group.querySelectorAll('.flow-dash');
+                dashes.forEach((d) => {
+                    d.style.animationName = animName;
+                    // Tăng thời gian lên 4 giây để chạy chậm và mượt mà hơn
+                    d.style.animationDuration = '4s'; 
+                    d.style.animationIterationCount = 'infinite';
+                    d.style.animationTimingFunction = 'linear';
                 });
             } else {
                 group.style.display = 'none';
             }
         }
 
-        // ================= KẾT NỐI FIREBASE & LOGIC =================
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -496,8 +491,6 @@
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
-                
-                // Đồng hồ cập nhật nhịp tim
                 const now = new Date();
                 document.getElementById('update-clock').innerText = now.toLocaleTimeString('vi-VN', { hour12: false });
 
