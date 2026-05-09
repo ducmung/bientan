@@ -73,6 +73,23 @@
             mix-blend-mode: multiply; 
         }
 
+        /* ================= ĐỒNG HỒ CẬP NHẬT DATA (MÀU XANH) ================= */
+        #update-clock {
+            position: absolute;
+            top: -20px; 
+            font-size: 11px;
+            font-weight: 900;
+            color: #0088ff; /* Màu xanh da trời */
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 2px 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            z-index: 25;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
         /* ================= WIDGET THỜI TIẾT ================= */
         .weather-container {
             position: absolute;
@@ -187,7 +204,7 @@
             background: #fff;
             padding: 1px;
             display: flex;
-            gap: 1px; /* Khoảng cách nhỏ giữa các vạch */
+            gap: 1px; 
         }
         .battery-box::after {
             content: '';
@@ -202,14 +219,13 @@
         .batt-seg {
             flex: 1;
             border-radius: 1px;
-            background: transparent; /* Mặc định là vạch trắng trống */
+            background: transparent; 
         }
 
         .solid-red { background-color: #ff4444; }
         .solid-yellow { background-color: #ffaa00; }
         .solid-green { background-color: #00cc66; }
 
-        /* Nháy từ màu đặc sang trong suốt (hiện nền trắng) */
         @keyframes flash-red { 0%, 100% { background-color: #ff4444; box-shadow: 0 0 4px #ff4444; } 50% { background-color: transparent; box-shadow: none; } }
         @keyframes flash-yellow { 0%, 100% { background-color: #ffaa00; box-shadow: 0 0 4px #ffaa00; } 50% { background-color: transparent; box-shadow: none; } }
         @keyframes flash-green { 0%, 100% { background-color: #00cc66; box-shadow: 0 0 4px #00cc66; } 50% { background-color: transparent; box-shadow: none; } }
@@ -339,6 +355,8 @@
             <div class="node pos-load"><div class="icon">🏠</div><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
 
             <div class="node node-center pos-inv">
+                <div id="update-clock">--:--:--</div>
+                
                 <img src="68.jpg" alt="Inverter">
                 <div id="lbl-status" style="transition: color 0.5s;">Đang tải...</div>
             </div>
@@ -484,6 +502,13 @@
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
+                
+                // --- CẬP NHẬT ĐỒNG HỒ "NHỊP TIM" MỖI KHI CÓ DATA MỚI ---
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('vi-VN', { hour12: false });
+                document.getElementById('update-clock').innerText = timeString;
+                // -----------------------------------------------------
+
                 let pvInW = Math.round(data.PV_Power * 1000); 
                 let gridInW = Math.round(data.Grid_Power);    
                 let battInW = Math.round(data.Batt_Voltage * data.Batt_Current); 
@@ -523,30 +548,26 @@
 
                 for (let i = 0; i < 5; i++) {
                     let seg = document.getElementById('batt-seg-' + i);
-                    seg.className = 'batt-seg'; // Reset tất cả class của vạch
+                    seg.className = 'batt-seg'; 
                     let lowerBound = i * 20;
                     let upperBound = (i + 1) * 20;
 
                     if (soc == 0 && i == 0) {
-                        seg.classList.add('blink-red'); // Pin 0% thì vạch 1 nháy đỏ
+                        seg.classList.add('blink-red'); 
                     } else if (soc > upperBound || (soc == 100 && i == 4)) {
-                        seg.classList.add('solid-' + colorTheme); // Vạch đã được sạc đầy -> Sáng im
+                        seg.classList.add('solid-' + colorTheme); 
                     } else if (soc > lowerBound && soc <= upperBound) {
-                        seg.classList.add('blink-' + colorTheme); // Vạch đang hoạt động -> Nháy
+                        seg.classList.add('blink-' + colorTheme); 
                     }
-                    // Nếu soc <= lowerBound -> không làm gì, vạch tự động là khoảng trắng trong suốt
                 }
 
                 // 4. KÍCH HOẠT HIỆU ỨNG 3 CHẤM CHẠY
-                // Mặt Trời -> Biến tần
                 if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00');
                 else setFlow('flow-pv', false);
 
-                // Biến tần -> Tải tiêu thụ
                 if(loadInW > 0) setFlow('flow-load', true, 'flowOutR', '#0088ff');
                 else setFlow('flow-load', false);
 
-                // Lõi Pin (Xả / Sạc)
                 if (data.Batt_Current < -0.1) { 
                     setFlow('flow-batt', true, 'flowOutL', '#ff4444');
                 } else if (data.Batt_Current > 0.1) { 
@@ -555,7 +576,6 @@
                     setFlow('flow-batt', false); 
                 }
 
-                // Điện Lưới (Mua / Bán)
                 if (gridInW > 0) { 
                     setFlow('flow-grid', true, 'flowInR', '#ff4444');
                 } else if (gridInW < 0) { 
@@ -566,7 +586,6 @@
             }
         });
         
-        // Thống kê ngày
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
