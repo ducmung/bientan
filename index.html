@@ -94,7 +94,7 @@
             transform: translate(-50%, -50%);
             text-shadow: 0 0 10px #ffaa00;
             transition: all 1s ease-out;
-            left: 15%; top: 100%; /* Vị trí chờ ban đầu */
+            left: 15%; top: 100%; 
         }
 
         /* ================= ĐỒNG HỒ CẬP NHẬT DATA ================= */
@@ -152,7 +152,7 @@
         .node .unit { font-size: 9px; color: #888; }
         .icon { font-size: 16px; margin-bottom: 2px; }
 
-        /* ================= CSS VẼ QUẢ PIN 5 VẠCH ================= */
+        /* ================= CSS VẼ QUẢ PIN ================= */
         .battery-box {
             width: 38px; height: 18px; border: 2px solid #555; border-radius: 4px; position: relative;
             margin: 0 auto 5px auto; background: #fff; padding: 1px; display: flex; gap: 1px; 
@@ -168,14 +168,15 @@
         .blink-red { animation: flash-red 1.2s infinite; } .blink-yellow { animation: flash-yellow 1.2s infinite; } .blink-green { animation: flash-green 1.2s infinite; }
 
         /* ================= VỊ TRÍ & ĐƯỜNG DÂY ================= */
-        .pos-pv { top: 16%; left: 16%; width: 120px; } /* Mở rộng nút PV để chứa quỹ đạo */
+        .pos-pv { top: 16%; left: 16%; width: 120px; } 
         .pos-grid { top: 16%; left: 84%; }
         .pos-batt { top: 84%; left: 16%; }
         .pos-load { top: 84%; left: 84%; }
         .pos-inv { top: 50%; left: 50%; }
 
         .line {
-            position: absolute; height: 3px; background: rgba(203, 213, 225, 0.6); /* Dây mờ hơn một chút */
+            position: absolute; height: 4px; 
+            background: transparent; /* ĐÃ XÓA ĐƯỜNG KẺ NỀN THEO YÊU CẦU */
             width: 48%; z-index: 1;
         }
 
@@ -184,26 +185,33 @@
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* ================= ANIMATION NĂNG LƯỢNG PLASMA ================= */
+        /* ================= ANIMATION NĂNG LƯỢNG PLASMA "MƯA" SAO BĂNG ================= */
         .flow-group {
             display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;
         }
         .flow-group .dot {
             position: absolute;
-            width: 16px; height: 4px; /* Dài ra tạo hiệu ứng vệt sáng */
-            border-radius: 2px;
-            top: -0.5px;
+            width: 14px; height: 3px; /* Kéo dài thành vệt sáng */
+            border-radius: 3px;
+            top: 0.5px;
             opacity: 0; 
         }
-        /* Độ trễ để 3 tia sáng rượt đuổi nhau */
-        .flow-group .d1 { animation-delay: 0s; }
-        .flow-group .d2 { animation-delay: 0.4s; }
-        .flow-group .d3 { animation-delay: 0.8s; }
+        /* Mật độ hạt dày đặc hơn, 10 hạt rượt đuổi nhau liên tục */
+        .flow-group .dot:nth-child(1) { animation-delay: 0.0s; }
+        .flow-group .dot:nth-child(2) { animation-delay: 0.15s; }
+        .flow-group .dot:nth-child(3) { animation-delay: 0.30s; }
+        .flow-group .dot:nth-child(4) { animation-delay: 0.45s; }
+        .flow-group .dot:nth-child(5) { animation-delay: 0.60s; }
+        .flow-group .dot:nth-child(6) { animation-delay: 0.75s; }
+        .flow-group .dot:nth-child(7) { animation-delay: 0.90s; }
+        .flow-group .dot:nth-child(8) { animation-delay: 1.05s; }
+        .flow-group .dot:nth-child(9) { animation-delay: 1.20s; }
+        .flow-group .dot:nth-child(10) { animation-delay: 1.35s; }
 
-        @keyframes flowInL { 0% { left: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
-        @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 0%; opacity: 0; } }
-        @keyframes flowInR { 0% { right: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
-        @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { right: 0%; opacity: 0; } }
+        @keyframes flowInL { 0% { left: 0%; opacity: 0; } 5% { opacity: 1; } 95% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+        @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 5% { opacity: 1; } 95% { opacity: 1; } 100% { left: 0%; opacity: 0; } }
+        @keyframes flowInR { 0% { right: 0%; opacity: 0; } 5% { opacity: 1; } 95% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
+        @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 5% { opacity: 1; } 95% { opacity: 1; } 100% { right: 0%; opacity: 0; } }
 
         /* ================= KHUNG THỐNG KÊ ================= */
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
@@ -250,16 +258,28 @@
             </div>
 
             <div class="line line-pv">
-                <div class="flow-group" id="flow-pv"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+                <div class="flow-group" id="flow-pv">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
             </div>
             <div class="line line-grid">
-                <div class="flow-group" id="flow-grid"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+                <div class="flow-group" id="flow-grid">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
             </div>
             <div class="line line-batt">
-                <div class="flow-group" id="flow-batt"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+                <div class="flow-group" id="flow-batt">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
             </div>
             <div class="line line-load">
-                <div class="flow-group" id="flow-load"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+                <div class="flow-group" id="flow-load">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
             </div>
 
             <div class="node pos-pv">
@@ -344,7 +364,6 @@
                 if (curData.main && foreData.list) {
                     updateWeatherUI(curData, foreData.list);
                     
-                    // Lưu lại giờ mọc/lặn từ API để vẽ quỹ đạo mặt trời
                     globalSunrise = curData.sys.sunrise;
                     globalSunset = curData.sys.sunset;
                     updateSunArc();
@@ -397,7 +416,6 @@
             document.getElementById('curve-dots').innerHTML = dotsHtml;
         }
 
-        // --- HÀM TÍNH TOÁN QUỸ ĐẠO MẶT TRỜI ---
         function updateSunArc() {
             if (!globalSunrise || !globalSunset) return;
             const nowUnix = Math.floor(Date.now() / 1000);
@@ -406,12 +424,11 @@
             if (nowUnix > globalSunrise && nowUnix < globalSunset) {
                 progress = (nowUnix - globalSunrise) / (globalSunset - globalSunrise);
             } else if (nowUnix >= globalSunset) {
-                progress = 1; // Mặt trời lặn hẳn
+                progress = 1; 
             } else {
-                progress = 0; // Chưa mọc
+                progress = 0; 
             }
 
-            // Đường cong Bezier tương ứng với viewBox 0 0 100 40
             const P0 = {x: 15, y: 35};
             const P1 = {x: 50, y: -10};
             const P2 = {x: 85, y: 35};
@@ -423,11 +440,11 @@
             const sun = document.getElementById('moving-sun');
             sun.style.left = x + '%'; 
             sun.style.top = (y / 40 * 100) + '%';
-            sun.style.opacity = (progress <= 0 || progress >= 1) ? "0.3" : "1"; // Mờ đi nếu đã lặn
+            sun.style.opacity = (progress <= 0 || progress >= 1) ? "0.3" : "1"; 
         }
 
-        setInterval(fetchWeather, 30 * 60 * 1000); // API 30p/lần
-        setInterval(updateSunArc, 60000); // Cập nhật vị trí mặt trời 1p/lần
+        setInterval(fetchWeather, 30 * 60 * 1000); 
+        setInterval(updateSunArc, 60000); 
         fetchWeather();
 
         // ================= HÀM KÍCH HOẠT NĂNG LƯỢNG PLASMA =================
@@ -437,10 +454,9 @@
                 group.style.display = 'block';
                 group.querySelectorAll('.dot').forEach(d => {
                     d.style.background = color;
-                    // Tạo hiệu ứng tỏa sáng bằng box-shadow theo màu
-                    d.style.boxShadow = `0 0 8px 2px ${color}`; 
+                    d.style.boxShadow = `0 0 6px 1px ${color}`; // Tạo hiệu ứng hào quang tỏa sáng
                     d.style.animationName = animName;
-                    d.style.animationDuration = '1.6s';
+                    d.style.animationDuration = '1.5s';
                     d.style.animationIterationCount = 'infinite';
                     d.style.animationTimingFunction = 'linear';
                 });
@@ -460,7 +476,6 @@
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
-                // Nhịp tim đồng hồ
                 const now = new Date();
                 document.getElementById('update-clock').innerText = now.toLocaleTimeString('vi-VN', { hour12: false });
 
@@ -502,7 +517,6 @@
                     else if (soc > lowerBound && soc <= upperBound) seg.classList.add('blink-' + colorTheme); 
                 }
 
-                // Chạy Plasma ánh sáng
                 if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00');
                 else setFlow('flow-pv', false);
 
