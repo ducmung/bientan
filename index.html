@@ -189,7 +189,7 @@
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* ================= HIỆU ỨNG LUỒNG CHẠY (5 VỆT NGẮN & CHẬM RÃI) ================= */
+        /* ================= HIỆU ỨNG LUỒNG CHẠY (5 VỆT) ================= */
         .flow-group {
             display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;
             overflow: hidden; 
@@ -208,7 +208,7 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 10px; /* Thanh luồng ngắn lại */
+            width: 10px; 
             height: 3px; 
             border-radius: 3px;
             background: var(--c);
@@ -216,12 +216,12 @@
             opacity: 0; 
         }
 
-        /* 5 thanh chạy nối tiếp nhau, khoảng cách delay được chia đều cho 4 giây */
+        /* Chia chu kỳ 3 giây cho 5 thanh, mỗi thanh cách nhau 0.6s */
         .flow-dash:nth-child(2) { animation-delay: 0s; }
-        .flow-dash:nth-child(3) { animation-delay: 0.8s; }
-        .flow-dash:nth-child(4) { animation-delay: 1.6s; }
-        .flow-dash:nth-child(5) { animation-delay: 2.4s; }
-        .flow-dash:nth-child(6) { animation-delay: 3.2s; }
+        .flow-dash:nth-child(3) { animation-delay: 0.6s; }
+        .flow-dash:nth-child(4) { animation-delay: 1.2s; }
+        .flow-dash:nth-child(5) { animation-delay: 1.8s; }
+        .flow-dash:nth-child(6) { animation-delay: 2.4s; }
 
         @keyframes flowInL { 0% { left: -20%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
         @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: -20%; opacity: 0; } }
@@ -471,8 +471,8 @@
                 const dashes = group.querySelectorAll('.flow-dash');
                 dashes.forEach((d) => {
                     d.style.animationName = animName;
-                    // Tăng thời gian lên 4 giây để chạy chậm và mượt mà hơn
-                    d.style.animationDuration = '4s'; 
+                    // Đã điều chỉnh tốc độ chu kỳ thành 3 giây
+                    d.style.animationDuration = '3s'; 
                     d.style.animationIterationCount = 'infinite';
                     d.style.animationTimingFunction = 'linear';
                 });
