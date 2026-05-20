@@ -76,10 +76,10 @@
             border-radius: 12px; 
         }
 
-        /* ĐÃ CHỈNH SỬA: CỤM HIỂN THỊ NHIỆT ĐỘ BIẾN TẦN */
+        /* CỤM HIỂN THỊ NHIỆT ĐỘ BIẾN TẦN */
         #lbl-inv-temp {
             position: absolute;
-            top: -30px; /* Đẩy lên cao để không đè vào biến tần */
+            top: -30px;
             font-size: 12px;
             font-weight: 900;
             background: #00cc66; /* Màu mặc định xanh lá */
@@ -540,18 +540,18 @@
                 document.getElementById('lbl-load').innerText = loadInW; 
                 document.getElementById('lbl-batt').innerText = Math.abs(battInW);
                 
-                // ĐÃ CHỈNH SỬA: Cập nhật nhiệt độ và màu nền theo dải nhiệt
+                // MÀU NỀN NHIỆT ĐỘ THEO DẢI
                 if (data.Inv_Temp !== undefined) {
                     const tempLabel = document.getElementById('lbl-inv-temp');
                     const t = data.Inv_Temp;
                     tempLabel.innerText = '🌡️ ' + t + '°C';
                     
-                    if (t < 35) {
-                        tempLabel.style.backgroundColor = '#00cc66'; // Xanh lá
-                    } else if (t >= 35 && t < 42) {
-                        tempLabel.style.backgroundColor = '#ffaa00'; // Vàng
+                    if (t < 40) {
+                        tempLabel.style.backgroundColor = '#00cc66'; // Dưới 40: Xanh lá
+                    } else if (t >= 40 && t < 46) {
+                        tempLabel.style.backgroundColor = '#ffaa00'; // 40 - dưới 46: Vàng
                     } else {
-                        tempLabel.style.backgroundColor = '#ff4444'; // Đỏ
+                        tempLabel.style.backgroundColor = '#ff4444'; // 46 trở lên: Đỏ
                     }
                 }
 
