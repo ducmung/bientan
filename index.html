@@ -41,13 +41,12 @@
             border: 1px solid rgba(255,255,255,0.4);
         }
 
-        /* ĐÃ BỎ KHUNG, NỀN, VÀ BÓNG ĐỔ CHO CÁC NODE XUNG QUANH */
         .node {
             position: absolute;
             transform: translate(-50%, -50%); 
-            background: transparent; /* Nền trong suốt giống thời tiết */
-            border: none; /* Xóa viền */
-            box-shadow: none; /* Xóa bóng đổ */
+            background: transparent; 
+            border: none; 
+            box-shadow: none; 
             padding: 10px 4px;
             text-align: center;
             width: 86px; 
@@ -62,7 +61,7 @@
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            background: #fff; /* Biến tần vẫn giữ nền trắng che dây */
+            background: #fff; 
             border-radius: 12px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
             border: 1px solid rgba(255,255,255,0.6);
@@ -75,6 +74,22 @@
             height: 100%;
             object-fit: cover; 
             border-radius: 12px; 
+        }
+
+        /* ĐÃ CHỈNH SỬA: CỤM HIỂN THỊ NHIỆT ĐỘ BIẾN TẦN */
+        #lbl-inv-temp {
+            position: absolute;
+            top: -30px; /* Đẩy lên cao để không đè vào biến tần */
+            font-size: 12px;
+            font-weight: 900;
+            background: #00cc66; /* Màu mặc định xanh lá */
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 12px;
+            z-index: 20;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            white-space: nowrap;
+            transition: background-color 0.5s ease; /* Chuyển màu mượt */
         }
 
         /* ================= HIỆU ỨNG MẶT TRỜI ================= */
@@ -188,7 +203,7 @@
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* ================= HIỆU ỨNG LUỒNG CHẠY (5 VỆT) ================= */
+        /* ================= HIỆU ỨNG LUỒNG CHẠY ================= */
         .flow-group {
             display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;
             overflow: hidden; 
@@ -239,6 +254,14 @@
         .list-detail div { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;}
         .list-detail div:last-child { border: none; }
         .list-detail span { font-weight: 800; color: #111; }
+
+        /* ================= NÚT GẠT (TOGGLE SWITCH) ================= */
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: #00cc66; }
+        input:checked + .slider:before { transform: translateX(24px); }
 
         @media (min-width: 768px) {
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
@@ -326,6 +349,7 @@
             <div class="node pos-load"><div class="icon">🏠</div><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
 
             <div class="node node-center pos-inv">
+                <div id="lbl-inv-temp">🌡️ --°C</div>
                 <img src="68.jpg" alt="Inverter">
                 <div id="lbl-status" style="transition: color 0.5s;">Đang tải...</div>
                 <div id="update-clock">--:--:--</div>
@@ -351,6 +375,19 @@
                     <div>Dòng điện: <span id="stat-a">0 A</span></div>
                 </div>
             </div>
+            
+            <div class="stat-card">
+                <div class="stat-header"><h2>🎛️ ĐIỀU KHIỂN BIẾN TẦN</h2></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 5px;">
+                    <span style="font-size: 14px; font-weight: 800; color: #444;">Trạng thái:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="inv-switch-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div id="switch-status-text" style="text-align: right; font-size: 12px; font-weight: 800; color: #888; margin-top: 5px;">Đang tải...</div>
+            </div>
+
         </div>
     </div>
 
@@ -485,6 +522,7 @@
         const lblStatus = document.getElementById('lbl-status');
         const lblSoc = document.getElementById('lbl-soc'); 
 
+        // LẮNG NGHE DỮ LIỆU TỪ FIREBASE ĐỂ HIỂN THỊ
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
@@ -501,6 +539,29 @@
                 document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
                 document.getElementById('lbl-load').innerText = loadInW; 
                 document.getElementById('lbl-batt').innerText = Math.abs(battInW);
+                
+                // ĐÃ CHỈNH SỬA: Cập nhật nhiệt độ và màu nền theo dải nhiệt
+                if (data.Inv_Temp !== undefined) {
+                    const tempLabel = document.getElementById('lbl-inv-temp');
+                    const t = data.Inv_Temp;
+                    tempLabel.innerText = '🌡️ ' + t + '°C';
+                    
+                    if (t < 35) {
+                        tempLabel.style.backgroundColor = '#00cc66'; // Xanh lá
+                    } else if (t >= 35 && t < 42) {
+                        tempLabel.style.backgroundColor = '#ffaa00'; // Vàng
+                    } else {
+                        tempLabel.style.backgroundColor = '#ff4444'; // Đỏ
+                    }
+                }
+
+                if (data.Inv_Switch !== undefined) {
+                    const toggle = document.getElementById('inv-switch-toggle');
+                    const statusText = document.getElementById('switch-status-text');
+                    toggle.checked = (data.Inv_Switch === 1);
+                    statusText.innerText = (data.Inv_Switch === 1) ? "Đang BẬT" : "Đã TẮT";
+                    statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444";
+                }
                 
                 let soc = data.Batt_SOC;
                 lblSoc.innerText = soc + '%';
@@ -554,6 +615,23 @@
                 document.getElementById('stat-bat-chg').innerText = data.Bat_Charge_Today.toFixed(1) + ' kWh';
                 document.getElementById('stat-load-total').innerText = (data.Load_Total || 0).toFixed(1) + ' kWh';
             }
+        });
+
+        // BẮT SỰ KIỆN KHI NGƯỜI DÙNG BẤM CÔNG TẮC GỬI LÊN FIREBASE
+        document.getElementById('inv-switch-toggle').addEventListener('change', function() {
+            const newState = this.checked ? 1 : 0;
+            const statusText = document.getElementById('switch-status-text');
+            
+            // Hiển thị trạng thái đang chờ ESP32 xử lý
+            statusText.innerText = "Đang gửi lệnh...";
+            statusText.style.color = "#ffaa00";
+            
+            database.ref('/SosenSystem/Control').update({ Inv_Switch: newState })
+                .catch((error) => {
+                    console.error("Lỗi khi gửi lệnh:", error);
+                    statusText.innerText = "Lỗi kết nối!";
+                    statusText.style.color = "#ff4444";
+                });
         });
     </script>
 </body>
