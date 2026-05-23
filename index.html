@@ -193,7 +193,7 @@
         .line {
             position: absolute; 
             height: 10px; 
-            margin-top: -5px; /* Căn thẳng tim trục xoay */
+            margin-top: -5px; 
             background: transparent; 
             width: 48%; z-index: 1;
         }
@@ -203,75 +203,72 @@
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* ================= HIỆU ỨNG LUỒNG CHẠY SAO BĂNG & ÁNH SÁNG MỜ ================= */
+        /* ================= HIỆU ỨNG LUỒNG CHẠY SAO BĂNG ĐÃ FIX ================= */
         .flow-group {
             display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;
             overflow: hidden; 
             --c: #fff; 
         }
 
-        /* Đường rãnh chạy mờ ẩn phía sau để làm nổi bật luồng sáng chính */
         .flow-track {
             position: absolute;
             top: 50%; left: 0;
             transform: translateY(-50%);
-            width: 100%; height: 2px;
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 4px rgba(255, 255, 255, 0.05);
+            width: 100%; height: 1px;
+            background: rgba(255, 255, 255, 0.3);
         }
 
-        /* Thân của luồng sao băng */
         .flow-dash {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 40px; /* Độ dài của đuôi sao băng */
+            width: 45px; /* Chiều dài đuôi sao băng */
             height: 3px; 
             border-radius: 4px;
             opacity: 0; 
         }
 
-        /* Chế độ chạy sang bên PHẢI */
+        /* 1. CHẾ ĐỘ BAY SANG PHẢI (Đầu mũi tên sáng ở bên phải, Đuôi mờ dần về bên trái) */
         .dir-right .flow-dash {
-            background: linear-gradient(to left, var(--c) 0%, transparent 100%);
+            /* 90deg: Đi từ trái sang phải, mờ dần bên trái, đậm dần ở bên phải */
+            background: linear-gradient(90deg, transparent 0%, var(--c) 100%);
         }
-        /* Đầu mũi tên sao băng phát sáng rực rỡ */
         .dir-right .flow-dash::after {
             content: '';
             position: absolute;
-            right: -2px; 
+            right: -2px; /* Mũi tên gắn vào sát mép phải */
             top: 50%;
             transform: translateY(-50%);
             border-top: 4px solid transparent;
             border-bottom: 4px solid transparent;
-            border-left: 8px solid #ffffff; 
-            filter: drop-shadow(0 0 4px var(--c)) drop-shadow(0 0 10px var(--c));
+            border-left: 8px solid #ffffff; /* Đầu nhọn hướng sang phải */
+            filter: drop-shadow(0 0 6px var(--c)); /* Phát sáng đầu sao băng */
         }
 
-        /* Chế độ chạy sang bên TRÁI */
+        /* 2. CHẾ ĐỘ BAY SANG TRÁI (Đầu mũi tên sáng ở bên trái, Đuôi mờ dần về bên phải) */
         .dir-left .flow-dash {
-            background: linear-gradient(to right, var(--c) 0%, transparent 100%);
+            /* 270deg: Đi từ phải sang trái, mờ dần bên phải, đậm dần ở bên trái */
+            background: linear-gradient(270deg, transparent 0%, var(--c) 100%);
         }
         .dir-left .flow-dash::after {
             content: '';
             position: absolute;
-            left: -2px;
+            left: -2px; /* Mũi tên gắn vào sát mép trái */
             top: 50%;
             transform: translateY(-50%);
             border-top: 4px solid transparent;
             border-bottom: 4px solid transparent;
-            border-right: 8px solid #ffffff;
-            filter: drop-shadow(0 0 4px var(--c)) drop-shadow(0 0 10px var(--c));
+            border-right: 8px solid #ffffff; /* Đầu nhọn hướng sang trái */
+            filter: drop-shadow(0 0 6px var(--c));
         }
 
-        /* Giãn cách thời gian phóng của 5 cụm vệt sao băng */
+        /* Delay giữa các vệt sao */
         .flow-dash:nth-child(2) { animation-delay: 0s; }
         .flow-dash:nth-child(3) { animation-delay: 0.6s; }
         .flow-dash:nth-child(4) { animation-delay: 1.2s; }
         .flow-dash:nth-child(5) { animation-delay: 1.8s; }
         .flow-dash:nth-child(6) { animation-delay: 2.4s; }
 
-        /* Các hàm CSS Keyframes quét dịch chuyển */
         @keyframes flowInL { 0% { left: -25%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
         @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: -25%; opacity: 0; } }
         @keyframes flowInR { 0% { right: -25%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
@@ -430,7 +427,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ================= XỬ LÝ THỜI TIẾT TỰ ĐỘNG & MẶT TRỜI =================
         const API_KEY = "55aad83cd5e765d6cf3439de1040eb4f"; 
         const LAT = 21.127; 
         const LON = 106.023;
@@ -442,7 +438,6 @@
             try {
                 const curRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&lang=vi`);
                 const curData = await curRes.json();
-
                 const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric&cnt=5&lang=vi`);
                 const foreData = await foreRes.json();
 
@@ -531,14 +526,14 @@
         setInterval(updateSunArc, 60000); 
         fetchWeather();
 
-        // ================= XỬ LÝ ANIMATION LUỒNG SAO BĂNG KHỚP HƯỚNG CHẠY =================
+        // ================= XỬ LÝ ANIMATION LUỒNG SAO BĂNG =================
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId);
             if (isActive) {
                 group.style.display = 'block';
                 group.style.setProperty('--c', color);
                 
-                // Tự động gán Class định hướng để đảo ngược Gradient và đầu mũi tên sao băng
+                // Xác định Class để lật đầu mũi tên sao băng và hướng Gradient đuôi mờ
                 if (animName === 'flowInL' || animName === 'flowOutR') {
                     group.classList.add('dir-right');
                     group.classList.remove('dir-left');
@@ -550,7 +545,7 @@
                 const dashes = group.querySelectorAll('.flow-dash');
                 dashes.forEach((d) => {
                     d.style.animationName = animName;
-                    d.style.animationDuration = '2.5s'; /* Tốc độ quét sao băng */
+                    d.style.animationDuration = '2.5s'; 
                     d.style.animationIterationCount = 'infinite';
                     d.style.animationTimingFunction = 'linear';
                 });
@@ -567,7 +562,6 @@
         const lblStatus = document.getElementById('lbl-status');
         const lblSoc = document.getElementById('lbl-soc'); 
 
-        // LẮNG NGHE DỮ LIỆU TỪ FIREBASE ĐỂ HIỂN THỊ
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
@@ -585,19 +579,14 @@
                 document.getElementById('lbl-load').innerText = loadInW; 
                 document.getElementById('lbl-batt').innerText = Math.abs(battInW);
                 
-                // MÀU NỀN NHIỆT ĐỘ THEO DẢI
                 if (data.Inv_Temp !== undefined) {
                     const tempLabel = document.getElementById('lbl-inv-temp');
                     const t = data.Inv_Temp;
                     tempLabel.innerText = '🌡️ ' + t + '°C';
                     
-                    if (t < 40) {
-                        tempLabel.style.backgroundColor = '#00cc66'; 
-                    } else if (t >= 40 && t < 48) {
-                        tempLabel.style.backgroundColor = '#ffaa00'; 
-                    } else {
-                        tempLabel.style.backgroundColor = '#ff4444'; 
-                    }
+                    if (t < 40) tempLabel.style.backgroundColor = '#00cc66'; 
+                    else if (t < 48) tempLabel.style.backgroundColor = '#ffaa00'; 
+                    else tempLabel.style.backgroundColor = '#ff4444'; 
                 }
 
                 if (data.Inv_Switch !== undefined) {
@@ -635,19 +624,31 @@
                     else if (soc > lowerBound && soc <= upperBound) seg.classList.add('blink-' + colorTheme); 
                 }
 
-                // KHỚP HIỆU ỨNG LUỒNG SAO BĂNG THEO CÔNG SUẤT VÀ HƯỚNG ĐIỆN THỰC TẾ
+                // =========================================================================
+                // ĐÃ FIX 100% CHIỀU DÒNG ĐIỆN VẬT LÝ VÀ HIỆU ỨNG MẶT THỊ GIÁC CỦA SAO BĂNG
+                // =========================================================================
+                
                 if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00');
                 else setFlow('flow-pv', false);
 
                 if(loadInW > 0) setFlow('flow-load', true, 'flowOutR', '#0088ff');
                 else setFlow('flow-load', false);
 
-                // Luồng Pin: Xả (Dòng < 0) chạy từ Pin vào Inverter (flowInL) | Sạc (Dòng > 0) chạy từ Inverter ra Pin (flowOutL)
-                if (data.Batt_Current < -0.1) setFlow('flow-batt', true, 'flowInL', '#ff4444');
-                else if (data.Batt_Current > 0.1) setFlow('flow-batt', true, 'flowOutL', '#00cc66');
-                else setFlow('flow-batt', false); 
+                // 1. PIN ĐANG SẠC (Dòng điện âm < -0.1A): Điện từ Biến tần chạy xuống Pin. 
+                // Sử dụng 'flowOutL' (Lùi từ tâm xuống đáy trái) => Đầu mũi tên hướng trái (xuống dưới).
+                if (data.Batt_Current < -0.1) {
+                    setFlow('flow-batt', true, 'flowOutL', '#00cc66');
+                } 
+                // 2. PIN ĐANG XẢ (Dòng điện dương > 0.1A): Điện từ Pin chạy lên Biến tần. 
+                // Sử dụng 'flowInL' (Tiến từ đáy trái lên tâm) => Đầu mũi tên hướng phải (lên trên).
+                else if (data.Batt_Current > 0.1) {
+                    setFlow('flow-batt', true, 'flowInL', '#ff4444');
+                } 
+                else {
+                    setFlow('flow-batt', false); 
+                }
 
-                // Luồng Lưới: Lấy điện lưới (Grid > 0) chạy vào Inverter (flowInR) | Đẩy lưới (Grid < 0) chạy ra ngoài (flowOutR)
+                // Lưới
                 if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444');
                 else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66');
                 else setFlow('flow-grid', false);
@@ -665,7 +666,6 @@
             }
         });
 
-        // BẮT SỰ KIỆN KHI NGƯỜI DÙNG BẤM CÔNG TẮC GỬI LÊN FIREBASE
         document.getElementById('inv-switch-toggle').addEventListener('change', function() {
             const newState = this.checked ? 1 : 0;
             const statusText = document.getElementById('switch-status-text');
