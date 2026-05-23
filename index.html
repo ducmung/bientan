@@ -82,14 +82,14 @@
             top: -30px;
             font-size: 12px;
             font-weight: 900;
-            background: #00cc66; /* Màu mặc định xanh lá */
+            background: #00cc66; 
             color: #fff;
             padding: 3px 10px;
             border-radius: 12px;
             z-index: 20;
             box-shadow: 0 3px 6px rgba(0,0,0,0.2);
             white-space: nowrap;
-            transition: background-color 0.5s ease; /* Chuyển màu mượt */
+            transition: background-color 0.5s ease; 
         }
 
         /* ================= HIỆU ỨNG MẶT TRỜI ================= */
@@ -193,7 +193,7 @@
         .line {
             position: absolute; 
             height: 10px; 
-            margin-top: -3.5px;
+            margin-top: -5px; /* Căn thẳng tim trục xoay */
             background: transparent; 
             width: 48%; z-index: 1;
         }
@@ -203,43 +203,79 @@
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* ================= HIỆU ỨNG LUỒNG CHẠY ================= */
+        /* ================= HIỆU ỨNG LUỒNG CHẠY SAO BĂNG & ÁNH SÁNG MỜ ================= */
         .flow-group {
             display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;
             overflow: hidden; 
             --c: #fff; 
         }
 
+        /* Đường rãnh chạy mờ ẩn phía sau để làm nổi bật luồng sáng chính */
         .flow-track {
             position: absolute;
             top: 50%; left: 0;
             transform: translateY(-50%);
-            width: 100%; height: 1px;
-            background: rgba(255, 255, 255, 0.3);
+            width: 100%; height: 2px;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.05);
         }
 
+        /* Thân của luồng sao băng */
         .flow-dash {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 10px; 
+            width: 40px; /* Độ dài của đuôi sao băng */
             height: 3px; 
-            border-radius: 3px;
-            background: var(--c);
-            box-shadow: 0 0 6px 1px var(--c); 
+            border-radius: 4px;
             opacity: 0; 
         }
 
+        /* Chế độ chạy sang bên PHẢI */
+        .dir-right .flow-dash {
+            background: linear-gradient(to left, var(--c) 0%, transparent 100%);
+        }
+        /* Đầu mũi tên sao băng phát sáng rực rỡ */
+        .dir-right .flow-dash::after {
+            content: '';
+            position: absolute;
+            right: -2px; 
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            border-left: 8px solid #ffffff; 
+            filter: drop-shadow(0 0 4px var(--c)) drop-shadow(0 0 10px var(--c));
+        }
+
+        /* Chế độ chạy sang bên TRÁI */
+        .dir-left .flow-dash {
+            background: linear-gradient(to right, var(--c) 0%, transparent 100%);
+        }
+        .dir-left .flow-dash::after {
+            content: '';
+            position: absolute;
+            left: -2px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            border-right: 8px solid #ffffff;
+            filter: drop-shadow(0 0 4px var(--c)) drop-shadow(0 0 10px var(--c));
+        }
+
+        /* Giãn cách thời gian phóng của 5 cụm vệt sao băng */
         .flow-dash:nth-child(2) { animation-delay: 0s; }
         .flow-dash:nth-child(3) { animation-delay: 0.6s; }
         .flow-dash:nth-child(4) { animation-delay: 1.2s; }
         .flow-dash:nth-child(5) { animation-delay: 1.8s; }
         .flow-dash:nth-child(6) { animation-delay: 2.4s; }
 
-        @keyframes flowInL { 0% { left: -20%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
-        @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: -20%; opacity: 0; } }
-        @keyframes flowInR { 0% { right: -20%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
-        @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { right: -20%; opacity: 0; } }
+        /* Các hàm CSS Keyframes quét dịch chuyển */
+        @keyframes flowInL { 0% { left: -25%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+        @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: -25%; opacity: 0; } }
+        @keyframes flowInR { 0% { right: -25%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
+        @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { right: -25%; opacity: 0; } }
 
         /* ================= KHUNG THỐNG KÊ ================= */
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
@@ -387,7 +423,6 @@
                 </div>
                 <div id="switch-status-text" style="text-align: right; font-size: 12px; font-weight: 800; color: #888; margin-top: 5px;">Đang tải...</div>
             </div>
-
         </div>
     </div>
 
@@ -413,7 +448,6 @@
 
                 if (curData.main && foreData.list) {
                     updateWeatherUI(curData, foreData.list);
-                    
                     globalSunrise = curData.sys.sunrise;
                     globalSunset = curData.sys.sunset;
                     updateSunArc();
@@ -497,16 +531,26 @@
         setInterval(updateSunArc, 60000); 
         fetchWeather();
 
+        // ================= XỬ LÝ ANIMATION LUỒNG SAO BĂNG KHỚP HƯỚNG CHẠY =================
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId);
             if (isActive) {
                 group.style.display = 'block';
                 group.style.setProperty('--c', color);
                 
+                // Tự động gán Class định hướng để đảo ngược Gradient và đầu mũi tên sao băng
+                if (animName === 'flowInL' || animName === 'flowOutR') {
+                    group.classList.add('dir-right');
+                    group.classList.remove('dir-left');
+                } else {
+                    group.classList.add('dir-left');
+                    group.classList.remove('dir-right');
+                }
+
                 const dashes = group.querySelectorAll('.flow-dash');
                 dashes.forEach((d) => {
                     d.style.animationName = animName;
-                    d.style.animationDuration = '3s'; 
+                    d.style.animationDuration = '2.5s'; /* Tốc độ quét sao băng */
                     d.style.animationIterationCount = 'infinite';
                     d.style.animationTimingFunction = 'linear';
                 });
@@ -515,6 +559,7 @@
             }
         }
 
+        // ================= KẾT NỐI FIREBASE =================
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -547,11 +592,11 @@
                     tempLabel.innerText = '🌡️ ' + t + '°C';
                     
                     if (t < 40) {
-                        tempLabel.style.backgroundColor = '#00cc66'; // Dưới 40: Xanh lá
+                        tempLabel.style.backgroundColor = '#00cc66'; 
                     } else if (t >= 40 && t < 48) {
-                        tempLabel.style.backgroundColor = '#ffaa00'; // 40 - dưới 48: Vàng
+                        tempLabel.style.backgroundColor = '#ffaa00'; 
                     } else {
-                        tempLabel.style.backgroundColor = '#ff4444'; // 48 trở lên: Đỏ
+                        tempLabel.style.backgroundColor = '#ff4444'; 
                     }
                 }
 
@@ -590,16 +635,19 @@
                     else if (soc > lowerBound && soc <= upperBound) seg.classList.add('blink-' + colorTheme); 
                 }
 
+                // KHỚP HIỆU ỨNG LUỒNG SAO BĂNG THEO CÔNG SUẤT VÀ HƯỚNG ĐIỆN THỰC TẾ
                 if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00');
                 else setFlow('flow-pv', false);
 
                 if(loadInW > 0) setFlow('flow-load', true, 'flowOutR', '#0088ff');
                 else setFlow('flow-load', false);
 
-                if (data.Batt_Current < -0.1) setFlow('flow-batt', true, 'flowOutL', '#ff4444');
-                else if (data.Batt_Current > 0.1) setFlow('flow-batt', true, 'flowInL', '#00cc66');
+                // Luồng Pin: Xả (Dòng < 0) chạy từ Pin vào Inverter (flowInL) | Sạc (Dòng > 0) chạy từ Inverter ra Pin (flowOutL)
+                if (data.Batt_Current < -0.1) setFlow('flow-batt', true, 'flowInL', '#ff4444');
+                else if (data.Batt_Current > 0.1) setFlow('flow-batt', true, 'flowOutL', '#00cc66');
                 else setFlow('flow-batt', false); 
 
+                // Luồng Lưới: Lấy điện lưới (Grid > 0) chạy vào Inverter (flowInR) | Đẩy lưới (Grid < 0) chạy ra ngoài (flowOutR)
                 if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444');
                 else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66');
                 else setFlow('flow-grid', false);
@@ -622,7 +670,6 @@
             const newState = this.checked ? 1 : 0;
             const statusText = document.getElementById('switch-status-text');
             
-            // Hiển thị trạng thái đang chờ ESP32 xử lý
             statusText.innerText = "Đang gửi lệnh...";
             statusText.style.color = "#ffaa00";
             
