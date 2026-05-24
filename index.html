@@ -444,8 +444,8 @@
 
         async function fetchWeather() {
             try {
-                // Đổi về Open-Meteo miễn phí, bổ sung no-store để chống lỗi cache
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&hourly=temperature_2m,precipitation_probability,relative_humidity_2m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&models=ecmwf_ifs04&forecast_days=3&timeformat=unixtime`;
+                // ĐÃ SỬA: Loại bỏ tham số ép buộc ECMWF, để Open-Meteo dùng mô hình phân giải cao tự động
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&hourly=temperature_2m,precipitation_probability,relative_humidity_2m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&forecast_days=3&timeformat=unixtime`;
                 
                 const res = await fetch(url, { cache: 'no-store' });
                 const data = await res.json();
@@ -474,8 +474,8 @@
                         forecastList.push({
                             time: data.hourly.time[idx],
                             temp: data.hourly.temperature_2m[idx],
-                            pop: data.hourly.precipitation_probability[idx], // Tỉ lệ mưa Open-Meteo
-                            hum: data.hourly.relative_humidity_2m[idx],      // Độ ẩm Open-Meteo 
+                            pop: data.hourly.precipitation_probability[idx], 
+                            hum: data.hourly.relative_humidity_2m[idx],      
                             code: data.hourly.weather_code[idx],
                             is_day: data.hourly.is_day[idx]
                         });
@@ -484,15 +484,15 @@
                     updateWeatherUI(currentInfo, forecastList);
                     updateSunArc();
                 } else {
-                    document.getElementById('now-desc').innerText = "Lỗi dữ liệu API";
+                    document.getElementById('now-desc').innerText = "Lỗi API dữ liệu";
                 }
             } catch (e) { 
                 console.error("Lỗi kết nối Thời tiết:", e); 
-                document.getElementById('now-desc').innerText = "Lỗi mạng / Không thể tải";
+                document.getElementById('now-desc').innerText = "Mất kết nối";
             }
         }
 
-        // Chuyển đổi mã WMO của Open-Meteo sang icon
+        // Chuyển đổi mã WMO sang icon
         function getWeatherIcon(code, isDay) {
             const isNight = !isDay;
             const map = {
