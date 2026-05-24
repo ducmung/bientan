@@ -104,18 +104,25 @@
             transition: all 1s ease-out;
             left: 15%; top: 100%;
         }
-        /* ================= ĐỒNG HỒ CẬP NHẬT DATA ================= */
+        
+        /* ================= ĐỒNG HỒ CẬP NHẬT DATA (BÊN TRÁI, MÀU ĐỎ) ================= */
         #update-clock {
             position: absolute;
-            bottom: -55px; 
-            font-size: 11px;
+            top: 50%; /* Nằm chính giữa trục dọc */
+            left: 16%; /* Căn thẳng hàng với Pin và Điện mặt trời */
+            transform: translate(-50%, -50%);
+            font-size: 12px;
             font-weight: 900;
-            color: #0088ff; 
+            color: #ff0000; /* Màu đỏ nổi bật */
             font-family: monospace;
-            background: transparent;
+            background: rgba(255, 255, 255, 0.85); /* Nền mờ để dễ nhìn */
+            padding: 5px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 0, 0, 0.3);
             z-index: 25;
             letter-spacing: 1px;
             white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         
         /* ================= WIDGET THỜI TIẾT ĐÃ ĐƯỢC THU GỌN ================= */
@@ -142,7 +149,7 @@
         /* Khung chứa biểu đồ giờ */
         .weather-forecast-bottom {
             position: absolute;
-            top: 88%; /* Chỉnh lại một chút để không chèn xuống dưới */
+            top: 88%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 200px; 
@@ -153,7 +160,7 @@
         
         .w-chart-container { 
             position: relative; display: flex; justify-content: space-between; 
-            width: 100%; min-height: 55px; /* Tăng nhẹ để chứa thêm dòng Độ ẩm */
+            width: 100%; min-height: 55px; 
         }
         .w-col { 
             display: flex; flex-direction: column; align-items: center; 
@@ -162,8 +169,18 @@
         .w-col .time { font-size: 8px; opacity: 0.9; margin-bottom: 1px; }
         .w-col .icon { font-size: 12px; margin-bottom: 1px; text-shadow: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));}
         .w-col .temp { font-weight: 900; font-size: 10px; margin-bottom: 7px; } 
-        .w-col .pop { font-size: 7px; color: #a5d8ff; display: flex; align-items: center; gap: 2px; margin-bottom: 1px; }
-        .w-col .hum { font-size: 7px; color: #69f0ae; display: flex; align-items: center; gap: 2px; } /* CSS cho Độ ẩm */
+        
+        /* Cập nhật màu đen, bóng trắng cho Độ ẩm và Tỉ lệ mưa */
+        .w-col .pop { 
+            font-size: 8px; color: #000; font-weight: 900;
+            display: flex; align-items: center; gap: 2px; margin-bottom: 1px; 
+            text-shadow: 0 1px 3px rgba(255,255,255,0.9), 0 0 2px rgba(255,255,255,1); 
+        }
+        .w-col .hum { 
+            font-size: 8px; color: #000; font-weight: 900;
+            display: flex; align-items: center; gap: 2px; 
+            text-shadow: 0 1px 3px rgba(255,255,255,0.9), 0 0 2px rgba(255,255,255,1);
+        }
         
         .w-svg-curve { 
             position: absolute; top: 25px; left: 0; width: 100%; height: 12px; 
@@ -478,6 +495,9 @@
 <body>
     <div class="app-container">
         <div class="diagram-panel">
+            
+            <div id="update-clock">--:--:--</div>
+
             <div class="weather-container">
                 <div class="ss-location">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -543,7 +563,6 @@
                 <div id="lbl-inv-temp">🌡️ --°C</div>
                 <img src="68.jpg" alt="Inverter">
                 <div id="lbl-status" style="transition: color 0.5s;">Đang tải...</div>
-                <div id="update-clock">--:--:--</div>
             </div>
             
             <div class="weather-forecast-bottom">
@@ -593,10 +612,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <script>
-        // 1. Điền API Key của WeatherAPI vào đây
         const WEATHER_API_KEY = "cc8ca70dfda44338a96125125262405"; 
-        
-        // 2. Tọa độ Đại Đồng, Tiên Du, Bắc Ninh
         const LAT = 21.088; 
         const LON = 105.988;
         let globalSunrise = 0;
@@ -604,14 +620,12 @@
 
         async function fetchWeather() {
             try {
-                // Gọi API của WeatherAPI (lấy dự báo 2 ngày để xử lý vắt ngang qua đêm, kèm tiếng Việt)
                 const url = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${LAT},${LON}&days=2&aqi=no&alerts=no&lang=vi`;
                 const res = await fetch(url);
                 const data = await res.json();
 
                 if (data && data.current) {
-                    // Tính toán thời gian Mặt trời mọc/lặn ra Unix Time
-                    const dateStr = data.forecast.forecastday[0].date; // Ngày hôm nay
+                    const dateStr = data.forecast.forecastday[0].date; 
                     const astro = data.forecast.forecastday[0].astro;
                     globalSunrise = new Date(`${dateStr} ${astro.sunrise}`).getTime() / 1000;
                     globalSunset = new Date(`${dateStr} ${astro.sunset}`).getTime() / 1000;
@@ -623,12 +637,10 @@
                         is_day: data.current.is_day,
                         max: data.forecast.forecastday[0].day.maxtemp_c,
                         min: data.forecast.forecastday[0].day.mintemp_c,
-                        desc: data.current.condition.text // Lấy thẳng mô tả tiếng Việt chuẩn từ WeatherAPI
+                        desc: data.current.condition.text 
                     };
 
                     const nowEpoch = data.location.localtime_epoch;
-
-                    // Gộp mảng dự báo từng giờ của hôm nay và ngày mai (tránh lỗi khi đang ở mốc 23h)
                     const allHours = [
                         ...data.forecast.forecastday[0].hour,
                         ...data.forecast.forecastday[1].hour
@@ -637,7 +649,6 @@
                     let currentIndex = allHours.findIndex(h => h.time_epoch >= nowEpoch);
                     if(currentIndex === -1) currentIndex = 0;
 
-                    // Lấy 5 mốc dự báo tiếp theo
                     const forecastList = [];
                     for(let i = 0; i < 5; i++) {
                         let idx = currentIndex + i;
@@ -646,8 +657,8 @@
                         forecastList.push({
                             time_epoch: h.time_epoch,
                             temp: h.temp_c,
-                            pop: h.chance_of_rain, // Tỉ lệ mưa
-                            hum: h.humidity,       // ĐỘ ẨM
+                            pop: h.chance_of_rain, 
+                            hum: h.humidity,       
                             code: h.condition.code,
                             is_day: h.is_day
                         });
@@ -661,34 +672,32 @@
             }
         }
 
-        // Chuyển đổi mã trạng thái của WeatherAPI sang Emoji biểu tượng
         function getWeatherIcon(code, isDay) {
             const isNight = !isDay;
             const map = {
-                1000: isNight ? '🌙' : '☀️', // Quang đãng
-                1003: isNight ? '🌙' : '🌤️', // Có mây vài nơi
-                1006: '☁️', // Nhiều mây
-                1009: '☁️', // Âm u
-                1030: '🌫️', // Sương mù
-                1063: '🌦️', // Mưa rào rải rác
+                1000: isNight ? '🌙' : '☀️', 
+                1003: isNight ? '🌙' : '🌤️', 
+                1006: '☁️', 
+                1009: '☁️', 
+                1030: '🌫️', 
+                1063: '🌦️', 
                 1066: '❄️', 1069: '🌧️', 1072: '🌧️',
-                1087: '⛈️', // Dông
+                1087: '⛈️', 
                 1114: '❄️', 1117: '❄️', 1135: '🌫️', 1148: '🌫️',
                 1150: '🌧️', 1153: '🌧️', 1168: '🌧️', 1171: '🌧️',
-                1180: '🌦️', 1183: '🌧️', // Mưa nhẹ
-                1186: '🌧️', 1189: '🌧️', // Mưa vừa
-                1192: '🌧️', 1195: '🌧️', // Mưa to
+                1180: '🌦️', 1183: '🌧️', 
+                1186: '🌧️', 1189: '🌧️', 
+                1192: '🌧️', 1195: '🌧️', 
                 1198: '🌧️', 1201: '🌧️', 1240: '🌦️', 1243: '🌧️', 1246: '🌧️',
-                1273: '⛈️', // Mưa dông
+                1273: '⛈️', 
                 1276: '⛈️'
             };
             return map[code] || '☁️';
         }
 
         function updateWeatherUI(currentInfo, forecastList) {
-            // Cập nhật thông số hiện tại
             document.getElementById('now-temp').innerText = Math.round(currentInfo.temp) + '°';
-            document.getElementById('now-desc').innerText = currentInfo.desc; // Text chuẩn của WeatherAPI
+            document.getElementById('now-desc').innerText = currentInfo.desc; 
             document.getElementById('now-hl').innerText = `↑ ${Math.round(currentInfo.max)}° / ↓ ${Math.round(currentInfo.min)}°`;
             document.getElementById('now-feels').innerText = `Cảm giác như ${Math.round(currentInfo.feels_like)}°`;
 
@@ -705,7 +714,6 @@
                 const timeStr = dateObj.getHours().toString().padStart(2, '0') + ":00";
                 const icon = getWeatherIcon(f.code, f.is_day);
 
-                // Tạo cột giờ, bây giờ có thêm cả tỷ lệ mưa (☔) và độ ẩm (💧)
                 const col = document.createElement('div');
                 col.className = 'w-col';
                 col.innerHTML = `
@@ -717,7 +725,6 @@
                 `;
                 container.appendChild(col);
 
-                // Vẽ đường line chart mượt
                 const x = 10 + (i * 20);
                 const y = maxT === minT ? 10 : 18 - ((f.temp - minT) / (maxT - minT) * 14); 
                 pathData += (i === 0 ? "M" : "L") + ` ${x} ${y}`;
