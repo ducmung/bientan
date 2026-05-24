@@ -216,87 +216,200 @@
         }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg);
         }
-        /* ================= HIỆU ỨNG LUỒNG CHẠY SAO BĂNG ĐÃ FIX ================= */
+
+        /* ================= HIỆU ỨNG SAO BĂNG NHIỀU LUỒNG CÙNG LÚC ================= */
         .flow-group {
             display: none;
-            width: 100%; height: 100%; position: absolute; top: 0; left: 0;
-            overflow: hidden; 
-            --c: #fff;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            inset: 0;
+            overflow: visible;
+            --c: #00e5ff;
         }
+
         .flow-track {
             position: absolute;
-            top: 50%; left: 0;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
             transform: translateY(-50%);
-            width: 100%; height: 1px;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255,255,255,0.15);
         }
+
+        /* sao băng */
         .flow-dash {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 45px; /* Chiều dài đuôi sao băng */
+            width: 65px;
             height: 3px;
-            border-radius: 4px;
-            opacity: 0; 
+            border-radius: 10px;
+            opacity: 0;
+            filter: blur(0.4px);
         }
-        /* 1. CHẾ ĐỘ BAY SANG PHẢI (Đầu mũi tên sáng ở bên phải, Đuôi mờ dần về bên trái) */
+
+        /* đuôi sao */
         .dir-right .flow-dash {
-            /* 90deg: Đi từ trái sang phải, mờ dần bên trái, đậm dần ở bên phải */
-            background: linear-gradient(90deg, transparent 0%, var(--c) 100%);
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255,255,255,0.15) 20%,
+                var(--c) 70%,
+                #ffffff 100%
+            );
+            box-shadow:
+                0 0 6px var(--c),
+                0 0 12px var(--c);
         }
-        .dir-right .flow-dash::after {
-            content: '';
-            position: absolute;
-            right: -2px;
-            /* Mũi tên gắn vào sát mép phải */
-            top: 50%;
-            transform: translateY(-50%);
-            border-top: 4px solid transparent;
-            border-bottom: 4px solid transparent;
-            border-left: 8px solid #ffffff;
-            /* Đầu nhọn hướng sang phải */
-            filter: drop-shadow(0 0 6px var(--c));
-            /* Phát sáng đầu sao băng */
-        }
-        /* 2. CHẾ ĐỘ BAY SANG TRÁI (Đầu mũi tên sáng ở bên trái, Đuôi mờ dần về bên phải) */
+
         .dir-left .flow-dash {
-            /* 270deg: Đi từ phải sang trái, mờ dần bên phải, đậm dần ở bên trái */
-            background: linear-gradient(270deg, transparent 0%, var(--c) 100%);
+            background: linear-gradient(
+                270deg,
+                transparent 0%,
+                rgba(255,255,255,0.15) 20%,
+                var(--c) 70%,
+                #ffffff 100%
+            );
+            box-shadow:
+                0 0 6px var(--c),
+                0 0 12px var(--c);
         }
-        .dir-left .flow-dash::after {
+
+        /* đầu sao */
+        .flow-dash::before {
             content: '';
             position: absolute;
-            left: -2px;
-            /* Mũi tên gắn vào sát mép trái */
+            width: 7px;
+            height: 7px;
+            background: #fff;
+            border-radius: 50%;
             top: 50%;
             transform: translateY(-50%);
-            border-top: 4px solid transparent;
-            border-bottom: 4px solid transparent;
-            border-right: 8px solid #ffffff;
-            /* Đầu nhọn hướng sang trái */
-            filter: drop-shadow(0 0 6px var(--c));
+            box-shadow:
+                0 0 8px #fff,
+                0 0 14px var(--c),
+                0 0 20px var(--c);
         }
-        /* Delay giữa các vệt sao */
-        .flow-dash:nth-child(2) { animation-delay: 0s;
+
+        /* spark nhỏ */
+        .flow-dash::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            top: 50%;
+            box-shadow:
+                -6px -4px 0 rgba(255,255,255,0.7),
+                -10px 3px 0 rgba(255,255,255,0.5),
+                -15px -2px 0 rgba(255,255,255,0.3),
+                -20px 5px 0 rgba(255,255,255,0.2);
         }
-        .flow-dash:nth-child(3) { animation-delay: 0.6s; }
-        .flow-dash:nth-child(4) { animation-delay: 1.2s;
+
+        .dir-right .flow-dash::before,
+        .dir-right .flow-dash::after {
+            right: -3px;
         }
-        .flow-dash:nth-child(5) { animation-delay: 1.8s; }
-        .flow-dash:nth-child(6) { animation-delay: 2.4s;
+
+        .dir-left .flow-dash::before,
+        .dir-left .flow-dash::after {
+            left: -3px;
         }
-        @keyframes flowInL { 0% { left: -25%; opacity: 0; } 15% { opacity: 1;
-            } 85% { opacity: 1; } 100% { left: 100%; opacity: 0;
-            } }
-        @keyframes flowOutL { 0% { left: 100%; opacity: 0; } 15% { opacity: 1;
-            } 85% { opacity: 1; } 100% { left: -25%; opacity: 0;
-            } }
-        @keyframes flowInR { 0% { right: -25%; opacity: 0; } 15% { opacity: 1;
-            } 85% { opacity: 1; } 100% { right: 100%; opacity: 0;
-            } }
-        @keyframes flowOutR { 0% { right: 100%; opacity: 0; } 15% { opacity: 1;
-            } 85% { opacity: 1; } 100% { right: -25%; opacity: 0;
-            } }
+
+        /* 5 sao băng chạy cùng lúc */
+        .flow-dash:nth-child(2) { animation-delay: 0s; }
+        .flow-dash:nth-child(3) { animation-delay: 0.35s; }
+        .flow-dash:nth-child(4) { animation-delay: 0.7s; }
+        .flow-dash:nth-child(5) { animation-delay: 1.05s; }
+        .flow-dash:nth-child(6) { animation-delay: 1.4s; }
+
+        /* bay sang phải */
+        @keyframes flowInL {
+            0% {
+                left: -30%;
+                opacity: 0;
+                transform: translateY(-50%) scale(0.7);
+            }
+            10% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50%) scale(1);
+            }
+            100% {
+                left: 100%;
+                opacity: 0;
+                transform: translateY(-50%) scale(0.8);
+            }
+        }
+
+        /* bay sang trái */
+        @keyframes flowOutL {
+            0% {
+                left: 100%;
+                opacity: 0;
+                transform: translateY(-50%) scale(0.7);
+            }
+            10% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50%) scale(1);
+            }
+            100% {
+                left: -30%;
+                opacity: 0;
+                transform: translateY(-50%) scale(0.8);
+            }
+        }
+
+        /* bay sang phải (dành cho node bên phải) */
+        @keyframes flowInR {
+            0% {
+                right: -30%;
+                opacity: 0;
+                transform: translateY(-50%) scale(0.7);
+            }
+            10% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50%) scale(1);
+            }
+            100% {
+                right: 100%;
+                opacity: 0;
+                transform: translateY(-50%) scale(0.8);
+            }
+        }
+
+        /* bay sang trái (dành cho node bên phải) */
+        @keyframes flowOutR {
+            0% {
+                right: 100%;
+                opacity: 0;
+                transform: translateY(-50%) scale(0.7);
+            }
+            10% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50%) scale(1);
+            }
+            100% {
+                right: -30%;
+                opacity: 0;
+                transform: translateY(-50%) scale(0.8);
+            }
+        }
+
         /* ================= KHUNG THỐNG KÊ ================= */
         .stats-panel { display: flex;
             flex-direction: column; gap: 15px; }
@@ -457,8 +570,8 @@
     <script>
         // Cấu hình tọa độ cho Open-Meteo
         // Cấu hình tọa độ cho Núi Móng, Đại Đồng, Tiên Du, Bắc Ninh
-const LAT = 21.088; 
-const LON = 105.988;
+        const LAT = 21.088; 
+        const LON = 105.988;
         let globalSunrise = 0;
         let globalSunset = 0;
 
@@ -610,7 +723,7 @@ const LON = 105.988;
                 const dashes = group.querySelectorAll('.flow-dash');
                 dashes.forEach((d) => {
                     d.style.animationName = animName;
-                    d.style.animationDuration = '2.5s'; 
+                    d.style.animationDuration = '1.8s'; 
                     d.style.animationIterationCount = 'infinite';
                     d.style.animationTimingFunction = 'linear';
                 });
