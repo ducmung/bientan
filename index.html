@@ -117,38 +117,46 @@
             letter-spacing: 1px;
             white-space: nowrap;
         }
-        /* ================= WIDGET THỜI TIẾT ================= */
+        
+        /* ================= WIDGET THỜI TIẾT (SAMSUNG S25 ULTRA STYLE) ================= */
         .weather-container {
             position: absolute;
-            top: 14%; 
+            top: 15%; 
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
-            width: 145px; 
+            width: 190px; 
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
-        .weather-widget { background: transparent;
-            padding: 0; display: flex; flex-direction: column; color: #ff0000; }
-        .w-top { display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255, 0, 0, 0.3); padding-bottom: 3px; margin-bottom: 3px; }
-        .w-temp { font-size: 24px;
-            font-weight: 900; line-height: 1; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9); }
-        .w-right { text-align: right;
+        .ss-location { 
+            font-size: 12px; font-weight: 800; display: flex; 
+            align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px; 
         }
-        .w-desc { font-size: 9px; font-weight: 900; margin-bottom: 1px; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
-            white-space: nowrap; }
-        .w-hl { font-size: 8px; font-weight: 800; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+        .ss-temp { font-size: 44px; font-weight: 400; line-height: 1; margin-bottom: 4px; letter-spacing: -1px; }
+        .ss-desc { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+        .ss-hilo { font-size: 10px; font-weight: 600; opacity: 0.9; margin-bottom: 2px; }
+        .ss-feels { font-size: 10px; font-weight: 600; opacity: 0.9; margin-bottom: 10px; }
+        
+        .w-chart-container { 
+            position: relative; display: flex; justify-content: space-between; 
+            width: 100%; min-height: 60px; margin-top: 5px; 
         }
-        .w-chart-container { position: relative; display: flex; justify-content: space-between; width: 100%; margin-top: 2px; padding-bottom: 2px; min-height: 45px;
+        .w-col { 
+            display: flex; flex-direction: column; align-items: center; 
+            font-size: 9px; font-weight: 700; z-index: 2; width: 20%; 
         }
-        .w-col { display: flex; flex-direction: column; align-items: center; font-size: 8px; font-weight: 800; z-index: 2;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9); }
-        .w-col span:nth-child(2) { font-size: 11px;
-            margin: 2px 0 8px 0; text-shadow: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+        .w-col .time { font-size: 9px; opacity: 0.9; margin-bottom: 2px; }
+        .w-col .icon { font-size: 14px; margin-bottom: 2px; text-shadow: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));}
+        .w-col .temp { font-weight: 900; font-size: 11px; margin-bottom: 12px; }
+        .w-col .pop { font-size: 8px; color: #a5d8ff; display: flex; align-items: center; gap: 2px; }
+        
+        .w-svg-curve { 
+            position: absolute; top: 38px; left: 0; width: 100%; height: 16px; 
+            z-index: 1; overflow: visible; filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3)); 
         }
-        .w-col span:nth-child(3) { font-weight: 900; font-size: 9px; }
-        .w-svg-curve { position: absolute;
-            bottom: 16px; left: 0; width: 100%; height: 16px; z-index: 1; overflow: visible; filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3));
-        }
+
         #lbl-status {
             position: absolute;
             bottom: -32px; 
@@ -458,20 +466,20 @@
     <div class="app-container">
         <div class="diagram-panel">
             <div class="weather-container">
-                <div class="weather-widget">
-                    <div class="w-top">
-                        <div class="w-temp" id="now-temp">--°</div>
-                        <div class="w-right">
-                            <div class="w-desc" id="now-desc">Đang tải...</div>
-                            <div class="w-hl" id="now-hl">↑ --° / ↓ --°</div>
-                        </div>
-                    </div>
-                    <div class="w-chart-container" id="forecast-cols">
-                        <svg class="w-svg-curve" viewBox="0 0 100 20" preserveAspectRatio="none">
-                             <path id="curve-path" d="" fill="none" stroke="#fde047" stroke-width="1.5"/>
-                             <g id="curve-dots"></g>
-                        </svg>
-                    </div>
+                <div class="ss-location">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    Đại Đồng, Bắc Ninh
+                </div>
+                <div class="ss-temp" id="now-temp">--°</div>
+                <div class="ss-desc" id="now-desc">Đang cập nhật...</div>
+                <div class="ss-hilo" id="now-hl">↑ --° / ↓ --°</div>
+                <div class="ss-feels" id="now-feels">Cảm giác như --°</div>
+                
+                <div class="w-chart-container" id="forecast-cols">
+                    <svg class="w-svg-curve" viewBox="0 0 100 20" preserveAspectRatio="none">
+                         <path id="curve-path" d="" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+                         <g id="curve-dots"></g>
+                    </svg>
                 </div>
             </div>
             <div class="line line-pv">
@@ -568,8 +576,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <script>
-        // Cấu hình tọa độ cho Open-Meteo
-        // Cấu hình tọa độ cho Núi Móng, Đại Đồng, Tiên Du, Bắc Ninh
+        // Tọa độ chính xác khu vực Đại Đồng, Tiên Du, Bắc Ninh
         const LAT = 21.088; 
         const LON = 105.988;
         let globalSunrise = 0;
@@ -577,8 +584,8 @@
 
         async function fetchWeather() {
             try {
-                // Gọi API Open-Meteo
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weather_code,is_day&hourly=temperature_2m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&timeformat=unixtime`;
+                // Lấy thêm apparent_temperature (cảm giác như) và precipitation_probability (tỉ lệ mưa)
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&hourly=temperature_2m,precipitation_probability,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&timeformat=unixtime`;
                 const res = await fetch(url);
                 const data = await res.json();
 
@@ -588,6 +595,7 @@
 
                     const currentInfo = {
                         temp: data.current.temperature_2m,
+                        feels_like: data.current.apparent_temperature,
                         code: data.current.weather_code,
                         is_day: data.current.is_day,
                         max: data.daily.temperature_2m_max[0],
@@ -598,13 +606,15 @@
                     let currentIndex = data.hourly.time.findIndex(t => t >= nowUnix);
                     if(currentIndex === -1) currentIndex = 0;
 
+                    // Lấy 5 mốc giờ tiếp theo (Mỗi mốc cách nhau 1 tiếng để biểu đồ mượt như app Samsung)
                     const forecastList = [];
                     for(let i = 0; i < 5; i++) {
-                        let idx = currentIndex + i * 3;
+                        let idx = currentIndex + i; 
                         if (idx >= data.hourly.time.length) break;
                         forecastList.push({
                             time: data.hourly.time[idx],
                             temp: data.hourly.temperature_2m[idx],
+                            pop: data.hourly.precipitation_probability[idx], // Khả năng mưa
                             code: data.hourly.weather_code[idx],
                             is_day: data.hourly.is_day[idx]
                         });
@@ -618,62 +628,73 @@
             }
         }
 
+        // Dịch văn phong sát với app Samsung
         function getWeatherDetails(code, isDay) {
             const isNight = !isDay;
             const map = {
-                0: { desc: 'QUANG MÂY', icon: isNight ? '🌙' : '☀️' },
-                1: { desc: 'CHỦ YẾU NẮNG', icon: isNight ? '🌙' : '🌤️' },
-                2: { desc: 'CÓ MÂY', icon: '⛅' },
-                3: { desc: 'NHIỀU MÂY', icon: '☁️' },
-                45: { desc: 'SƯƠNG MÙ', icon: '🌫️' },
-                48: { desc: 'SƯƠNG LẠNH', icon: '🌫️' },
-                51: { desc: 'MƯA PHÙN', icon: '🌧️' },
-                53: { desc: 'MƯA PHÙN', icon: '🌧️' },
-                55: { desc: 'MƯA DÀY', icon: '🌧️' },
-                61: { desc: 'MƯA NHẸ', icon: '🌧️' },
-                63: { desc: 'MƯA VỪA', icon: '🌧️' },
-                65: { desc: 'MƯA TO', icon: '🌧️' },
-                71: { desc: 'TUYẾT NHẸ', icon: '❄️' },
-                73: { desc: 'TUYẾT', icon: '❄️' },
-                75: { desc: 'TUYẾT DÀY', icon: '❄️' },
-                80: { desc: 'MƯA RÀO', icon: '🌦️' },
-                81: { desc: 'MƯA RÀO', icon: '🌧️' },
-                82: { desc: 'MƯA LỚN', icon: '🌧️' },
-                95: { desc: 'DÔNG BÃO', icon: '⛈️' },
-                96: { desc: 'DÔNG BÃO', icon: '⛈️' },
-                99: { desc: 'DÔNG LỚN', icon: '⛈️' }
+                0: { desc: isNight ? 'Trời quang' : 'Trời nắng', icon: isNight ? '🌙' : '☀️' },
+                1: { desc: 'Chủ yếu nắng', icon: isNight ? '🌙' : '🌤️' },
+                2: { desc: 'Phần nào có mây', icon: '⛅' },
+                3: { desc: 'Nhiều mây', icon: '☁️' },
+                45: { desc: 'Sương mù', icon: '🌫️' },
+                48: { desc: 'Sương lạnh', icon: '🌫️' },
+                51: { desc: 'Mưa phùn', icon: '🌧️' },
+                53: { desc: 'Mưa phùn', icon: '🌧️' },
+                55: { desc: 'Mưa dày', icon: '🌧️' },
+                61: { desc: 'Mưa nhẹ', icon: '🌧️' },
+                63: { desc: 'Mưa vừa', icon: '🌧️' },
+                65: { desc: 'Mưa to', icon: '🌧️' },
+                71: { desc: 'Tuyết nhẹ', icon: '❄️' },
+                73: { desc: 'Tuyết', icon: '❄️' },
+                75: { desc: 'Tuyết dày', icon: '❄️' },
+                80: { desc: 'Mưa rào', icon: '🌦️' },
+                81: { desc: 'Mưa rào', icon: '🌧️' },
+                82: { desc: 'Mưa lớn', icon: '🌧️' },
+                95: { desc: 'Dông bão', icon: '⛈️' },
+                96: { desc: 'Dông bão', icon: '⛈️' },
+                99: { desc: 'Dông lớn', icon: '⛈️' }
             };
-            return map[code] || { desc: 'KHÔNG RÕ', icon: '☁️' };
+            return map[code] || { desc: 'Không rõ', icon: '☁️' };
         }
 
         function updateWeatherUI(currentInfo, forecastList) {
             const curDetails = getWeatherDetails(currentInfo.code, currentInfo.is_day);
+            
+            // Cập nhật thông số hiện tại
             document.getElementById('now-temp').innerText = Math.round(currentInfo.temp) + '°';
             document.getElementById('now-desc').innerText = curDetails.desc;
             document.getElementById('now-hl').innerText = `↑ ${Math.round(currentInfo.max)}° / ↓ ${Math.round(currentInfo.min)}°`;
+            document.getElementById('now-feels').innerText = `Cảm giác như ${Math.round(currentInfo.feels_like)}°`;
 
             const container = document.getElementById('forecast-cols');
             container.querySelectorAll('.w-col').forEach(c => c.remove());
 
             let pathData = "", dotsHtml = "";
             const temps = forecastList.map(f => f.temp);
-            const minT = Math.min(...temps) - 2;
-            const maxT = Math.max(...temps) + 2;
+            const minT = Math.min(...temps) - 1;
+            const maxT = Math.max(...temps) + 1;
 
             forecastList.forEach((f, i) => {
                 const dateObj = new Date(f.time * 1000);
                 const timeStr = dateObj.getHours().toString().padStart(2, '0') + ":00";
                 const details = getWeatherDetails(f.code, f.is_day);
 
+                // Tạo cột giờ
                 const col = document.createElement('div');
                 col.className = 'w-col';
-                col.innerHTML = `<span>${timeStr}</span><span>${details.icon}</span><span>${Math.round(f.temp)}°</span>`;
+                col.innerHTML = `
+                    <span class="time">${timeStr}</span>
+                    <span class="icon">${details.icon}</span>
+                    <span class="temp">${Math.round(f.temp)}°</span>
+                    <span class="pop">💧${f.pop}%</span>
+                `;
                 container.appendChild(col);
 
+                // Vẽ đường line chart mượt
                 const x = 10 + (i * 20);
-                const y = 18 - ((f.temp - minT) / (maxT - minT) * 14);
+                const y = maxT === minT ? 10 : 18 - ((f.temp - minT) / (maxT - minT) * 14); 
                 pathData += (i === 0 ? "M" : "L") + ` ${x} ${y}`;
-                dotsHtml += `<circle cx="${x}" cy="${y}" r="1.5" fill="#ff0000"/>`;
+                dotsHtml += `<circle cx="${x}" cy="${y}" r="2" fill="#ffffff"/>`;
             });
 
             document.getElementById('curve-path').setAttribute('d', pathData);
