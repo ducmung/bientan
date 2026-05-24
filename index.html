@@ -105,17 +105,17 @@
             left: 15%; top: 100%;
         }
         
-        /* ================= ĐỒNG HỒ CẬP NHẬT DATA (BÊN TRÁI, MÀU ĐỎ) ================= */
+        /* ================= ĐỒNG HỒ CẬP NHẬT DATA (CHUYỂN SANG PHẢI) ================= */
         #update-clock {
             position: absolute;
-            top: 50%; /* Nằm chính giữa trục dọc */
-            left: 16%; /* Căn thẳng hàng với Pin và Điện mặt trời */
+            top: 50%; 
+            left: 84%; /* Đã đổi thành 84% để sang phải */
             transform: translate(-50%, -50%);
             font-size: 12px;
             font-weight: 900;
-            color: #ff0000; /* Màu đỏ nổi bật */
+            color: #ff0000; 
             font-family: monospace;
-            background: rgba(255, 255, 255, 0.85); /* Nền mờ để dễ nhìn */
+            background: rgba(255, 255, 255, 0.85); 
             padding: 5px 10px;
             border-radius: 12px;
             border: 1px solid rgba(255, 0, 0, 0.3);
@@ -124,8 +124,25 @@
             white-space: nowrap;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
+
+        /* ================= TRẠNG THÁI SẠC/XẢ (CHUYỂN SANG TRÁI) ================= */
+        #lbl-status {
+            position: absolute;
+            top: 50%; /* Đưa lên giữa trục dọc */
+            left: 16%; /* Căn bên trái */
+            transform: translate(-50%, -50%);
+            font-size: 13px;
+            font-weight: 800;
+            background: rgba(255,255,255,0.9); 
+            padding: 4px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: #888;
+            white-space: nowrap; 
+            z-index: 25;
+        }
         
-        /* ================= WIDGET THỜI TIẾT ĐÃ ĐƯỢC THU GỌN ================= */
+        /* ================= WIDGET THỜI TIẾT ================= */
         .weather-container {
             position: absolute;
             top: 11%; 
@@ -187,19 +204,6 @@
             z-index: 1; overflow: visible; filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3)); 
         }
 
-        #lbl-status {
-            position: absolute;
-            bottom: -32px; 
-            font-size: 13px;
-            font-weight: 800;
-            background: rgba(255,255,255,0.9); 
-            padding: 4px 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            color: #888;
-            white-space: nowrap; 
-            z-index: 20;
-        }
         .node h3 { font-size: 9px; color: #666; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px;
         }
         .node .val { font-size: 15px; font-weight: 900; color: #111;
@@ -498,6 +502,8 @@
             
             <div id="update-clock">--:--:--</div>
 
+            <div id="lbl-status" style="transition: color 0.5s;">Đang tải...</div>
+
             <div class="weather-container">
                 <div class="ss-location">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -562,7 +568,6 @@
             <div class="node node-center pos-inv">
                 <div id="lbl-inv-temp">🌡️ --°C</div>
                 <img src="68.jpg" alt="Inverter">
-                <div id="lbl-status" style="transition: color 0.5s;">Đang tải...</div>
             </div>
             
             <div class="weather-forecast-bottom">
