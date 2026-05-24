@@ -105,7 +105,7 @@
             left: 15%; top: 100%;
         }
         
-        /* ================= ĐỒNG HỒ CẬP NHẬT DATA (CHUYỂN SANG PHẢI) ================= */
+        /* ================= ĐỒNG HỒ CẬP NHẬT DATA (BÊN PHẢI) ================= */
         #update-clock {
             position: absolute;
             top: 50%; 
@@ -125,7 +125,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* ================= TRẠNG THÁI SẠC/XẢ (CHUYỂN SANG TRÁI) ================= */
+        /* ================= TRẠNG THÁI SẠC/XẢ (BÊN TRÁI) ================= */
         #lbl-status {
             position: absolute;
             top: 50%; 
@@ -187,7 +187,6 @@
         .w-col .icon { font-size: 12px; margin-bottom: 1px; text-shadow: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));}
         .w-col .temp { font-weight: 900; font-size: 10px; margin-bottom: 7px; } 
         
-        /* Cập nhật màu đen, bóng trắng cho Độ ẩm và Tỉ lệ mưa */
         .w-col .pop { 
             font-size: 8px; color: #000; font-weight: 900;
             display: flex; align-items: center; gap: 2px; margin-bottom: 1px; 
@@ -204,13 +203,11 @@
             z-index: 1; overflow: visible; filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3)); 
         }
 
-        .node h3 { font-size: 9px; color: #666; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px;
-        }
-        .node .val { font-size: 15px; font-weight: 900; color: #111;
-        }
+        .node h3 { font-size: 9px; color: #666; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; }
+        .node .val { font-size: 15px; font-weight: 900; color: #111; }
         .node .unit { font-size: 9px; color: #888; }
-        .icon { font-size: 16px;
-            margin-bottom: 2px; }
+        .icon { font-size: 16px; margin-bottom: 2px; }
+
         /* ================= CSS VẼ QUẢ PIN ================= */
         .battery-box {
             width: 38px;
@@ -220,278 +217,123 @@
         }
         .battery-box::after { content: ''; position: absolute; top: 3px; right: -4px; width: 3px;
             height: 8px; background: #555; border-radius: 0 2px 2px 0; }
-        .batt-seg { flex: 1; border-radius: 1px;
-            background: transparent; }
-        .solid-red { background-color: #ff4444; } .solid-yellow { background-color: #ffaa00; } .solid-green { background-color: #00cc66;
-        }
+        .batt-seg { flex: 1; border-radius: 1px; background: transparent; }
+        .solid-red { background-color: #ff4444; } .solid-yellow { background-color: #ffaa00; } .solid-green { background-color: #00cc66; }
         @keyframes flash-red { 0%, 100% { background-color: #ff4444; box-shadow: 0 0 4px #ff4444;
             } 50% { background-color: transparent; box-shadow: none; } }
-        @keyframes flash-yellow { 0%, 100% { background-color: #ffaa00;
-            box-shadow: 0 0 4px #ffaa00; } 50% { background-color: transparent; box-shadow: none;
-            } }
+        @keyframes flash-yellow { 0%, 100% { background-color: #ffaa00; box-shadow: 0 0 4px #ffaa00;
+            } 50% { background-color: transparent; box-shadow: none; } }
         @keyframes flash-green { 0%, 100% { background-color: #00cc66; box-shadow: 0 0 4px #00cc66;
             } 50% { background-color: transparent; box-shadow: none; } }
-        .blink-red { animation: flash-red 1.2s infinite;
-            } .blink-yellow { animation: flash-yellow 1.2s infinite; } .blink-green { animation: flash-green 1.2s infinite;
-            }
+        .blink-red { animation: flash-red 1.2s infinite; } 
+        .blink-yellow { animation: flash-yellow 1.2s infinite; } 
+        .blink-green { animation: flash-green 1.2s infinite; }
+
         /* ================= VỊ TRÍ & ĐƯỜNG DÂY ================= */
-        .pos-pv { top: 16%;
-            left: 16%; } 
+        .pos-pv { top: 16%; left: 16%; } 
         .pos-grid { top: 16%; left: 84%; }
-        .pos-batt { top: 84%;
-            left: 16%; }
+        .pos-batt { top: 84%; left: 16%; }
         .pos-load { top: 84%; left: 84%; }
-        .pos-inv { top: 50%;
-            left: 50%; }
+        .pos-inv { top: 50%; left: 50%; }
         .line {
-            position: absolute; 
-            height: 10px; 
-            margin-top: -5px;
-            background: transparent; 
-            width: 48%; z-index: 1;
+            position: absolute; height: 10px; margin-top: -5px;
+            background: transparent; width: 48%; z-index: 1;
         }
-        .line-pv { top: 16%; left: 16%; transform-origin: left center;
-            transform: rotate(45deg); }
-        .line-grid { top: 16%; right: 16%; transform-origin: right center; transform: rotate(-45deg);
-        }
-        .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg);
-        }
-        .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg);
-        }
+        .line-pv { top: 16%; left: 16%; transform-origin: left center; transform: rotate(45deg); }
+        .line-grid { top: 16%; right: 16%; transform-origin: right center; transform: rotate(-45deg); }
+        .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
+        .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* ================= HIỆU ỨNG SAO BĂNG NHIỀU LUỒNG CÙNG LÚC ================= */
+        /* ================= HIỆU ỨNG SAO BĂNG ================= */
         .flow-group {
-            display: none;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            inset: 0;
-            overflow: visible;
-            --c: #00e5ff;
+            display: none; width: 100%; height: 100%;
+            position: absolute; inset: 0; overflow: visible; --c: #00e5ff;
         }
-
         .flow-track {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.15);
+            position: absolute; top: 50%; left: 0; width: 100%; height: 1px;
+            transform: translateY(-50%); background: rgba(255,255,255,0.15);
         }
-
-        /* sao băng - đã được thu nhỏ lại */
         .flow-dash {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 40px; /* Thu hẹp chiều dài */
-            height: 2px; /* Thu hẹp chiều cao */
-            border-radius: 10px;
-            opacity: 0;
-            filter: blur(0.4px);
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 40px; height: 2px; border-radius: 10px; opacity: 0; filter: blur(0.4px);
         }
-
-        /* đuôi sao */
         .dir-right .flow-dash {
-            background: linear-gradient(
-                90deg,
-                transparent 0%,
-                rgba(255,255,255,0.15) 20%,
-                var(--c) 70%,
-                #ffffff 100%
-            );
-            box-shadow:
-                0 0 4px var(--c),
-                0 0 8px var(--c); /* Giảm độ tỏa sáng do tia nhỏ lại */
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%);
+            box-shadow: 0 0 4px var(--c), 0 0 8px var(--c);
         }
-
         .dir-left .flow-dash {
-            background: linear-gradient(
-                270deg,
-                transparent 0%,
-                rgba(255,255,255,0.15) 20%,
-                var(--c) 70%,
-                #ffffff 100%
-            );
-            box-shadow:
-                0 0 4px var(--c),
-                0 0 8px var(--c);
+            background: linear-gradient(270deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%);
+            box-shadow: 0 0 4px var(--c), 0 0 8px var(--c);
         }
-
-        /* đầu sao - thu nhỏ lại cho hài hòa */
         .flow-dash::before {
-            content: '';
-            position: absolute;
-            width: 5px; /* Thu nhỏ đầu sao */
-            height: 5px; /* Thu nhỏ đầu sao */
-            background: #fff;
-            border-radius: 50%;
-            top: 50%;
-            transform: translateY(-50%);
-            box-shadow:
-                0 0 6px #fff,
-                0 0 10px var(--c),
-                0 0 15px var(--c);
+            content: ''; position: absolute; width: 5px; height: 5px;
+            background: #fff; border-radius: 50%; top: 50%; transform: translateY(-50%);
+            box-shadow: 0 0 6px #fff, 0 0 10px var(--c), 0 0 15px var(--c);
         }
-
-        /* spark nhỏ */
         .flow-dash::after {
-            content: '';
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: #fff;
-            border-radius: 50%;
-            top: 50%;
-            box-shadow:
-                -6px -4px 0 rgba(255,255,255,0.7),
-                -10px 3px 0 rgba(255,255,255,0.5),
-                -15px -2px 0 rgba(255,255,255,0.3);
+            content: ''; position: absolute; width: 2px; height: 2px;
+            background: #fff; border-radius: 50%; top: 50%;
+            box-shadow: -6px -4px 0 rgba(255,255,255,0.7), -10px 3px 0 rgba(255,255,255,0.5), -15px -2px 0 rgba(255,255,255,0.3);
         }
+        .dir-right .flow-dash::before, .dir-right .flow-dash::after { right: -2px; }
+        .dir-left .flow-dash::before, .dir-left .flow-dash::after { left: -2px; }
 
-        .dir-right .flow-dash::before,
-        .dir-right .flow-dash::after {
-            right: -2px;
-        }
-
-        .dir-left .flow-dash::before,
-        .dir-left .flow-dash::after {
-            left: -2px;
-        }
-
-        /* 5 sao băng chạy cùng lúc - Đã điều chỉnh lại nhịp điệu trễ do chạy chậm lại */
         .flow-dash:nth-child(2) { animation-delay: 0s; }
         .flow-dash:nth-child(3) { animation-delay: 0.5s; }
         .flow-dash:nth-child(4) { animation-delay: 1.0s; }
         .flow-dash:nth-child(5) { animation-delay: 1.5s; }
         .flow-dash:nth-child(6) { animation-delay: 2.0s; }
 
-        /* bay sang phải */
         @keyframes flowInL {
-            0% {
-                left: -30%;
-                opacity: 0;
-                transform: translateY(-50%) scale(0.7);
-            }
-            10% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 1;
-                transform: translateY(-50%) scale(1);
-            }
-            100% {
-                left: 100%;
-                opacity: 0;
-                transform: translateY(-50%) scale(0.8);
-            }
+            0% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.7); }
+            10% { opacity: 1; }
+            50% { opacity: 1; transform: translateY(-50%) scale(1); }
+            100% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.8); }
         }
-
-        /* bay sang trái */
         @keyframes flowOutL {
-            0% {
-                left: 100%;
-                opacity: 0;
-                transform: translateY(-50%) scale(0.7);
-            }
-            10% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 1;
-                transform: translateY(-50%) scale(1);
-            }
-            100% {
-                left: -30%;
-                opacity: 0;
-                transform: translateY(-50%) scale(0.8);
-            }
+            0% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.7); }
+            10% { opacity: 1; }
+            50% { opacity: 1; transform: translateY(-50%) scale(1); }
+            100% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.8); }
         }
-
-        /* bay sang phải (dành cho node bên phải) */
         @keyframes flowInR {
-            0% {
-                right: -30%;
-                opacity: 0;
-                transform: translateY(-50%) scale(0.7);
-            }
-            10% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 1;
-                transform: translateY(-50%) scale(1);
-            }
-            100% {
-                right: 100%;
-                opacity: 0;
-                transform: translateY(-50%) scale(0.8);
-            }
+            0% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.7); }
+            10% { opacity: 1; }
+            50% { opacity: 1; transform: translateY(-50%) scale(1); }
+            100% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.8); }
         }
-
-        /* bay sang trái (dành cho node bên phải) */
         @keyframes flowOutR {
-            0% {
-                right: 100%;
-                opacity: 0;
-                transform: translateY(-50%) scale(0.7);
-            }
-            10% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 1;
-                transform: translateY(-50%) scale(1);
-            }
-            100% {
-                right: -30%;
-                opacity: 0;
-                transform: translateY(-50%) scale(0.8);
-            }
+            0% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.7); }
+            10% { opacity: 1; }
+            50% { opacity: 1; transform: translateY(-50%) scale(1); }
+            100% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.8); }
         }
 
         /* ================= KHUNG THỐNG KÊ ================= */
-        .stats-panel { display: flex;
-            flex-direction: column; gap: 15px; }
+        .stats-panel { display: flex; flex-direction: column; gap: 15px; }
         .stat-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-        }
+            border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .stat-header h2 { font-size: 16px; color: #444; }
-        .progress-bar { width: 100%;
-            height: 12px; background: rgba(0,0,0,0.05); border-radius: 10px; display: flex; overflow: hidden; margin-bottom: 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .bar-batt { background: linear-gradient(90deg, #00cc66, #33ff99); width: 0%; transition: width 1s;
-        }
+        .progress-bar { width: 100%; height: 12px; background: rgba(0,0,0,0.05); border-radius: 10px; display: flex; overflow: hidden; margin-bottom: 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .bar-batt { background: linear-gradient(90deg, #00cc66, #33ff99); width: 0%; transition: width 1s; }
         .list-detail { font-size: 13px; color: #555; }
-        .list-detail div { display: flex;
-            justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;}
-        .list-detail div:last-child { border: none;
-        }
-        .list-detail span { font-weight: 800; color: #111;
-        }
-        /* ================= NÚT GẠT (TOGGLE SWITCH) ================= */
-        .switch { position: relative;
-            display: inline-block; width: 50px; height: 26px; }
-        .switch input { opacity: 0; width: 0; height: 0;
-        }
+        .list-detail div { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px;}
+        .list-detail div:last-child { border: none; }
+        .list-detail span { font-weight: 800; color: #111; }
+        /* ================= NÚT GẠT ================= */
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc;
             transition: .4s; border-radius: 26px; }
         .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px;
-            bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+            bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         input:checked + .slider { background-color: #00cc66; }
-        input:checked + .slider:before { transform: translateX(24px);
-        }
+        input:checked + .slider:before { transform: translateX(24px); }
         @media (min-width: 768px) {
-            .app-container { flex-direction: row; flex-wrap: wrap;
-                align-items: stretch; }
-            .diagram-panel { flex: 1; max-width: none;
-            }
-            .stats-panel { flex: 1; justify-content: center;
-            }
+            .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
+            .diagram-panel { flex: 1; max-width: none; }
+            .stats-panel { flex: 1; justify-content: center; }
         }
     </style>
 </head>
@@ -500,7 +342,6 @@
         <div class="diagram-panel">
             
             <div id="update-clock">--:--:--</div>
-
             <div id="lbl-status" style="transition: color 0.5s;">Đang tải...</div>
 
             <div class="weather-container">
@@ -515,52 +356,31 @@
             </div>
             
             <div class="line line-pv">
-                <div class="flow-group" id="flow-pv">
-                    <div class="flow-track"></div>
-                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
-                </div>
+                <div class="flow-group" id="flow-pv"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div>
             </div>
             <div class="line line-grid">
-                <div class="flow-group" id="flow-grid">
-                    <div class="flow-track"></div>
-                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
-                </div>
+                <div class="flow-group" id="flow-grid"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div>
             </div>
             <div class="line line-batt">
-                <div class="flow-group" id="flow-batt">
-                    <div class="flow-track"></div>
-                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
-                </div>
+                <div class="flow-group" id="flow-batt"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div>
             </div>
             <div class="line line-load">
-                <div class="flow-group" id="flow-load">
-                    <div class="flow-track"></div>
-                    <div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div>
-                </div>
+                <div class="flow-group" id="flow-load"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div>
             </div>
+            
             <div class="node pos-pv">
                 <div class="sun-arc-mini">
-                    <svg viewBox="0 0 80 40">
-                     <path d="M 5 35 Q 40 -5 75 35" fill="none" stroke="#ffaa00" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.6"/>
-                    </svg>
+                    <svg viewBox="0 0 80 40"><path d="M 5 35 Q 40 -5 75 35" fill="none" stroke="#ffaa00" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.6"/></svg>
                     <div id="moving-sun">☀️</div>
                 </div>
-                <h3>MẶT TRỜI</h3>
-                <div class="val" id="lbl-pv">0</div>
-                <div class="unit">W</div>
+                <h3>MẶT TRỜI</h3><div class="val" id="lbl-pv">0</div><div class="unit">W</div>
             </div>
             <div class="node pos-grid"><div class="icon">🗼</div><h3>LƯỚI EVN</h3><div class="val" id="lbl-grid">0</div><div class="unit">W</div></div>
             <div class="node pos-batt">
                 <div class="battery-box">
-                    <div class="batt-seg" id="batt-seg-0"></div>
-                    <div class="batt-seg" id="batt-seg-1"></div>
-                    <div class="batt-seg" id="batt-seg-2"></div>
-                    <div class="batt-seg" id="batt-seg-3"></div>
-                    <div class="batt-seg" id="batt-seg-4"></div>
+                    <div class="batt-seg" id="batt-seg-0"></div><div class="batt-seg" id="batt-seg-1"></div><div class="batt-seg" id="batt-seg-2"></div><div class="batt-seg" id="batt-seg-3"></div><div class="batt-seg" id="batt-seg-4"></div>
                 </div>
-                <h3>PIN LƯU TRỮ</h3>
-                <div class="val" id="lbl-batt">0</div>
-                <div class="unit">W</div>
+                <h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div>
                 <div style="font-size: 16px; font-weight:900; margin-top: 2px; transition: color 0.5s;" id="lbl-soc">0%</div>
             </div>
             <div class="node pos-load"><div class="icon">🏠</div><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
@@ -616,7 +436,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <script>
-        const WEATHER_API_KEY = "cc8ca70dfda44338a96125125262405"; 
+        // Tọa độ Đại Đồng, Tiên Du, Bắc Ninh
         const LAT = 21.088; 
         const LON = 105.988;
         let globalSunrise = 0;
@@ -624,84 +444,90 @@
 
         async function fetchWeather() {
             try {
-                const url = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${LAT},${LON}&days=2&aqi=no&alerts=no&lang=vi`;
-                const res = await fetch(url);
+                // Đổi về Open-Meteo miễn phí, bổ sung no-store để chống lỗi cache
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&hourly=temperature_2m,precipitation_probability,relative_humidity_2m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&models=ecmwf_ifs04&forecast_days=3&timeformat=unixtime`;
+                
+                const res = await fetch(url, { cache: 'no-store' });
                 const data = await res.json();
 
                 if (data && data.current) {
-                    const dateStr = data.forecast.forecastday[0].date; 
-                    const astro = data.forecast.forecastday[0].astro;
-                    globalSunrise = new Date(`${dateStr} ${astro.sunrise}`).getTime() / 1000;
-                    globalSunset = new Date(`${dateStr} ${astro.sunset}`).getTime() / 1000;
+                    globalSunrise = data.daily.sunrise[0];
+                    globalSunset = data.daily.sunset[0];
 
                     const currentInfo = {
-                        temp: data.current.temp_c,
-                        feels_like: data.current.feelslike_c,
-                        code: data.current.condition.code,
+                        temp: data.current.temperature_2m,
+                        feels_like: data.current.apparent_temperature,
+                        code: data.current.weather_code,
                         is_day: data.current.is_day,
-                        max: data.forecast.forecastday[0].day.maxtemp_c,
-                        min: data.forecast.forecastday[0].day.mintemp_c,
-                        desc: data.current.condition.text 
+                        max: data.daily.temperature_2m_max[0],
+                        min: data.daily.temperature_2m_min[0]
                     };
 
-                    const nowEpoch = data.location.localtime_epoch;
-                    const allHours = [
-                        ...data.forecast.forecastday[0].hour,
-                        ...data.forecast.forecastday[1].hour
-                    ];
-
-                    let currentIndex = allHours.findIndex(h => h.time_epoch >= nowEpoch);
+                    const nowUnix = Math.floor(Date.now() / 1000);
+                    let currentIndex = data.hourly.time.findIndex(t => t >= nowUnix);
                     if(currentIndex === -1) currentIndex = 0;
 
                     const forecastList = [];
                     for(let i = 0; i < 5; i++) {
                         let idx = currentIndex + i;
-                        if (idx >= allHours.length) break;
-                        const h = allHours[idx];
+                        if (idx >= data.hourly.time.length) break;
                         forecastList.push({
-                            time_epoch: h.time_epoch,
-                            temp: h.temp_c,
-                            pop: h.chance_of_rain, 
-                            hum: h.humidity,       
-                            code: h.condition.code,
-                            is_day: h.is_day
+                            time: data.hourly.time[idx],
+                            temp: data.hourly.temperature_2m[idx],
+                            pop: data.hourly.precipitation_probability[idx], // Tỉ lệ mưa Open-Meteo
+                            hum: data.hourly.relative_humidity_2m[idx],      // Độ ẩm Open-Meteo 
+                            code: data.hourly.weather_code[idx],
+                            is_day: data.hourly.is_day[idx]
                         });
                     }
 
                     updateWeatherUI(currentInfo, forecastList);
                     updateSunArc();
+                } else {
+                    document.getElementById('now-desc').innerText = "Lỗi dữ liệu API";
                 }
             } catch (e) { 
-                console.error("Lỗi kết nối WeatherAPI:", e); 
+                console.error("Lỗi kết nối Thời tiết:", e); 
+                document.getElementById('now-desc').innerText = "Lỗi mạng / Không thể tải";
             }
         }
 
+        // Chuyển đổi mã WMO của Open-Meteo sang icon
         function getWeatherIcon(code, isDay) {
             const isNight = !isDay;
             const map = {
-                1000: isNight ? '🌙' : '☀️', 
-                1003: isNight ? '🌙' : '🌤️', 
-                1006: '☁️', 
-                1009: '☁️', 
-                1030: '🌫️', 
-                1063: '🌦️', 
-                1066: '❄️', 1069: '🌧️', 1072: '🌧️',
-                1087: '⛈️', 
-                1114: '❄️', 1117: '❄️', 1135: '🌫️', 1148: '🌫️',
-                1150: '🌧️', 1153: '🌧️', 1168: '🌧️', 1171: '🌧️',
-                1180: '🌦️', 1183: '🌧️', 
-                1186: '🌧️', 1189: '🌧️', 
-                1192: '🌧️', 1195: '🌧️', 
-                1198: '🌧️', 1201: '🌧️', 1240: '🌦️', 1243: '🌧️', 1246: '🌧️',
-                1273: '⛈️', 
-                1276: '⛈️'
+                0: isNight ? '🌙' : '☀️', 
+                1: isNight ? '🌙' : '🌤️', 
+                2: '⛅', 3: '☁️', 
+                45: '🌫️', 48: '🌫️', 
+                51: '🌧️', 53: '🌧️', 55: '🌧️', 
+                61: '🌧️', 63: '🌧️', 65: '🌧️', 
+                71: '❄️', 73: '❄️', 75: '❄️', 
+                80: '🌦️', 81: '🌧️', 82: '🌧️', 
+                95: '⛈️', 96: '⛈️', 99: '⛈️'
             };
             return map[code] || '☁️';
         }
 
+        // Chuyển đổi mã WMO sang tiếng Việt
+        function getWeatherDesc(code, isDay) {
+            const isNight = !isDay;
+            const map = {
+                0: isNight ? 'Trời quang' : 'Trời nắng',
+                1: 'Chủ yếu nắng', 2: 'Có mây', 3: 'Nhiều mây',
+                45: 'Sương mù', 48: 'Sương lạnh',
+                51: 'Mưa phùn', 53: 'Mưa phùn', 55: 'Mưa dày',
+                61: 'Mưa nhẹ', 63: 'Mưa vừa', 65: 'Mưa to',
+                71: 'Tuyết nhẹ', 73: 'Tuyết', 75: 'Tuyết dày',
+                80: 'Mưa rào', 81: 'Mưa rào', 82: 'Mưa lớn',
+                95: 'Dông bão', 96: 'Dông bão', 99: 'Dông lớn'
+            };
+            return map[code] || 'Đang cập nhật...';
+        }
+
         function updateWeatherUI(currentInfo, forecastList) {
             document.getElementById('now-temp').innerText = Math.round(currentInfo.temp) + '°';
-            document.getElementById('now-desc').innerText = currentInfo.desc; 
+            document.getElementById('now-desc').innerText = getWeatherDesc(currentInfo.code, currentInfo.is_day); 
             document.getElementById('now-hl').innerText = `↑ ${Math.round(currentInfo.max)}° / ↓ ${Math.round(currentInfo.min)}°`;
             document.getElementById('now-feels').innerText = `Cảm giác như ${Math.round(currentInfo.feels_like)}°`;
 
@@ -714,7 +540,7 @@
             const maxT = Math.max(...temps) + 1;
 
             forecastList.forEach((f, i) => {
-                const dateObj = new Date(f.time_epoch * 1000);
+                const dateObj = new Date(f.time * 1000);
                 const timeStr = dateObj.getHours().toString().padStart(2, '0') + ":00";
                 const icon = getWeatherIcon(f.code, f.is_day);
 
@@ -782,7 +608,6 @@
                 const dashes = group.querySelectorAll('.flow-dash');
                 dashes.forEach((d) => {
                     d.style.animationName = animName;
-                    // ĐÃ CẬP NHẬT TỐC ĐỘ LUỒNG CHẠY Ở ĐÂY CHẬM LẠI THÀNH 2.5s
                     d.style.animationDuration = '2.5s'; 
                     d.style.animationIterationCount = 'infinite';
                     d.style.animationTimingFunction = 'linear';
