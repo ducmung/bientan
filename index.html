@@ -109,7 +109,7 @@
         #update-clock {
             position: absolute;
             top: 50%; 
-            left: 84%; /* Đã đổi thành 84% để sang phải */
+            left: 84%;
             transform: translate(-50%, -50%);
             font-size: 12px;
             font-weight: 900;
@@ -128,8 +128,8 @@
         /* ================= TRẠNG THÁI SẠC/XẢ (CHUYỂN SANG TRÁI) ================= */
         #lbl-status {
             position: absolute;
-            top: 50%; /* Đưa lên giữa trục dọc */
-            left: 16%; /* Căn bên trái */
+            top: 50%; 
+            left: 16%;
             transform: translate(-50%, -50%);
             font-size: 13px;
             font-weight: 800;
@@ -280,13 +280,13 @@
             background: rgba(255,255,255,0.15);
         }
 
-        /* sao băng */
+        /* sao băng - đã được thu nhỏ lại */
         .flow-dash {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 65px;
-            height: 3px;
+            width: 40px; /* Thu hẹp chiều dài */
+            height: 2px; /* Thu hẹp chiều cao */
             border-radius: 10px;
             opacity: 0;
             filter: blur(0.4px);
@@ -302,8 +302,8 @@
                 #ffffff 100%
             );
             box-shadow:
-                0 0 6px var(--c),
-                0 0 12px var(--c);
+                0 0 4px var(--c),
+                0 0 8px var(--c); /* Giảm độ tỏa sáng do tia nhỏ lại */
         }
 
         .dir-left .flow-dash {
@@ -315,24 +315,24 @@
                 #ffffff 100%
             );
             box-shadow:
-                0 0 6px var(--c),
-                0 0 12px var(--c);
+                0 0 4px var(--c),
+                0 0 8px var(--c);
         }
 
-        /* đầu sao */
+        /* đầu sao - thu nhỏ lại cho hài hòa */
         .flow-dash::before {
             content: '';
             position: absolute;
-            width: 7px;
-            height: 7px;
+            width: 5px; /* Thu nhỏ đầu sao */
+            height: 5px; /* Thu nhỏ đầu sao */
             background: #fff;
             border-radius: 50%;
             top: 50%;
             transform: translateY(-50%);
             box-shadow:
-                0 0 8px #fff,
-                0 0 14px var(--c),
-                0 0 20px var(--c);
+                0 0 6px #fff,
+                0 0 10px var(--c),
+                0 0 15px var(--c);
         }
 
         /* spark nhỏ */
@@ -347,26 +347,25 @@
             box-shadow:
                 -6px -4px 0 rgba(255,255,255,0.7),
                 -10px 3px 0 rgba(255,255,255,0.5),
-                -15px -2px 0 rgba(255,255,255,0.3),
-                -20px 5px 0 rgba(255,255,255,0.2);
+                -15px -2px 0 rgba(255,255,255,0.3);
         }
 
         .dir-right .flow-dash::before,
         .dir-right .flow-dash::after {
-            right: -3px;
+            right: -2px;
         }
 
         .dir-left .flow-dash::before,
         .dir-left .flow-dash::after {
-            left: -3px;
+            left: -2px;
         }
 
-        /* 5 sao băng chạy cùng lúc */
+        /* 5 sao băng chạy cùng lúc - Đã điều chỉnh lại nhịp điệu trễ do chạy chậm lại */
         .flow-dash:nth-child(2) { animation-delay: 0s; }
-        .flow-dash:nth-child(3) { animation-delay: 0.35s; }
-        .flow-dash:nth-child(4) { animation-delay: 0.7s; }
-        .flow-dash:nth-child(5) { animation-delay: 1.05s; }
-        .flow-dash:nth-child(6) { animation-delay: 1.4s; }
+        .flow-dash:nth-child(3) { animation-delay: 0.5s; }
+        .flow-dash:nth-child(4) { animation-delay: 1.0s; }
+        .flow-dash:nth-child(5) { animation-delay: 1.5s; }
+        .flow-dash:nth-child(6) { animation-delay: 2.0s; }
 
         /* bay sang phải */
         @keyframes flowInL {
@@ -783,7 +782,8 @@
                 const dashes = group.querySelectorAll('.flow-dash');
                 dashes.forEach((d) => {
                     d.style.animationName = animName;
-                    d.style.animationDuration = '1.8s'; 
+                    // ĐÃ CẬP NHẬT TỐC ĐỘ LUỒNG CHẠY Ở ĐÂY CHẬM LẠI THÀNH 2.5s
+                    d.style.animationDuration = '2.5s'; 
                     d.style.animationIterationCount = 'infinite';
                     d.style.animationTimingFunction = 'linear';
                 });
