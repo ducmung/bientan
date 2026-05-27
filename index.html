@@ -162,45 +162,51 @@
         .ss-desc { font-size: 11px; font-weight: 700; margin-bottom: 1px; }
         .ss-hilo { font-size: 9px; font-weight: 600; opacity: 0.9; margin-bottom: 1px; }
         .ss-feels { font-size: 9px; font-weight: 600; opacity: 0.9; margin-bottom: 2px; }
-        
-        /* Khung chứa biểu đồ giờ */
-        .weather-forecast-bottom {
+
+        /* ================= CHỮ BÁT PHƯƠNG LAI TÀI 4D (HÁN TỰ) ================= */
+        .bpf-container {
             position: absolute;
-            top: 88%;
+            top: 86%; /* Đặt đúng vị trí của biểu đồ cũ */
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 200px; 
             z-index: 15;
-            color: #fff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 100%;
+            pointer-events: none; /* Không cản trở click */
         }
         
-        .w-chart-container { 
-            position: relative; display: flex; justify-content: space-between; 
-            width: 100%; min-height: 55px; 
-        }
-        .w-col { 
-            display: flex; flex-direction: column; align-items: center; 
-            font-size: 9px; font-weight: 700; z-index: 2; width: 20%; 
-        }
-        .w-col .time { font-size: 8px; opacity: 0.9; margin-bottom: 1px; }
-        .w-col .icon { font-size: 12px; margin-bottom: 1px; text-shadow: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));}
-        .w-col .temp { font-weight: 900; font-size: 10px; margin-bottom: 7px; } 
-        
-        .w-col .pop { 
-            font-size: 8px; color: #000; font-weight: 900;
-            display: flex; align-items: center; gap: 2px; margin-bottom: 1px; 
-            text-shadow: 0 1px 3px rgba(255,255,255,0.9), 0 0 2px rgba(255,255,255,1); 
-        }
-        .w-col .hum { 
-            font-size: 8px; color: #000; font-weight: 900;
-            display: flex; align-items: center; gap: 2px; 
-            text-shadow: 0 1px 3px rgba(255,255,255,0.9), 0 0 2px rgba(255,255,255,1);
+        .bpf-text {
+            font-family: "STKaiti", "KaiTi", "Times New Roman", serif; /* Font chữ thư pháp/chữ Hán */
+            font-size: 50px;
+            font-weight: 900;
+            letter-spacing: 8px;
+            position: relative;
+            display: inline-block;
+            /* Đổ viền gradient nhũ vàng cho bề mặt chữ */
+            background: linear-gradient(180deg, #fffae3 0%, #fcd34d 30%, #d97706 70%, #78350f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* Hiệu ứng Glow nhấp nháy tỏa hào quang */
+            filter: drop-shadow(0px 0px 12px rgba(253, 224, 71, 0.5));
         }
         
-        .w-svg-curve { 
-            position: absolute; top: 25px; left: 0; width: 100%; height: 12px; 
-            z-index: 1; overflow: visible; filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3)); 
+        /* Hiệu ứng 4D đùn khối phía sau chữ */
+        .bpf-text::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: -1;
+            -webkit-text-fill-color: transparent;
+            background: none;
+            /* Các lớp bóng tạo độ dày và màu đồng cổ */
+            text-shadow: 
+                1px 1px 0px #b45309,
+                2px 2px 0px #92400e,
+                3px 3px 0px #78350f,
+                4px 4px 0px #451a03,
+                5px 5px 0px #451a03,
+                6px 6px 15px rgba(0,0,0,0.9);
         }
 
         .node h3 { font-size: 9px; color: #666; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; }
@@ -389,13 +395,8 @@
                 <img src="68.jpg" alt="Inverter">
             </div>
             
-            <div class="weather-forecast-bottom">
-                <div class="w-chart-container" id="forecast-cols">
-                    <svg class="w-svg-curve" viewBox="0 0 100 20" preserveAspectRatio="none">
-                         <path id="curve-path" d="" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
-                         <g id="curve-dots"></g>
-                    </svg>
-                </div>
+            <div class="bpf-container">
+                <div class="bpf-text" data-text="八方來財">八方來財</div>
             </div>
             
         </div>
@@ -436,7 +437,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <script>
-        // Tọa độ Đại Đồng, Tiên Du, Bắc Ninh
         const LAT = 21.088; 
         const LON = 105.988;
         let globalSunrise = 0;
@@ -444,8 +444,8 @@
 
         async function fetchWeather() {
             try {
-                // ĐÃ SỬA: Loại bỏ tham số ép buộc ECMWF, để Open-Meteo dùng mô hình phân giải cao tự động
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&hourly=temperature_2m,precipitation_probability,relative_humidity_2m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&forecast_days=3&timeformat=unixtime`;
+                // Đã tối ưu hóa đường link API: Xóa bỏ dữ liệu hourly không cần thiết
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&forecast_days=1&timeformat=unixtime`;
                 
                 const res = await fetch(url, { cache: 'no-store' });
                 const data = await res.json();
@@ -463,25 +463,7 @@
                         min: data.daily.temperature_2m_min[0]
                     };
 
-                    const nowUnix = Math.floor(Date.now() / 1000);
-                    let currentIndex = data.hourly.time.findIndex(t => t >= nowUnix);
-                    if(currentIndex === -1) currentIndex = 0;
-
-                    const forecastList = [];
-                    for(let i = 0; i < 5; i++) {
-                        let idx = currentIndex + i;
-                        if (idx >= data.hourly.time.length) break;
-                        forecastList.push({
-                            time: data.hourly.time[idx],
-                            temp: data.hourly.temperature_2m[idx],
-                            pop: data.hourly.precipitation_probability[idx], 
-                            hum: data.hourly.relative_humidity_2m[idx],      
-                            code: data.hourly.weather_code[idx],
-                            is_day: data.hourly.is_day[idx]
-                        });
-                    }
-
-                    updateWeatherUI(currentInfo, forecastList);
+                    updateWeatherUI(currentInfo);
                     updateSunArc();
                 } else {
                     document.getElementById('now-desc').innerText = "Lỗi API dữ liệu";
@@ -490,23 +472,6 @@
                 console.error("Lỗi kết nối Thời tiết:", e); 
                 document.getElementById('now-desc').innerText = "Mất kết nối";
             }
-        }
-
-        // Chuyển đổi mã WMO sang icon
-        function getWeatherIcon(code, isDay) {
-            const isNight = !isDay;
-            const map = {
-                0: isNight ? '🌙' : '☀️', 
-                1: isNight ? '🌙' : '🌤️', 
-                2: '⛅', 3: '☁️', 
-                45: '🌫️', 48: '🌫️', 
-                51: '🌧️', 53: '🌧️', 55: '🌧️', 
-                61: '🌧️', 63: '🌧️', 65: '🌧️', 
-                71: '❄️', 73: '❄️', 75: '❄️', 
-                80: '🌦️', 81: '🌧️', 82: '🌧️', 
-                95: '⛈️', 96: '⛈️', 99: '⛈️'
-            };
-            return map[code] || '☁️';
         }
 
         // Chuyển đổi mã WMO sang tiếng Việt
@@ -525,44 +490,11 @@
             return map[code] || 'Đang cập nhật...';
         }
 
-        function updateWeatherUI(currentInfo, forecastList) {
+        function updateWeatherUI(currentInfo) {
             document.getElementById('now-temp').innerText = Math.round(currentInfo.temp) + '°';
             document.getElementById('now-desc').innerText = getWeatherDesc(currentInfo.code, currentInfo.is_day); 
             document.getElementById('now-hl').innerText = `↑ ${Math.round(currentInfo.max)}° / ↓ ${Math.round(currentInfo.min)}°`;
             document.getElementById('now-feels').innerText = `Cảm giác như ${Math.round(currentInfo.feels_like)}°`;
-
-            const container = document.getElementById('forecast-cols');
-            container.querySelectorAll('.w-col').forEach(c => c.remove());
-
-            let pathData = "", dotsHtml = "";
-            const temps = forecastList.map(f => f.temp);
-            const minT = Math.min(...temps) - 1;
-            const maxT = Math.max(...temps) + 1;
-
-            forecastList.forEach((f, i) => {
-                const dateObj = new Date(f.time * 1000);
-                const timeStr = dateObj.getHours().toString().padStart(2, '0') + ":00";
-                const icon = getWeatherIcon(f.code, f.is_day);
-
-                const col = document.createElement('div');
-                col.className = 'w-col';
-                col.innerHTML = `
-                    <span class="time">${timeStr}</span>
-                    <span class="icon">${icon}</span>
-                    <span class="temp">${Math.round(f.temp)}°</span>
-                    <span class="pop">☔${f.pop}%</span>
-                    <span class="hum">💧${f.hum}%</span>
-                `;
-                container.appendChild(col);
-
-                const x = 10 + (i * 20);
-                const y = maxT === minT ? 10 : 18 - ((f.temp - minT) / (maxT - minT) * 14); 
-                pathData += (i === 0 ? "M" : "L") + ` ${x} ${y}`;
-                dotsHtml += `<circle cx="${x}" cy="${y}" r="2" fill="#ffffff"/>`;
-            });
-
-            document.getElementById('curve-path').setAttribute('d', pathData);
-            document.getElementById('curve-dots').innerHTML = dotsHtml;
         }
 
         function updateSunArc() {
