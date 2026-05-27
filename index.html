@@ -163,34 +163,34 @@
         .ss-hilo { font-size: 9px; font-weight: 600; opacity: 0.9; margin-bottom: 1px; }
         .ss-feels { font-size: 9px; font-weight: 600; opacity: 0.9; margin-bottom: 2px; }
 
-        /* ================= CHỮ BÁT PHƯƠNG LAI TÀI 4D (HÁN TỰ) ================= */
+        /* ================= CHỮ BÁT PHƯƠNG LAI TÀI 4D ================= */
         .bpf-container {
             position: absolute;
-            top: 86%; /* Đặt đúng vị trí của biểu đồ cũ */
+            top: 83%; /* Đẩy chữ lên cao hơn để không đè vào Pin và Tiêu thụ */
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
             text-align: center;
             width: 100%;
-            pointer-events: none; /* Không cản trở click */
+            pointer-events: none; 
         }
         
         .bpf-text {
-            font-family: "STKaiti", "KaiTi", "Times New Roman", serif; /* Font chữ thư pháp/chữ Hán */
-            font-size: 50px;
+            font-family: "STKaiti", "KaiTi", "Times New Roman", serif; 
+            font-size: 36px; /* Thu nhỏ cỡ chữ */
             font-weight: 900;
-            letter-spacing: 8px;
+            letter-spacing: 6px; /* Giảm khoảng cách chữ cho gọn */
             position: relative;
             display: inline-block;
-            /* Đổ viền gradient nhũ vàng cho bề mặt chữ */
-            background: linear-gradient(180deg, #fffae3 0%, #fcd34d 30%, #d97706 70%, #78350f 100%);
+            /* Dải màu Vàng nhũ kim */
+            background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            /* Hiệu ứng Glow nhấp nháy tỏa hào quang */
-            filter: drop-shadow(0px 0px 12px rgba(253, 224, 71, 0.5));
+            /* Hào quang vàng mỏng */
+            filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.4));
         }
         
-        /* Hiệu ứng 4D đùn khối phía sau chữ */
+        /* Hiệu ứng bóng 4D màu ĐỎ */
         .bpf-text::after {
             content: attr(data-text);
             position: absolute;
@@ -199,14 +199,14 @@
             z-index: -1;
             -webkit-text-fill-color: transparent;
             background: none;
-            /* Các lớp bóng tạo độ dày và màu đồng cổ */
+            /* Lớp bóng đỏ đùn 4D */
             text-shadow: 
-                1px 1px 0px #b45309,
-                2px 2px 0px #92400e,
-                3px 3px 0px #78350f,
-                4px 4px 0px #451a03,
-                5px 5px 0px #451a03,
-                6px 6px 15px rgba(0,0,0,0.9);
+                1px 1px 0px #ff0000,
+                2px 2px 0px #cc0000,
+                3px 3px 0px #990000,
+                4px 4px 0px #660000,
+                5px 5px 0px #330000,
+                6px 6px 12px rgba(255, 0, 0, 0.8); /* Tỏa sáng đỏ phong thủy */
         }
 
         .node h3 { font-size: 9px; color: #666; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; }
