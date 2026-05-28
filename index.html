@@ -163,10 +163,10 @@
         .ss-hilo { font-size: 9px; font-weight: 600; opacity: 0.9; margin-bottom: 1px; }
         .ss-feels { font-size: 9px; font-weight: 600; opacity: 0.9; margin-bottom: 2px; }
 
-        /* ================= CHỮ BÁT PHƯƠNG LAI TÀI 4D ================= */
+        /* ================= CHỮ BÁT PHƯƠNG LAI TÀI ================= */
         .bpf-container {
             position: absolute;
-            top: 83%; /* Đẩy chữ lên cao hơn để không đè vào Pin và Tiêu thụ */
+            top: 83%; 
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
@@ -177,20 +177,17 @@
         
         .bpf-text {
             font-family: "STKaiti", "KaiTi", "Times New Roman", serif; 
-            font-size: 36px; /* Thu nhỏ cỡ chữ */
+            font-size: 36px; 
             font-weight: 900;
-            letter-spacing: 6px; /* Giảm khoảng cách chữ cho gọn */
+            letter-spacing: 6px; 
             position: relative;
             display: inline-block;
-            /* Dải màu Vàng nhũ kim */
             background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            /* Hào quang vàng mỏng */
             filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.4));
         }
         
-        /* Hiệu ứng bóng 4D màu ĐỎ */
         .bpf-text::after {
             content: attr(data-text);
             position: absolute;
@@ -199,14 +196,13 @@
             z-index: -1;
             -webkit-text-fill-color: transparent;
             background: none;
-            /* Lớp bóng đỏ đùn 4D */
             text-shadow: 
                 1px 1px 0px #ff0000,
                 2px 2px 0px #cc0000,
                 3px 3px 0px #990000,
                 4px 4px 0px #660000,
                 5px 5px 0px #330000,
-                6px 6px 12px rgba(255, 0, 0, 0.8); /* Tỏa sáng đỏ phong thủy */
+                6px 6px 12px rgba(255, 0, 0, 0.8);
         }
 
         .node h3 { font-size: 9px; color: #666; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; }
@@ -319,6 +315,13 @@
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
         .stat-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        /* Box Quy đổi tiền điện riêng biệt với viền mạ vàng */
+        .money-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,248,220,0.95));
+            border: 1px solid rgba(218, 165, 32, 0.6);
+        }
+        
         .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .stat-header h2 { font-size: 16px; color: #444; }
         .progress-bar { width: 100%; height: 12px; background: rgba(0,0,0,0.05); border-radius: 10px; display: flex; overflow: hidden; margin-bottom: 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
@@ -419,6 +422,16 @@
                     <div>Dòng điện: <span id="stat-a">0 A</span></div>
                 </div>
             </div>
+            
+            <div class="stat-card money-card">
+                <div class="stat-header"><h2 style="color: #b8860b;">💰 QUY ĐỔI TIỀN ĐIỆN (EVN)</h2></div>
+                <div class="list-detail">
+                    <div>Hôm nay (<span id="money-pv-today">0</span> kWh): <span id="money-today" style="font-size: 15px; color: #ffaa00;">0 đ</span></div>
+                    <div>Tháng này (<span id="money-pv-month">0</span> kWh): <span id="money-month" style="font-size: 16px; color: #ff4444;">0 đ</span></div>
+                </div>
+                <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic;">*Tính theo biểu giá bậc thang đã gồm 8% VAT</div>
+            </div>
+
             <div class="stat-card">
                 <div class="stat-header"><h2>🎛️ ĐIỀU KHIỂN BIẾN TẦN</h2></div>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 5px;">
@@ -444,9 +457,7 @@
 
         async function fetchWeather() {
             try {
-                // Đã tối ưu hóa đường link API: Xóa bỏ dữ liệu hourly không cần thiết
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&forecast_days=1&timeformat=unixtime`;
-                
                 const res = await fetch(url, { cache: 'no-store' });
                 const data = await res.json();
 
@@ -474,7 +485,6 @@
             }
         }
 
-        // Chuyển đổi mã WMO sang tiếng Việt
         function getWeatherDesc(code, isDay) {
             const isNight = !isDay;
             const map = {
@@ -640,11 +650,47 @@
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
-                document.getElementById('stat-pv-today').innerText = data.PV_Today.toFixed(1) + ' kWh';
+                let pvToday = data.PV_Today || 0;
+                document.getElementById('stat-pv-today').innerText = pvToday.toFixed(1) + ' kWh';
                 document.getElementById('stat-grid-buy').innerText = (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh';
-                document.getElementById('stat-bat-dis').innerText = data.Bat_Discharge_Today.toFixed(1) + ' kWh';
-                document.getElementById('stat-bat-chg').innerText = data.Bat_Charge_Today.toFixed(1) + ' kWh';
+                document.getElementById('stat-bat-dis').innerText = (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh';
+                document.getElementById('stat-bat-chg').innerText = (data.Bat_Charge_Today || 0).toFixed(1) + ' kWh';
                 document.getElementById('stat-load-total').innerText = (data.Load_Total || 0).toFixed(1) + ' kWh';
+
+                // ================== TÍNH TIỀN ĐIỆN BẬC THANG CHUẨN XÁC ==================
+                // Lấy PV_Month từ Firebase. Nếu không có, tự động ước tính: PV_Today * số ngày hiện tại của tháng
+                let currentDay = new Date().getDate();
+                let pvMonth = data.PV_Month !== undefined ? data.PV_Month : (pvToday * currentDay); 
+
+                // Hàm tính tiền theo 6 bậc EVN (đã cộng 8% VAT)
+                function calcEVN(kWh) {
+                    let cost = 0; let r = kWh;
+                    if(r > 0) { let q = Math.min(r, 50); cost += q * 2142.72; r -= q; }
+                    if(r > 0) { let q = Math.min(r, 50); cost += q * 2214.00; r -= q; }
+                    if(r > 0) { let q = Math.min(r, 100); cost += q * 2570.40; r -= q; }
+                    if(r > 0) { let q = Math.min(r, 100); cost += q * 3237.84; r -= q; }
+                    if(r > 0) { let q = Math.min(r, 100); cost += q * 3618.00; r -= q; }
+                    if(r > 0) { cost += r * 3736.80; }
+                    return cost;
+                }
+
+                let monthMoney = calcEVN(pvMonth); 
+                
+                // Tính tiền hôm nay = (Tiền điện của tổng tháng) - (Tiền điện của tháng nếu không tính hôm nay)
+                // Cách tính này giúp "hôm nay" luôn được nhân với đơn giá của bậc thang cao nhất đang đạt được
+                let todayMoney = 0;
+                if (pvMonth >= pvToday) {
+                    todayMoney = monthMoney - calcEVN(pvMonth - pvToday);
+                } else {
+                    todayMoney = calcEVN(pvToday);
+                }
+
+                document.getElementById('money-pv-today').innerText = pvToday.toFixed(1);
+                document.getElementById('money-pv-month').innerText = pvMonth.toFixed(1);
+                
+                // Cập nhật lên UI
+                document.getElementById('money-today').innerText = Math.round(todayMoney).toLocaleString('vi-VN') + ' đ';
+                document.getElementById('money-month').innerText = Math.round(monthMoney).toLocaleString('vi-VN') + ' đ';
             }
         });
         
