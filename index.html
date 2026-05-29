@@ -105,7 +105,7 @@
             left: 15%; top: 100%;
         }
         
-        /* ================= ĐỒNG HỒ CẬP NHẬT DATA ================= */
+        /* ================= ĐỒNG HỒ CẬP NHẬT DATA (BÊN PHẢI) ================= */
         #update-clock {
             position: absolute;
             top: 50%; 
@@ -125,7 +125,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* ================= TRẠNG THÁI SẠC/XẢ ================= */
+        /* ================= TRẠNG THÁI SẠC/XẢ (BÊN TRÁI) ================= */
         #lbl-status {
             position: absolute;
             top: 50%; 
@@ -426,8 +426,9 @@
             <div class="stat-card money-card">
                 <div class="stat-header"><h2 style="color: #b8860b;">💰 QUY ĐỔI TIỀN ĐIỆN (EVN)</h2></div>
                 <div class="list-detail">
-                    <div>Hôm nay (<span id="money-pv-today">0</span> kWh): <span id="money-today" style="font-size: 15px; color: #ffaa00;">0 đ</span></div>
-                    <div>Tháng này (<span id="money-pv-month">0</span> kWh): <span id="money-month" style="font-size: 16px; color: #ff4444;">0 đ</span></div>
+                    <div>Hôm nay (<span id="money-pv-today">0</span> kWh): <span id="money-today" style="font-size: 15px; color: #ffaa00; font-weight: 900;">0 đ</span></div>
+                    <div>Tháng này (<span id="money-pv-month">0</span> kWh): <span id="money-month" style="font-size: 15px; color: #ff4444; font-weight: 900;">0 đ</span></div>
+                    <div>Năm nay/Trọn đời (<span id="money-pv-total">0</span> kWh): <span id="money-total" style="font-size: 16px; color: #00cc66; font-weight: 900;">0 đ</span></div>
                 </div>
                 <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic;">*Hệ thống tự động cộng dồn theo ngày dương lịch</div>
             </div>
@@ -630,14 +631,12 @@
                 pvMonthTotal += currentMonthHistory[key];
             }
 
-            // Tránh tụt hiển thị nếu ban đêm hệ thống biến tần reset
             let displayPvToday = Math.max(pvToday, savedPv);
-            
-            // Cân bằng tổng để không bị lỗi nếu hôm nay chưa được cộng dồn kịp
             if (pvMonthTotal < displayPvToday) pvMonthTotal = displayPvToday;
 
             // 3. Quy đổi ra Tiền
             let monthMoney = calcEVN(pvMonthTotal); 
+            
             let todayMoney = 0;
             if (pvMonthTotal >= displayPvToday && displayPvToday > 0) {
                 todayMoney = monthMoney - calcEVN(pvMonthTotal - displayPvToday);
@@ -645,21 +644,27 @@
                 todayMoney = calcEVN(displayPvToday);
             }
 
+            // 4. Tính toán TỔNG NĂM dựa trên E_Total
+            // Lấy giá trị trung bình 1 số điện của tháng này nhân với toàn bộ E_Total để ra mức ước tính chính xác nhất
+            let avgPrice = pvMonthTotal > 0 ? (monthMoney / pvMonthTotal) : 2500;
+            let totalMoney = currentETotal * avgPrice;
+
             // Cập nhật giao diện
             document.getElementById('stat-pv-today').innerText = displayPvToday.toFixed(1) + ' kWh';
             document.getElementById('money-pv-today').innerText = displayPvToday.toFixed(1);
             document.getElementById('money-pv-month').innerText = pvMonthTotal.toFixed(1);
+            document.getElementById('money-pv-total').innerText = currentETotal.toFixed(1);
             
             document.getElementById('money-today').innerText = Math.round(todayMoney).toLocaleString('vi-VN') + ' đ';
             document.getElementById('money-month').innerText = Math.round(monthMoney).toLocaleString('vi-VN') + ' đ';
+            document.getElementById('money-total').innerText = Math.round(totalMoney).toLocaleString('vi-VN') + ' đ';
         }
 
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
             latestDailyData = snapshot.val();
-            checkAndSwitchMonth(); // Kích hoạt kiểm tra tháng tự động mỗi khi có data mới
+            checkAndSwitchMonth(); 
         });
 
-        // Hẹn giờ kiểm tra chuyển tháng vào lúc nửa đêm
         setInterval(() => {
             checkAndSwitchMonth();
         }, 60000); 
