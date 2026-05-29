@@ -105,7 +105,7 @@
             left: 15%; top: 100%;
         }
         
-        /* ================= ĐỒNG HỒ CẬP NHẬT DATA (BÊN PHẢI) ================= */
+        /* ================= ĐỒNG HỒ CẬP NHẬT DATA ================= */
         #update-clock {
             position: absolute;
             top: 50%; 
@@ -125,7 +125,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* ================= TRẠNG THÁI SẠC/XẢ (BÊN TRÁI) ================= */
+        /* ================= TRẠNG THÁI SẠC/XẢ ================= */
         #lbl-status {
             position: absolute;
             top: 50%; 
@@ -429,7 +429,7 @@
                     <div>Hôm nay (<span id="money-pv-today">0</span> kWh): <span id="money-today" style="font-size: 15px; color: #ffaa00;">0 đ</span></div>
                     <div>Tháng này (<span id="money-pv-month">0</span> kWh): <span id="money-month" style="font-size: 16px; color: #ff4444;">0 đ</span></div>
                 </div>
-                <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic;">*Tính theo biểu giá 6 bậc thang đã gồm 8% VAT</div>
+                <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic;">*Hệ thống tự động cộng dồn theo ngày dương lịch</div>
             </div>
 
             <div class="stat-card">
@@ -534,7 +534,7 @@
         setInterval(updateSunArc, 60000); 
         fetchWeather();
 
-        // ================= XỬ LÝ ANIMATION LUỒNG SAO BĂNG =================
+        // ================= XỬ LÝ ANIMATION =================
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId);
             if (isActive) {
@@ -559,25 +559,112 @@
             }
         }
 
-        // ================= KẾT NỐI FIREBASE VÀ QUẢN LÝ LỊCH SỬ THÁNG =================
+        // ================= KẾT NỐI FIREBASE & QUẢN LÝ NGÀY THÁNG TỰ ĐỘNG =================
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const lblStatus = document.getElementById('lbl-status');
         const lblSoc = document.getElementById('lbl-soc');
 
-        // Biến lưu trữ lịch sử mảng điện của tháng hiện tại
+        let currentMonthKey = "";
         let currentMonthHistory = {};
-        
-        // Tạo key thư mục cho tháng (VD: 2026_05)
-        let initDate = new Date();
-        let initMonthKey = initDate.getFullYear() + "_" + (initDate.getMonth() + 1).toString().padStart(2, '0');
+        let latestDailyData = null;
 
-        // Lắng nghe dữ liệu lịch sử của tháng này từ Firebase
-        database.ref(`/SosenSystem/Monthly_History/${initMonthKey}`).on('value', (snap) => {
-            currentMonthHistory = snap.val() || {};
+        // Hàm kiểm tra và chuyển đổi dữ liệu khi bước sang tháng mới
+        function checkAndSwitchMonth() {
+            let d = new Date();
+            // Định dạng thư mục: 2026_05
+            let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
+            if (mk !== currentMonthKey) {
+                if (currentMonthKey !== "") {
+                    database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).off();
+                }
+                currentMonthKey = mk;
+                // Tự động quét và lấy lịch sử của đúng tháng hiện tại
+                database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).on('value', (snap) => {
+                    currentMonthHistory = snap.val() || {};
+                    recalculateEnergy();
+                });
+            }
+        }
+
+        // Hàm tính tiền theo 6 bậc EVN (Đã gồm 8% VAT)
+        function calcEVN(kWh) {
+            let cost = 0; let r = kWh;
+            if(r > 0) { let q = Math.min(r, 50); cost += q * 2142.72; r -= q; }
+            if(r > 0) { let q = Math.min(r, 50); cost += q * 2214.00; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 2570.40; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 3237.84; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 3618.00; r -= q; }
+            if(r > 0) { cost += r * 3736.80; }
+            return cost;
+        }
+
+        function recalculateEnergy() {
+            if (!latestDailyData) return;
+            const data = latestDailyData;
+            
+            let pvToday = data.PV_Today || 0;
+            let currentETotal = data.Load_Total || 0; 
+            
+            document.getElementById('stat-grid-buy').innerText = (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh';
+            document.getElementById('stat-bat-dis').innerText = (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh';
+            document.getElementById('stat-bat-chg').innerText = (data.Bat_Charge_Today || 0).toFixed(1) + ' kWh';
+            document.getElementById('stat-load-total').innerText = currentETotal.toFixed(1) + ' kWh';
+
+            let todayDate = new Date();
+            let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
+            let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
+
+            // 1. Lấy chỉ số lưu của ngày hôm nay, nếu số mới cao hơn thì cập nhật vào Firebase
+            let savedPv = currentMonthHistory[curDayKey] || 0;
+            if (pvToday > savedPv && pvToday > 0) {
+                database.ref(`/SosenSystem/Monthly_History/${curMonthKey}/${curDayKey}`).set(pvToday);
+                currentMonthHistory[curDayKey] = pvToday; 
+                savedPv = pvToday; 
+            }
+
+            // 2. Tính tổng của tháng bằng cách cộng tất cả các ngày trong thư mục hiện tại
+            let pvMonthTotal = 0;
+            for (let key in currentMonthHistory) {
+                pvMonthTotal += currentMonthHistory[key];
+            }
+
+            // Tránh tụt hiển thị nếu ban đêm hệ thống biến tần reset
+            let displayPvToday = Math.max(pvToday, savedPv);
+            
+            // Cân bằng tổng để không bị lỗi nếu hôm nay chưa được cộng dồn kịp
+            if (pvMonthTotal < displayPvToday) pvMonthTotal = displayPvToday;
+
+            // 3. Quy đổi ra Tiền
+            let monthMoney = calcEVN(pvMonthTotal); 
+            let todayMoney = 0;
+            if (pvMonthTotal >= displayPvToday && displayPvToday > 0) {
+                todayMoney = monthMoney - calcEVN(pvMonthTotal - displayPvToday);
+            } else {
+                todayMoney = calcEVN(displayPvToday);
+            }
+
+            // Cập nhật giao diện
+            document.getElementById('stat-pv-today').innerText = displayPvToday.toFixed(1) + ' kWh';
+            document.getElementById('money-pv-today').innerText = displayPvToday.toFixed(1);
+            document.getElementById('money-pv-month').innerText = pvMonthTotal.toFixed(1);
+            
+            document.getElementById('money-today').innerText = Math.round(todayMoney).toLocaleString('vi-VN') + ' đ';
+            document.getElementById('money-month').innerText = Math.round(monthMoney).toLocaleString('vi-VN') + ' đ';
+        }
+
+        database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
+            latestDailyData = snapshot.val();
+            checkAndSwitchMonth(); // Kích hoạt kiểm tra tháng tự động mỗi khi có data mới
         });
-        
+
+        // Hẹn giờ kiểm tra chuyển tháng vào lúc nửa đêm
+        setInterval(() => {
+            checkAndSwitchMonth();
+        }, 60000); 
+
+        // Giao tiếp dữ liệu Live
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
@@ -656,72 +743,6 @@
                 if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444');
                 else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66');
                 else setFlow('flow-grid', false);
-            }
-        });
-        
-        database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if(data) {
-                let pvToday = data.PV_Today || 0;
-                let currentETotal = data.Load_Total || 0; 
-                
-                document.getElementById('stat-grid-buy').innerText = (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh';
-                document.getElementById('stat-bat-dis').innerText = (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh';
-                document.getElementById('stat-bat-chg').innerText = (data.Bat_Charge_Today || 0).toFixed(1) + ' kWh';
-                document.getElementById('stat-load-total').innerText = currentETotal.toFixed(1) + ' kWh';
-
-                // ================== LƯU & TÍNH TIỀN ĐIỆN TỰ ĐỘNG TỪNG NGÀY ==================
-                let todayDate = new Date();
-                let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
-                let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
-
-                // 1. Tự động lưu giá trị điện lớn nhất trong ngày vào Firebase
-                let savedPv = currentMonthHistory[curDayKey] || 0;
-                // Điều kiện pvToday > 0 và lớn hơn số đã lưu để tránh qua đêm biến tần sập nguồn tự reset về 0
-                if (pvToday > savedPv && pvToday > 0) {
-                    database.ref(`/SosenSystem/Monthly_History/${curMonthKey}/${curDayKey}`).set(pvToday);
-                    currentMonthHistory[curDayKey] = pvToday; // Cập nhật luôn cho bộ nhớ cục bộ
-                    savedPv = pvToday; 
-                }
-
-                // 2. Cộng dồn số điện các ngày từ mùng 1 đến nay
-                let pvMonthTotal = 0;
-                for (let key in currentMonthHistory) {
-                    pvMonthTotal += currentMonthHistory[key];
-                }
-
-                // 3. Hàm tính tiền theo 6 bậc EVN (Đã gồm 8% VAT theo bảng Excel)
-                function calcEVN(kWh) {
-                    let cost = 0; let r = kWh;
-                    if(r > 0) { let q = Math.min(r, 50); cost += q * 2142.72; r -= q; }
-                    if(r > 0) { let q = Math.min(r, 50); cost += q * 2214.00; r -= q; }
-                    if(r > 0) { let q = Math.min(r, 100); cost += q * 2570.40; r -= q; }
-                    if(r > 0) { let q = Math.min(r, 100); cost += q * 3237.84; r -= q; }
-                    if(r > 0) { let q = Math.min(r, 100); cost += q * 3618.00; r -= q; }
-                    if(r > 0) { cost += r * 3736.80; }
-                    return cost;
-                }
-
-                let monthMoney = calcEVN(pvMonthTotal); 
-                
-                // Mẹo giữ số hiển thị hôm nay không bị tụt về 0 lúc ban đêm
-                let displayPvToday = Math.max(pvToday, savedPv);
-                
-                // Tiền hôm nay = (Tiền điện của tổng tháng) - (Tiền điện của tháng nếu không tính hôm nay)
-                let todayMoney = 0;
-                if (pvMonthTotal >= displayPvToday && displayPvToday > 0) {
-                    todayMoney = monthMoney - calcEVN(pvMonthTotal - displayPvToday);
-                } else {
-                    todayMoney = calcEVN(displayPvToday);
-                }
-
-                // Đẩy thông số lên giao diện web
-                document.getElementById('stat-pv-today').innerText = displayPvToday.toFixed(1) + ' kWh';
-                document.getElementById('money-pv-today').innerText = displayPvToday.toFixed(1);
-                document.getElementById('money-pv-month').innerText = pvMonthTotal.toFixed(1);
-                
-                document.getElementById('money-today').innerText = Math.round(todayMoney).toLocaleString('vi-VN') + ' đ';
-                document.getElementById('money-month').innerText = Math.round(monthMoney).toLocaleString('vi-VN') + ' đ';
             }
         });
         
