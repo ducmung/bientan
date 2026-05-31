@@ -4,113 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sosen Energy Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #07111f;
-            --panel: rgba(12, 22, 38, 0.62);
-            --panel-strong: rgba(255, 255, 255, 0.12);
-            --line: rgba(255, 255, 255, 0.18);
-            --text: #f5fbff;
-            --muted: rgba(245, 251, 255, 0.66);
-            --solar: #ffd166;
-            --grid: #6bd4ff;
-            --battery: #5dffb1;
-            --load: #a78bfa;
-            --danger: #ff5c7a;
-            --warning: #ffb84d;
-            --ok: #38ef9d;
-            --radius: 20px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        html {
-            min-height: 100%;
-            background: var(--bg);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
 
         body {
-            min-height: 100vh;
-            color: var(--text);
-            padding: clamp(12px, 3vw, 28px);
-            overflow-x: hidden;
             background:
-                radial-gradient(circle at 14% 18%, rgba(255, 209, 102, 0.26), transparent 26%),
-                radial-gradient(circle at 78% 8%, rgba(107, 212, 255, 0.28), transparent 30%),
-                radial-gradient(circle at 74% 84%, rgba(93, 255, 177, 0.18), transparent 30%),
-                linear-gradient(135deg, rgba(7, 17, 31, 0.88), rgba(12, 27, 48, 0.8)),
-                url("1279_High_Defination_(HDTV).jpg") center / cover fixed no-repeat;
+                radial-gradient(circle at 15% 12%, rgba(255, 215, 0, 0.26), transparent 25%),
+                radial-gradient(circle at 84% 18%, rgba(0, 229, 255, 0.22), transparent 25%),
+                radial-gradient(circle at 76% 86%, rgba(0, 204, 102, 0.18), transparent 28%),
+                linear-gradient(135deg, rgba(6, 12, 24, 0.6), rgba(18, 32, 58, 0.5)),
+                url('1279_High_Defination_(HDTV).jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: #333;
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
         }
 
-        body::before,
-        body::after {
+        body::before {
             content: "";
             position: fixed;
             inset: 0;
             pointer-events: none;
+            background-image:
+                radial-gradient(circle at 18% 24%, rgba(255,255,255,0.8) 0 1px, transparent 2px),
+                radial-gradient(circle at 78% 28%, rgba(255,255,255,0.5) 0 1px, transparent 2px),
+                radial-gradient(circle at 70% 76%, rgba(255,255,255,0.45) 0 1px, transparent 2px),
+                radial-gradient(circle at 30% 82%, rgba(255,255,255,0.35) 0 1px, transparent 2px);
+            animation: skyTwinkle 5s ease-in-out infinite alternate;
             z-index: -1;
         }
 
-        body::before {
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-            background-size: 64px 64px;
-            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent 78%);
-        }
-
-        body::after {
-            background:
-                radial-gradient(circle at 20% 25%, rgba(255, 255, 255, 0.7) 0 1px, transparent 2px),
-                radial-gradient(circle at 82% 32%, rgba(255, 255, 255, 0.5) 0 1px, transparent 2px),
-                radial-gradient(circle at 68% 78%, rgba(255, 255, 255, 0.45) 0 1px, transparent 2px),
-                radial-gradient(circle at 34% 86%, rgba(255, 255, 255, 0.38) 0 1px, transparent 2px);
-            animation: shimmerSky 7s ease-in-out infinite alternate;
-        }
-
-        @keyframes shimmerSky {
+        @keyframes skyTwinkle {
             from { opacity: 0.35; transform: translateY(0); }
-            to { opacity: 0.85; transform: translateY(-8px); }
+            to { opacity: 0.9; transform: translateY(-5px); }
+        }
+
+        .color-sky {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+            mix-blend-mode: screen;
+        }
+
+        .star {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            width: var(--s);
+            height: var(--s);
+            border-radius: 50%;
+            background: var(--c);
+            opacity: 0.38;
+            box-shadow: 0 0 6px var(--c), 0 0 14px var(--c), 0 0 24px var(--c);
+            animation:
+                starBlink var(--d) ease-in-out infinite alternate,
+                starDrift var(--f) linear infinite;
+            animation-delay: var(--delay);
+        }
+
+        .star::before,
+        .star::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--c);
+            border-radius: 999px;
+            opacity: 0.72;
+            filter: blur(0.2px);
+        }
+
+        .star::before {
+            width: calc(var(--s) * 4.2);
+            height: 1px;
+        }
+
+        .star::after {
+            width: 1px;
+            height: calc(var(--s) * 4.2);
+        }
+
+        @keyframes starBlink {
+            0% { opacity: 0.16; transform: scale(0.62); filter: hue-rotate(0deg); }
+            48% { opacity: 1; transform: scale(1.3); filter: hue-rotate(70deg); }
+            100% { opacity: 0.32; transform: scale(0.86); filter: hue-rotate(170deg); }
+        }
+
+        @keyframes starDrift {
+            from { margin-top: 0; margin-left: 0; }
+            to { margin-top: -18px; margin-left: 12px; }
         }
 
         .app-container {
-            width: min(1180px, 100%);
-            min-height: calc(100vh - clamp(24px, 6vw, 56px));
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: minmax(340px, 1.08fr) minmax(320px, 0.92fr);
-            gap: clamp(16px, 2.6vw, 28px);
-            align-items: stretch;
-        }
-
-        .diagram-panel,
-        .stat-card {
             position: relative;
-            border: 1px solid var(--line);
-            background:
-                linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05)),
-                var(--panel);
-            box-shadow:
-                0 28px 80px rgba(0, 0, 0, 0.34),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(22px);
-            -webkit-backdrop-filter: blur(22px);
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
+        /* ================= KHUNG ĐỒ HỌA TRUNG TÂM ================= */
         .diagram-panel {
+            position: relative;
             width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
             aspect-ratio: 1 / 1;
-            max-height: calc(100vh - 56px);
-            min-height: 430px;
-            border-radius: 28px;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.34), rgba(255,255,255,0.12) 42%, rgba(255,255,255,0.28)),
+                rgba(255, 255, 255, 0.36);
+            border-radius: 20px;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.18),
+                inset 0 1px 0 rgba(255,255,255,0.65),
+                0 0 34px rgba(0,229,255,0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.42);
             overflow: hidden;
             isolation: isolate;
         }
@@ -118,335 +138,430 @@
         .diagram-panel::before {
             content: "";
             position: absolute;
-            inset: 2px;
-            border-radius: 26px;
+            inset: 8%;
+            border-radius: 50%;
             background:
-                radial-gradient(circle at 50% 50%, rgba(93, 255, 177, 0.16), transparent 25%),
-                radial-gradient(circle at 16% 16%, rgba(255, 209, 102, 0.14), transparent 19%),
-                radial-gradient(circle at 84% 16%, rgba(107, 212, 255, 0.12), transparent 18%);
+                radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 2px),
+                conic-gradient(from 0deg, transparent, rgba(255,215,0,0.18), transparent, rgba(0,229,255,0.16), transparent);
+            filter: blur(0.1px);
+            animation: softSpin 22s linear infinite;
             z-index: -1;
         }
 
-        .diagram-panel::after {
-            content: "";
-            position: absolute;
-            inset: -45%;
-            background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.14), transparent 28%);
-            animation: haloSpin 18s linear infinite;
-            z-index: -2;
-        }
-
-        @keyframes haloSpin {
+        @keyframes softSpin {
             to { transform: rotate(360deg); }
         }
 
-        .top-badge {
-            position: absolute;
-            top: 18px;
-            left: 18px;
-            z-index: 30;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(7, 17, 31, 0.58);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 900;
-            letter-spacing: 0.04em;
+        @property --rainbow-angle {
+            syntax: "<angle>";
+            inherits: false;
+            initial-value: 0deg;
         }
 
-        .top-badge::before {
+        .diagram-panel::after,
+        .stat-card::after,
+        .node-center::after,
+        .weather-container::after,
+        #update-clock::after,
+        #lbl-status::after,
+        #lbl-inv-temp::after {
             content: "";
-            width: 9px;
-            height: 9px;
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            padding: 2px;
+            background:
+                conic-gradient(
+                    from var(--rainbow-angle),
+                    #ff004c,
+                    #ff8c00,
+                    #ffd700,
+                    #00cc66,
+                    #00e5ff,
+                    #4169ff,
+                    #b000ff,
+                    #ff004c
+                );
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            filter:
+                drop-shadow(0 0 5px rgba(255, 0, 76, 0.5))
+                drop-shadow(0 0 10px rgba(0, 229, 255, 0.34));
+            animation:
+                rainbowBorderRun 2.6s linear infinite,
+                rainbowBorderGlow 1.4s ease-in-out infinite alternate;
+        }
+
+        .diagram-panel::after { z-index: 4; inset: 0; border-radius: 20px; }
+        .stat-card::after { z-index: 2; inset: 0; border-radius: 20px; }
+        .node-center::after { z-index: 2; inset: -3px; border-radius: 15px; padding: 2px; }
+        .weather-container::after { z-index: -1; border-radius: 15px; }
+        #update-clock::after,
+        #lbl-status::after,
+        #lbl-inv-temp::after { z-index: -1; border-radius: 14px; }
+
+        @keyframes rainbowBorderRun {
+            to { --rainbow-angle: 360deg; }
+        }
+
+        @keyframes rainbowBorderGlow {
+            from {
+                opacity: 0.58;
+                filter:
+                    drop-shadow(0 0 4px rgba(255, 0, 76, 0.42))
+                    drop-shadow(0 0 8px rgba(0, 229, 255, 0.28));
+            }
+            to {
+                opacity: 1;
+                filter:
+                    drop-shadow(0 0 8px rgba(255, 215, 0, 0.72))
+                    drop-shadow(0 0 16px rgba(176, 0, 255, 0.52));
+            }
+        }
+
+        .panel-sparkles {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            overflow: hidden;
+            mix-blend-mode: screen;
+        }
+
+        .spark {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            width: var(--s);
+            height: var(--s);
             border-radius: 50%;
-            background: var(--ok);
-            box-shadow: 0 0 14px var(--ok);
+            background: var(--c);
+            box-shadow: 0 0 8px var(--c), 0 0 18px var(--c);
+            animation: panelSparkle var(--d) ease-in-out infinite;
+            animation-delay: var(--delay);
         }
 
-        #update-clock {
-            position: absolute;
-            top: 18px;
-            right: 18px;
-            z-index: 30;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(7, 17, 31, 0.58);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            color: #fff;
-            font: 900 13px/1.1 ui-monospace, "SFMono-Regular", Consolas, monospace;
-            letter-spacing: 0.08em;
-            box-shadow: 0 0 20px rgba(107, 212, 255, 0.18);
-            white-space: nowrap;
-        }
-
-        #lbl-status {
-            position: absolute;
-            top: 50%;
-            left: 13.5%;
-            transform: translate(-50%, -50%);
-            z-index: 25;
-            min-width: 94px;
-            padding: 7px 10px;
-            border-radius: 999px;
-            background: rgba(7, 17, 31, 0.68);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            box-shadow: 0 0 24px rgba(93, 255, 177, 0.16);
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 900;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .weather-container {
-            position: absolute;
-            top: 12%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 20;
-            width: 190px;
-            text-align: center;
-            padding: 10px 12px;
-            border-radius: 18px;
-            background: rgba(7, 17, 31, 0.36);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 0 34px rgba(255, 209, 102, 0.13);
-        }
-
-        .ss-location {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            margin-bottom: 2px;
-            color: rgba(255, 255, 255, 0.76);
-            font-size: 10px;
-            font-weight: 900;
-        }
-
-        .ss-temp {
-            color: #fff;
-            font-size: 38px;
-            font-weight: 900;
-            line-height: 0.98;
-            text-shadow: 0 0 20px rgba(255, 209, 102, 0.52);
-        }
-
-        .ss-desc,
-        .ss-hilo,
-        .ss-feels {
-            color: rgba(255, 255, 255, 0.76);
-            font-size: 11px;
-            font-weight: 800;
-            line-height: 1.35;
+        @keyframes panelSparkle {
+            0%, 100% { opacity: 0; transform: translateY(0) scale(0.35); }
+            35% { opacity: 0.95; transform: translateY(-5px) scale(1.25); }
+            70% { opacity: 0.45; transform: translateY(-11px) scale(0.78); }
         }
 
         .node {
             position: absolute;
             transform: translate(-50%, -50%);
-            z-index: 10;
-            width: 108px;
-            min-height: 96px;
-            display: grid;
-            place-items: center;
-            align-content: center;
-            gap: 2px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 10px 4px;
             text-align: center;
-            padding: 12px 10px;
-            border-radius: 20px;
-            background: rgba(7, 17, 31, 0.58);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            box-shadow:
-                0 14px 28px rgba(0, 0, 0, 0.24),
-                inset 0 1px 0 rgba(255, 255, 255, 0.14);
+            width: 86px;
+            z-index: 10;
         }
-
-        .node h3 {
-            color: rgba(255, 255, 255, 0.68);
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 0.08em;
-        }
-
-        .node .val {
-            color: #fff;
-            font-size: 20px;
-            font-weight: 900;
-            line-height: 1.05;
-            text-shadow: 0 0 16px currentColor;
-        }
-
-        .node .unit {
-            color: rgba(255, 255, 255, 0.54);
-            font-size: 10px;
-            font-weight: 800;
-        }
-
-        .icon {
-            font-size: 24px;
-            line-height: 1;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.45));
-        }
-
-        .pos-pv { top: 20%; left: 18%; box-shadow: 0 0 34px rgba(255, 209, 102, 0.18); }
-        .pos-grid { top: 20%; left: 82%; box-shadow: 0 0 34px rgba(107, 212, 255, 0.18); }
-        .pos-batt { top: 80%; left: 18%; box-shadow: 0 0 34px rgba(93, 255, 177, 0.16); }
-        .pos-load { top: 80%; left: 82%; box-shadow: 0 0 34px rgba(167, 139, 250, 0.18); }
-        .pos-inv { top: 50%; left: 50%; }
 
         .node-center {
-            width: 132px;
-            min-height: 150px;
-            padding: 10px;
-            border-radius: 24px;
-            background:
-                linear-gradient(150deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.05)),
-                rgba(7, 17, 31, 0.72);
+            width: 110px;
+            height: 120px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            border-radius: 12px;
             box-shadow:
-                0 0 0 1px rgba(255, 255, 255, 0.16),
-                0 0 42px rgba(93, 255, 177, 0.24),
-                0 26px 50px rgba(0, 0, 0, 0.34);
+                0 4px 10px rgba(0,0,0,0.16),
+                0 0 22px rgba(0,204,102,0.3);
+            border: 1px solid rgba(255,255,255,0.65);
+            z-index: 15;
             overflow: visible;
-            animation: inverterPulse 3.2s ease-in-out infinite;
+            animation: inverterGlow 3s ease-in-out infinite;
         }
 
-        @keyframes inverterPulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.025); }
+        @keyframes inverterGlow {
+            0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.16), 0 0 18px rgba(0,204,102,0.24); }
+            50% { box-shadow: 0 4px 14px rgba(0,0,0,0.18), 0 0 32px rgba(0,204,102,0.42); }
         }
 
         .node-center img {
             width: 100%;
-            height: 124px;
+            height: 100%;
             object-fit: cover;
-            border-radius: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
         }
 
+        /* CỤM HIỂN THỊ NHIỆT ĐỘ BIẾN TẦN */
         #lbl-inv-temp {
             position: absolute;
-            top: -18px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-            padding: 6px 12px;
-            border-radius: 999px;
-            color: #07111f;
-            background: var(--ok);
-            box-shadow: 0 0 24px rgba(56, 239, 157, 0.55);
+            top: -30px;
             font-size: 12px;
             font-weight: 900;
+            background: #00cc66;
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 12px;
+            z-index: 20;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2), 0 0 14px rgba(0,204,102,0.38);
             white-space: nowrap;
-            transition: background-color 0.4s ease, box-shadow 0.4s ease;
+            transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
 
+        /* ================= HIỆU ỨNG MẶT TRỜI ================= */
         .sun-arc-mini {
             position: relative;
-            width: 76px;
-            height: 34px;
+            width: 100%;
+            height: 35px;
             margin-bottom: 2px;
         }
 
         .sun-arc-mini svg {
             position: absolute;
-            inset: 0;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            overflow: visible;
         }
 
         #moving-sun {
             position: absolute;
+            font-size: 14px;
+            transform: translate(-50%, -50%);
+            text-shadow: 0 0 10px #ffaa00, 0 0 22px rgba(255,170,0,0.65);
+            transition: all 1s ease-out;
             left: 15%;
             top: 100%;
-            transform: translate(-50%, -50%);
-            font-size: 18px;
-            filter: drop-shadow(0 0 12px var(--solar));
-            transition: left 1s ease-out, top 1s ease-out, opacity 0.5s ease;
         }
 
-        .battery-box {
-            position: relative;
+        /* ================= ĐỒNG HỒ CẬP NHẬT DATA (BÊN PHẢI) ================= */
+        #update-clock {
+            position: absolute;
+            top: 50%;
+            left: 84%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: 900;
+            color: #ff0000;
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.88);
+            padding: 5px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            z-index: 25;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1), 0 0 16px rgba(255,0,0,0.12);
+        }
+
+        /* ================= TRẠNG THÁI SẠC/XẢ (BÊN TRÁI) ================= */
+        #lbl-status {
+            position: absolute;
+            top: 50%;
+            left: 16%;
+            transform: translate(-50%, -50%);
+            font-size: 13px;
+            font-weight: 800;
+            background: rgba(255,255,255,0.9);
+            padding: 4px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1), 0 0 16px rgba(0,204,102,0.13);
+            color: #888;
+            white-space: nowrap;
+            z-index: 25;
+            transition: color 0.5s, box-shadow 0.5s;
+        }
+
+        /* ================= WIDGET THỜI TIẾT ================= */
+        .weather-container {
+            position: absolute;
+            top: 11%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 15;
+            width: 160px;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 0 14px rgba(255,215,0,0.34);
+            border-radius: 15px;
+            padding: 4px 2px;
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .ss-location {
+            font-size: 10px;
+            font-weight: 800;
             display: flex;
-            gap: 2px;
-            width: 48px;
-            height: 22px;
-            margin: 0 auto 4px;
-            padding: 2px;
-            border: 2px solid rgba(255, 255, 255, 0.72);
-            border-radius: 7px;
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.08);
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            margin-bottom: 2px;
+        }
+
+        .ss-temp { font-size: 32px; font-weight: 400; line-height: 1; margin-bottom: 2px; letter-spacing: -1px; }
+        .ss-desc { font-size: 11px; font-weight: 700; margin-bottom: 1px; }
+        .ss-hilo { font-size: 9px; font-weight: 600; opacity: 0.9; margin-bottom: 1px; }
+        .ss-feels { font-size: 9px; font-weight: 600; opacity: 0.9; margin-bottom: 2px; }
+
+        /* ================= CHỮ BÁT PHƯƠNG LAI TÀI ================= */
+        .bpf-container {
+            position: absolute;
+            top: 83%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 15;
+            text-align: center;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .bpf-text {
+            font-family: "STKaiti", "KaiTi", "Times New Roman", serif;
+            font-size: 36px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            position: relative;
+            display: inline-block;
+            background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.55));
+            animation: goldPulse 2.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes goldPulse {
+            from { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.45)); }
+            to { filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.9)); }
+        }
+
+        .bpf-text::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: -1;
+            -webkit-text-fill-color: transparent;
+            background: none;
+            text-shadow:
+                1px 1px 0 #ff0000,
+                2px 2px 0 #cc0000,
+                3px 3px 0 #990000,
+                4px 4px 0 #660000,
+                5px 5px 0 #330000,
+                6px 6px 12px rgba(255, 0, 0, 0.8);
+        }
+
+        .node h3 {
+            font-size: 9px;
+            color: #f6f8ff;
+            font-weight: 800;
+            margin-bottom: 2px;
+            letter-spacing: -0.2px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.55);
+        }
+
+        .node .val {
+            font-size: 15px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45);
+        }
+
+        .node .unit {
+            font-size: 9px;
+            color: rgba(255,255,255,0.86);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.45);
+        }
+
+        .icon {
+            font-size: 16px;
+            margin-bottom: 2px;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.55));
+        }
+
+        /* ================= CSS VẼ QUẢ PIN ================= */
+        .battery-box {
+            width: 38px;
+            height: 18px;
+            border: 2px solid #555;
+            border-radius: 4px;
+            position: relative;
+            margin: 0 auto 5px auto;
+            background: #fff;
+            padding: 1px;
+            display: flex;
+            gap: 1px;
+            box-shadow: 0 0 12px rgba(255,255,255,0.38);
         }
 
         .battery-box::after {
-            content: "";
+            content: '';
             position: absolute;
-            top: 5px;
-            right: -6px;
-            width: 4px;
-            height: 9px;
-            border-radius: 0 3px 3px 0;
-            background: rgba(255, 255, 255, 0.72);
+            top: 3px;
+            right: -4px;
+            width: 3px;
+            height: 8px;
+            background: #555;
+            border-radius: 0 2px 2px 0;
         }
 
-        .batt-seg {
-            flex: 1;
-            border-radius: 3px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .solid-red { background-color: var(--danger); }
-        .solid-yellow { background-color: var(--warning); }
-        .solid-green { background-color: var(--ok); }
+        .batt-seg { flex: 1; border-radius: 1px; background: transparent; }
+        .solid-red { background-color: #ff4444; }
+        .solid-yellow { background-color: #ffaa00; }
+        .solid-green { background-color: #00cc66; }
 
         @keyframes flash-red {
-            0%, 100% { background-color: var(--danger); box-shadow: 0 0 10px var(--danger); }
-            50% { background-color: rgba(255, 255, 255, 0.08); box-shadow: none; }
+            0%, 100% { background-color: #ff4444; box-shadow: 0 0 4px #ff4444; }
+            50% { background-color: transparent; box-shadow: none; }
         }
 
         @keyframes flash-yellow {
-            0%, 100% { background-color: var(--warning); box-shadow: 0 0 10px var(--warning); }
-            50% { background-color: rgba(255, 255, 255, 0.08); box-shadow: none; }
+            0%, 100% { background-color: #ffaa00; box-shadow: 0 0 4px #ffaa00; }
+            50% { background-color: transparent; box-shadow: none; }
         }
 
         @keyframes flash-green {
-            0%, 100% { background-color: var(--ok); box-shadow: 0 0 10px var(--ok); }
-            50% { background-color: rgba(255, 255, 255, 0.08); box-shadow: none; }
+            0%, 100% { background-color: #00cc66; box-shadow: 0 0 4px #00cc66; }
+            50% { background-color: transparent; box-shadow: none; }
         }
 
         .blink-red { animation: flash-red 1.2s infinite; }
         .blink-yellow { animation: flash-yellow 1.2s infinite; }
         .blink-green { animation: flash-green 1.2s infinite; }
 
+        /* ================= VỊ TRÍ & ĐƯỜNG DÂY ================= */
+        .pos-pv { top: 16%; left: 16%; }
+        .pos-grid { top: 16%; left: 84%; }
+        .pos-batt { top: 84%; left: 16%; }
+        .pos-load { top: 84%; left: 84%; }
+        .pos-inv { top: 50%; left: 50%; }
+
         .line {
             position: absolute;
-            z-index: 3;
-            width: 47%;
-            height: 12px;
-            margin-top: -6px;
+            height: 10px;
+            margin-top: -5px;
             background: transparent;
+            width: 48%;
+            z-index: 1;
         }
 
-        .line-pv { top: 20%; left: 18%; transform-origin: left center; transform: rotate(43deg); }
-        .line-grid { top: 20%; right: 18%; transform-origin: right center; transform: rotate(-43deg); }
-        .line-batt { top: 80%; left: 18%; transform-origin: left center; transform: rotate(-43deg); }
-        .line-load { top: 80%; right: 18%; transform-origin: right center; transform: rotate(43deg); }
+        .line-pv { top: 16%; left: 16%; transform-origin: left center; transform: rotate(45deg); }
+        .line-grid { top: 16%; right: 16%; transform-origin: right center; transform: rotate(-45deg); }
+        .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
+        .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
+        /* ================= HIỆU ỨNG SAO BĂNG ================= */
         .flow-group {
             display: none;
-            position: absolute;
-            inset: 0;
             width: 100%;
             height: 100%;
+            position: absolute;
+            inset: 0;
             overflow: visible;
-            --c: #6bd4ff;
+            --c: #00e5ff;
         }
 
         .flow-track {
@@ -454,56 +569,54 @@
             top: 50%;
             left: 0;
             width: 100%;
-            height: 2px;
+            height: 1px;
             transform: translateY(-50%);
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            box-shadow: 0 0 16px rgba(255, 255, 255, 0.12);
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 0 8px rgba(255,255,255,0.18);
         }
 
         .flow-dash {
             position: absolute;
             top: 50%;
-            width: 54px;
-            height: 3px;
-            border-radius: 99px;
-            opacity: 0;
             transform: translateY(-50%);
+            width: 40px;
+            height: 2px;
+            border-radius: 10px;
+            opacity: 0;
+            filter: blur(0.4px);
         }
 
         .dir-right .flow-dash {
-            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.14) 18%, var(--c) 70%, #fff 100%);
-            box-shadow: 0 0 10px var(--c), 0 0 22px var(--c);
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%);
+            box-shadow: 0 0 4px var(--c), 0 0 8px var(--c), 0 0 16px var(--c);
         }
 
         .dir-left .flow-dash {
-            background: linear-gradient(270deg, transparent 0%, rgba(255, 255, 255, 0.14) 18%, var(--c) 70%, #fff 100%);
-            box-shadow: 0 0 10px var(--c), 0 0 22px var(--c);
+            background: linear-gradient(270deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%);
+            box-shadow: 0 0 4px var(--c), 0 0 8px var(--c), 0 0 16px var(--c);
         }
 
         .flow-dash::before {
-            content: "";
+            content: '';
             position: absolute;
-            top: 50%;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+            width: 5px;
+            height: 5px;
             background: #fff;
+            border-radius: 50%;
+            top: 50%;
             transform: translateY(-50%);
-            box-shadow: 0 0 8px #fff, 0 0 18px var(--c), 0 0 30px var(--c);
+            box-shadow: 0 0 6px #fff, 0 0 10px var(--c), 0 0 15px var(--c);
         }
 
         .flow-dash::after {
-            content: "";
+            content: '';
             position: absolute;
-            top: 50%;
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
+            width: 2px;
+            height: 2px;
             background: #fff;
-            box-shadow:
-                -8px -6px 0 rgba(255, 255, 255, 0.75),
-                -14px 5px 0 rgba(255, 255, 255, 0.48),
-                -24px -2px 0 rgba(255, 255, 255, 0.34);
+            border-radius: 50%;
+            top: 50%;
+            box-shadow: -6px -4px 0 rgba(255,255,255,0.7), -10px 3px 0 rgba(255,255,255,0.5), -15px -2px 0 rgba(255,255,255,0.3);
         }
 
         .dir-right .flow-dash::before,
@@ -513,347 +626,239 @@
         .dir-left .flow-dash::after { left: -2px; }
 
         .flow-dash:nth-child(2) { animation-delay: 0s; }
-        .flow-dash:nth-child(3) { animation-delay: 0.45s; }
-        .flow-dash:nth-child(4) { animation-delay: 0.9s; }
-        .flow-dash:nth-child(5) { animation-delay: 1.35s; }
-        .flow-dash:nth-child(6) { animation-delay: 1.8s; }
+        .flow-dash:nth-child(3) { animation-delay: 0.5s; }
+        .flow-dash:nth-child(4) { animation-delay: 1.0s; }
+        .flow-dash:nth-child(5) { animation-delay: 1.5s; }
+        .flow-dash:nth-child(6) { animation-delay: 2.0s; }
 
         @keyframes flowInL {
-            0% { left: -28%; opacity: 0; transform: translateY(-50%) scale(0.75); }
-            12%, 72% { opacity: 1; }
-            100% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.9); }
+            0% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.7); }
+            10% { opacity: 1; }
+            50% { opacity: 1; transform: translateY(-50%) scale(1); }
+            100% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.8); }
         }
 
         @keyframes flowOutL {
-            0% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.75); }
-            12%, 72% { opacity: 1; }
-            100% { left: -28%; opacity: 0; transform: translateY(-50%) scale(0.9); }
+            0% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.7); }
+            10% { opacity: 1; }
+            50% { opacity: 1; transform: translateY(-50%) scale(1); }
+            100% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.8); }
         }
 
         @keyframes flowInR {
-            0% { right: -28%; opacity: 0; transform: translateY(-50%) scale(0.75); }
-            12%, 72% { opacity: 1; }
-            100% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.9); }
+            0% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.7); }
+            10% { opacity: 1; }
+            50% { opacity: 1; transform: translateY(-50%) scale(1); }
+            100% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.8); }
         }
 
         @keyframes flowOutR {
-            0% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.75); }
-            12%, 72% { opacity: 1; }
-            100% { right: -28%; opacity: 0; transform: translateY(-50%) scale(0.9); }
+            0% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.7); }
+            10% { opacity: 1; }
+            50% { opacity: 1; transform: translateY(-50%) scale(1); }
+            100% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.8); }
         }
 
-        .bpf-container {
-            position: absolute;
-            left: 50%;
-            bottom: 8.5%;
-            transform: translateX(-50%);
-            z-index: 15;
-            width: 100%;
-            text-align: center;
-            pointer-events: none;
-        }
-
-        .bpf-text {
-            position: relative;
-            display: inline-block;
-            font-family: "STKaiti", "KaiTi", "Times New Roman", serif;
-            font-size: clamp(30px, 5.2vw, 52px);
-            font-weight: 900;
-            letter-spacing: 0.14em;
-            background: linear-gradient(180deg, #fff8bf 0%, #ffe066 32%, #ff9f1c 68%, #bf6d00 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 12px rgba(255, 209, 102, 0.6));
-            animation: goldGlow 2.4s ease-in-out infinite alternate;
-        }
-
-        .bpf-text::after {
-            content: attr(data-text);
-            position: absolute;
-            inset: 0;
-            z-index: -1;
-            -webkit-text-fill-color: transparent;
-            text-shadow:
-                1px 1px 0 #d41f35,
-                3px 3px 0 #8f1426,
-                7px 8px 20px rgba(255, 30, 64, 0.75);
-        }
-
-        @keyframes goldGlow {
-            from { filter: drop-shadow(0 0 10px rgba(255, 209, 102, 0.45)); }
-            to { filter: drop-shadow(0 0 24px rgba(255, 209, 102, 0.92)); }
-        }
-
-        .stats-panel {
-            display: grid;
-            grid-template-rows: auto auto auto auto;
-            gap: 16px;
-            min-height: 100%;
-        }
+        /* ================= KHUNG THỐNG KÊ ================= */
+        .stats-panel { display: flex; flex-direction: column; gap: 15px; }
 
         .stat-card {
-            border-radius: var(--radius);
-            padding: 18px;
+            position: relative;
             overflow: hidden;
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.78), rgba(255,255,255,0.58)),
+                rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08), 0 0 22px rgba(255,255,255,0.12);
         }
 
         .stat-card::before {
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-            transform: translateX(-100%);
-            animation: cardSheen 6s ease-in-out infinite;
+            background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%);
+            transform: translateX(-120%);
+            animation: cardSheen 5.5s ease-in-out infinite;
             pointer-events: none;
         }
 
         @keyframes cardSheen {
-            0%, 42% { transform: translateX(-120%); }
-            70%, 100% { transform: translateX(120%); }
+            0%, 48% { transform: translateX(-120%); }
+            78%, 100% { transform: translateX(120%); }
+        }
+
+        /* Box Quy đổi tiền điện riêng biệt với viền mạ vàng */
+        .money-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95));
+            border: 1px solid rgba(218, 165, 32, 0.65);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08), 0 0 24px rgba(255, 215, 0, 0.18);
         }
 
         .stat-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
         }
 
-        .stat-header h2 {
-            color: #fff;
-            font-size: 15px;
-            font-weight: 900;
-            letter-spacing: 0.04em;
+        .stat-header h2 { font-size: 16px; color: #444; }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+            display: flex;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .bar-batt {
+            background: linear-gradient(90deg, #00cc66, #33ff99, #d8ffe8);
+            width: 0%;
+            transition: width 1s;
+            box-shadow: 0 0 12px rgba(0,204,102,0.42);
         }
 
         .list-detail {
-            display: grid;
-            gap: 9px;
-            color: var(--muted);
             font-size: 13px;
-            font-weight: 800;
+            color: #555;
+            position: relative;
+            z-index: 1;
         }
 
         .list-detail div {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 10px;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
+            padding-bottom: 4px;
         }
 
-        .list-detail div:last-child {
-            border-bottom: 0;
-        }
+        .list-detail div:last-child { border: none; }
+        .list-detail span { font-weight: 800; color: #111; white-space: nowrap; }
 
-        .list-detail span {
-            color: #fff;
-            font-weight: 900;
-            white-space: nowrap;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 14px;
-            margin-bottom: 13px;
-            border-radius: 999px;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.24);
-        }
-
-        .bar-batt {
-            width: 0%;
-            height: 100%;
-            border-radius: inherit;
-            background: linear-gradient(90deg, #38ef9d, #9effd1, #fff);
-            box-shadow: 0 0 18px rgba(56, 239, 157, 0.55);
-            transition: width 0.8s ease;
-        }
-
-        .money-card {
-            border-color: rgba(255, 209, 102, 0.34);
-            background:
-                linear-gradient(145deg, rgba(255, 209, 102, 0.18), rgba(255, 255, 255, 0.06)),
-                rgba(12, 22, 38, 0.68);
-            box-shadow:
-                0 28px 80px rgba(0, 0, 0, 0.34),
-                0 0 42px rgba(255, 209, 102, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.18);
-        }
-
-        .money-note {
-            margin-top: 8px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 10px;
-            font-style: italic;
-            font-weight: 700;
-            text-align: right;
-        }
-
-        .switch-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            padding-top: 2px;
-        }
-
-        .switch-label {
-            color: var(--muted);
-            font-size: 14px;
-            font-weight: 900;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 58px;
-            height: 30px;
-            flex: 0 0 auto;
-        }
-
-        .switch input {
-            width: 0;
-            height: 0;
-            opacity: 0;
-        }
+        /* ================= NÚT GẠT ================= */
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
 
         .slider {
             position: absolute;
-            inset: 0;
             cursor: pointer;
-            border-radius: 999px;
-            background: rgba(255, 92, 122, 0.62);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            transition: 0.3s ease;
-            box-shadow: inset 0 2px 7px rgba(0, 0, 0, 0.24);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 26px;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.18);
         }
 
-        .slider::before {
-            content: "";
+        .slider:before {
             position: absolute;
-            width: 24px;
-            height: 24px;
+            content: "";
+            height: 20px;
+            width: 20px;
             left: 3px;
-            bottom: 2px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
             border-radius: 50%;
-            background: #fff;
-            transition: 0.3s ease;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.34);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         input:checked + .slider {
-            background: rgba(56, 239, 157, 0.72);
-            box-shadow: 0 0 18px rgba(56, 239, 157, 0.36);
+            background-color: #00cc66;
+            box-shadow: 0 0 14px rgba(0,204,102,0.35);
         }
 
-        input:checked + .slider::before {
-            transform: translateX(27px);
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        @media (max-width: 360px) {
+            #update-clock { font-size: 11px; padding: 4px 8px; }
+            #lbl-status { font-size: 12px; padding: 4px 10px; }
+            .bpf-text { font-size: 32px; letter-spacing: 5px; }
         }
 
-        #switch-status-text {
-            margin-top: 8px;
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 900;
-            text-align: right;
-        }
-
-        @media (max-width: 860px) {
-            body {
-                padding: 12px;
-                background-attachment: scroll;
-            }
-
-            .app-container {
-                grid-template-columns: 1fr;
-                min-height: auto;
-            }
-
-            .diagram-panel {
-                min-height: 360px;
-                max-height: none;
-                border-radius: 24px;
-            }
-
-            .node {
-                width: 94px;
-                min-height: 84px;
-                padding: 10px 8px;
-                border-radius: 17px;
-            }
-
-            .node .val { font-size: 17px; }
-            .weather-container { width: 168px; top: 13%; }
-            .ss-temp { font-size: 31px; }
-            #lbl-status { left: 15%; font-size: 11px; min-width: 82px; }
-            .node-center { width: 116px; min-height: 132px; }
-            .node-center img { height: 108px; }
-            .top-badge { display: none; }
-        }
-
-        @media (max-width: 420px) {
-            .diagram-panel {
-                min-height: 330px;
-            }
-
-            .pos-pv { top: 21%; left: 18%; }
-            .pos-grid { top: 21%; left: 82%; }
-            .pos-batt { top: 78%; left: 18%; }
-            .pos-load { top: 78%; left: 82%; }
-
-            .node {
-                width: 84px;
-                min-height: 76px;
-            }
-
-            .node h3 {
-                font-size: 8px;
-            }
-
-            .node .val {
-                font-size: 15px;
-            }
-
-            .icon {
-                font-size: 20px;
-            }
-
-            .weather-container {
-                width: 150px;
-                padding: 8px;
-            }
-
-            .ss-location {
-                font-size: 9px;
-            }
-
-            .bpf-text {
-                font-size: 28px;
-            }
-
-            .list-detail div {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 3px;
-            }
+        @media (min-width: 768px) {
+            .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
+            .diagram-panel { flex: 1; max-width: none; }
+            .stats-panel { flex: 1; justify-content: center; }
         }
     </style>
 </head>
 <body>
-    <main class="app-container">
-        <section class="diagram-panel" aria-label="Sơ đồ năng lượng Sosen">
-            <div class="top-badge">SOSEN LIVE</div>
+    <div class="color-sky" aria-hidden="true">
+        <span class="star" style="--x:4%; --y:8%; --s:2px; --c:#ffffff; --d:2.4s; --f:18s; --delay:-0.2s;"></span>
+        <span class="star" style="--x:11%; --y:22%; --s:3px; --c:#ffd700; --d:2.1s; --f:21s; --delay:-1.4s;"></span>
+        <span class="star" style="--x:18%; --y:13%; --s:2px; --c:#00e5ff; --d:2.9s; --f:23s; --delay:-0.8s;"></span>
+        <span class="star" style="--x:25%; --y:31%; --s:2px; --c:#ff4fd8; --d:2.2s; --f:19s; --delay:-1.1s;"></span>
+        <span class="star" style="--x:33%; --y:10%; --s:3px; --c:#8cff66; --d:2.7s; --f:25s; --delay:-2.1s;"></span>
+        <span class="star" style="--x:41%; --y:25%; --s:2px; --c:#ffffff; --d:2.3s; --f:20s; --delay:-0.6s;"></span>
+        <span class="star" style="--x:49%; --y:7%; --s:2px; --c:#ff8c00; --d:3s; --f:28s; --delay:-1.7s;"></span>
+        <span class="star" style="--x:56%; --y:19%; --s:3px; --c:#78a7ff; --d:2.5s; --f:24s; --delay:-2.8s;"></span>
+        <span class="star" style="--x:65%; --y:11%; --s:2px; --c:#ff5c7a; --d:2.2s; --f:22s; --delay:-1.9s;"></span>
+        <span class="star" style="--x:72%; --y:29%; --s:3px; --c:#00ffcc; --d:2.8s; --f:27s; --delay:-0.9s;"></span>
+        <span class="star" style="--x:81%; --y:8%; --s:2px; --c:#fff7a1; --d:2.4s; --f:18s; --delay:-1.2s;"></span>
+        <span class="star" style="--x:92%; --y:24%; --s:3px; --c:#c084fc; --d:2.6s; --f:26s; --delay:-2.2s;"></span>
+        <span class="star" style="--x:7%; --y:45%; --s:2px; --c:#38ef9d; --d:3.1s; --f:30s; --delay:-2.5s;"></span>
+        <span class="star" style="--x:16%; --y:58%; --s:3px; --c:#ffffff; --d:2.5s; --f:21s; --delay:-1.6s;"></span>
+        <span class="star" style="--x:24%; --y:48%; --s:2px; --c:#6bd4ff; --d:2.3s; --f:19s; --delay:-0.4s;"></span>
+        <span class="star" style="--x:36%; --y:62%; --s:3px; --c:#ffd700; --d:2.9s; --f:26s; --delay:-1.8s;"></span>
+        <span class="star" style="--x:44%; --y:43%; --s:2px; --c:#ff4fd8; --d:2.4s; --f:23s; --delay:-2.3s;"></span>
+        <span class="star" style="--x:53%; --y:57%; --s:3px; --c:#8cff66; --d:2.7s; --f:28s; --delay:-0.7s;"></span>
+        <span class="star" style="--x:62%; --y:47%; --s:2px; --c:#ffffff; --d:2.2s; --f:20s; --delay:-1.3s;"></span>
+        <span class="star" style="--x:70%; --y:61%; --s:3px; --c:#ff8c00; --d:2.8s; --f:27s; --delay:-2.9s;"></span>
+        <span class="star" style="--x:83%; --y:49%; --s:2px; --c:#78a7ff; --d:2.1s; --f:18s; --delay:-1s;"></span>
+        <span class="star" style="--x:94%; --y:56%; --s:3px; --c:#00ffcc; --d:3s; --f:29s; --delay:-2.4s;"></span>
+        <span class="star" style="--x:9%; --y:78%; --s:3px; --c:#ff5c7a; --d:2.6s; --f:25s; --delay:-0.5s;"></span>
+        <span class="star" style="--x:19%; --y:88%; --s:2px; --c:#fff7a1; --d:2.3s; --f:22s; --delay:-1.5s;"></span>
+        <span class="star" style="--x:29%; --y:74%; --s:3px; --c:#c084fc; --d:2.9s; --f:31s; --delay:-2.6s;"></span>
+        <span class="star" style="--x:39%; --y:91%; --s:2px; --c:#38ef9d; --d:2.2s; --f:18s; --delay:-0.8s;"></span>
+        <span class="star" style="--x:51%; --y:82%; --s:3px; --c:#ffffff; --d:2.7s; --f:27s; --delay:-1.9s;"></span>
+        <span class="star" style="--x:60%; --y:93%; --s:2px; --c:#6bd4ff; --d:2.5s; --f:24s; --delay:-0.3s;"></span>
+        <span class="star" style="--x:68%; --y:76%; --s:3px; --c:#ffd700; --d:2.8s; --f:26s; --delay:-2.1s;"></span>
+        <span class="star" style="--x:79%; --y:89%; --s:2px; --c:#ff4fd8; --d:2.4s; --f:20s; --delay:-1.7s;"></span>
+        <span class="star" style="--x:88%; --y:74%; --s:3px; --c:#8cff66; --d:3.1s; --f:32s; --delay:-2.7s;"></span>
+        <span class="star" style="--x:97%; --y:84%; --s:2px; --c:#ffffff; --d:2.2s; --f:19s; --delay:-1.1s;"></span>
+    </div>
+    <div class="app-container">
+        <div class="diagram-panel">
+            <div class="panel-sparkles" aria-hidden="true">
+                <span class="spark" style="--x:8%; --y:30%; --s:2px; --c:#ffffff; --d:2.2s; --delay:-0.4s;"></span>
+                <span class="spark" style="--x:14%; --y:63%; --s:3px; --c:#ffd700; --d:2.6s; --delay:-1.1s;"></span>
+                <span class="spark" style="--x:24%; --y:22%; --s:2px; --c:#00e5ff; --d:2.1s; --delay:-1.8s;"></span>
+                <span class="spark" style="--x:30%; --y:76%; --s:3px; --c:#ff4fd8; --d:2.9s; --delay:-0.7s;"></span>
+                <span class="spark" style="--x:38%; --y:39%; --s:2px; --c:#8cff66; --d:2.4s; --delay:-1.5s;"></span>
+                <span class="spark" style="--x:47%; --y:18%; --s:3px; --c:#fff7a1; --d:2.7s; --delay:-0.9s;"></span>
+                <span class="spark" style="--x:52%; --y:72%; --s:2px; --c:#78a7ff; --d:2.2s; --delay:-2.2s;"></span>
+                <span class="spark" style="--x:60%; --y:34%; --s:3px; --c:#ff8c00; --d:2.8s; --delay:-1.3s;"></span>
+                <span class="spark" style="--x:68%; --y:64%; --s:2px; --c:#00ffcc; --d:2.5s; --delay:-0.5s;"></span>
+                <span class="spark" style="--x:75%; --y:24%; --s:3px; --c:#ff5c7a; --d:2.9s; --delay:-1.9s;"></span>
+                <span class="spark" style="--x:84%; --y:57%; --s:2px; --c:#ffffff; --d:2.3s; --delay:-0.8s;"></span>
+                <span class="spark" style="--x:91%; --y:38%; --s:3px; --c:#c084fc; --d:2.6s; --delay:-1.6s;"></span>
+                <span class="spark" style="--x:18%; --y:47%; --s:2px; --c:#38ef9d; --d:2.4s; --delay:-2.4s;"></span>
+                <span class="spark" style="--x:42%; --y:86%; --s:2px; --c:#ffd700; --d:2.7s; --delay:-0.2s;"></span>
+                <span class="spark" style="--x:58%; --y:12%; --s:2px; --c:#6bd4ff; --d:2.1s; --delay:-1.2s;"></span>
+                <span class="spark" style="--x:80%; --y:79%; --s:3px; --c:#ff4fd8; --d:2.8s; --delay:-2.5s;"></span>
+            </div>
             <div id="update-clock">--:--:--</div>
             <div id="lbl-status">Đang tải...</div>
 
             <div class="weather-container">
                 <div class="ss-location">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     Đại Đồng, Bắc Ninh
                 </div>
                 <div class="ss-temp" id="now-temp">--°</div>
@@ -877,95 +882,78 @@
 
             <div class="node pos-pv">
                 <div class="sun-arc-mini">
-                    <svg viewBox="0 0 80 40" aria-hidden="true"><path d="M 5 35 Q 40 -5 75 35" fill="none" stroke="#ffd166" stroke-width="2" stroke-dasharray="4,4" opacity="0.8"/></svg>
+                    <svg viewBox="0 0 80 40"><path d="M 5 35 Q 40 -5 75 35" fill="none" stroke="#ffaa00" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.75"/></svg>
                     <div id="moving-sun">☀️</div>
                 </div>
-                <h3>MẶT TRỜI</h3>
-                <div class="val" id="lbl-pv">0</div>
-                <div class="unit">W</div>
+                <h3>MẶT TRỜI</h3><div class="val" id="lbl-pv">0</div><div class="unit">W</div>
             </div>
 
-            <div class="node pos-grid">
-                <div class="icon">🏭</div>
-                <h3>LƯỚI EVN</h3>
-                <div class="val" id="lbl-grid">0</div>
-                <div class="unit">W</div>
-            </div>
+            <div class="node pos-grid"><div class="icon">🗼</div><h3>LƯỚI EVN</h3><div class="val" id="lbl-grid">0</div><div class="unit">W</div></div>
 
             <div class="node pos-batt">
                 <div class="battery-box">
-                    <div class="batt-seg" id="batt-seg-0"></div>
-                    <div class="batt-seg" id="batt-seg-1"></div>
-                    <div class="batt-seg" id="batt-seg-2"></div>
-                    <div class="batt-seg" id="batt-seg-3"></div>
-                    <div class="batt-seg" id="batt-seg-4"></div>
+                    <div class="batt-seg" id="batt-seg-0"></div><div class="batt-seg" id="batt-seg-1"></div><div class="batt-seg" id="batt-seg-2"></div><div class="batt-seg" id="batt-seg-3"></div><div class="batt-seg" id="batt-seg-4"></div>
                 </div>
-                <h3>PIN LƯU TRỮ</h3>
-                <div class="val" id="lbl-batt">0</div>
-                <div class="unit">W</div>
-                <div style="font-size: 17px; font-weight: 900; margin-top: 2px; transition: color 0.5s;" id="lbl-soc">0%</div>
+                <h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div>
+                <div style="font-size: 16px; font-weight:900; margin-top: 2px; transition: color 0.5s;" id="lbl-soc">0%</div>
             </div>
 
-            <div class="node pos-load">
-                <div class="icon">🏠</div>
-                <h3>TIÊU THỤ</h3>
-                <div class="val" id="lbl-load">0</div>
-                <div class="unit">W</div>
-            </div>
+            <div class="node pos-load"><div class="icon">🏠</div><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
 
             <div class="node node-center pos-inv">
                 <div id="lbl-inv-temp">🌡️ --°C</div>
-                <img src="68.jpg" alt="Inverter Sosen">
+                <img src="68.jpg" alt="Inverter">
             </div>
 
             <div class="bpf-container">
                 <div class="bpf-text" data-text="八方來財">八方來財</div>
             </div>
-        </section>
+        </div>
 
-        <aside class="stats-panel" aria-label="Thông số chi tiết">
-            <section class="stat-card">
+        <div class="stats-panel">
+            <div class="stat-card">
                 <div class="stat-header"><h2>📊 THỐNG KÊ HÔM NAY</h2></div>
                 <div class="list-detail">
-                    <div>☀️ Sản lượng PV <span id="stat-pv-today">0 kWh</span></div>
-                    <div>🏭 Lấy lưới hôm nay <span id="stat-grid-buy">0 kWh</span></div>
-                    <div>🔋 Pin đã xả <span id="stat-bat-dis">0 kWh</span></div>
-                    <div>⚡ Pin đã sạc <span id="stat-bat-chg">0 kWh</span></div>
-                    <div style="color: #ffd166;">🌐 E_Total PV trọn đời <span id="stat-load-total">0 kWh</span></div>
+                    <div>☀️ Sản lượng PV: <span id="stat-pv-today">0 kWh</span></div>
+                    <div>🗼 Lấy lưới hôm nay: <span id="stat-grid-buy">0 kWh</span></div>
+                    <div>🔋 Pin đã xả: <span id="stat-bat-dis">0 kWh</span></div>
+                    <div>⚡ Pin đã sạc: <span id="stat-bat-chg">0 kWh</span></div>
+                    <div style="color: #d35400;">🌐 E_Total (PV Trọn đời): <span id="stat-load-total">0 kWh</span></div>
                 </div>
-            </section>
+            </div>
 
-            <section class="stat-card">
-                <div class="stat-header"><h2>🔋 DUNG LƯỢNG PIN & ÁP</h2></div>
+            <div class="stat-card">
+                <div class="stat-header"><h2>Dung lượng Pin & Áp</h2></div>
                 <div class="progress-bar"><div class="bar-batt" id="bar-soc"></div></div>
                 <div class="list-detail">
-                    <div>Điện áp pin <span id="stat-v">0 V</span></div>
-                    <div>Dòng điện <span id="stat-a">0 A</span></div>
+                    <div>Điện áp Pin: <span id="stat-v">0 V</span></div>
+                    <div>Dòng điện: <span id="stat-a">0 A</span></div>
                 </div>
-            </section>
+            </div>
 
-            <section class="stat-card money-card">
-                <div class="stat-header"><h2 style="color: #ffe08a;">💰 QUY ĐỔI TIỀN ĐIỆN EVN</h2></div>
+            <div class="stat-card money-card">
+                <div class="stat-header"><h2 style="color: #b8860b;">💰 QUY ĐỔI TIỀN ĐIỆN (EVN)</h2></div>
                 <div class="list-detail">
-                    <div>Hôm nay (<span id="money-pv-today">0</span> kWh) <span id="money-today" style="font-size: 16px; color: #ffe08a;">0 đ</span></div>
-                    <div>Tháng này (<span id="money-pv-month">0</span> kWh) <span id="money-month" style="font-size: 17px; color: #ffcf66;">0 đ</span></div>
+                    <div>Hôm nay (<span id="money-pv-today">0</span> kWh): <span id="money-today" style="font-size: 15px; color: #ffaa00; font-weight: 900;">0 đ</span></div>
+                    <div>Tháng này (<span id="money-pv-month">0</span> kWh): <span id="money-month" style="font-size: 15px; color: #ff4444; font-weight: 900;">0 đ</span></div>
+                    <div>Năm nay/Trọn đời (<span id="money-pv-total">0</span> kWh): <span id="money-total" style="font-size: 16px; color: #00cc66; font-weight: 900;">0 đ</span></div>
                 </div>
-                <div class="money-note">*Tính theo biểu giá 6 bậc thang, đã gồm 8% VAT</div>
-            </section>
+                <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic; position: relative; z-index: 1;">*Hệ thống tự động cộng dồn theo ngày dương lịch</div>
+            </div>
 
-            <section class="stat-card">
+            <div class="stat-card">
                 <div class="stat-header"><h2>🎛️ ĐIỀU KHIỂN BIẾN TẦN</h2></div>
-                <div class="switch-row">
-                    <span class="switch-label">Trạng thái inverter</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 5px; position: relative; z-index: 1;">
+                    <span style="font-size: 14px; font-weight: 800; color: #444;">Trạng thái:</span>
                     <label class="switch">
                         <input type="checkbox" id="inv-switch-toggle">
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div id="switch-status-text">Đang tải...</div>
-            </section>
-        </aside>
-    </main>
+                <div id="switch-status-text" style="text-align: right; font-size: 12px; font-weight: 800; color: #888; margin-top: 5px; position: relative; z-index: 1;">Đang tải...</div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -979,51 +967,53 @@
         async function fetchWeather() {
             try {
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&forecast_days=1&timeformat=unixtime`;
-                const res = await fetch(url, { cache: "no-store" });
+                const res = await fetch(url, { cache: 'no-store' });
                 const data = await res.json();
 
                 if (data && data.current) {
                     globalSunrise = data.daily.sunrise[0];
                     globalSunset = data.daily.sunset[0];
 
-                    updateWeatherUI({
+                    const currentInfo = {
                         temp: data.current.temperature_2m,
                         feels_like: data.current.apparent_temperature,
                         code: data.current.weather_code,
                         is_day: data.current.is_day,
                         max: data.daily.temperature_2m_max[0],
                         min: data.daily.temperature_2m_min[0]
-                    });
+                    };
+
+                    updateWeatherUI(currentInfo);
                     updateSunArc();
                 } else {
-                    document.getElementById("now-desc").innerText = "Lỗi API dữ liệu";
+                    document.getElementById('now-desc').innerText = "Lỗi API dữ liệu";
                 }
             } catch (e) {
-                console.error("Lỗi kết nối thời tiết:", e);
-                document.getElementById("now-desc").innerText = "Mất kết nối";
+                console.error("Lỗi kết nối Thời tiết:", e);
+                document.getElementById('now-desc').innerText = "Mất kết nối";
             }
         }
 
         function getWeatherDesc(code, isDay) {
             const isNight = !isDay;
             const map = {
-                0: isNight ? "Trời quang" : "Trời nắng",
-                1: "Chủ yếu nắng", 2: "Có mây", 3: "Nhiều mây",
-                45: "Sương mù", 48: "Sương lạnh",
-                51: "Mưa phùn", 53: "Mưa phùn", 55: "Mưa dày",
-                61: "Mưa nhẹ", 63: "Mưa vừa", 65: "Mưa to",
-                71: "Tuyết nhẹ", 73: "Tuyết", 75: "Tuyết dày",
-                80: "Mưa rào", 81: "Mưa rào", 82: "Mưa lớn",
-                95: "Dông bão", 96: "Dông bão", 99: "Dông lớn"
+                0: isNight ? 'Trời quang' : 'Trời nắng',
+                1: 'Chủ yếu nắng', 2: 'Có mây', 3: 'Nhiều mây',
+                45: 'Sương mù', 48: 'Sương lạnh',
+                51: 'Mưa phùn', 53: 'Mưa phùn', 55: 'Mưa dày',
+                61: 'Mưa nhẹ', 63: 'Mưa vừa', 65: 'Mưa to',
+                71: 'Tuyết nhẹ', 73: 'Tuyết', 75: 'Tuyết dày',
+                80: 'Mưa rào', 81: 'Mưa rào', 82: 'Mưa lớn',
+                95: 'Dông bão', 96: 'Dông bão', 99: 'Dông lớn'
             };
-            return map[code] || "Đang cập nhật...";
+            return map[code] || 'Đang cập nhật...';
         }
 
         function updateWeatherUI(currentInfo) {
-            document.getElementById("now-temp").innerText = Math.round(currentInfo.temp) + "°";
-            document.getElementById("now-desc").innerText = getWeatherDesc(currentInfo.code, currentInfo.is_day);
-            document.getElementById("now-hl").innerText = `↑ ${Math.round(currentInfo.max)}° / ↓ ${Math.round(currentInfo.min)}°`;
-            document.getElementById("now-feels").innerText = `Cảm giác như ${Math.round(currentInfo.feels_like)}°`;
+            document.getElementById('now-temp').innerText = Math.round(currentInfo.temp) + '°';
+            document.getElementById('now-desc').innerText = getWeatherDesc(currentInfo.code, currentInfo.is_day);
+            document.getElementById('now-hl').innerText = `↑ ${Math.round(currentInfo.max)}° / ↓ ${Math.round(currentInfo.min)}°`;
+            document.getElementById('now-feels').innerText = `Cảm giác như ${Math.round(currentInfo.feels_like)}°`;
         }
 
         function updateSunArc() {
@@ -1034,165 +1024,105 @@
                 progress = (nowUnix - globalSunrise) / (globalSunset - globalSunrise);
             } else if (nowUnix >= globalSunset) {
                 progress = 1;
+            } else {
+                progress = 0;
             }
-
-            const P0 = { x: 5, y: 35 };
-            const P1 = { x: 40, y: -5 };
-            const P2 = { x: 75, y: 35 };
+            const P0 = {x: 5, y: 35};
+            const P1 = {x: 40, y: -5};
+            const P2 = {x: 75, y: 35};
             const t = progress;
-            const x = Math.pow(1 - t, 2) * P0.x + 2 * (1 - t) * t * P1.x + Math.pow(t, 2) * P2.x;
-            const y = Math.pow(1 - t, 2) * P0.y + 2 * (1 - t) * t * P1.y + Math.pow(t, 2) * P2.y;
-            const sun = document.getElementById("moving-sun");
-            sun.style.left = (x / 80 * 100) + "%";
-            sun.style.top = (y / 40 * 100) + "%";
-            sun.style.opacity = (progress <= 0 || progress >= 1) ? "0.35" : "1";
+            const x = Math.pow(1-t, 2)*P0.x + 2*(1-t)*t*P1.x + Math.pow(t, 2)*P2.x;
+            const y = Math.pow(1-t, 2)*P0.y + 2*(1-t)*t*P1.y + Math.pow(t, 2)*P2.y;
+            const sun = document.getElementById('moving-sun');
+            sun.style.left = (x / 80 * 100) + '%';
+            sun.style.top = (y / 40 * 100) + '%';
+            sun.style.opacity = (progress <= 0 || progress >= 1) ? "0.3" : "1";
         }
 
         setInterval(fetchWeather, 30 * 60 * 1000);
         setInterval(updateSunArc, 60000);
         fetchWeather();
 
+        // ================= XỬ LÝ ANIMATION =================
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId);
             if (!group) return;
-
             if (isActive) {
-                group.style.display = "block";
-                group.style.setProperty("--c", color);
-                if (animName === "flowInL" || animName === "flowOutR") {
-                    group.classList.add("dir-right");
-                    group.classList.remove("dir-left");
+                group.style.display = 'block';
+                group.style.setProperty('--c', color);
+                if (animName === 'flowInL' || animName === 'flowOutR') {
+                    group.classList.add('dir-right');
+                    group.classList.remove('dir-left');
                 } else {
-                    group.classList.add("dir-left");
-                    group.classList.remove("dir-right");
+                    group.classList.add('dir-left');
+                    group.classList.remove('dir-right');
                 }
-
-                group.querySelectorAll(".flow-dash").forEach((dash) => {
-                    dash.style.animationName = animName;
-                    dash.style.animationDuration = "2.35s";
-                    dash.style.animationIterationCount = "infinite";
-                    dash.style.animationTimingFunction = "linear";
+                const dashes = group.querySelectorAll('.flow-dash');
+                dashes.forEach((d) => {
+                    d.style.animationName = animName;
+                    d.style.animationDuration = '2.5s';
+                    d.style.animationIterationCount = 'infinite';
+                    d.style.animationTimingFunction = 'linear';
                 });
             } else {
-                group.style.display = "none";
+                group.style.display = 'none';
             }
         }
 
+        // ================= KẾT NỐI FIREBASE & QUẢN LÝ NGÀY THÁNG TỰ ĐỘNG =================
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const lblStatus = document.getElementById("lbl-status");
-        const lblSoc = document.getElementById("lbl-soc");
+        const lblStatus = document.getElementById('lbl-status');
+        const lblSoc = document.getElementById('lbl-soc');
 
+        let currentMonthKey = "";
         let currentMonthHistory = {};
-        const initDate = new Date();
-        const initMonthKey = initDate.getFullYear() + "_" + (initDate.getMonth() + 1).toString().padStart(2, "0");
+        let latestDailyData = null;
 
-        database.ref(`/SosenSystem/Monthly_History/${initMonthKey}`).on("value", (snap) => {
-            currentMonthHistory = snap.val() || {};
-        });
-
-        database.ref("/SosenSystem/Live").on("value", (snapshot) => {
-            const data = snapshot.val();
-            if (!data) return;
-
-            const now = new Date();
-            document.getElementById("update-clock").innerText = now.toLocaleTimeString("vi-VN", { hour12: false });
-            const pvInW = Math.round(data.PV_Power * 1000);
-            const gridInW = Math.round(data.Grid_Power);
-            const battInW = Math.round(data.Batt_Voltage * data.Batt_Current);
-            let loadInW = pvInW + gridInW + battInW;
-
-            if (loadInW < 0) loadInW = 0;
-            document.getElementById("lbl-pv").innerText = pvInW;
-            document.getElementById("lbl-grid").innerText = Math.abs(gridInW);
-            document.getElementById("lbl-load").innerText = loadInW;
-            document.getElementById("lbl-batt").innerText = Math.abs(battInW);
-
-            if (data.Inv_Temp !== undefined) {
-                const tempLabel = document.getElementById("lbl-inv-temp");
-                const t = data.Inv_Temp;
-                tempLabel.innerText = "🌡️ " + t + "°C";
-                if (t < 40) {
-                    tempLabel.style.backgroundColor = "#38ef9d";
-                    tempLabel.style.boxShadow = "0 0 24px rgba(56, 239, 157, 0.55)";
-                } else if (t < 48) {
-                    tempLabel.style.backgroundColor = "#ffb84d";
-                    tempLabel.style.boxShadow = "0 0 24px rgba(255, 184, 77, 0.55)";
-                } else {
-                    tempLabel.style.backgroundColor = "#ff5c7a";
-                    tempLabel.style.boxShadow = "0 0 24px rgba(255, 92, 122, 0.55)";
+        // Hàm kiểm tra và chuyển đổi dữ liệu khi bước sang tháng mới
+        function checkAndSwitchMonth() {
+            let d = new Date();
+            let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
+            if (mk !== currentMonthKey) {
+                if (currentMonthKey !== "") {
+                    database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).off();
                 }
+                currentMonthKey = mk;
+                database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).on('value', (snap) => {
+                    currentMonthHistory = snap.val() || {};
+                    recalculateEnergy();
+                });
             }
+        }
 
-            if (data.Inv_Switch !== undefined) {
-                const toggle = document.getElementById("inv-switch-toggle");
-                const statusText = document.getElementById("switch-status-text");
-                toggle.checked = (data.Inv_Switch === 1);
-                statusText.innerText = (data.Inv_Switch === 1) ? "Đang BẬT" : "Đã TẮT";
-                statusText.style.color = (data.Inv_Switch === 1) ? "#38ef9d" : "#ff5c7a";
-            }
+        // Hàm tính tiền theo 6 bậc EVN (Đã gồm 8% VAT)
+        function calcEVN(kWh) {
+            let cost = 0; let r = kWh;
+            if(r > 0) { let q = Math.min(r, 50); cost += q * 2142.72; r -= q; }
+            if(r > 0) { let q = Math.min(r, 50); cost += q * 2214.00; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 2570.40; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 3237.84; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 3618.00; r -= q; }
+            if(r > 0) { cost += r * 3736.80; }
+            return cost;
+        }
 
-            const soc = data.Batt_SOC;
-            lblSoc.innerText = soc + "%";
-            document.getElementById("stat-v").innerText = data.Batt_Voltage.toFixed(1) + " V";
-            document.getElementById("stat-a").innerText = data.Batt_Current.toFixed(1) + " A";
-            document.getElementById("bar-soc").style.width = soc + "%";
-            lblStatus.innerText = data.Batt_Status;
+        function recalculateEnergy() {
+            if (!latestDailyData) return;
+            const data = latestDailyData;
 
-            if (data.Batt_Status === "Đang Sạc") lblStatus.style.color = "#38ef9d";
-            else if (data.Batt_Status === "Đang Xả") lblStatus.style.color = "#ff5c7a";
-            else lblStatus.style.color = "rgba(245, 251, 255, 0.72)";
+            let pvToday = data.PV_Today || 0;
+            let currentETotal = data.Load_Total || 0;
 
-            let colorTheme = "green";
-            if (soc <= 20) colorTheme = "red";
-            else if (soc <= 40) colorTheme = "yellow";
-            lblSoc.style.color = (colorTheme === "red") ? "#ff5c7a" : (colorTheme === "yellow") ? "#ffb84d" : "#38ef9d";
+            document.getElementById('stat-grid-buy').innerText = (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh';
+            document.getElementById('stat-bat-dis').innerText = (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh';
+            document.getElementById('stat-bat-chg').innerText = (data.Bat_Charge_Today || 0).toFixed(1) + ' kWh';
+            document.getElementById('stat-load-total').innerText = currentETotal.toFixed(1) + ' kWh';
 
-            for (let i = 0; i < 5; i++) {
-                const seg = document.getElementById("batt-seg-" + i);
-                seg.className = "batt-seg";
-                const lowerBound = i * 20;
-                const upperBound = (i + 1) * 20;
-                if (soc === 0 && i === 0) seg.classList.add("blink-red");
-                else if (soc > upperBound || (soc === 100 && i === 4)) seg.classList.add("solid-" + colorTheme);
-                else if (soc > lowerBound && soc <= upperBound) seg.classList.add("blink-" + colorTheme);
-            }
-
-            if (pvInW > 0) setFlow("flow-pv", true, "flowInL", "#ffd166");
-            else setFlow("flow-pv", false);
-
-            if (loadInW > 0) setFlow("flow-load", true, "flowOutR", "#a78bfa");
-            else setFlow("flow-load", false);
-
-            if (data.Batt_Current < -0.1) {
-                setFlow("flow-batt", true, "flowOutL", "#38ef9d");
-            } else if (data.Batt_Current > 0.1) {
-                setFlow("flow-batt", true, "flowInL", "#ff5c7a");
-            } else {
-                setFlow("flow-batt", false);
-            }
-
-            if (gridInW > 0) setFlow("flow-grid", true, "flowInR", "#ff5c7a");
-            else if (gridInW < 0) setFlow("flow-grid", true, "flowOutR", "#38ef9d");
-            else setFlow("flow-grid", false);
-        });
-
-        database.ref("/SosenSystem/Daily_Energy").on("value", (snapshot) => {
-            const data = snapshot.val();
-            if (!data) return;
-
-            const pvToday = data.PV_Today || 0;
-            const currentETotal = data.Load_Total || 0;
-
-            document.getElementById("stat-grid-buy").innerText = (data.Grid_Buy_Today || 0).toFixed(1) + " kWh";
-            document.getElementById("stat-bat-dis").innerText = (data.Bat_Discharge_Today || 0).toFixed(1) + " kWh";
-            document.getElementById("stat-bat-chg").innerText = (data.Bat_Charge_Today || 0).toFixed(1) + " kWh";
-            document.getElementById("stat-load-total").innerText = currentETotal.toFixed(1) + " kWh";
-
-            const todayDate = new Date();
-            const curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, "0");
-            const curDayKey = "day_" + todayDate.getDate().toString().padStart(2, "0");
+            let todayDate = new Date();
+            let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
+            let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
 
             let savedPv = currentMonthHistory[curDayKey] || 0;
             if (pvToday > savedPv && pvToday > 0) {
@@ -1202,24 +1132,15 @@
             }
 
             let pvMonthTotal = 0;
-            for (const key in currentMonthHistory) {
-                pvMonthTotal += currentMonthHistory[key];
+            for (let key in currentMonthHistory) {
+                pvMonthTotal += Number(currentMonthHistory[key]) || 0;
             }
 
-            function calcEVN(kWh) {
-                let cost = 0;
-                let r = kWh;
-                if (r > 0) { const q = Math.min(r, 50); cost += q * 2142.72; r -= q; }
-                if (r > 0) { const q = Math.min(r, 50); cost += q * 2214.00; r -= q; }
-                if (r > 0) { const q = Math.min(r, 100); cost += q * 2570.40; r -= q; }
-                if (r > 0) { const q = Math.min(r, 100); cost += q * 3237.84; r -= q; }
-                if (r > 0) { const q = Math.min(r, 100); cost += q * 3618.00; r -= q; }
-                if (r > 0) cost += r * 3736.80;
-                return cost;
-            }
+            let displayPvToday = Math.max(pvToday, savedPv);
+            if (pvMonthTotal < displayPvToday) pvMonthTotal = displayPvToday;
 
-            const monthMoney = calcEVN(pvMonthTotal);
-            const displayPvToday = Math.max(pvToday, savedPv);
+            let monthMoney = calcEVN(pvMonthTotal);
+
             let todayMoney = 0;
             if (pvMonthTotal >= displayPvToday && displayPvToday > 0) {
                 todayMoney = monthMoney - calcEVN(pvMonthTotal - displayPvToday);
@@ -1227,23 +1148,126 @@
                 todayMoney = calcEVN(displayPvToday);
             }
 
-            document.getElementById("stat-pv-today").innerText = displayPvToday.toFixed(1) + " kWh";
-            document.getElementById("money-pv-today").innerText = displayPvToday.toFixed(1);
-            document.getElementById("money-pv-month").innerText = pvMonthTotal.toFixed(1);
-            document.getElementById("money-today").innerText = Math.round(todayMoney).toLocaleString("vi-VN") + " đ";
-            document.getElementById("money-month").innerText = Math.round(monthMoney).toLocaleString("vi-VN") + " đ";
+            let avgPrice = pvMonthTotal > 0 ? (monthMoney / pvMonthTotal) : 2500;
+            let totalMoney = currentETotal * avgPrice;
+
+            document.getElementById('stat-pv-today').innerText = displayPvToday.toFixed(1) + ' kWh';
+            document.getElementById('money-pv-today').innerText = displayPvToday.toFixed(1);
+            document.getElementById('money-pv-month').innerText = pvMonthTotal.toFixed(1);
+            document.getElementById('money-pv-total').innerText = currentETotal.toFixed(1);
+
+            document.getElementById('money-today').innerText = Math.round(todayMoney).toLocaleString('vi-VN') + ' đ';
+            document.getElementById('money-month').innerText = Math.round(monthMoney).toLocaleString('vi-VN') + ' đ';
+            document.getElementById('money-total').innerText = Math.round(totalMoney).toLocaleString('vi-VN') + ' đ';
+        }
+
+        database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
+            latestDailyData = snapshot.val();
+            checkAndSwitchMonth();
+            recalculateEnergy();
         });
 
-        document.getElementById("inv-switch-toggle").addEventListener("change", function() {
+        setInterval(() => {
+            checkAndSwitchMonth();
+        }, 60000);
+
+        // Giao tiếp dữ liệu Live
+        database.ref('/SosenSystem/Live').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if(data) {
+                const now = new Date();
+                document.getElementById('update-clock').innerText = now.toLocaleTimeString('vi-VN', { hour12: false });
+                let pvInW = Math.round(data.PV_Power * 1000);
+                let gridInW = Math.round(data.Grid_Power);
+                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current);
+                let loadInW = pvInW + gridInW + battInW;
+
+                if (loadInW < 0) loadInW = 0;
+                document.getElementById('lbl-pv').innerText = pvInW;
+                document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
+                document.getElementById('lbl-load').innerText = loadInW;
+                document.getElementById('lbl-batt').innerText = Math.abs(battInW);
+
+                if (data.Inv_Temp !== undefined) {
+                    const tempLabel = document.getElementById('lbl-inv-temp');
+                    const t = data.Inv_Temp;
+                    tempLabel.innerText = '🌡️ ' + t + '°C';
+                    if (t < 40) {
+                        tempLabel.style.backgroundColor = '#00cc66';
+                        tempLabel.style.boxShadow = '0 3px 6px rgba(0,0,0,0.2), 0 0 14px rgba(0,204,102,0.38)';
+                    } else if (t < 48) {
+                        tempLabel.style.backgroundColor = '#ffaa00';
+                        tempLabel.style.boxShadow = '0 3px 6px rgba(0,0,0,0.2), 0 0 14px rgba(255,170,0,0.42)';
+                    } else {
+                        tempLabel.style.backgroundColor = '#ff4444';
+                        tempLabel.style.boxShadow = '0 3px 6px rgba(0,0,0,0.2), 0 0 14px rgba(255,68,68,0.42)';
+                    }
+                }
+
+                if (data.Inv_Switch !== undefined) {
+                    const toggle = document.getElementById('inv-switch-toggle');
+                    const statusText = document.getElementById('switch-status-text');
+                    toggle.checked = (data.Inv_Switch === 1);
+                    statusText.innerText = (data.Inv_Switch === 1) ? "Đang BẬT" : "Đã TẮT";
+                    statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444";
+                }
+
+                let soc = data.Batt_SOC;
+                lblSoc.innerText = soc + '%';
+                document.getElementById('stat-v').innerText = data.Batt_Voltage.toFixed(1) + ' V';
+                document.getElementById('stat-a').innerText = data.Batt_Current.toFixed(1) + ' A';
+                document.getElementById('bar-soc').style.width = soc + '%';
+                lblStatus.innerText = data.Batt_Status;
+
+                if (data.Batt_Status === "Đang Sạc") lblStatus.style.color = '#00cc66';
+                else if (data.Batt_Status === "Đang Xả") lblStatus.style.color = '#ff4444';
+                else lblStatus.style.color = '#888';
+
+                let colorTheme = 'green';
+                if (soc <= 20) colorTheme = 'red';
+                else if (soc <= 40) colorTheme = 'yellow';
+                lblSoc.style.color = (colorTheme === 'red') ? '#ff4444' : (colorTheme === 'yellow') ? '#ffaa00' : '#00cc66';
+
+                for (let i = 0; i < 5; i++) {
+                    let seg = document.getElementById('batt-seg-' + i);
+                    seg.className = 'batt-seg';
+                    let lowerBound = i * 20;
+                    let upperBound = (i + 1) * 20;
+                    if (soc == 0 && i == 0) seg.classList.add('blink-red');
+                    else if (soc > upperBound || (soc == 100 && i == 4)) seg.classList.add('solid-' + colorTheme);
+                    else if (soc > lowerBound && soc <= upperBound) seg.classList.add('blink-' + colorTheme);
+                }
+
+                if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00');
+                else setFlow('flow-pv', false);
+
+                if(loadInW > 0) setFlow('flow-load', true, 'flowOutR', '#0088ff');
+                else setFlow('flow-load', false);
+
+                if (data.Batt_Current < -0.1) {
+                    setFlow('flow-batt', true, 'flowOutL', '#00cc66');
+                } else if (data.Batt_Current > 0.1) {
+                    setFlow('flow-batt', true, 'flowInL', '#ff4444');
+                } else {
+                    setFlow('flow-batt', false);
+                }
+
+                if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444');
+                else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66');
+                else setFlow('flow-grid', false);
+            }
+        });
+
+        document.getElementById('inv-switch-toggle').addEventListener('change', function() {
             const newState = this.checked ? 1 : 0;
-            const statusText = document.getElementById("switch-status-text");
+            const statusText = document.getElementById('switch-status-text');
             statusText.innerText = "Đang gửi lệnh...";
-            statusText.style.color = "#ffb84d";
-            database.ref("/SosenSystem/Control").update({ Inv_Switch: newState })
+            statusText.style.color = "#ffaa00";
+            database.ref('/SosenSystem/Control').update({ Inv_Switch: newState })
                 .catch((error) => {
                     console.error("Lỗi khi gửi lệnh:", error);
                     statusText.innerText = "Lỗi kết nối!";
-                    statusText.style.color = "#ff5c7a";
+                    statusText.style.color = "#ff4444";
                 });
         });
     </script>
