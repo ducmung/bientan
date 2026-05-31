@@ -54,7 +54,6 @@
             mix-blend-mode: screen;
         }
 
-        /* Thêm Hardware Acceleration cho hạt sao */
         .star {
             position: absolute;
             left: var(--x);
@@ -129,7 +128,7 @@
             border: 1px solid rgba(255,255,255,0.42);
             overflow: hidden;
             isolation: isolate;
-            transform: translateZ(0); /* Fix lỗi nháy viền trên iOS */
+            transform: translateZ(0); 
         }
 
         .diagram-panel::before {
@@ -148,7 +147,6 @@
 
         @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
-        /* TỐI ƯU CỰC MẠNH: Đổi từ @property conic-gradient sang linear-gradient chạy ngang */
         .diagram-panel::after,
         .stat-card::after,
         .node-center::after,
@@ -205,7 +203,6 @@
             mix-blend-mode: screen;
         }
 
-        /* Thêm Hardware Acceleration cho tia lửa */
         .spark {
             position: absolute;
             left: var(--x);
@@ -317,7 +314,7 @@
             position: absolute;
             font-size: 14px;
             transform: translate(-50%, -50%);
-            text-shadow: 0 0 10px #ffaa00; /* Bỏ shadow thừa */
+            text-shadow: 0 0 10px #ffaa00; 
             transition: all 1s ease-out;
             left: 15%;
             top: 100%;
@@ -383,9 +380,9 @@
         .node h3 { font-size: 9px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
         .node .val { font-size: 15px; font-weight: 900; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
         .node .unit { font-size: 9px; color: rgba(255,255,255,0.86); }
-        .icon { font-size: 16px; margin-bottom: 2px; } /* Đã gỡ bỏ shadow lặp lại để giảm lag */
+        .icon { font-size: 16px; margin-bottom: 2px; } 
 
-        /* CỤM PIN HIỂN THỊ */
+        /* CỤM PIN HIỂN THỊ VỚI PHẦN TRĂM NẰM BÊN TRONG */
         .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 5px auto; position: relative; }
         .battery-body {
             width: 72px; height: 32px;
@@ -409,13 +406,28 @@
         .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
         .fill-green { background: linear-gradient(to bottom, #00ee77 0%, #88ffbb 30%, #00bb55 70%, #007733 100%); }
 
+        /* CHỮ PHẦN TRĂM PIN NẰM GIỮA LÕI PIN */
         #lbl-soc {
-            font-size: 18px; font-weight: 900; margin-bottom: 4px; color: #ff2a2a; 
-            text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6);
-            letter-spacing: 1px; transition: transform 0.3s ease;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            font-size: 18px; 
+            font-weight: 900;
+            color: #ff2a2a; 
+            text-shadow: 
+                1px 1px 0 #ffffff, 
+                -1px -1px 0 #ffffff, 
+                1px -1px 0 #ffffff, 
+                -1px 1px 0 #ffffff, 
+                2px 2px 0 #cc0000, 
+                3px 3px 0 #990000, 
+                4px 4px 6px rgba(0,0,0,0.6);
+            letter-spacing: 1px; 
+            margin: 0; 
         }
 
-        /* Thêm GPU acceleration vào dòng chảy năng lượng */
         .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; }
         .flow-track { position: absolute; top: 50%; left: 0; width: 100%; height: 1px; transform: translateY(-50%); background: rgba(255,255,255,0.2); box-shadow: 0 0 8px rgba(255,255,255,0.18); }
         .flow-dash { 
@@ -435,7 +447,6 @@
         @keyframes flowInR { 0% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.7) translateZ(0); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1) translateZ(0); } 100% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.8) translateZ(0); } }
         @keyframes flowOutR { 0% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.7) translateZ(0); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1) translateZ(0); } 100% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.8) translateZ(0); } }
 
-        /* KHUNG THỐNG KÊ (Giảm gánh nặng bộ lọc nền) */
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
         .stat-card {
             position: relative; overflow: hidden;
@@ -443,7 +454,7 @@
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transform: translateZ(0); /* Ép lên GPU */
+            transform: translateZ(0); 
         }
         .stat-card::before {
             content: ""; position: absolute; inset: 0;
@@ -463,7 +474,6 @@
         .list-detail div:last-child { border: none; }
         .list-detail span { font-weight: 800; color: #111; white-space: nowrap; }
 
-        /* NÚT GẠT */
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; box-shadow: inset 0 1px 4px rgba(0,0,0,0.18); }
@@ -548,11 +558,10 @@
             <div class="node pos-grid"><div class="icon">🗼</div><h3>LƯỚI EVN</h3><div class="val" id="lbl-grid">0</div><div class="unit">W</div></div>
 
             <div class="node pos-batt">
-                <div id="lbl-soc">0%</div>
                 <div class="battery-wrapper">
                     <div class="battery-body">
                         <div class="battery-fill" id="batt-fill"></div>
-                        <div id="lbl-soc-inner" style="display: none;">0%</div> </div>
+                        <div id="lbl-soc">0%</div> </div>
                     <div class="battery-cap"></div>
                 </div>
                 <h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div>
@@ -618,8 +627,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // --- HÀM TỐI ƯU DOM: Cực kỳ quan trọng để chống giật lag ---
-        // Hàm này chỉ viết lại text lên màn hình NẾU giá trị thực sự bị thay đổi
         function updateDOMText(id, newValue) {
             const el = document.getElementById(id);
             if (el && el.innerText !== String(newValue)) {
@@ -679,7 +686,6 @@
             const group = document.getElementById(groupId);
             if (!group) return;
             
-            // Tối ưu DOM: tránh bật/tắt liên tục nếu trạng thái không đổi
             const isCurrentlyActive = group.style.display === 'block';
             if (isActive && !isCurrentlyActive) {
                 group.style.display = 'block';
@@ -802,7 +808,6 @@
             checkAndSwitchMonth();
         }, 60000);
 
-        // THAY ĐỔI LỚN NHẤT ĐỂ GIẢM LAG NẰM Ở ĐÂY: DÙNG HÀM TỐI ƯU GHI ĐÈ DOM
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
@@ -849,6 +854,7 @@
                 }
 
                 let soc = data.Batt_SOC;
+                
                 updateDOMText('lbl-soc', soc + '%');
                 updateDOMText('stat-v', data.Batt_Voltage.toFixed(1) + ' V');
                 updateDOMText('stat-a', data.Batt_Current.toFixed(1) + ' A');
