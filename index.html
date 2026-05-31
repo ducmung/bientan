@@ -37,6 +37,7 @@
                 radial-gradient(circle at 30% 82%, rgba(255,255,255,0.35) 0 1px, transparent 2px);
             animation: skyTwinkle 5s ease-in-out infinite alternate;
             z-index: -1;
+            will-change: opacity, transform;
         }
 
         @keyframes skyTwinkle {
@@ -53,6 +54,7 @@
             mix-blend-mode: screen;
         }
 
+        /* Thêm Hardware Acceleration cho hạt sao */
         .star {
             position: absolute;
             left: var(--x);
@@ -62,11 +64,13 @@
             border-radius: 50%;
             background: var(--c);
             opacity: 0.38;
-            box-shadow: 0 0 6px var(--c), 0 0 14px var(--c), 0 0 24px var(--c);
+            box-shadow: 0 0 6px var(--c), 0 0 14px var(--c);
             animation:
                 starBlink var(--d) ease-in-out infinite alternate,
                 starDrift var(--f) linear infinite;
             animation-delay: var(--delay);
+            will-change: transform, opacity;
+            transform: translateZ(0);
         }
 
         .star::before,
@@ -86,14 +90,14 @@
         .star::after { width: 1px; height: calc(var(--s) * 4.2); }
 
         @keyframes starBlink {
-            0% { opacity: 0.16; transform: scale(0.62); filter: hue-rotate(0deg); }
-            48% { opacity: 1; transform: scale(1.3); filter: hue-rotate(70deg); }
-            100% { opacity: 0.32; transform: scale(0.86); filter: hue-rotate(170deg); }
+            0% { opacity: 0.16; transform: scale(0.62) translateZ(0); filter: hue-rotate(0deg); }
+            48% { opacity: 1; transform: scale(1.3) translateZ(0); filter: hue-rotate(70deg); }
+            100% { opacity: 0.32; transform: scale(0.86) translateZ(0); filter: hue-rotate(170deg); }
         }
 
         @keyframes starDrift {
-            from { margin-top: 0; margin-left: 0; }
-            to { margin-top: -18px; margin-left: 12px; }
+            from { transform: translate(0, 0) translateZ(0); }
+            to { transform: translate(12px, -18px) translateZ(0); }
         }
 
         .app-container {
@@ -106,7 +110,6 @@
             margin: 0 auto;
         }
 
-        /* ================= KHUNG ĐỒ HỌA TRUNG TÂM ================= */
         .diagram-panel {
             position: relative;
             width: 100%;
@@ -126,6 +129,7 @@
             border: 1px solid rgba(255,255,255,0.42);
             overflow: hidden;
             isolation: isolate;
+            transform: translateZ(0); /* Fix lỗi nháy viền trên iOS */
         }
 
         .diagram-panel::before {
@@ -139,16 +143,12 @@
             filter: blur(0.1px);
             animation: softSpin 22s linear infinite;
             z-index: -1;
+            will-change: transform;
         }
 
-        @keyframes softSpin { to { transform: rotate(360deg); } }
+        @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
-        @property --rainbow-angle {
-            syntax: "<angle>";
-            inherits: false;
-            initial-value: 0deg;
-        }
-
+        /* TỐI ƯU CỰC MẠNH: Đổi từ @property conic-gradient sang linear-gradient chạy ngang */
         .diagram-panel::after,
         .stat-card::after,
         .node-center::after,
@@ -161,24 +161,22 @@
             inset: -2px;
             border-radius: inherit;
             padding: 2px;
-            background:
-                conic-gradient(
-                    from var(--rainbow-angle),
-                    #ff004c, #ff8c00, #ffd700, #00cc66,
-                    #00e5ff, #4169ff, #b000ff, #ff004c
-                );
+            background: linear-gradient(90deg, 
+                #ff004c, #ff8c00, #ffd700, #00cc66, 
+                #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00
+            );
+            background-size: 200% 100%;
             -webkit-mask:
                 linear-gradient(#000 0 0) content-box,
                 linear-gradient(#000 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
-            filter:
-                drop-shadow(0 0 5px rgba(255, 0, 76, 0.5))
-                drop-shadow(0 0 10px rgba(0, 229, 255, 0.34));
+            filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4));
             animation:
-                rainbowBorderRun 2.6s linear infinite,
-                rainbowBorderGlow 1.4s ease-in-out infinite alternate;
+                rainbowSlide 3s linear infinite,
+                rainbowBorderGlow 1.5s ease-in-out infinite alternate;
+            will-change: background-position, filter, opacity;
         }
 
         .diagram-panel::after { z-index: 4; inset: 0; border-radius: 20px; }
@@ -189,16 +187,13 @@
         #lbl-status::after,
         #lbl-inv-temp::after { z-index: -1; border-radius: 14px; }
 
-        @keyframes rainbowBorderRun { to { --rainbow-angle: 360deg; } }
+        @keyframes rainbowSlide { 
+            to { background-position: -200% 0; } 
+        }
+
         @keyframes rainbowBorderGlow {
-            from {
-                opacity: 0.58;
-                filter: drop-shadow(0 0 4px rgba(255, 0, 76, 0.42)) drop-shadow(0 0 8px rgba(0, 229, 255, 0.28));
-            }
-            to {
-                opacity: 1;
-                filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.72)) drop-shadow(0 0 16px rgba(176, 0, 255, 0.52));
-            }
+            from { opacity: 0.7; filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.3)); }
+            to { opacity: 1; filter: drop-shadow(0 0 10px rgba(176, 0, 255, 0.6)); }
         }
 
         .panel-sparkles {
@@ -210,6 +205,7 @@
             mix-blend-mode: screen;
         }
 
+        /* Thêm Hardware Acceleration cho tia lửa */
         .spark {
             position: absolute;
             left: var(--x);
@@ -218,15 +214,17 @@
             height: var(--s);
             border-radius: 50%;
             background: var(--c);
-            box-shadow: 0 0 8px var(--c), 0 0 18px var(--c);
+            box-shadow: 0 0 8px var(--c);
             animation: panelSparkle var(--d) ease-in-out infinite;
             animation-delay: var(--delay);
+            will-change: transform, opacity;
+            transform: translateZ(0);
         }
 
         @keyframes panelSparkle {
-            0%, 100% { opacity: 0; transform: translateY(0) scale(0.35); }
-            35% { opacity: 0.95; transform: translateY(-5px) scale(1.25); }
-            70% { opacity: 0.45; transform: translateY(-11px) scale(0.78); }
+            0%, 100% { opacity: 0; transform: translateY(0) scale(0.35) translateZ(0); }
+            35% { opacity: 0.95; transform: translateY(-5px) scale(1.25) translateZ(0); }
+            70% { opacity: 0.45; transform: translateY(-11px) scale(0.78) translateZ(0); }
         }
 
         .node {
@@ -256,6 +254,7 @@
             z-index: 15;
             overflow: visible;
             animation: inverterGlow 3s ease-in-out infinite;
+            will-change: box-shadow;
         }
 
         @keyframes inverterGlow {
@@ -270,7 +269,6 @@
             border-radius: 12px;
         }
 
-        /* ================= VỊ TRÍ & ĐƯỜNG DÂY ================= */
         .pos-pv { top: 16%; left: 16%; }
         .pos-grid { top: 16%; left: 84%; }
         .pos-batt { top: 84%; left: 16%; }
@@ -291,7 +289,6 @@
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* CỤM HIỂN THỊ NHIỆT ĐỘ BIẾN TẦN */
         #lbl-inv-temp {
             position: absolute;
             top: 74%;
@@ -309,279 +306,154 @@
             transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
 
-        /* ================= HIỆU ỨNG MẶT TRỜI ================= */
         .sun-arc-mini {
             position: relative;
             width: 100%;
             height: 35px;
             margin-bottom: 2px;
         }
-
-        .sun-arc-mini svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
+        .sun-arc-mini svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         #moving-sun {
             position: absolute;
             font-size: 14px;
             transform: translate(-50%, -50%);
-            text-shadow: 0 0 10px #ffaa00, 0 0 22px rgba(255,170,0,0.65);
+            text-shadow: 0 0 10px #ffaa00; /* Bỏ shadow thừa */
             transition: all 1s ease-out;
             left: 15%;
             top: 100%;
+            will-change: left, top;
         }
 
-        /* ================= ĐỒNG HỒ CẬP NHẬT DATA ================= */
         #update-clock {
             position: absolute;
-            top: 50%;
-            left: 84%;
+            top: 50%; left: 84%;
             transform: translate(-50%, -50%);
-            font-size: 12px;
-            font-weight: 900;
-            color: #ff0000;
-            font-family: monospace;
+            font-size: 12px; font-weight: 900; color: #ff0000; font-family: monospace;
             background: rgba(255, 255, 255, 0.88);
-            padding: 5px 10px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            z-index: 25;
-            letter-spacing: 1px;
-            white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1), 0 0 16px rgba(255,0,0,0.12);
+            padding: 5px 10px; border-radius: 12px; border: 1px solid rgba(255, 0, 0, 0.3);
+            z-index: 25; letter-spacing: 1px; white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* ================= TRẠNG THÁI SẠC/XẢ ================= */
         #lbl-status {
             position: absolute;
-            top: 50%;
-            left: 16%;
+            top: 50%; left: 16%;
             transform: translate(-50%, -50%);
-            font-size: 13px;
-            font-weight: 800;
+            font-size: 13px; font-weight: 800;
             background: rgba(255,255,255,0.9);
-            padding: 4px 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1), 0 0 16px rgba(0,204,102,0.13);
-            color: #888;
-            white-space: nowrap;
-            z-index: 25;
+            padding: 4px 15px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: #888; white-space: nowrap; z-index: 25;
             transition: color 0.5s, box-shadow 0.5s;
         }
 
-        /* ================= WIDGET THỜI TIẾT ẢNH ================= */
         .weather-container {
-            position: absolute;
-            top: 16%; 
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 15;
-            width: 130px;
-            height: auto;
-            border-radius: 15px;
+            position: absolute; top: 16%; left: 50%;
+            transform: translate(-50%, -50%); z-index: 15;
+            width: 130px; height: auto; border-radius: 15px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
+        .weather-container img { width: 100%; height: auto; display: block; border-radius: 13px; }
 
-        .weather-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 13px; 
-        }
-
-        /* ================= CHỮ BÁT PHƯƠNG LAI TÀI ================= */
         .bpf-container {
-            position: absolute;
-            top: 92%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 15;
-            text-align: center;
-            width: 100%;
-            pointer-events: none;
+            position: absolute; top: 92%; left: 50%;
+            transform: translate(-50%, -50%); z-index: 15;
+            text-align: center; width: 100%; pointer-events: none;
+            will-change: transform;
         }
-
         .bpf-text {
             font-family: "STKaiti", "KaiTi", "Times New Roman", serif;
-            font-size: 34px;
-            font-weight: 900;
-            letter-spacing: 12px;
-            position: relative;
-            display: inline-block;
+            font-size: 34px; font-weight: 900; letter-spacing: 12px;
+            position: relative; display: inline-block;
             background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.55));
             animation: goldPulse 2.6s ease-in-out infinite alternate;
         }
-
         @keyframes goldPulse {
-            from { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.45)); }
-            to { filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.9)); }
+            from { filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.45)); }
+            to { filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8)); }
         }
-
         .bpf-text::after {
-            content: attr(data-text);
-            position: absolute;
-            left: 0;
-            top: 0;
-            z-index: -1;
-            -webkit-text-fill-color: transparent;
-            background: none;
-            text-shadow:
-                1px 1px 0 #ff0000, 2px 2px 0 #cc0000, 3px 3px 0 #990000,
-                4px 4px 0 #660000, 5px 5px 0 #330000, 6px 6px 12px rgba(255, 0, 0, 0.8);
+            content: attr(data-text); position: absolute; left: 0; top: 0; z-index: -1;
+            -webkit-text-fill-color: transparent; background: none;
+            text-shadow: 1px 1px 0 #ff0000, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 0 #660000, 5px 5px 0 #330000, 6px 6px 12px rgba(255, 0, 0, 0.8);
         }
 
-        .node h3 {
-            font-size: 9px;
-            color: #f6f8ff;
-            font-weight: 800;
-            margin-bottom: 2px;
-            letter-spacing: -0.2px;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.55);
-        }
+        .node h3 { font-size: 9px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
+        .node .val { font-size: 15px; font-weight: 900; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
+        .node .unit { font-size: 9px; color: rgba(255,255,255,0.86); }
+        .icon { font-size: 16px; margin-bottom: 2px; } /* Đã gỡ bỏ shadow lặp lại để giảm lag */
 
-        .node .val {
-            font-size: 15px;
-            font-weight: 900;
-            color: #fff;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45);
-        }
-
-        .node .unit {
-            font-size: 9px;
-            color: rgba(255,255,255,0.86);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.45);
-        }
-
-        .icon {
-            font-size: 16px;
-            margin-bottom: 2px;
-            filter: drop-shadow(0 0 8px rgba(255,255,255,0.55));
-        }
-
-        /* ================= VẼ QUẢ PIN 3D GIỐNG ẢNH ================= */
-        .battery-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 5px auto;
-            position: relative;
-        }
-
+        /* CỤM PIN HIỂN THỊ */
+        .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 5px auto; position: relative; }
         .battery-body {
-            width: 72px; /* Kích thước thân pin */
-            height: 32px;
-            /* Hiệu ứng trụ kim loại rỗng bóng bẩy */
+            width: 72px; height: 32px;
             background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%);
-            border-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-right: 1px solid #111;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8);
+            border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); border-right: 1px solid #111;
+            position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8);
+            transform: translateZ(0);
         }
-
-        /* Lớp kính phản quang 3D cong phía trên thân pin */
         .battery-body::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 45%;
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 45%;
             background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.05) 100%);
-            pointer-events: none;
-            z-index: 2; /* Nằm trên chất lỏng fill */
+            pointer-events: none; z-index: 2;
         }
-
-        /* Đầu cực dương (nắp pin) kim loại bóng */
-        .battery-cap {
-            width: 6px;
-            height: 14px;
-            background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%);
-            border-radius: 0 3px 3px 0;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-left: none;
-            box-shadow: inset 1px 0 3px rgba(255,255,255,0.6);
-        }
-
-        /* Phần lõi bên trong thay đổi độ rộng theo % */
+        .battery-cap { width: 6px; height: 14px; background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%); border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.3); border-left: none; box-shadow: inset 1px 0 3px rgba(255,255,255,0.6); }
         .battery-fill {
-            height: 100%;
-            width: 0%; 
-            transition: width 0.5s ease-in-out, background 0.5s;
-            position: absolute;
-            top: 0; left: 0;
-            z-index: 1;
-            border-right: 1px solid rgba(0,0,0,0.5); /* Tạo viền mỏng ở đầu chất lỏng */
+            height: 100%; width: 0%; transition: width 0.5s ease-in-out, background 0.5s;
+            position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5);
+            will-change: width, background;
         }
-
-        /* Các trạng thái màu của chất lỏng 3D */
         .fill-red { background: linear-gradient(to bottom, #ff5555 0%, #ffaaaa 30%, #ff2222 70%, #aa0000 100%); }
         .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
         .fill-green { background: linear-gradient(to bottom, #00ee77 0%, #88ffbb 30%, #00bb55 70%, #007733 100%); }
 
-        /* CHỮ PHẦN TRĂM PIN NẰM CHÍNH GIỮA BÊN TRONG PIN */
         #lbl-soc {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 3; /* Nằm trên cùng (trên cả lớp kính) */
-            font-size: 15px; 
-            font-weight: 900;
-            color: #fff;
-            /* Viền đen đậm nét giúp số luôn nổi bật trên bất kỳ nền màu nào */
-            text-shadow:
-                -1px -1px 0 #000, 
-                 1px -1px 0 #000, 
-                -1px  1px 0 #000, 
-                 1px  1px 0 #000, 
-                 0px  2px 4px rgba(0,0,0,0.8);
-            letter-spacing: 0.5px;
+            font-size: 18px; font-weight: 900; margin-bottom: 4px; color: #ff2a2a; 
+            text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6);
+            letter-spacing: 1px; transition: transform 0.3s ease;
         }
 
-        /* ================= HIỆU ỨNG SAO BĂNG ================= */
+        /* Thêm GPU acceleration vào dòng chảy năng lượng */
         .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; }
         .flow-track { position: absolute; top: 50%; left: 0; width: 100%; height: 1px; transform: translateY(-50%); background: rgba(255,255,255,0.2); box-shadow: 0 0 8px rgba(255,255,255,0.18); }
-        .flow-dash { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 2px; border-radius: 10px; opacity: 0; filter: blur(0.4px); }
-        .dir-right .flow-dash { background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%); box-shadow: 0 0 4px var(--c), 0 0 8px var(--c), 0 0 16px var(--c); }
-        .dir-left .flow-dash { background: linear-gradient(270deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%); box-shadow: 0 0 4px var(--c), 0 0 8px var(--c), 0 0 16px var(--c); }
-        .flow-dash::before { content: ''; position: absolute; width: 5px; height: 5px; background: #fff; border-radius: 50%; top: 50%; transform: translateY(-50%); box-shadow: 0 0 6px #fff, 0 0 10px var(--c), 0 0 15px var(--c); }
-        .flow-dash::after { content: ''; position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; top: 50%; box-shadow: -6px -4px 0 rgba(255,255,255,0.7), -10px 3px 0 rgba(255,255,255,0.5), -15px -2px 0 rgba(255,255,255,0.3); }
+        .flow-dash { 
+            position: absolute; top: 50%; width: 40px; height: 2px; border-radius: 10px; opacity: 0; 
+            will-change: transform, opacity; transform: translateZ(0);
+        }
+        .dir-right .flow-dash { background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%); box-shadow: 0 0 4px var(--c), 0 0 10px var(--c); }
+        .dir-left .flow-dash { background: linear-gradient(270deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%); box-shadow: 0 0 4px var(--c), 0 0 10px var(--c); }
+        .flow-dash::before { content: ''; position: absolute; width: 5px; height: 5px; background: #fff; border-radius: 50%; top: 50%; transform: translateY(-50%); box-shadow: 0 0 6px #fff, 0 0 10px var(--c); }
+        .flow-dash::after { content: ''; position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; top: 50%; box-shadow: -6px -4px 0 rgba(255,255,255,0.7); }
         .dir-right .flow-dash::before, .dir-right .flow-dash::after { right: -2px; }
         .dir-left .flow-dash::before, .dir-left .flow-dash::after { left: -2px; }
         .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.5s; } .flow-dash:nth-child(4) { animation-delay: 1.0s; } .flow-dash:nth-child(5) { animation-delay: 1.5s; } .flow-dash:nth-child(6) { animation-delay: 2.0s; }
 
-        @keyframes flowInL { 0% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.7); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1); } 100% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.8); } }
-        @keyframes flowOutL { 0% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.7); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1); } 100% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.8); } }
-        @keyframes flowInR { 0% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.7); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1); } 100% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.8); } }
-        @keyframes flowOutR { 0% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.7); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1); } 100% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.8); } }
+        @keyframes flowInL { 0% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.7) translateZ(0); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1) translateZ(0); } 100% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.8) translateZ(0); } }
+        @keyframes flowOutL { 0% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.7) translateZ(0); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1) translateZ(0); } 100% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.8) translateZ(0); } }
+        @keyframes flowInR { 0% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.7) translateZ(0); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1) translateZ(0); } 100% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.8) translateZ(0); } }
+        @keyframes flowOutR { 0% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.7) translateZ(0); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1) translateZ(0); } 100% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.8) translateZ(0); } }
 
-        /* ================= KHUNG THỐNG KÊ ================= */
+        /* KHUNG THỐNG KÊ (Giảm gánh nặng bộ lọc nền) */
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
-
         .stat-card {
             position: relative; overflow: hidden;
-            background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(255,255,255,0.58)), rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255, 255, 255, 0.7));
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08), 0 0 22px rgba(255,255,255,0.12);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transform: translateZ(0); /* Ép lên GPU */
         }
-
         .stat-card::before {
             content: ""; position: absolute; inset: 0;
             background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%);
             transform: translateX(-120%); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none;
+            will-change: transform;
         }
+        @keyframes cardSheen { 0%, 48% { transform: translateX(-120%) translateZ(0); } 78%, 100% { transform: translateX(120%) translateZ(0); } }
 
-        @keyframes cardSheen { 0%, 48% { transform: translateX(-120%); } 78%, 100% { transform: translateX(120%); } }
-
-        .money-card { background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95)); border: 1px solid rgba(218, 165, 32, 0.65); box-shadow: 0 4px 15px rgba(0,0,0,0.08), 0 0 24px rgba(255, 215, 0, 0.18); }
+        .money-card { background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95)); border: 1px solid rgba(218, 165, 32, 0.65); }
         .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 1; }
         .stat-header h2 { font-size: 16px; color: #444; }
         .progress-bar { width: 100%; height: 12px; background: rgba(0,0,0,0.05); border-radius: 10px; display: flex; overflow: hidden; margin-bottom: 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); position: relative; z-index: 1; }
@@ -591,7 +463,7 @@
         .list-detail div:last-child { border: none; }
         .list-detail span { font-weight: 800; color: #111; white-space: nowrap; }
 
-        /* ================= NÚT GẠT ================= */
+        /* NÚT GẠT */
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; box-shadow: inset 0 1px 4px rgba(0,0,0,0.18); }
@@ -605,7 +477,6 @@
             .bpf-text { font-size: 26px; letter-spacing: 8px; }
             .weather-container { width: 100px; }
         }
-
         @media (min-width: 768px) {
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
             .diagram-panel { flex: 1; max-width: none; }
@@ -616,57 +487,32 @@
 <body>
     <div class="color-sky" aria-hidden="true">
         <span class="star" style="--x:4%; --y:8%; --s:2px; --c:#ffffff; --d:2.4s; --f:18s; --delay:-0.2s;"></span>
-        <span class="star" style="--x:11%; --y:22%; --s:3px; --c:#ffd700; --d:2.1s; --f:21s; --delay:-1.4s;"></span>
         <span class="star" style="--x:18%; --y:13%; --s:2px; --c:#00e5ff; --d:2.9s; --f:23s; --delay:-0.8s;"></span>
-        <span class="star" style="--x:25%; --y:31%; --s:2px; --c:#ff4fd8; --d:2.2s; --f:19s; --delay:-1.1s;"></span>
         <span class="star" style="--x:33%; --y:10%; --s:3px; --c:#8cff66; --d:2.7s; --f:25s; --delay:-2.1s;"></span>
-        <span class="star" style="--x:41%; --y:25%; --s:2px; --c:#ffffff; --d:2.3s; --f:20s; --delay:-0.6s;"></span>
         <span class="star" style="--x:49%; --y:7%; --s:2px; --c:#ff8c00; --d:3s; --f:28s; --delay:-1.7s;"></span>
-        <span class="star" style="--x:56%; --y:19%; --s:3px; --c:#78a7ff; --d:2.5s; --f:24s; --delay:-2.8s;"></span>
         <span class="star" style="--x:65%; --y:11%; --s:2px; --c:#ff5c7a; --d:2.2s; --f:22s; --delay:-1.9s;"></span>
-        <span class="star" style="--x:72%; --y:29%; --s:3px; --c:#00ffcc; --d:2.8s; --f:27s; --delay:-0.9s;"></span>
         <span class="star" style="--x:81%; --y:8%; --s:2px; --c:#fff7a1; --d:2.4s; --f:18s; --delay:-1.2s;"></span>
-        <span class="star" style="--x:92%; --y:24%; --s:3px; --c:#c084fc; --d:2.6s; --f:26s; --delay:-2.2s;"></span>
         <span class="star" style="--x:7%; --y:45%; --s:2px; --c:#38ef9d; --d:3.1s; --f:30s; --delay:-2.5s;"></span>
-        <span class="star" style="--x:16%; --y:58%; --s:3px; --c:#ffffff; --d:2.5s; --f:21s; --delay:-1.6s;"></span>
         <span class="star" style="--x:24%; --y:48%; --s:2px; --c:#6bd4ff; --d:2.3s; --f:19s; --delay:-0.4s;"></span>
-        <span class="star" style="--x:36%; --y:62%; --s:3px; --c:#ffd700; --d:2.9s; --f:26s; --delay:-1.8s;"></span>
         <span class="star" style="--x:44%; --y:43%; --s:2px; --c:#ff4fd8; --d:2.4s; --f:23s; --delay:-2.3s;"></span>
-        <span class="star" style="--x:53%; --y:57%; --s:3px; --c:#8cff66; --d:2.7s; --f:28s; --delay:-0.7s;"></span>
         <span class="star" style="--x:62%; --y:47%; --s:2px; --c:#ffffff; --d:2.2s; --f:20s; --delay:-1.3s;"></span>
-        <span class="star" style="--x:70%; --y:61%; --s:3px; --c:#ff8c00; --d:2.8s; --f:27s; --delay:-2.9s;"></span>
         <span class="star" style="--x:83%; --y:49%; --s:2px; --c:#78a7ff; --d:2.1s; --f:18s; --delay:-1s;"></span>
-        <span class="star" style="--x:94%; --y:56%; --s:3px; --c:#00ffcc; --d:3s; --f:29s; --delay:-2.4s;"></span>
-        <span class="star" style="--x:9%; --y:78%; --s:3px; --c:#ff5c7a; --d:2.6s; --f:25s; --delay:-0.5s;"></span>
         <span class="star" style="--x:19%; --y:88%; --s:2px; --c:#fff7a1; --d:2.3s; --f:22s; --delay:-1.5s;"></span>
-        <span class="star" style="--x:29%; --y:74%; --s:3px; --c:#c084fc; --d:2.9s; --f:31s; --delay:-2.6s;"></span>
         <span class="star" style="--x:39%; --y:91%; --s:2px; --c:#38ef9d; --d:2.2s; --f:18s; --delay:-0.8s;"></span>
-        <span class="star" style="--x:51%; --y:82%; --s:3px; --c:#ffffff; --d:2.7s; --f:27s; --delay:-1.9s;"></span>
         <span class="star" style="--x:60%; --y:93%; --s:2px; --c:#6bd4ff; --d:2.5s; --f:24s; --delay:-0.3s;"></span>
-        <span class="star" style="--x:68%; --y:76%; --s:3px; --c:#ffd700; --d:2.8s; --f:26s; --delay:-2.1s;"></span>
         <span class="star" style="--x:79%; --y:89%; --s:2px; --c:#ff4fd8; --d:2.4s; --f:20s; --delay:-1.7s;"></span>
-        <span class="star" style="--x:88%; --y:74%; --s:3px; --c:#8cff66; --d:3.1s; --f:32s; --delay:-2.7s;"></span>
         <span class="star" style="--x:97%; --y:84%; --s:2px; --c:#ffffff; --d:2.2s; --f:19s; --delay:-1.1s;"></span>
     </div>
+
     <div class="app-container">
         <div class="diagram-panel">
             <div class="panel-sparkles" aria-hidden="true">
-                <span class="spark" style="--x:8%; --y:30%; --s:2px; --c:#ffffff; --d:2.2s; --delay:-0.4s;"></span>
                 <span class="spark" style="--x:14%; --y:63%; --s:3px; --c:#ffd700; --d:2.6s; --delay:-1.1s;"></span>
-                <span class="spark" style="--x:24%; --y:22%; --s:2px; --c:#00e5ff; --d:2.1s; --delay:-1.8s;"></span>
-                <span class="spark" style="--x:30%; --y:76%; --s:3px; --c:#ff4fd8; --d:2.9s; --delay:-0.7s;"></span>
                 <span class="spark" style="--x:38%; --y:39%; --s:2px; --c:#8cff66; --d:2.4s; --delay:-1.5s;"></span>
-                <span class="spark" style="--x:47%; --y:18%; --s:3px; --c:#fff7a1; --d:2.7s; --delay:-0.9s;"></span>
-                <span class="spark" style="--x:52%; --y:72%; --s:2px; --c:#78a7ff; --d:2.2s; --delay:-2.2s;"></span>
                 <span class="spark" style="--x:60%; --y:34%; --s:3px; --c:#ff8c00; --d:2.8s; --delay:-1.3s;"></span>
-                <span class="spark" style="--x:68%; --y:64%; --s:2px; --c:#00ffcc; --d:2.5s; --delay:-0.5s;"></span>
-                <span class="spark" style="--x:75%; --y:24%; --s:3px; --c:#ff5c7a; --d:2.9s; --delay:-1.9s;"></span>
                 <span class="spark" style="--x:84%; --y:57%; --s:2px; --c:#ffffff; --d:2.3s; --delay:-0.8s;"></span>
-                <span class="spark" style="--x:91%; --y:38%; --s:3px; --c:#c084fc; --d:2.6s; --delay:-1.6s;"></span>
                 <span class="spark" style="--x:18%; --y:47%; --s:2px; --c:#38ef9d; --d:2.4s; --delay:-2.4s;"></span>
-                <span class="spark" style="--x:42%; --y:86%; --s:2px; --c:#ffd700; --d:2.7s; --delay:-0.2s;"></span>
                 <span class="spark" style="--x:58%; --y:12%; --s:2px; --c:#6bd4ff; --d:2.1s; --delay:-1.2s;"></span>
-                <span class="spark" style="--x:80%; --y:79%; --s:3px; --c:#ff4fd8; --d:2.8s; --delay:-2.5s;"></span>
             </div>
             
             <div id="update-clock">--:--:--</div>
@@ -702,11 +548,11 @@
             <div class="node pos-grid"><div class="icon">🗼</div><h3>LƯỚI EVN</h3><div class="val" id="lbl-grid">0</div><div class="unit">W</div></div>
 
             <div class="node pos-batt">
+                <div id="lbl-soc">0%</div>
                 <div class="battery-wrapper">
                     <div class="battery-body">
                         <div class="battery-fill" id="batt-fill"></div>
-                        <div id="lbl-soc">0%</div>
-                    </div>
+                        <div id="lbl-soc-inner" style="display: none;">0%</div> </div>
                     <div class="battery-cap"></div>
                 </div>
                 <h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div>
@@ -772,6 +618,15 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // --- HÀM TỐI ƯU DOM: Cực kỳ quan trọng để chống giật lag ---
+        // Hàm này chỉ viết lại text lên màn hình NẾU giá trị thực sự bị thay đổi
+        function updateDOMText(id, newValue) {
+            const el = document.getElementById(id);
+            if (el && el.innerText !== String(newValue)) {
+                el.innerText = newValue;
+            }
+        }
+
         const LAT = 21.088;
         const LON = 105.988;
         let globalSunrise = 0;
@@ -823,7 +678,10 @@
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId);
             if (!group) return;
-            if (isActive) {
+            
+            // Tối ưu DOM: tránh bật/tắt liên tục nếu trạng thái không đổi
+            const isCurrentlyActive = group.style.display === 'block';
+            if (isActive && !isCurrentlyActive) {
                 group.style.display = 'block';
                 group.style.setProperty('--c', color);
                 if (animName === 'flowInL' || animName === 'flowOutR') {
@@ -840,7 +698,7 @@
                     d.style.animationIterationCount = 'infinite';
                     d.style.animationTimingFunction = 'linear';
                 });
-            } else {
+            } else if (!isActive && isCurrentlyActive) {
                 group.style.display = 'none';
             }
         }
@@ -849,7 +707,6 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const lblStatus = document.getElementById('lbl-status');
-        const lblSoc = document.getElementById('lbl-soc');
         const battFill = document.getElementById('batt-fill');
 
         let currentMonthKey = "";
@@ -889,10 +746,10 @@
             let pvToday = data.PV_Today || 0;
             let currentETotal = data.Load_Total || 0;
 
-            document.getElementById('stat-grid-buy').innerText = (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh';
-            document.getElementById('stat-bat-dis').innerText = (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh';
-            document.getElementById('stat-bat-chg').innerText = (data.Bat_Charge_Today || 0).toFixed(1) + ' kWh';
-            document.getElementById('stat-load-total').innerText = currentETotal.toFixed(1) + ' kWh';
+            updateDOMText('stat-grid-buy', (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh');
+            updateDOMText('stat-bat-dis', (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh');
+            updateDOMText('stat-bat-chg', (data.Bat_Charge_Today || 0).toFixed(1) + ' kWh');
+            updateDOMText('stat-load-total', currentETotal.toFixed(1) + ' kWh');
 
             let todayDate = new Date();
             let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
@@ -925,14 +782,14 @@
             let avgPrice = pvMonthTotal > 0 ? (monthMoney / pvMonthTotal) : 2500;
             let totalMoney = currentETotal * avgPrice;
 
-            document.getElementById('stat-pv-today').innerText = displayPvToday.toFixed(1) + ' kWh';
-            document.getElementById('money-pv-today').innerText = displayPvToday.toFixed(1);
-            document.getElementById('money-pv-month').innerText = pvMonthTotal.toFixed(1);
-            document.getElementById('money-pv-total').innerText = currentETotal.toFixed(1);
+            updateDOMText('stat-pv-today', displayPvToday.toFixed(1) + ' kWh');
+            updateDOMText('money-pv-today', displayPvToday.toFixed(1));
+            updateDOMText('money-pv-month', pvMonthTotal.toFixed(1));
+            updateDOMText('money-pv-total', currentETotal.toFixed(1));
 
-            document.getElementById('money-today').innerText = Math.round(todayMoney).toLocaleString('vi-VN') + ' đ';
-            document.getElementById('money-month').innerText = Math.round(monthMoney).toLocaleString('vi-VN') + ' đ';
-            document.getElementById('money-total').innerText = Math.round(totalMoney).toLocaleString('vi-VN') + ' đ';
+            updateDOMText('money-today', Math.round(todayMoney).toLocaleString('vi-VN') + ' đ');
+            updateDOMText('money-month', Math.round(monthMoney).toLocaleString('vi-VN') + ' đ');
+            updateDOMText('money-total', Math.round(totalMoney).toLocaleString('vi-VN') + ' đ');
         }
 
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
@@ -945,33 +802,37 @@
             checkAndSwitchMonth();
         }, 60000);
 
+        // THAY ĐỔI LỚN NHẤT ĐỂ GIẢM LAG NẰM Ở ĐÂY: DÙNG HÀM TỐI ƯU GHI ĐÈ DOM
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
                 const now = new Date();
-                document.getElementById('update-clock').innerText = now.toLocaleTimeString('vi-VN', { hour12: false });
+                updateDOMText('update-clock', now.toLocaleTimeString('vi-VN', { hour12: false }));
+                
                 let pvInW = Math.round(data.PV_Power * 1000);
                 let gridInW = Math.round(data.Grid_Power);
                 let battInW = Math.round(data.Batt_Voltage * data.Batt_Current);
                 let loadInW = pvInW + gridInW + battInW;
 
                 if (loadInW < 0) loadInW = 0;
-                document.getElementById('lbl-pv').innerText = pvInW;
-                document.getElementById('lbl-grid').innerText = Math.abs(gridInW);
-                document.getElementById('lbl-load').innerText = loadInW;
-                document.getElementById('lbl-batt').innerText = Math.abs(battInW);
+                
+                updateDOMText('lbl-pv', pvInW);
+                updateDOMText('lbl-grid', Math.abs(gridInW));
+                updateDOMText('lbl-load', loadInW);
+                updateDOMText('lbl-batt', Math.abs(battInW));
 
                 if (data.Inv_Temp !== undefined) {
                     const tempLabel = document.getElementById('lbl-inv-temp');
                     const t = data.Inv_Temp;
-                    tempLabel.innerText = '🌡️ ' + t + '°C';
-                    if (t < 40) {
+                    updateDOMText('lbl-inv-temp', '🌡️ ' + t + '°C');
+                    
+                    if (t < 40 && tempLabel.style.backgroundColor !== 'rgb(0, 204, 102)') {
                         tempLabel.style.backgroundColor = '#00cc66';
                         tempLabel.style.boxShadow = '0 3px 6px rgba(0,0,0,0.2), 0 0 14px rgba(0,204,102,0.38)';
-                    } else if (t < 48) {
+                    } else if (t >= 40 && t < 48 && tempLabel.style.backgroundColor !== 'rgb(255, 170, 0)') {
                         tempLabel.style.backgroundColor = '#ffaa00';
                         tempLabel.style.boxShadow = '0 3px 6px rgba(0,0,0,0.2), 0 0 14px rgba(255,170,0,0.42)';
-                    } else {
+                    } else if (t >= 48 && tempLabel.style.backgroundColor !== 'rgb(255, 68, 68)') {
                         tempLabel.style.backgroundColor = '#ff4444';
                         tempLabel.style.boxShadow = '0 3px 6px rgba(0,0,0,0.2), 0 0 14px rgba(255,68,68,0.42)';
                     }
@@ -980,29 +841,31 @@
                 if (data.Inv_Switch !== undefined) {
                     const toggle = document.getElementById('inv-switch-toggle');
                     const statusText = document.getElementById('switch-status-text');
-                    toggle.checked = (data.Inv_Switch === 1);
-                    statusText.innerText = (data.Inv_Switch === 1) ? "Đang BẬT" : "Đã TẮT";
+                    if (toggle.checked !== (data.Inv_Switch === 1)) {
+                        toggle.checked = (data.Inv_Switch === 1);
+                    }
+                    updateDOMText('switch-status-text', (data.Inv_Switch === 1) ? "Đang BẬT" : "Đã TẮT");
                     statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444";
                 }
 
                 let soc = data.Batt_SOC;
-                lblSoc.innerText = soc + '%';
-                document.getElementById('stat-v').innerText = data.Batt_Voltage.toFixed(1) + ' V';
-                document.getElementById('stat-a').innerText = data.Batt_Current.toFixed(1) + ' A';
+                updateDOMText('lbl-soc', soc + '%');
+                updateDOMText('stat-v', data.Batt_Voltage.toFixed(1) + ' V');
+                updateDOMText('stat-a', data.Batt_Current.toFixed(1) + ' A');
+                
                 document.getElementById('bar-soc').style.width = soc + '%';
-                lblStatus.innerText = data.Batt_Status;
+                updateDOMText('lbl-status', data.Batt_Status);
 
                 if (data.Batt_Status === "Đang Sạc") lblStatus.style.color = '#00cc66';
                 else if (data.Batt_Status === "Đang Xả") lblStatus.style.color = '#ff4444';
                 else lblStatus.style.color = '#888';
 
-                // Thay đổi màu cho thanh pin 3D mới
                 let colorTheme = 'fill-green';
                 if (soc <= 20) colorTheme = 'fill-red';
                 else if (soc <= 40) colorTheme = 'fill-yellow';
                 
-                battFill.style.width = soc + '%';
-                battFill.className = 'battery-fill ' + colorTheme;
+                if (battFill.style.width !== soc + '%') battFill.style.width = soc + '%';
+                if (!battFill.className.includes(colorTheme)) battFill.className = 'battery-fill ' + colorTheme;
 
                 if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00');
                 else setFlow('flow-pv', false);
@@ -1010,13 +873,9 @@
                 if(loadInW > 0) setFlow('flow-load', true, 'flowOutR', '#0088ff');
                 else setFlow('flow-load', false);
 
-                if (data.Batt_Current < -0.1) {
-                    setFlow('flow-batt', true, 'flowOutL', '#00cc66');
-                } else if (data.Batt_Current > 0.1) {
-                    setFlow('flow-batt', true, 'flowInL', '#ff4444');
-                } else {
-                    setFlow('flow-batt', false);
-                }
+                if (data.Batt_Current < -0.1) setFlow('flow-batt', true, 'flowOutL', '#00cc66');
+                else if (data.Batt_Current > 0.1) setFlow('flow-batt', true, 'flowInL', '#ff4444');
+                else setFlow('flow-batt', false);
 
                 if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444');
                 else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66');
