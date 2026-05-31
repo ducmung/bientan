@@ -466,59 +466,83 @@
             filter: drop-shadow(0 0 8px rgba(255,255,255,0.55));
         }
 
-        /* ================= CSS VẼ QUẢ PIN ================= */
-        .battery-box {
-            width: 38px;
-            height: 18px;
-            border: 2px solid #555;
-            border-radius: 4px;
-            position: relative;
-            margin: 0 auto 5px auto;
-            background: #fff;
-            padding: 1px;
+        /* ================= VẼ QUẢ PIN 3D GIỐNG ẢNH ================= */
+        .battery-wrapper {
             display: flex;
-            gap: 1px;
-            box-shadow: 0 0 12px rgba(255,255,255,0.38);
+            align-items: center;
+            justify-content: center;
+            margin: 5px auto;
+            position: relative;
         }
 
-        .battery-box::after {
-            content: '';
+        .battery-body {
+            width: 72px; /* Kích thước thân pin */
+            height: 32px;
+            /* Hiệu ứng trụ kim loại rỗng bóng bẩy */
+            background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%);
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-right: 1px solid #111;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8);
+        }
+
+        /* Lớp kính phản quang 3D cong phía trên thân pin */
+        .battery-body::after {
+            content: "";
             position: absolute;
-            top: 3px; right: -4px;
-            width: 3px; height: 8px;
-            background: #555;
-            border-radius: 0 2px 2px 0;
+            top: 0; left: 0; right: 0; height: 45%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.05) 100%);
+            pointer-events: none;
+            z-index: 2; /* Nằm trên chất lỏng fill */
         }
 
-        .batt-seg { flex: 1; border-radius: 1px; background: transparent; }
-        .solid-red { background-color: #ff4444; }
-        .solid-yellow { background-color: #ffaa00; }
-        .solid-green { background-color: #00cc66; }
+        /* Đầu cực dương (nắp pin) kim loại bóng */
+        .battery-cap {
+            width: 6px;
+            height: 14px;
+            background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%);
+            border-radius: 0 3px 3px 0;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-left: none;
+            box-shadow: inset 1px 0 3px rgba(255,255,255,0.6);
+        }
 
-        @keyframes flash-red { 0%, 100% { background-color: #ff4444; box-shadow: 0 0 4px #ff4444; } 50% { background-color: transparent; box-shadow: none; } }
-        @keyframes flash-yellow { 0%, 100% { background-color: #ffaa00; box-shadow: 0 0 4px #ffaa00; } 50% { background-color: transparent; box-shadow: none; } }
-        @keyframes flash-green { 0%, 100% { background-color: #00cc66; box-shadow: 0 0 4px #00cc66; } 50% { background-color: transparent; box-shadow: none; } }
+        /* Phần lõi bên trong thay đổi độ rộng theo % */
+        .battery-fill {
+            height: 100%;
+            width: 0%; 
+            transition: width 0.5s ease-in-out, background 0.5s;
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 1;
+            border-right: 1px solid rgba(0,0,0,0.5); /* Tạo viền mỏng ở đầu chất lỏng */
+        }
 
-        .blink-red { animation: flash-red 1.2s infinite; }
-        .blink-yellow { animation: flash-yellow 1.2s infinite; }
-        .blink-green { animation: flash-green 1.2s infinite; }
-        
-        /* CHỈNH SỬA: PHẦN TRĂM PIN NHỎ LẠI VÀ CHUYỂN LÊN TRÊN */
+        /* Các trạng thái màu của chất lỏng 3D */
+        .fill-red { background: linear-gradient(to bottom, #ff5555 0%, #ffaaaa 30%, #ff2222 70%, #aa0000 100%); }
+        .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
+        .fill-green { background: linear-gradient(to bottom, #00ee77 0%, #88ffbb 30%, #00bb55 70%, #007733 100%); }
+
+        /* CHỮ PHẦN TRĂM PIN NẰM CHÍNH GIỮA BÊN TRONG PIN */
         #lbl-soc {
-            font-size: 18px; /* Đã thu nhỏ từ 22px xuống 18px */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3; /* Nằm trên cùng (trên cả lớp kính) */
+            font-size: 15px; 
             font-weight: 900;
-            margin-bottom: 4px; /* Tạo khoảng cách mỏng với quả pin bên dưới */
-            color: #ff2a2a; 
+            color: #fff;
+            /* Viền đen đậm nét giúp số luôn nổi bật trên bất kỳ nền màu nào */
             text-shadow:
-                1px 1px 0 #ffffff,
-                -1px -1px 0 #ffffff,
-                1px -1px 0 #ffffff,
-                -1px 1px 0 #ffffff,
-                2px 2px 0 #cc0000,
-                3px 3px 0 #990000,
-                4px 4px 6px rgba(0,0,0,0.6); /* Thu nhỏ shadow một chút để vừa vặn */
-            letter-spacing: 1px;
-            transition: transform 0.3s ease;
+                -1px -1px 0 #000, 
+                 1px -1px 0 #000, 
+                -1px  1px 0 #000, 
+                 1px  1px 0 #000, 
+                 0px  2px 4px rgba(0,0,0,0.8);
+            letter-spacing: 0.5px;
         }
 
         /* ================= HIỆU ỨNG SAO BĂNG ================= */
@@ -678,10 +702,12 @@
             <div class="node pos-grid"><div class="icon">🗼</div><h3>LƯỚI EVN</h3><div class="val" id="lbl-grid">0</div><div class="unit">W</div></div>
 
             <div class="node pos-batt">
-                <div id="lbl-soc">0%</div>
-
-                <div class="battery-box">
-                    <div class="batt-seg" id="batt-seg-0"></div><div class="batt-seg" id="batt-seg-1"></div><div class="batt-seg" id="batt-seg-2"></div><div class="batt-seg" id="batt-seg-3"></div><div class="batt-seg" id="batt-seg-4"></div>
+                <div class="battery-wrapper">
+                    <div class="battery-body">
+                        <div class="battery-fill" id="batt-fill"></div>
+                        <div id="lbl-soc">0%</div>
+                    </div>
+                    <div class="battery-cap"></div>
                 </div>
                 <h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div>
             </div>
@@ -824,6 +850,7 @@
         const database = firebase.database();
         const lblStatus = document.getElementById('lbl-status');
         const lblSoc = document.getElementById('lbl-soc');
+        const battFill = document.getElementById('batt-fill');
 
         let currentMonthKey = "";
         let currentMonthHistory = {};
@@ -969,19 +996,13 @@
                 else if (data.Batt_Status === "Đang Xả") lblStatus.style.color = '#ff4444';
                 else lblStatus.style.color = '#888';
 
-                let colorTheme = 'green';
-                if (soc <= 20) colorTheme = 'red';
-                else if (soc <= 40) colorTheme = 'yellow';
-
-                for (let i = 0; i < 5; i++) {
-                    let seg = document.getElementById('batt-seg-' + i);
-                    seg.className = 'batt-seg';
-                    let lowerBound = i * 20;
-                    let upperBound = (i + 1) * 20;
-                    if (soc == 0 && i == 0) seg.classList.add('blink-red');
-                    else if (soc > upperBound || (soc == 100 && i == 4)) seg.classList.add('solid-' + colorTheme);
-                    else if (soc > lowerBound && soc <= upperBound) seg.classList.add('blink-' + colorTheme);
-                }
+                // Thay đổi màu cho thanh pin 3D mới
+                let colorTheme = 'fill-green';
+                if (soc <= 20) colorTheme = 'fill-red';
+                else if (soc <= 40) colorTheme = 'fill-yellow';
+                
+                battFill.style.width = soc + '%';
+                battFill.className = 'battery-fill ' + colorTheme;
 
                 if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00');
                 else setFlow('flow-pv', false);
