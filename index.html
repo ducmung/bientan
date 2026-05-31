@@ -82,15 +82,8 @@
             filter: blur(0.2px);
         }
 
-        .star::before {
-            width: calc(var(--s) * 4.2);
-            height: 1px;
-        }
-
-        .star::after {
-            width: 1px;
-            height: calc(var(--s) * 4.2);
-        }
+        .star::before { width: calc(var(--s) * 4.2); height: 1px; }
+        .star::after { width: 1px; height: calc(var(--s) * 4.2); }
 
         @keyframes starBlink {
             0% { opacity: 0.16; transform: scale(0.62); filter: hue-rotate(0deg); }
@@ -148,9 +141,7 @@
             z-index: -1;
         }
 
-        @keyframes softSpin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes softSpin { to { transform: rotate(360deg); } }
 
         @property --rainbow-angle {
             syntax: "<angle>";
@@ -173,14 +164,8 @@
             background:
                 conic-gradient(
                     from var(--rainbow-angle),
-                    #ff004c,
-                    #ff8c00,
-                    #ffd700,
-                    #00cc66,
-                    #00e5ff,
-                    #4169ff,
-                    #b000ff,
-                    #ff004c
+                    #ff004c, #ff8c00, #ffd700, #00cc66,
+                    #00e5ff, #4169ff, #b000ff, #ff004c
                 );
             -webkit-mask:
                 linear-gradient(#000 0 0) content-box,
@@ -204,22 +189,15 @@
         #lbl-status::after,
         #lbl-inv-temp::after { z-index: -1; border-radius: 14px; }
 
-        @keyframes rainbowBorderRun {
-            to { --rainbow-angle: 360deg; }
-        }
-
+        @keyframes rainbowBorderRun { to { --rainbow-angle: 360deg; } }
         @keyframes rainbowBorderGlow {
             from {
                 opacity: 0.58;
-                filter:
-                    drop-shadow(0 0 4px rgba(255, 0, 76, 0.42))
-                    drop-shadow(0 0 8px rgba(0, 229, 255, 0.28));
+                filter: drop-shadow(0 0 4px rgba(255, 0, 76, 0.42)) drop-shadow(0 0 8px rgba(0, 229, 255, 0.28));
             }
             to {
                 opacity: 1;
-                filter:
-                    drop-shadow(0 0 8px rgba(255, 215, 0, 0.72))
-                    drop-shadow(0 0 16px rgba(176, 0, 255, 0.52));
+                filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.72)) drop-shadow(0 0 16px rgba(176, 0, 255, 0.52));
             }
         }
 
@@ -273,9 +251,7 @@
             align-items: center;
             background: #fff;
             border-radius: 12px;
-            box-shadow:
-                0 4px 10px rgba(0,0,0,0.16),
-                0 0 22px rgba(0,204,102,0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.16), 0 0 22px rgba(0,204,102,0.3);
             border: 1px solid rgba(255,255,255,0.65);
             z-index: 15;
             overflow: visible;
@@ -294,16 +270,39 @@
             border-radius: 12px;
         }
 
-        /* CỤM HIỂN THỊ NHIỆT ĐỘ BIẾN TẦN */
+        /* ================= VỊ TRÍ & ĐƯỜNG DÂY ================= */
+        .pos-pv { top: 16%; left: 16%; }
+        .pos-grid { top: 16%; left: 84%; }
+        .pos-batt { top: 84%; left: 16%; }
+        .pos-load { top: 84%; left: 84%; }
+        .pos-inv { top: 50%; left: 50%; }
+
+        .line {
+            position: absolute;
+            height: 10px;
+            margin-top: -5px;
+            background: transparent;
+            width: 48%;
+            z-index: 1;
+        }
+
+        .line-pv { top: 16%; left: 16%; transform-origin: left center; transform: rotate(45deg); }
+        .line-grid { top: 16%; right: 16%; transform-origin: right center; transform: rotate(-45deg); }
+        .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
+        .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
+
+        /* CỤM HIỂN THỊ NHIỆT ĐỘ BIẾN TẦN (ĐÃ CHUYỂN XUỐNG DƯỚI) */
         #lbl-inv-temp {
             position: absolute;
-            top: -30px;
-            font-size: 12px;
+            top: 84%;  /* Nằm cùng hàng với Pin và Tải */
+            left: 50%; /* Nằm ở giữa */
+            transform: translate(-50%, -50%);
+            font-size: 13px;
             font-weight: 900;
             background: #00cc66;
             color: #fff;
-            padding: 3px 10px;
-            border-radius: 12px;
+            padding: 4px 14px;
+            border-radius: 14px;
             z-index: 20;
             box-shadow: 0 3px 6px rgba(0,0,0,0.2), 0 0 14px rgba(0,204,102,0.38);
             white-space: nowrap;
@@ -336,7 +335,7 @@
             top: 100%;
         }
 
-        /* ================= ĐỒNG HỒ CẬP NHẬT DATA (BÊN PHẢI) ================= */
+        /* ================= ĐỒNG HỒ CẬP NHẬT DATA ================= */
         #update-clock {
             position: absolute;
             top: 50%;
@@ -356,7 +355,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1), 0 0 16px rgba(255,0,0,0.12);
         }
 
-        /* ================= TRẠNG THÁI SẠC/XẢ (BÊN TRÁI) ================= */
+        /* ================= TRẠNG THÁI SẠC/XẢ ================= */
         #lbl-status {
             position: absolute;
             top: 50%;
@@ -374,14 +373,14 @@
             transition: color 0.5s, box-shadow 0.5s;
         }
 
-        /* ================= WIDGET THỜI TIẾT (ĐÃ THAY BẰNG ẢNH) ================= */
+        /* ================= WIDGET THỜI TIẾT ẢNH ================= */
         .weather-container {
             position: absolute;
-            top: 11%;
+            top: 18%; /* Đẩy xuống để căn cân đối và không bị tràn viền */
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
-            width: 140px; /* Điều chỉnh kích thước ảnh ở đây */
+            width: 105px; /* Giảm kích thước ảnh để hiển thị tốt trên mọi màn hình */
             height: auto;
             border-radius: 15px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -391,13 +390,13 @@
             width: 100%;
             height: auto;
             display: block;
-            border-radius: 13px; /* Bóp viền ảnh 1 chút để lọt vào khung rainbow */
+            border-radius: 13px; 
         }
 
         /* ================= CHỮ BÁT PHƯƠNG LAI TÀI ================= */
         .bpf-container {
             position: absolute;
-            top: 83%;
+            top: 93%; /* Hạ thấp xuống sát mép dưới */
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
@@ -408,9 +407,9 @@
 
         .bpf-text {
             font-family: "STKaiti", "KaiTi", "Times New Roman", serif;
-            font-size: 36px;
+            font-size: 26px; /* Chữ nhỏ lại một chút để không bị tràn viền */
             font-weight: 900;
-            letter-spacing: 6px;
+            letter-spacing: 5px;
             position: relative;
             display: inline-block;
             background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
@@ -435,12 +434,8 @@
             -webkit-text-fill-color: transparent;
             background: none;
             text-shadow:
-                1px 1px 0 #ff0000,
-                2px 2px 0 #cc0000,
-                3px 3px 0 #990000,
-                4px 4px 0 #660000,
-                5px 5px 0 #330000,
-                6px 6px 12px rgba(255, 0, 0, 0.8);
+                1px 1px 0 #ff0000, 2px 2px 0 #cc0000, 3px 3px 0 #990000,
+                4px 4px 0 #660000, 5px 5px 0 #330000, 6px 6px 12px rgba(255, 0, 0, 0.8);
         }
 
         .node h3 {
@@ -489,10 +484,8 @@
         .battery-box::after {
             content: '';
             position: absolute;
-            top: 3px;
-            right: -4px;
-            width: 3px;
-            height: 8px;
+            top: 3px; right: -4px;
+            width: 3px; height: 8px;
             background: #555;
             border-radius: 0 2px 2px 0;
         }
@@ -502,282 +495,73 @@
         .solid-yellow { background-color: #ffaa00; }
         .solid-green { background-color: #00cc66; }
 
-        @keyframes flash-red {
-            0%, 100% { background-color: #ff4444; box-shadow: 0 0 4px #ff4444; }
-            50% { background-color: transparent; box-shadow: none; }
-        }
-
-        @keyframes flash-yellow {
-            0%, 100% { background-color: #ffaa00; box-shadow: 0 0 4px #ffaa00; }
-            50% { background-color: transparent; box-shadow: none; }
-        }
-
-        @keyframes flash-green {
-            0%, 100% { background-color: #00cc66; box-shadow: 0 0 4px #00cc66; }
-            50% { background-color: transparent; box-shadow: none; }
-        }
+        @keyframes flash-red { 0%, 100% { background-color: #ff4444; box-shadow: 0 0 4px #ff4444; } 50% { background-color: transparent; box-shadow: none; } }
+        @keyframes flash-yellow { 0%, 100% { background-color: #ffaa00; box-shadow: 0 0 4px #ffaa00; } 50% { background-color: transparent; box-shadow: none; } }
+        @keyframes flash-green { 0%, 100% { background-color: #00cc66; box-shadow: 0 0 4px #00cc66; } 50% { background-color: transparent; box-shadow: none; } }
 
         .blink-red { animation: flash-red 1.2s infinite; }
         .blink-yellow { animation: flash-yellow 1.2s infinite; }
         .blink-green { animation: flash-green 1.2s infinite; }
 
-        /* ================= VỊ TRÍ & ĐƯỜNG DÂY ================= */
-        .pos-pv { top: 16%; left: 16%; }
-        .pos-grid { top: 16%; left: 84%; }
-        .pos-batt { top: 84%; left: 16%; }
-        .pos-load { top: 84%; left: 84%; }
-        .pos-inv { top: 50%; left: 50%; }
-
-        .line {
-            position: absolute;
-            height: 10px;
-            margin-top: -5px;
-            background: transparent;
-            width: 48%;
-            z-index: 1;
-        }
-
-        .line-pv { top: 16%; left: 16%; transform-origin: left center; transform: rotate(45deg); }
-        .line-grid { top: 16%; right: 16%; transform-origin: right center; transform: rotate(-45deg); }
-        .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
-        .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
-
         /* ================= HIỆU ỨNG SAO BĂNG ================= */
-        .flow-group {
-            display: none;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            inset: 0;
-            overflow: visible;
-            --c: #00e5ff;
-        }
+        .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; }
+        .flow-track { position: absolute; top: 50%; left: 0; width: 100%; height: 1px; transform: translateY(-50%); background: rgba(255,255,255,0.2); box-shadow: 0 0 8px rgba(255,255,255,0.18); }
+        .flow-dash { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 2px; border-radius: 10px; opacity: 0; filter: blur(0.4px); }
+        .dir-right .flow-dash { background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%); box-shadow: 0 0 4px var(--c), 0 0 8px var(--c), 0 0 16px var(--c); }
+        .dir-left .flow-dash { background: linear-gradient(270deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%); box-shadow: 0 0 4px var(--c), 0 0 8px var(--c), 0 0 16px var(--c); }
+        .flow-dash::before { content: ''; position: absolute; width: 5px; height: 5px; background: #fff; border-radius: 50%; top: 50%; transform: translateY(-50%); box-shadow: 0 0 6px #fff, 0 0 10px var(--c), 0 0 15px var(--c); }
+        .flow-dash::after { content: ''; position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; top: 50%; box-shadow: -6px -4px 0 rgba(255,255,255,0.7), -10px 3px 0 rgba(255,255,255,0.5), -15px -2px 0 rgba(255,255,255,0.3); }
+        .dir-right .flow-dash::before, .dir-right .flow-dash::after { right: -2px; }
+        .dir-left .flow-dash::before, .dir-left .flow-dash::after { left: -2px; }
+        .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.5s; } .flow-dash:nth-child(4) { animation-delay: 1.0s; } .flow-dash:nth-child(5) { animation-delay: 1.5s; } .flow-dash:nth-child(6) { animation-delay: 2.0s; }
 
-        .flow-track {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.2);
-            box-shadow: 0 0 8px rgba(255,255,255,0.18);
-        }
-
-        .flow-dash {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 40px;
-            height: 2px;
-            border-radius: 10px;
-            opacity: 0;
-            filter: blur(0.4px);
-        }
-
-        .dir-right .flow-dash {
-            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%);
-            box-shadow: 0 0 4px var(--c), 0 0 8px var(--c), 0 0 16px var(--c);
-        }
-
-        .dir-left .flow-dash {
-            background: linear-gradient(270deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%);
-            box-shadow: 0 0 4px var(--c), 0 0 8px var(--c), 0 0 16px var(--c);
-        }
-
-        .flow-dash::before {
-            content: '';
-            position: absolute;
-            width: 5px;
-            height: 5px;
-            background: #fff;
-            border-radius: 50%;
-            top: 50%;
-            transform: translateY(-50%);
-            box-shadow: 0 0 6px #fff, 0 0 10px var(--c), 0 0 15px var(--c);
-        }
-
-        .flow-dash::after {
-            content: '';
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: #fff;
-            border-radius: 50%;
-            top: 50%;
-            box-shadow: -6px -4px 0 rgba(255,255,255,0.7), -10px 3px 0 rgba(255,255,255,0.5), -15px -2px 0 rgba(255,255,255,0.3);
-        }
-
-        .dir-right .flow-dash::before,
-        .dir-right .flow-dash::after { right: -2px; }
-
-        .dir-left .flow-dash::before,
-        .dir-left .flow-dash::after { left: -2px; }
-
-        .flow-dash:nth-child(2) { animation-delay: 0s; }
-        .flow-dash:nth-child(3) { animation-delay: 0.5s; }
-        .flow-dash:nth-child(4) { animation-delay: 1.0s; }
-        .flow-dash:nth-child(5) { animation-delay: 1.5s; }
-        .flow-dash:nth-child(6) { animation-delay: 2.0s; }
-
-        @keyframes flowInL {
-            0% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.7); }
-            10% { opacity: 1; }
-            50% { opacity: 1; transform: translateY(-50%) scale(1); }
-            100% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.8); }
-        }
-
-        @keyframes flowOutL {
-            0% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.7); }
-            10% { opacity: 1; }
-            50% { opacity: 1; transform: translateY(-50%) scale(1); }
-            100% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.8); }
-        }
-
-        @keyframes flowInR {
-            0% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.7); }
-            10% { opacity: 1; }
-            50% { opacity: 1; transform: translateY(-50%) scale(1); }
-            100% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.8); }
-        }
-
-        @keyframes flowOutR {
-            0% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.7); }
-            10% { opacity: 1; }
-            50% { opacity: 1; transform: translateY(-50%) scale(1); }
-            100% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.8); }
-        }
+        @keyframes flowInL { 0% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.7); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1); } 100% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.8); } }
+        @keyframes flowOutL { 0% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.7); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1); } 100% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.8); } }
+        @keyframes flowInR { 0% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.7); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1); } 100% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.8); } }
+        @keyframes flowOutR { 0% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.7); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1); } 100% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.8); } }
 
         /* ================= KHUNG THỐNG KÊ ================= */
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
 
         .stat-card {
-            position: relative;
-            overflow: hidden;
-            background:
-                linear-gradient(135deg, rgba(255,255,255,0.78), rgba(255,255,255,0.58)),
-                rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.5);
-            border-radius: 20px;
-            padding: 20px;
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(255,255,255,0.58)), rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08), 0 0 22px rgba(255,255,255,0.12);
         }
 
         .stat-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
+            content: ""; position: absolute; inset: 0;
             background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%);
-            transform: translateX(-120%);
-            animation: cardSheen 5.5s ease-in-out infinite;
-            pointer-events: none;
+            transform: translateX(-120%); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none;
         }
 
-        @keyframes cardSheen {
-            0%, 48% { transform: translateX(-120%); }
-            78%, 100% { transform: translateX(120%); }
-        }
+        @keyframes cardSheen { 0%, 48% { transform: translateX(-120%); } 78%, 100% { transform: translateX(120%); } }
 
-        /* Box Quy đổi tiền điện riêng biệt với viền mạ vàng */
-        .money-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95));
-            border: 1px solid rgba(218, 165, 32, 0.65);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08), 0 0 24px rgba(255, 215, 0, 0.18);
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
+        .money-card { background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95)); border: 1px solid rgba(218, 165, 32, 0.65); box-shadow: 0 4px 15px rgba(0,0,0,0.08), 0 0 24px rgba(255, 215, 0, 0.18); }
+        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 1; }
         .stat-header h2 { font-size: 16px; color: #444; }
-
-        .progress-bar {
-            width: 100%;
-            height: 12px;
-            background: rgba(0,0,0,0.05);
-            border-radius: 10px;
-            display: flex;
-            overflow: hidden;
-            margin-bottom: 15px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 1;
-        }
-
-        .bar-batt {
-            background: linear-gradient(90deg, #00cc66, #33ff99, #d8ffe8);
-            width: 0%;
-            transition: width 1s;
-            box-shadow: 0 0 12px rgba(0,204,102,0.42);
-        }
-
-        .list-detail {
-            font-size: 13px;
-            color: #555;
-            position: relative;
-            z-index: 1;
-        }
-
-        .list-detail div {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 8px;
-            border-bottom: 1px dashed rgba(0,0,0,0.1);
-            padding-bottom: 4px;
-        }
-
+        .progress-bar { width: 100%; height: 12px; background: rgba(0,0,0,0.05); border-radius: 10px; display: flex; overflow: hidden; margin-bottom: 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); position: relative; z-index: 1; }
+        .bar-batt { background: linear-gradient(90deg, #00cc66, #33ff99, #d8ffe8); width: 0%; transition: width 1s; box-shadow: 0 0 12px rgba(0,204,102,0.42); }
+        .list-detail { font-size: 13px; color: #555; position: relative; z-index: 1; }
+        .list-detail div { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px; }
         .list-detail div:last-child { border: none; }
         .list-detail span { font-weight: 800; color: #111; white-space: nowrap; }
 
         /* ================= NÚT GẠT ================= */
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 26px;
-            box-shadow: inset 0 1px 4px rgba(0,0,0,0.18);
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        input:checked + .slider {
-            background-color: #00cc66;
-            box-shadow: 0 0 14px rgba(0,204,102,0.35);
-        }
-
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; box-shadow: inset 0 1px 4px rgba(0,0,0,0.18); }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: #00cc66; box-shadow: 0 0 14px rgba(0,204,102,0.35); }
         input:checked + .slider:before { transform: translateX(24px); }
 
         @media (max-width: 360px) {
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 12px; padding: 4px 10px; }
-            .bpf-text { font-size: 32px; letter-spacing: 5px; }
+            .bpf-text { font-size: 22px; letter-spacing: 4px; }
+            .weather-container { width: 85px; } /* Thu nhỏ ảnh thêm một chút cho điện thoại màn hình siêu bé */
         }
 
         @media (min-width: 768px) {
@@ -842,12 +626,15 @@
                 <span class="spark" style="--x:58%; --y:12%; --s:2px; --c:#6bd4ff; --d:2.1s; --delay:-1.2s;"></span>
                 <span class="spark" style="--x:80%; --y:79%; --s:3px; --c:#ff4fd8; --d:2.8s; --delay:-2.5s;"></span>
             </div>
+            
             <div id="update-clock">--:--:--</div>
             <div id="lbl-status">Đang tải...</div>
 
             <div class="weather-container">
                 <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image">
             </div>
+
+            <div id="lbl-inv-temp">🌡️ --°C</div>
 
             <div class="line line-pv">
                 <div class="flow-group" id="flow-pv"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div>
@@ -883,7 +670,6 @@
             <div class="node pos-load"><div class="icon">🏠</div><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
 
             <div class="node node-center pos-inv">
-                <div id="lbl-inv-temp">🌡️ --°C</div>
                 <img src="68.jpg" alt="Inverter">
             </div>
 
@@ -948,7 +734,6 @@
 
         async function fetchWeather() {
             try {
-                // Vẫn gọi API để lấy giờ mặt trời lặn/mọc nhằm duy trì hiệu ứng mặt trời chạy
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&forecast_days=1&timeformat=unixtime`;
                 const res = await fetch(url, { cache: 'no-store' });
                 const data = await res.json();
