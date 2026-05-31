@@ -291,10 +291,10 @@
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* CỤM HIỂN THỊ NHIỆT ĐỘ BIẾN TẦN (Đã đẩy lên sát biến tần) */
+        /* CỤM HIỂN THỊ NHIỆT ĐỘ BIẾN TẦN */
         #lbl-inv-temp {
             position: absolute;
-            top: 74%;  /* Đưa lên gần mép dưới của khung biến tần */
+            top: 74%;
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 13px;
@@ -376,11 +376,11 @@
         /* ================= WIDGET THỜI TIẾT ẢNH ================= */
         .weather-container {
             position: absolute;
-            top: 20%; /* Dịch xuống 1 chút để không bị tràn viền */
+            top: 16%; /* Đã dịch lên bằng hàng với Mặt Trời và Lưới EVN */
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
-            width: 130px; /* Tăng kích thước ảnh cho to và cân đối hơn */
+            width: 130px;
             height: auto;
             border-radius: 15px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -396,7 +396,7 @@
         /* ================= CHỮ BÁT PHƯƠNG LAI TÀI ================= */
         .bpf-container {
             position: absolute;
-            top: 92%; /* Nằm ở khoảng trống rộng bên dưới */
+            top: 92%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
@@ -407,9 +407,9 @@
 
         .bpf-text {
             font-family: "STKaiti", "KaiTi", "Times New Roman", serif;
-            font-size: 34px; /* Chữ to bề thế hơn */
+            font-size: 34px;
             font-weight: 900;
-            letter-spacing: 12px; /* Dài trải rộng ra */
+            letter-spacing: 12px;
             position: relative;
             display: inline-block;
             background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
@@ -561,7 +561,7 @@
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 12px; padding: 4px 10px; }
             .bpf-text { font-size: 26px; letter-spacing: 8px; }
-            .weather-container { width: 100px; } /* Phóng to ảnh thời tiết trên điện thoại cỡ nhỏ */
+            .weather-container { width: 100px; }
         }
 
         @media (min-width: 768px) {
