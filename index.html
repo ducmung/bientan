@@ -374,36 +374,25 @@
             transition: color 0.5s, box-shadow 0.5s;
         }
 
-        /* ================= WIDGET THỜI TIẾT ================= */
+        /* ================= WIDGET THỜI TIẾT (ĐÃ THAY BẰNG ẢNH) ================= */
         .weather-container {
             position: absolute;
             top: 11%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
-            width: 160px;
-            text-align: center;
-            color: #fff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 0 14px rgba(255,215,0,0.34);
+            width: 140px; /* Điều chỉnh kích thước ảnh ở đây */
+            height: auto;
             border-radius: 15px;
-            padding: 4px 2px;
-            background: rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        .ss-location {
-            font-size: 10px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            margin-bottom: 2px;
+        .weather-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 13px; /* Bóp viền ảnh 1 chút để lọt vào khung rainbow */
         }
-
-        .ss-temp { font-size: 32px; font-weight: 400; line-height: 1; margin-bottom: 2px; letter-spacing: -1px; }
-        .ss-desc { font-size: 11px; font-weight: 700; margin-bottom: 1px; }
-        .ss-hilo { font-size: 9px; font-weight: 600; opacity: 0.9; margin-bottom: 1px; }
-        .ss-feels { font-size: 9px; font-weight: 600; opacity: 0.9; margin-bottom: 2px; }
 
         /* ================= CHỮ BÁT PHƯƠNG LAI TÀI ================= */
         .bpf-container {
@@ -857,14 +846,7 @@
             <div id="lbl-status">Đang tải...</div>
 
             <div class="weather-container">
-                <div class="ss-location">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    Đại Đồng, Bắc Ninh
-                </div>
-                <div class="ss-temp" id="now-temp">--°</div>
-                <div class="ss-desc" id="now-desc">Đang cập nhật...</div>
-                <div class="ss-hilo" id="now-hl">↑ --° / ↓ --°</div>
-                <div class="ss-feels" id="now-feels">Cảm giác như --°</div>
+                <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image">
             </div>
 
             <div class="line line-pv">
@@ -966,6 +948,7 @@
 
         async function fetchWeather() {
             try {
+                // Vẫn gọi API để lấy giờ mặt trời lặn/mọc nhằm duy trì hiệu ứng mặt trời chạy
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&forecast_days=1&timeformat=unixtime`;
                 const res = await fetch(url, { cache: 'no-store' });
                 const data = await res.json();
@@ -973,47 +956,11 @@
                 if (data && data.current) {
                     globalSunrise = data.daily.sunrise[0];
                     globalSunset = data.daily.sunset[0];
-
-                    const currentInfo = {
-                        temp: data.current.temperature_2m,
-                        feels_like: data.current.apparent_temperature,
-                        code: data.current.weather_code,
-                        is_day: data.current.is_day,
-                        max: data.daily.temperature_2m_max[0],
-                        min: data.daily.temperature_2m_min[0]
-                    };
-
-                    updateWeatherUI(currentInfo);
                     updateSunArc();
-                } else {
-                    document.getElementById('now-desc').innerText = "Lỗi API dữ liệu";
                 }
             } catch (e) {
                 console.error("Lỗi kết nối Thời tiết:", e);
-                document.getElementById('now-desc').innerText = "Mất kết nối";
             }
-        }
-
-        function getWeatherDesc(code, isDay) {
-            const isNight = !isDay;
-            const map = {
-                0: isNight ? 'Trời quang' : 'Trời nắng',
-                1: 'Chủ yếu nắng', 2: 'Có mây', 3: 'Nhiều mây',
-                45: 'Sương mù', 48: 'Sương lạnh',
-                51: 'Mưa phùn', 53: 'Mưa phùn', 55: 'Mưa dày',
-                61: 'Mưa nhẹ', 63: 'Mưa vừa', 65: 'Mưa to',
-                71: 'Tuyết nhẹ', 73: 'Tuyết', 75: 'Tuyết dày',
-                80: 'Mưa rào', 81: 'Mưa rào', 82: 'Mưa lớn',
-                95: 'Dông bão', 96: 'Dông bão', 99: 'Dông lớn'
-            };
-            return map[code] || 'Đang cập nhật...';
-        }
-
-        function updateWeatherUI(currentInfo) {
-            document.getElementById('now-temp').innerText = Math.round(currentInfo.temp) + '°';
-            document.getElementById('now-desc').innerText = getWeatherDesc(currentInfo.code, currentInfo.is_day);
-            document.getElementById('now-hl').innerText = `↑ ${Math.round(currentInfo.max)}° / ↓ ${Math.round(currentInfo.min)}°`;
-            document.getElementById('now-feels').innerText = `Cảm giác như ${Math.round(currentInfo.feels_like)}°`;
         }
 
         function updateSunArc() {
@@ -1080,7 +1027,6 @@
         let currentMonthHistory = {};
         let latestDailyData = null;
 
-        // Hàm kiểm tra và chuyển đổi dữ liệu khi bước sang tháng mới
         function checkAndSwitchMonth() {
             let d = new Date();
             let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
@@ -1096,7 +1042,6 @@
             }
         }
 
-        // Hàm tính tiền theo 6 bậc EVN (Đã gồm 8% VAT)
         function calcEVN(kWh) {
             let cost = 0; let r = kWh;
             if(r > 0) { let q = Math.min(r, 50); cost += q * 2142.72; r -= q; }
@@ -1171,7 +1116,6 @@
             checkAndSwitchMonth();
         }, 60000);
 
-        // Giao tiếp dữ liệu Live
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
