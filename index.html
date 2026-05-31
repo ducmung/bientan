@@ -376,7 +376,7 @@
         /* ================= WIDGET THỜI TIẾT ẢNH ================= */
         .weather-container {
             position: absolute;
-            top: 16%; /* Đã dịch lên bằng hàng với Mặt Trời và Lưới EVN */
+            top: 16%; 
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
@@ -502,6 +502,25 @@
         .blink-red { animation: flash-red 1.2s infinite; }
         .blink-yellow { animation: flash-yellow 1.2s infinite; }
         .blink-green { animation: flash-green 1.2s infinite; }
+        
+        /* CHỈNH SỬA: PHẦN TRĂM PIN 3D ĐỎ */
+        #lbl-soc {
+            font-size: 22px; /* Chữ to hơn */
+            font-weight: 900;
+            margin-top: 4px;
+            color: #ff2a2a; /* Màu đỏ nổi bật xen kẽ trắng của viền */
+            text-shadow:
+                1px 1px 0 #ffffff,
+                -1px -1px 0 #ffffff,
+                1px -1px 0 #ffffff,
+                -1px 1px 0 #ffffff,
+                2px 2px 0 #cc0000,
+                3px 3px 0 #990000,
+                4px 4px 0 #660000,
+                5px 5px 8px rgba(0,0,0,0.6); /* Hiệu ứng nổi 3D đỏ đậm */
+            letter-spacing: 1px;
+            transition: transform 0.3s ease;
+        }
 
         /* ================= HIỆU ỨNG SAO BĂNG ================= */
         .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; }
@@ -664,7 +683,8 @@
                     <div class="batt-seg" id="batt-seg-0"></div><div class="batt-seg" id="batt-seg-1"></div><div class="batt-seg" id="batt-seg-2"></div><div class="batt-seg" id="batt-seg-3"></div><div class="batt-seg" id="batt-seg-4"></div>
                 </div>
                 <h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div>
-                <div style="font-size: 16px; font-weight:900; margin-top: 2px; transition: color 0.5s;" id="lbl-soc">0%</div>
+                
+                <div id="lbl-soc">0%</div>
             </div>
 
             <div class="node pos-load"><div class="icon">🏠</div><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
@@ -950,10 +970,10 @@
                 else if (data.Batt_Status === "Đang Xả") lblStatus.style.color = '#ff4444';
                 else lblStatus.style.color = '#888';
 
+                // Giữ lại logic đổi màu đèn báo thanh pin (nhưng không đổi màu chữ #lbl-soc nữa)
                 let colorTheme = 'green';
                 if (soc <= 20) colorTheme = 'red';
                 else if (soc <= 40) colorTheme = 'yellow';
-                lblSoc.style.color = (colorTheme === 'red') ? '#ff4444' : (colorTheme === 'yellow') ? '#ffaa00' : '#00cc66';
 
                 for (let i = 0; i < 5; i++) {
                     let seg = document.getElementById('batt-seg-' + i);
