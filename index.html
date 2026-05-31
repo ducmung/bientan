@@ -291,11 +291,11 @@
         .line-batt { top: 84%; left: 16%; transform-origin: left center; transform: rotate(-45deg); }
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
-        /* CỤM HIỂN THỊ NHIỆT ĐỘ BIẾN TẦN (ĐÃ CHUYỂN XUỐNG DƯỚI) */
+        /* CỤM HIỂN THỊ NHIỆT ĐỘ BIẾN TẦN (Đã đẩy lên sát biến tần) */
         #lbl-inv-temp {
             position: absolute;
-            top: 84%;  /* Nằm cùng hàng với Pin và Tải */
-            left: 50%; /* Nằm ở giữa */
+            top: 74%;  /* Đưa lên gần mép dưới của khung biến tần */
+            left: 50%;
             transform: translate(-50%, -50%);
             font-size: 13px;
             font-weight: 900;
@@ -376,11 +376,11 @@
         /* ================= WIDGET THỜI TIẾT ẢNH ================= */
         .weather-container {
             position: absolute;
-            top: 18%; /* Đẩy xuống để căn cân đối và không bị tràn viền */
+            top: 20%; /* Dịch xuống 1 chút để không bị tràn viền */
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
-            width: 105px; /* Giảm kích thước ảnh để hiển thị tốt trên mọi màn hình */
+            width: 130px; /* Tăng kích thước ảnh cho to và cân đối hơn */
             height: auto;
             border-radius: 15px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -396,7 +396,7 @@
         /* ================= CHỮ BÁT PHƯƠNG LAI TÀI ================= */
         .bpf-container {
             position: absolute;
-            top: 93%; /* Hạ thấp xuống sát mép dưới */
+            top: 92%; /* Nằm ở khoảng trống rộng bên dưới */
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 15;
@@ -407,9 +407,9 @@
 
         .bpf-text {
             font-family: "STKaiti", "KaiTi", "Times New Roman", serif;
-            font-size: 26px; /* Chữ nhỏ lại một chút để không bị tràn viền */
+            font-size: 34px; /* Chữ to bề thế hơn */
             font-weight: 900;
-            letter-spacing: 5px;
+            letter-spacing: 12px; /* Dài trải rộng ra */
             position: relative;
             display: inline-block;
             background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
@@ -560,8 +560,8 @@
         @media (max-width: 360px) {
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 12px; padding: 4px 10px; }
-            .bpf-text { font-size: 22px; letter-spacing: 4px; }
-            .weather-container { width: 85px; } /* Thu nhỏ ảnh thêm một chút cho điện thoại màn hình siêu bé */
+            .bpf-text { font-size: 26px; letter-spacing: 8px; }
+            .weather-container { width: 100px; } /* Phóng to ảnh thời tiết trên điện thoại cỡ nhỏ */
         }
 
         @media (min-width: 768px) {
@@ -775,7 +775,6 @@
         setInterval(updateSunArc, 60000);
         fetchWeather();
 
-        // ================= XỬ LÝ ANIMATION =================
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId);
             if (!group) return;
@@ -801,7 +800,6 @@
             }
         }
 
-        // ================= KẾT NỐI FIREBASE & QUẢN LÝ NGÀY THÁNG TỰ ĐỘNG =================
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
