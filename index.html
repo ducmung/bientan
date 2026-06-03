@@ -338,7 +338,9 @@
         }
 
         .node h3 { font-size: 9px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
-        .node .val { font-size: 15px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
+        
+        /* Tăng xíu kích thước font cho Val để hiệu ứng 3D hiển thị rõ ràng hơn */
+        .node .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
         .node .unit { font-size: 9px; color: rgba(255,255,255,0.86); }
         .icon { font-size: 16px; margin-bottom: 2px; } 
 
@@ -765,8 +767,8 @@
                 updateDOMText('lbl-pv', pvInW);
                 updateDOMText('lbl-load', loadInW);
 
-                let gridStr = gridInW > 0 ? "+" + gridInW : gridInW;
-                updateDOMText('lbl-grid', gridStr);
+                // === LƯỚI EVN === (Đã bỏ dấu cộng/trừ)
+                updateDOMText('lbl-grid', Math.abs(gridInW));
                 const elGrid = document.getElementById('lbl-grid');
                 if (gridInW < 0) { 
                     elGrid.style.color = '#00cc66';
@@ -779,16 +781,16 @@
                     elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
                 }
 
-                let battStr = battInW > 0 ? "+" + battInW : battInW;
-                updateDOMText('lbl-batt', battStr);
+                // === PIN LƯU TRỮ === (Bỏ dấu, thêm hiệu ứng 3D Trắng Xanh / Tím Đỏ)
+                updateDOMText('lbl-batt', Math.abs(battInW));
                 const elBatt = document.getElementById('lbl-batt');
-                if (battInW < 0) { 
-                    elBatt.style.color = '#00cc66';
-                    elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(0,204,102,0.45)';
-                } else if (battInW > 0) { 
-                    elBatt.style.color = '#ff4444';
-                    elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,68,68,0.45)';
-                } else { 
+                if (battInW < 0) { // Đang Sạc -> Trắng Xanh 3D
+                    elBatt.style.color = '#ffffff';
+                    elBatt.style.textShadow = '0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.8)';
+                } else if (battInW > 0) { // Đang Xả -> Tím Đỏ 3D
+                    elBatt.style.color = '#ffffff';
+                    elBatt.style.textShadow = '0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.8)';
+                } else { // Chờ -> Mặc định
                     elBatt.style.color = '#fff';
                     elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
                 }
@@ -828,7 +830,6 @@
                 
                 document.getElementById('bar-soc').style.width = soc + '%';
                 
-                // === XỬ LÝ LẠI CHỮ TRẠNG THÁI (MẤT DẤU/MẤT MÀU) ===
                 let rawStatus = data.Batt_Status || "";
                 let statusLower = rawStatus.toLowerCase();
                 let displayStatus = rawStatus; 
@@ -836,13 +837,13 @@
 
                 if (statusLower.includes("sac") || statusLower.includes("sạc") || statusLower.includes("charge")) {
                     displayStatus = "Đang Sạc";
-                    statusColor = '#00cc66'; // Xanh lá
+                    statusColor = '#00cc66'; 
                 } else if (statusLower.includes("xa") || statusLower.includes("xả") || statusLower.includes("discharge")) {
                     displayStatus = "Đang Xả";
-                    statusColor = '#ff4444'; // Đỏ
+                    statusColor = '#ff4444'; 
                 } else {
                     displayStatus = "Chờ";
-                    statusColor = '#888'; // Xám
+                    statusColor = '#888'; 
                 }
 
                 updateDOMText('lbl-status', displayStatus);
