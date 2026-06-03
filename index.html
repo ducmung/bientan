@@ -259,12 +259,7 @@
             50% { box-shadow: 0 4px 14px rgba(0,0,0,0.18), 0 0 32px rgba(0,204,102,0.42); }
         }
 
-        .node-center img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 12px;
-        }
+        .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
 
         .pos-pv { top: 16%; left: 16%; }
         .pos-grid { top: 16%; left: 84%; }
@@ -273,12 +268,8 @@
         .pos-inv { top: 50%; left: 50%; }
 
         .line {
-            position: absolute;
-            height: 10px;
-            margin-top: -5px;
-            background: transparent;
-            width: 48%;
-            z-index: 1;
+            position: absolute; height: 10px; margin-top: -5px;
+            background: transparent; width: 48%; z-index: 1;
         }
 
         .line-pv { top: 16%; left: 16%; transform-origin: left center; transform: rotate(45deg); }
@@ -287,76 +278,45 @@
         .line-load { top: 84%; right: 16%; transform-origin: right center; transform: rotate(45deg); }
 
         #lbl-inv-temp {
-            position: absolute;
-            top: 74%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 13px;
-            font-weight: 900;
-            background: #00cc66;
-            color: #fff;
-            padding: 4px 14px;
-            border-radius: 14px;
-            z-index: 20;
+            position: absolute; top: 74%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 13px; font-weight: 900; background: #00cc66; color: #fff;
+            padding: 4px 14px; border-radius: 14px; z-index: 20;
             box-shadow: 0 3px 6px rgba(0,0,0,0.2), 0 0 14px rgba(0,204,102,0.38);
-            white-space: nowrap;
-            transition: background-color 0.5s ease, box-shadow 0.5s ease;
+            white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
 
-        .sun-arc-mini {
-            position: relative;
-            width: 100%;
-            height: 35px;
-            margin-bottom: 2px;
-        }
+        .sun-arc-mini { position: relative; width: 100%; height: 35px; margin-bottom: 2px; }
         .sun-arc-mini svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         #moving-sun {
-            position: absolute;
-            font-size: 14px;
-            transform: translate(-50%, -50%);
-            text-shadow: 0 0 10px #ffaa00; 
-            transition: all 1s ease-out;
-            left: 15%;
-            top: 100%;
-            will-change: left, top;
+            position: absolute; font-size: 14px; transform: translate(-50%, -50%);
+            text-shadow: 0 0 10px #ffaa00; transition: all 1s ease-out;
+            left: 15%; top: 100%; will-change: left, top;
         }
 
         #update-clock {
-            position: absolute;
-            top: 50%; left: 84%;
-            transform: translate(-50%, -50%);
+            position: absolute; top: 50%; left: 84%; transform: translate(-50%, -50%);
             font-size: 12px; font-weight: 900; color: #ff0000; font-family: monospace;
-            background: rgba(255, 255, 255, 0.88);
-            padding: 5px 10px; border-radius: 12px; border: 1px solid rgba(255, 0, 0, 0.3);
-            z-index: 25; letter-spacing: 1px; white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.88); padding: 5px 10px; border-radius: 12px;
+            border: 1px solid rgba(255, 0, 0, 0.3); z-index: 25; letter-spacing: 1px;
+            white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         #lbl-status {
-            position: absolute;
-            top: 50%; left: 16%;
-            transform: translate(-50%, -50%);
-            font-size: 13px; font-weight: 800;
-            background: rgba(255,255,255,0.9);
-            padding: 4px 15px; border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            color: #888; white-space: nowrap; z-index: 25;
-            transition: color 0.5s, box-shadow 0.5s;
+            position: absolute; top: 50%; left: 16%; transform: translate(-50%, -50%);
+            font-size: 13px; font-weight: 800; background: rgba(255,255,255,0.9);
+            padding: 4px 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: #888; white-space: nowrap; z-index: 25; transition: color 0.5s, box-shadow 0.5s;
         }
 
         .weather-container {
-            position: absolute; top: 16%; left: 50%;
-            transform: translate(-50%, -50%); z-index: 15;
-            width: 130px; height: auto; border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: absolute; top: 16%; left: 50%; transform: translate(-50%, -50%); z-index: 15;
+            width: 130px; height: auto; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         .weather-container img { width: 100%; height: auto; display: block; border-radius: 13px; }
 
         .bpf-container {
-            position: absolute; top: 92%; left: 50%;
-            transform: translate(-50%, -50%); z-index: 15;
-            text-align: center; width: 100%; pointer-events: none;
-            will-change: transform;
+            position: absolute; top: 92%; left: 50%; transform: translate(-50%, -50%); z-index: 15;
+            text-align: center; width: 100%; pointer-events: none; will-change: transform;
         }
         .bpf-text {
             font-family: "STKaiti", "KaiTi", "Times New Roman", serif;
@@ -378,7 +338,7 @@
         }
 
         .node h3 { font-size: 9px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
-        .node .val { font-size: 15px; font-weight: 900; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
+        .node .val { font-size: 15px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
         .node .unit { font-size: 9px; color: rgba(255,255,255,0.86); }
         .icon { font-size: 16px; margin-bottom: 2px; } 
 
@@ -408,32 +368,15 @@
 
         /* CHỮ PHẦN TRĂM PIN NẰM GIỮA LÕI PIN */
         #lbl-soc {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 3;
-            font-size: 18px; 
-            font-weight: 900;
-            color: #ff2a2a; 
-            text-shadow: 
-                1px 1px 0 #ffffff, 
-                -1px -1px 0 #ffffff, 
-                1px -1px 0 #ffffff, 
-                -1px 1px 0 #ffffff, 
-                2px 2px 0 #cc0000, 
-                3px 3px 0 #990000, 
-                4px 4px 6px rgba(0,0,0,0.6);
-            letter-spacing: 1px; 
-            margin: 0; 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a; 
+            text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6);
+            letter-spacing: 1px; margin: 0; 
         }
 
         .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; }
         .flow-track { position: absolute; top: 50%; left: 0; width: 100%; height: 1px; transform: translateY(-50%); background: rgba(255,255,255,0.2); box-shadow: 0 0 8px rgba(255,255,255,0.18); }
-        .flow-dash { 
-            position: absolute; top: 50%; width: 40px; height: 2px; border-radius: 10px; opacity: 0; 
-            will-change: transform, opacity; transform: translateZ(0);
-        }
+        .flow-dash { position: absolute; top: 50%; width: 40px; height: 2px; border-radius: 10px; opacity: 0; will-change: transform, opacity; transform: translateZ(0); }
         .dir-right .flow-dash { background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%); box-shadow: 0 0 4px var(--c), 0 0 10px var(--c); }
         .dir-left .flow-dash { background: linear-gradient(270deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%); box-shadow: 0 0 4px var(--c), 0 0 10px var(--c); }
         .flow-dash::before { content: ''; position: absolute; width: 5px; height: 5px; background: #fff; border-radius: 50%; top: 50%; transform: translateY(-50%); box-shadow: 0 0 6px #fff, 0 0 10px var(--c); }
@@ -453,14 +396,11 @@
             background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255, 255, 255, 0.7));
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transform: translateZ(0); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateZ(0); 
         }
         .stat-card::before {
-            content: ""; position: absolute; inset: 0;
-            background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%);
-            transform: translateX(-120%); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none;
-            will-change: transform;
+            content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%);
+            transform: translateX(-120%); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none; will-change: transform;
         }
         @keyframes cardSheen { 0%, 48% { transform: translateX(-120%) translateZ(0); } 78%, 100% { transform: translateX(120%) translateZ(0); } }
 
@@ -561,7 +501,8 @@
                 <div class="battery-wrapper">
                     <div class="battery-body">
                         <div class="battery-fill" id="batt-fill"></div>
-                        <div id="lbl-soc">0%</div> </div>
+                        <div id="lbl-soc">0%</div> 
+                    </div>
                     <div class="battery-cap"></div>
                 </div>
                 <h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div>
@@ -822,9 +763,37 @@
                 if (loadInW < 0) loadInW = 0;
                 
                 updateDOMText('lbl-pv', pvInW);
-                updateDOMText('lbl-grid', Math.abs(gridInW));
                 updateDOMText('lbl-load', loadInW);
-                updateDOMText('lbl-batt', Math.abs(battInW));
+
+                // === LƯỚI EVN: Hiển thị có dấu kèm đổi màu ===
+                let gridStr = gridInW > 0 ? "+" + gridInW : gridInW;
+                updateDOMText('lbl-grid', gridStr);
+                const elGrid = document.getElementById('lbl-grid');
+                if (gridInW < 0) { // Đẩy lưới (Số âm) -> Màu xanh
+                    elGrid.style.color = '#00cc66';
+                    elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(0,204,102,0.45)';
+                } else if (gridInW > 0) { // Lấy lưới (Số dương) -> Màu đỏ
+                    elGrid.style.color = '#ff4444';
+                    elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,68,68,0.45)';
+                } else { // Bằng 0 -> Màu trắng
+                    elGrid.style.color = '#fff';
+                    elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
+                }
+
+                // === PIN LƯU TRỮ: Hiển thị có dấu kèm đổi màu (Sửa lỗi mất dấu) ===
+                let battStr = battInW > 0 ? "+" + battInW : battInW;
+                updateDOMText('lbl-batt', battStr);
+                const elBatt = document.getElementById('lbl-batt');
+                if (battInW < 0) { // Đang sạc (Số âm) -> Màu xanh
+                    elBatt.style.color = '#00cc66';
+                    elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(0,204,102,0.45)';
+                } else if (battInW > 0) { // Đang xả (Số dương) -> Màu đỏ
+                    elBatt.style.color = '#ff4444';
+                    elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,68,68,0.45)';
+                } else { // Bằng 0 -> Màu trắng
+                    elBatt.style.color = '#fff';
+                    elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
+                }
 
                 if (data.Inv_Temp !== undefined) {
                     const tempLabel = document.getElementById('lbl-inv-temp');
@@ -860,10 +829,14 @@
                 updateDOMText('stat-a', data.Batt_Current.toFixed(1) + ' A');
                 
                 document.getElementById('bar-soc').style.width = soc + '%';
-                updateDOMText('lbl-status', data.Batt_Status);
+                
+                // === XỬ LÝ CHUỖI THÔNG MINH CHO TRẠNG THÁI (Sửa lỗi mất màu) ===
+                let statusText = data.Batt_Status || "";
+                updateDOMText('lbl-status', statusText);
+                let statusLower = statusText.toLowerCase();
 
-                if (data.Batt_Status === "Đang Sạc") lblStatus.style.color = '#00cc66';
-                else if (data.Batt_Status === "Đang Xả") lblStatus.style.color = '#ff4444';
+                if (statusLower.includes("sạc")) lblStatus.style.color = '#00cc66';
+                else if (statusLower.includes("xả")) lblStatus.style.color = '#ff4444';
                 else lblStatus.style.color = '#888';
 
                 let colorTheme = 'fill-green';
