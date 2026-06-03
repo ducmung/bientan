@@ -765,32 +765,30 @@
                 updateDOMText('lbl-pv', pvInW);
                 updateDOMText('lbl-load', loadInW);
 
-                // === LƯỚI EVN: Hiển thị có dấu kèm đổi màu ===
                 let gridStr = gridInW > 0 ? "+" + gridInW : gridInW;
                 updateDOMText('lbl-grid', gridStr);
                 const elGrid = document.getElementById('lbl-grid');
-                if (gridInW < 0) { // Đẩy lưới (Số âm) -> Màu xanh
+                if (gridInW < 0) { 
                     elGrid.style.color = '#00cc66';
                     elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(0,204,102,0.45)';
-                } else if (gridInW > 0) { // Lấy lưới (Số dương) -> Màu đỏ
+                } else if (gridInW > 0) { 
                     elGrid.style.color = '#ff4444';
                     elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,68,68,0.45)';
-                } else { // Bằng 0 -> Màu trắng
+                } else { 
                     elGrid.style.color = '#fff';
                     elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
                 }
 
-                // === PIN LƯU TRỮ: Hiển thị có dấu kèm đổi màu (Sửa lỗi mất dấu) ===
                 let battStr = battInW > 0 ? "+" + battInW : battInW;
                 updateDOMText('lbl-batt', battStr);
                 const elBatt = document.getElementById('lbl-batt');
-                if (battInW < 0) { // Đang sạc (Số âm) -> Màu xanh
+                if (battInW < 0) { 
                     elBatt.style.color = '#00cc66';
                     elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(0,204,102,0.45)';
-                } else if (battInW > 0) { // Đang xả (Số dương) -> Màu đỏ
+                } else if (battInW > 0) { 
                     elBatt.style.color = '#ff4444';
                     elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,68,68,0.45)';
-                } else { // Bằng 0 -> Màu trắng
+                } else { 
                     elBatt.style.color = '#fff';
                     elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
                 }
@@ -830,14 +828,27 @@
                 
                 document.getElementById('bar-soc').style.width = soc + '%';
                 
-                // === XỬ LÝ CHUỖI THÔNG MINH CHO TRẠNG THÁI (Sửa lỗi mất màu) ===
-                let statusText = data.Batt_Status || "";
-                updateDOMText('lbl-status', statusText);
-                let statusLower = statusText.toLowerCase();
+                // === XỬ LÝ LẠI CHỮ TRẠNG THÁI (MẤT DẤU/MẤT MÀU) ===
+                let rawStatus = data.Batt_Status || "";
+                let statusLower = rawStatus.toLowerCase();
+                let displayStatus = rawStatus; 
+                let statusColor = '#888';
 
-                if (statusLower.includes("sạc")) lblStatus.style.color = '#00cc66';
-                else if (statusLower.includes("xả")) lblStatus.style.color = '#ff4444';
-                else lblStatus.style.color = '#888';
+                if (statusLower.includes("sac") || statusLower.includes("sạc") || statusLower.includes("charge")) {
+                    displayStatus = "Đang Sạc";
+                    statusColor = '#00cc66'; // Xanh lá
+                } else if (statusLower.includes("xa") || statusLower.includes("xả") || statusLower.includes("discharge")) {
+                    displayStatus = "Đang Xả";
+                    statusColor = '#ff4444'; // Đỏ
+                } else {
+                    displayStatus = "Chờ";
+                    statusColor = '#888'; // Xám
+                }
+
+                updateDOMText('lbl-status', displayStatus);
+                if (lblStatus.style.color !== statusColor) {
+                    lblStatus.style.color = statusColor;
+                }
 
                 let colorTheme = 'fill-green';
                 if (soc <= 20) colorTheme = 'fill-red';
