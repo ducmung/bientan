@@ -86,7 +86,6 @@
 
         @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
-        /* ================= KHÔI PHỤC VIỀN CẦU VỒNG ================= */
         .diagram-panel::after,
         .stat-card::after,
         .node-center::after,
@@ -150,7 +149,6 @@
         .pos-batt { top: 82%; left: 16%; }
         .pos-load { top: 82%; left: 84%; }
 
-        /* Căn chỉnh lại cho vừa vặn */
         .weather-container {
             position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%); z-index: 15;
             width: 140px; background: #fff; padding: 3px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -192,7 +190,6 @@
         .line-batt { top: 82%; left: 16%; transform-origin: left center; transform: rotate(-38deg); }
         .line-load { top: 82%; right: 16%; transform-origin: right center; transform: rotate(38deg); }
 
-        /* ================= STATUS & CLOCK ================= */
         #lbl-status {
             position: absolute; top: 48%; left: 18%; transform: translate(-50%, -50%);
             font-size: 13px; font-weight: 800; background: rgba(255,255,255,0.95);
@@ -210,7 +207,23 @@
 
         .node h3 { font-size: 10px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
         .node .unit { font-size: 10px; color: rgba(255,255,255,0.86); font-weight: 800; }
-        .icon { font-size: 18px; margin-bottom: 4px; } 
+        
+        /* CĂN CHỈNH KÍCH THƯỚC ICON CỘT ĐIỆN VÀ NHÀ TO LÊN ĐỂ CÂN ĐỐI VỚI MẶT TRỜI VÀ PIN */
+        .icon { 
+            font-size: 46px; /* Tăng từ 18px lên 46px */
+            line-height: 1;
+            margin-bottom: 8px; 
+            display: inline-block;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); /* Thêm đổ bóng khối 3D */
+        }
+        /* Phát sáng nhẹ quanh cột điện để đẹp hơn */
+        .pos-grid .icon {
+            filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+        }
+        /* Phát sáng nhẹ quanh nhà để đẹp hơn */
+        .pos-load .icon {
+            filter: drop-shadow(0 0 10px rgba(0, 136, 255, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+        }
 
         .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; }
         .battery-body {
@@ -319,7 +332,6 @@
             align-items: center;
         }
 
-        /* Lõi mặt trời */
         .sun-core{
             width: 42px;
             height: 42px;
@@ -329,7 +341,6 @@
             animation: sunPulse 2s infinite ease-in-out;
         }
 
-        /* Tia nắng - Đã fix tọa độ chuẩn vào tâm */
         .sun-ray{
             position: absolute;
             top: 0;
@@ -350,7 +361,6 @@
         .r7{transform:rotate(270deg);}
         .r8{transform:rotate(315deg);}
 
-        /* Hạt lấp lánh - Đã thu gọn tọa độ để xoay quanh lõi gọn gàng */
         #solar-sun .spark{
             position: absolute;
             width: 4px;
@@ -378,7 +388,6 @@
             100%{ transform: scale(1); }
         }
 
-        /* Mức sáng theo công suất PV */
         .sun-low{ opacity: .35; filter: brightness(.5); }
         .sun-medium{ opacity: .8; filter: brightness(1.1); }
         .sun-high{ opacity: 1; filter: brightness(1.8); }
