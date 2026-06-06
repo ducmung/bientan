@@ -217,17 +217,24 @@
         }
         .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
         
-        /* Cấu hình ảnh biệt thự (Tiêu thụ) */
+        /* ================= CẤU HÌNH ẢNH NHÀ (MỚI) ================= */
         .img-icon {
-            width: 60px;
-            height: 60px;
+            width: 75px; /* To hơn một chút so với cũ */
+            height: 75px;
             object-fit: cover;
-            border-radius: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.8);
             display: block;
-            margin: 0 auto 5px auto;
+            margin: -5px auto 5px auto;
+            
+            /* Tăng độ nét/tươi cho ảnh */
+            filter: brightness(1.1) contrast(1.1);
+
+            /* Tạo mặt nạ mờ viền giúp ảnh chìm vào background tự nhiên */
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 75%);
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 75%);
         }
-        .pos-load .icon { filter: drop-shadow(0 0 10px rgba(0, 136, 255, 0.6)) drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+
+        /* Vẫn giữ quầng sáng xanh dương cho khu vực ảnh nhà */
+        .pos-load .icon { filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.8)); }
 
         .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; }
         .battery-body {
@@ -491,7 +498,6 @@
 
             <div class="node pos-load">
                 <div class="icon">
-                    <!-- Đã thay bằng ảnh biệt thự -->
                     <img src="biet-thu-hien-dai-sang-trong.jpg" alt="Biệt thự" class="img-icon">
                 </div>
                 <h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div>
