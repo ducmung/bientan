@@ -208,22 +208,26 @@
         .node h3 { font-size: 10px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
         .node .unit { font-size: 10px; color: rgba(255,255,255,0.86); font-weight: 800; }
         
-        /* CĂN CHỈNH KÍCH THƯỚC ICON CỘT ĐIỆN VÀ NHÀ TO LÊN ĐỂ CÂN ĐỐI VỚI MẶT TRỜI VÀ PIN */
         .icon { 
-            font-size: 46px; /* Tăng từ 18px lên 46px */
+            font-size: 46px; 
             line-height: 1;
             margin-bottom: 8px; 
             display: inline-block;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); /* Thêm đổ bóng khối 3D */
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); 
         }
-        /* Phát sáng nhẹ quanh cột điện để đẹp hơn */
-        .pos-grid .icon {
-            filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+        .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+        
+        /* Cấu hình ảnh biệt thự (Tiêu thụ) */
+        .img-icon {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            display: block;
+            margin: 0 auto 5px auto;
         }
-        /* Phát sáng nhẹ quanh nhà để đẹp hơn */
-        .pos-load .icon {
-            filter: drop-shadow(0 0 10px rgba(0, 136, 255, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.5));
-        }
+        .pos-load .icon { filter: drop-shadow(0 0 10px rgba(0, 136, 255, 0.6)) drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
 
         .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; }
         .battery-body {
@@ -485,7 +489,13 @@
                 <h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div>
             </div>
 
-            <div class="node pos-load"><div class="icon">🏠</div><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
+            <div class="node pos-load">
+                <div class="icon">
+                    <!-- Đã thay bằng ảnh biệt thự -->
+                    <img src="biet-thu-hien-dai-sang-trong.jpg" alt="Biệt thự" class="img-icon">
+                </div>
+                <h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div>
+            </div>
 
             <div class="bpf-container">
                 <div class="bpf-text" data-text="八方來財">八方來財</div>
