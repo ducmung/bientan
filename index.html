@@ -86,14 +86,34 @@
 
         @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
-        .diagram-panel::after, .stat-card::after, .node-center::after, .weather-container::after {
-            content: ""; position: absolute; inset: -2px; border-radius: inherit; padding: 2px;
-            background: linear-gradient(90deg, #ff004c, #ff8c00, #ffd700, #00cc66, #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00);
+        /* ================= KHÔI PHỤC VIỀN CẦU VỒNG CHO STATUS VÀ CLOCK ================= */
+        .diagram-panel::after,
+        .stat-card::after,
+        .node-center::after,
+        .weather-container::after,
+        #update-clock::after,
+        #lbl-status::after,
+        #lbl-inv-temp::after {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(90deg, 
+                #ff004c, #ff8c00, #ffd700, #00cc66, 
+                #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00
+            );
             background-size: 200% 100%;
-            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
             filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4));
-            animation: rainbowSlide 3s linear infinite, rainbowBorderGlow 1.5s ease-in-out infinite alternate;
+            animation:
+                rainbowSlide 3s linear infinite,
+                rainbowBorderGlow 1.5s ease-in-out infinite alternate;
             will-change: background-position, filter, opacity;
         }
 
@@ -101,6 +121,8 @@
         .stat-card::after { z-index: 2; inset: 0; border-radius: 20px; }
         .weather-container::after { z-index: -1; border-radius: 15px; }
         .node-center::after { z-index: -1; border-radius: 15px; }
+        #update-clock::after, #lbl-status::after { z-index: -1; border-radius: 20px; }
+        #lbl-inv-temp::after { z-index: -1; border-radius: 20px; }
 
         @keyframes rainbowSlide { to { background-position: -200% 0; } }
         @keyframes rainbowBorderGlow {
@@ -143,7 +165,7 @@
 
         #lbl-inv-temp {
             position: absolute; top: 66%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 14px; font-weight: 900; background: #00cc66; color: #fff; border: 2px solid #fff;
+            font-size: 14px; font-weight: 900; background: #00cc66; color: #fff;
             padding: 4px 16px; border-radius: 20px; z-index: 20; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
@@ -173,18 +195,19 @@
         .sun-arc-mini svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         #moving-sun { position: absolute; font-size: 14px; transform: translate(-50%, -50%); text-shadow: 0 0 10px #ffaa00; transition: all 1s ease-out; left: 15%; top: 100%; will-change: left, top; }
 
+        /* ================= STATUS & CLOCK (ĐÃ XÓA BORDER CỨNG ĐỂ HIỂN THỊ CẦU VỒNG) ================= */
         #lbl-status {
             position: absolute; top: 48%; left: 18%; transform: translate(-50%, -50%);
             font-size: 13px; font-weight: 800; background: rgba(255,255,255,0.95);
-            padding: 6px 16px; border-radius: 20px; border: 2px solid #888;
+            padding: 6px 16px; border-radius: 20px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1);
-            color: #888; white-space: nowrap; z-index: 25; transition: border-color 0.5s, box-shadow 0.5s, color 0.5s;
+            color: #888; white-space: nowrap; z-index: 25; transition: color 0.5s;
         }
 
         #update-clock {
             position: absolute; top: 48%; right: 18%; transform: translate(50%, -50%);
             font-size: 13px; font-weight: 900; color: #ff0000; font-family: monospace; background: rgba(255, 255, 255, 0.95);
-            padding: 6px 16px; border-radius: 20px; border: 2px solid #4169ff;
+            padding: 6px 16px; border-radius: 20px; 
             z-index: 25; letter-spacing: 1px; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1);
         }
 
@@ -192,15 +215,16 @@
         .node .unit { font-size: 10px; color: rgba(255,255,255,0.86); font-weight: 800; }
         .icon { font-size: 18px; margin-bottom: 4px; } 
 
+        /* ================= VẼ LẠI QUẢ PIN & CHỮ 3D VÀO GIỮA ================= */
         .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; }
         .battery-body {
-            width: 60px; height: 28px; margin-left: 20px; 
+            width: 72px; height: 32px; /* Kích thước chuẩn trở lại */
             background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%);
             border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); border-right: 1px solid #111;
             position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8); transform: translateZ(0);
         }
         .battery-body::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.05) 100%); pointer-events: none; z-index: 2; }
-        .battery-cap { width: 5px; height: 12px; background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%); border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.3); border-left: none; box-shadow: inset 1px 0 3px rgba(255,255,255,0.6); }
+        .battery-cap { width: 5px; height: 14px; background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%); border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.3); border-left: none; box-shadow: inset 1px 0 3px rgba(255,255,255,0.6); }
         .battery-fill {
             height: 100%; width: 0%; transition: width 0.5s ease-in-out, background 0.5s;
             position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); will-change: width, background;
@@ -209,14 +233,15 @@
         .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
         .fill-green { background: linear-gradient(to bottom, #00ee77 0%, #88ffbb 30%, #00bb55 70%, #007733 100%); }
 
+        /* KHÔI PHỤC CHỮ 3D VÀO GIỮA */
         #lbl-soc {
-            position: absolute; left: -18px; top: 50%; transform: translateY(-50%);
-            z-index: 5; font-size: 34px; font-weight: 900; color: #ff2a2a; 
-            -webkit-text-stroke: 1.5px #ffffff; 
-            text-shadow: 0 4px 6px rgba(0,0,0,0.6); 
-            letter-spacing: -1px; margin: 0; 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a; 
+            text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6);
+            letter-spacing: 1px; margin: 0; 
         }
 
+        /* TEXT CÔNG SUẤT (Trắng Xanh 3D / Tím Đỏ 3D) */
         .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
         .val-charge { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.8) !important; font-size: 18px; }
         .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.8) !important; font-size: 18px; }
@@ -349,9 +374,9 @@
 
             <div class="node pos-batt">
                 <div class="battery-wrapper">
-                    <div id="lbl-soc">0%</div> 
                     <div class="battery-body">
                         <div class="battery-fill" id="batt-fill"></div>
+                        <div id="lbl-soc">0%</div> 
                     </div>
                     <div class="battery-cap"></div>
                 </div>
@@ -505,7 +530,6 @@
 
             if (pvMonthTotal >= displayPvToday && displayPvToday > 0) { todayMoney = monthMoney - calcEVN(pvMonthTotal - displayPvToday); } else { todayMoney = calcEVN(displayPvToday); }
 
-            // === CỐ ĐỊNH E_TOTAL x 3.000 VNĐ YÊU CẦU MỚI ===
             let totalMoney = currentETotal * 3000;
 
             updateDOMText('stat-pv-today', displayPvToday.toFixed(1) + ' kWh'); updateDOMText('money-pv-today', displayPvToday.toFixed(1));
@@ -577,20 +601,19 @@
                 document.getElementById('bar-soc').style.width = soc + '%';
                 
                 let rawStatus = data.Batt_Status || ""; let statusLower = rawStatus.toLowerCase();
-                let displayStatus = rawStatus; let statusColor = '#888'; let borderColor = '#888';
+                let displayStatus = rawStatus; let statusColor = '#888';
 
                 if (statusLower.includes("sac") || statusLower.includes("sạc") || statusLower.includes("charge")) {
-                    displayStatus = "Đang Sạc"; statusColor = '#00cc66'; borderColor = '#00cc66';
+                    displayStatus = "Đang Sạc"; statusColor = '#00cc66';
                 } else if (statusLower.includes("xa") || statusLower.includes("xả") || statusLower.includes("discharge")) {
-                    displayStatus = "Đang Xả"; statusColor = '#ff4444'; borderColor = '#ff4444';
+                    displayStatus = "Đang Xả"; statusColor = '#ff4444';
                 } else {
-                    displayStatus = "Chờ"; statusColor = '#888'; borderColor = '#888';
+                    displayStatus = "Chờ"; statusColor = '#888';
                 }
 
                 updateDOMText('lbl-status', displayStatus);
                 if (lblStatus.style.color !== statusColor) { 
                     lblStatus.style.color = statusColor; 
-                    lblStatus.style.borderColor = borderColor;
                 }
 
                 let colorTheme = 'fill-green';
