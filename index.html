@@ -86,6 +86,7 @@
 
         @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
+        /* ================= KHÔI PHỤC VIỀN CẦU VỒNG ================= */
         .diagram-panel::after,
         .stat-card::after,
         .node-center::after,
@@ -149,6 +150,7 @@
         .pos-batt { top: 82%; left: 16%; }
         .pos-load { top: 82%; left: 84%; }
 
+        /* Căn chỉnh lại cho vừa vặn */
         .weather-container {
             position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%); z-index: 15;
             width: 140px; background: #fff; padding: 3px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -190,6 +192,7 @@
         .line-batt { top: 82%; left: 16%; transform-origin: left center; transform: rotate(-38deg); }
         .line-load { top: 82%; right: 16%; transform-origin: right center; transform: rotate(38deg); }
 
+        /* ================= STATUS & CLOCK ================= */
         #lbl-status {
             position: absolute; top: 48%; left: 18%; transform: translate(-50%, -50%);
             font-size: 13px; font-weight: 800; background: rgba(255,255,255,0.95);
@@ -283,7 +286,7 @@
         input:checked + .slider { background-color: #00cc66; box-shadow: 0 0 14px rgba(0,204,102,0.35); }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        /* ======== Bổ sung Responsive cho màn hình nhỏ ======= */
+        /* ======== Responsive ======= */
         @media (max-width: 400px) {
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 12px; padding: 4px 10px; }
@@ -301,52 +304,41 @@
         /* ================= SUN POWER EFFECT ================= */
 
         .solar-sun-box{
-            width:90px;
-            height:90px;
-            margin:auto;
-            position:relative;
+            width: 90px;
+            height: 90px;
+            margin: auto;
+            position: relative;
         }
 
         #solar-sun{
-            width:100%;
-            height:100%;
-            position:relative;
-            display:flex;
-            justify-content:center;
-            align-items:center;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* lõi mặt trời */
-
+        /* Lõi mặt trời */
         .sun-core{
-            width:42px;
-            height:42px;
-            border-radius:50%;
-            background:
-                radial-gradient(circle,
-                #fffef5 0%,
-                #fff7c2 20%,
-                #ffd700 55%,
-                #ff9800 100%);
-            box-shadow:
-                0 0 15px #ffd700,
-                0 0 30px #ffaa00;
-            animation:sunPulse 2s infinite ease-in-out;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fffef5 0%, #fff7c2 20%, #ffd700 55%, #ff9800 100%);
+            box-shadow: 0 0 15px #ffd700, 0 0 30px #ffaa00;
+            animation: sunPulse 2s infinite ease-in-out;
         }
 
-        /* tia nắng */
-
+        /* Tia nắng - Đã fix tọa độ chuẩn vào tâm */
         .sun-ray{
-            position:absolute;
-            width:4px;
-            height:22px;
-            border-radius:20px;
-            background:linear-gradient(
-                to bottom,
-                rgba(255,255,255,1),
-                rgba(255,215,0,0)
-            );
-            transform-origin:center 45px;
+            position: absolute;
+            top: 0;
+            left: calc(50% - 2px);
+            width: 4px;
+            height: 22px;
+            border-radius: 20px;
+            background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,215,0,0));
+            transform-origin: center 45px;
         }
 
         .r1{transform:rotate(0deg);}
@@ -358,66 +350,38 @@
         .r7{transform:rotate(270deg);}
         .r8{transform:rotate(315deg);}
 
-        /* hạt lấp lánh */
-
+        /* Hạt lấp lánh - Đã thu gọn tọa độ để xoay quanh lõi gọn gàng */
         #solar-sun .spark{
-            position:absolute;
-            width:4px;
-            height:4px;
-            border-radius:50%;
-            background:white;
-            box-shadow:0 0 10px white;
-            animation:sparkFly 2s infinite;
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 0 10px white;
+            animation: sparkFly 2s infinite;
         }
 
-        .s1{top:5px;left:40px;}
-        .s2{top:20px;right:8px;animation-delay:.4s;}
-        .s3{bottom:10px;left:10px;animation-delay:.8s;}
-        .s4{bottom:15px;right:15px;animation-delay:1.2s;}
+        .s1{top: 15px; left: 15px;}
+        .s2{top: 20px; right: 15px; animation-delay: .4s;}
+        .s3{bottom: 15px; left: 20px; animation-delay: .8s;}
+        .s4{bottom: 20px; right: 20px; animation-delay: 1.2s;}
 
         @keyframes sparkFly{
-            0%{
-                opacity:0;
-                transform:scale(0);
-            }
-            50%{
-                opacity:1;
-                transform:scale(1.5);
-            }
-            100%{
-                opacity:0;
-                transform:translateY(-12px) scale(0);
-            }
+            0%{ opacity: 0; transform: scale(0); }
+            50%{ opacity: 1; transform: scale(1.5); }
+            100%{ opacity: 0; transform: translateY(-12px) scale(0); }
         }
 
         @keyframes sunPulse{
-            0%{
-                transform:scale(1);
-            }
-            50%{
-                transform:scale(1.08);
-            }
-            100%{
-                transform:scale(1);
-            }
+            0%{ transform: scale(1); }
+            50%{ transform: scale(1.08); }
+            100%{ transform: scale(1); }
         }
 
         /* Mức sáng theo công suất PV */
-
-        .sun-low{
-            opacity:.35;
-            filter:brightness(.5);
-        }
-
-        .sun-medium{
-            opacity:.8;
-            filter:brightness(1.1);
-        }
-
-        .sun-high{
-            opacity:1;
-            filter:brightness(1.8);
-        }
+        .sun-low{ opacity: .35; filter: brightness(.5); }
+        .sun-medium{ opacity: .8; filter: brightness(1.1); }
+        .sun-high{ opacity: 1; filter: brightness(1.8); }
     </style>
 </head>
 <body>
@@ -481,7 +445,6 @@
                 <div class="solar-sun-box">
                     <div id="solar-sun">
                         <div class="sun-core"></div>
-
                         <span class="sun-ray r1"></span>
                         <span class="sun-ray r2"></span>
                         <span class="sun-ray r3"></span>
@@ -574,36 +537,6 @@
             if (el && el.innerText !== String(newValue)) { el.innerText = newValue; }
         }
 
-        const LAT = 21.088; const LON = 105.988;
-        let globalSunrise = 0; let globalSunset = 0;
-
-        async function fetchWeather() {
-            try {
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&forecast_days=1&timeformat=unixtime`;
-                const res = await fetch(url, { cache: 'no-store' });
-                const data = await res.json();
-                if (data && data.current) {
-                    globalSunrise = data.daily.sunrise[0]; globalSunset = data.daily.sunset[0]; updateSunArc();
-                }
-            } catch (e) { console.error("Lỗi kết nối Thời tiết:", e); }
-        }
-
-        function updateSunArc() {
-            if (!globalSunrise || !globalSunset) return;
-            const nowUnix = Math.floor(Date.now() / 1000); let progress = 0;
-            if (nowUnix > globalSunrise && nowUnix < globalSunset) { progress = (nowUnix - globalSunrise) / (globalSunset - globalSunrise); } 
-            else if (nowUnix >= globalSunset) { progress = 1; } else { progress = 0; }
-            const P0 = {x: 5, y: 35}; const P1 = {x: 40, y: -5}; const P2 = {x: 75, y: 35}; const t = progress;
-            const x = Math.pow(1-t, 2)*P0.x + 2*(1-t)*t*P1.x + Math.pow(t, 2)*P2.x; const y = Math.pow(1-t, 2)*P0.y + 2*(1-t)*t*P1.y + Math.pow(t, 2)*P2.y;
-            const sun = document.getElementById('moving-sun');
-            // Bổ sung kiểm tra sun để không gây lỗi Javascript khi đã xóa id moving-sun
-            if (sun) {
-                sun.style.left = (x / 80 * 100) + '%'; sun.style.top = (y / 40 * 100) + '%'; sun.style.opacity = (progress <= 0 || progress >= 1) ? "0.3" : "1";
-            }
-        }
-
-        setInterval(fetchWeather, 30 * 60 * 1000); setInterval(updateSunArc, 60000); fetchWeather();
-
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId); if (!group) return;
             const isCurrentlyActive = group.style.display === 'block';
@@ -688,9 +621,7 @@
                 
                 updateDOMText('lbl-pv', pvInW);
 
-                // ==========================================
                 // HIỆU ỨNG MẶT TRỜI TÙY CHỈNH THEO CÔNG SUẤT PV
-                // ==========================================
                 const solarSun = document.getElementById('solar-sun');
                 if (solarSun) {
                     solarSun.classList.remove('sun-low', 'sun-medium', 'sun-high');
