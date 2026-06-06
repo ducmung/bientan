@@ -26,7 +26,8 @@
         }
 
         body::before {
-            content: ""; position: fixed; inset: 0; pointer-events: none;
+            content: "";
+            position: fixed; inset: 0; pointer-events: none;
             background-image:
                 radial-gradient(circle at 18% 24%, rgba(255,255,255,0.8) 0 1px, transparent 2px),
                 radial-gradient(circle at 78% 28%, rgba(255,255,255,0.5) 0 1px, transparent 2px),
@@ -65,28 +66,22 @@
         .diagram-panel {
             position: relative; width: 100%; max-width: 500px; margin: 0 auto; aspect-ratio: 1 / 1.1;
             background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.34), rgba(255,255,255,0.12) 42%, rgba(255,255,255,0.28)), rgba(255, 255, 255, 0.36);
-            border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.65), 0 0 34px rgba(0,229,255,0.12);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.65), 0 0 34px rgba(0,229,255,0.12);
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.42);
-            overflow: hidden; isolation: isolate; transform: translateZ(0); 
+            overflow: hidden; isolation: isolate; transform: translateZ(0);
         }
 
         .diagram-panel::before {
-            content: "";
-            position: absolute;
-            inset: 8%;
-            border-radius: 50%;
+            content: ""; position: absolute; inset: 8%; border-radius: 50%;
             background:
                 radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 2px),
                 conic-gradient(from 0deg, transparent, rgba(255,215,0,0.18), transparent, rgba(0,229,255,0.16), transparent);
-            filter: blur(0.1px);
-            animation: softSpin 22s linear infinite;
-            z-index: -1;
-            will-change: transform;
+            filter: blur(0.1px); animation: softSpin 22s linear infinite; z-index: -1; will-change: transform;
         }
 
         @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
-        /* ================= KHÔI PHỤC VIỀN CẦU VỒNG CHO STATUS VÀ CLOCK ================= */
         .diagram-panel::after,
         .stat-card::after,
         .node-center::after,
@@ -94,26 +89,16 @@
         #update-clock::after,
         #lbl-status::after,
         #lbl-inv-temp::after {
-            content: "";
-            position: absolute;
-            inset: -2px;
-            border-radius: inherit;
-            padding: 2px;
+            content: ""; position: absolute; inset: -2px; border-radius: inherit; padding: 2px;
             background: linear-gradient(90deg, 
                 #ff004c, #ff8c00, #ffd700, #00cc66, 
                 #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00
             );
             background-size: 200% 100%;
-            -webkit-mask:
-                linear-gradient(#000 0 0) content-box,
-                linear-gradient(#000 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
             filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4));
-            animation:
-                rainbowSlide 3s linear infinite,
-                rainbowBorderGlow 1.5s ease-in-out infinite alternate;
+            animation: rainbowSlide 3s linear infinite, rainbowBorderGlow 1.5s ease-in-out infinite alternate;
             will-change: background-position, filter, opacity;
         }
 
@@ -195,53 +180,39 @@
         .sun-arc-mini svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         #moving-sun { position: absolute; font-size: 14px; transform: translate(-50%, -50%); text-shadow: 0 0 10px #ffaa00; transition: all 1s ease-out; left: 15%; top: 100%; will-change: left, top; }
 
-        /* ================= STATUS & CLOCK (ĐÃ XÓA BORDER CỨNG ĐỂ HIỂN THỊ CẦU VỒNG) ================= */
         #lbl-status {
             position: absolute; top: 48%; left: 18%; transform: translate(-50%, -50%);
             font-size: 13px; font-weight: 800; background: rgba(255,255,255,0.95);
-            padding: 6px 16px; border-radius: 20px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1);
+            padding: 6px 16px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1);
             color: #888; white-space: nowrap; z-index: 25; transition: color 0.5s;
         }
 
         #update-clock {
             position: absolute; top: 48%; right: 18%; transform: translate(50%, -50%);
             font-size: 13px; font-weight: 900; color: #ff0000; font-family: monospace; background: rgba(255, 255, 255, 0.95);
-            padding: 6px 16px; border-radius: 20px; 
-            z-index: 25; letter-spacing: 1px; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1);
+            padding: 6px 16px; border-radius: 20px; z-index: 25; letter-spacing: 1px; white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1);
         }
 
         .node h3 { font-size: 10px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
         .node .unit { font-size: 10px; color: rgba(255,255,255,0.86); font-weight: 800; }
         .icon { font-size: 18px; margin-bottom: 4px; } 
 
-        /* ================= VẼ LẠI QUẢ PIN & CHỮ 3D VÀO GIỮA ================= */
         .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; }
         .battery-body {
-            width: 72px; height: 32px; /* Kích thước chuẩn trở lại */
-            background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%);
+            width: 72px; height: 32px; background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%);
             border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); border-right: 1px solid #111;
             position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8); transform: translateZ(0);
         }
         .battery-body::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.05) 100%); pointer-events: none; z-index: 2; }
         .battery-cap { width: 5px; height: 14px; background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%); border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.3); border-left: none; box-shadow: inset 1px 0 3px rgba(255,255,255,0.6); }
-        .battery-fill {
-            height: 100%; width: 0%; transition: width 0.5s ease-in-out, background 0.5s;
-            position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); will-change: width, background;
-        }
+        .battery-fill { height: 100%; width: 0%; transition: width 0.5s ease-in-out, background 0.5s; position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); will-change: width, background; }
         .fill-red { background: linear-gradient(to bottom, #ff5555 0%, #ffaaaa 30%, #ff2222 70%, #aa0000 100%); }
         .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
         .fill-green { background: linear-gradient(to bottom, #00ee77 0%, #88ffbb 30%, #00bb55 70%, #007733 100%); }
 
-        /* KHÔI PHỤC CHỮ 3D VÀO GIỮA */
-        #lbl-soc {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a; 
-            text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6);
-            letter-spacing: 1px; margin: 0; 
-        }
+        #lbl-soc { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a; text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6); letter-spacing: 1px; margin: 0; }
 
-        /* TEXT CÔNG SUẤT (Trắng Xanh 3D / Tím Đỏ 3D) */
         .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
         .val-charge { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.8) !important; font-size: 18px; }
         .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.8) !important; font-size: 18px; }
@@ -266,13 +237,9 @@
             position: relative; overflow: hidden;
             background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255, 255, 255, 0.7));
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateZ(0); 
+            border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateZ(0); 
         }
-        .stat-card::before {
-            content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%);
-            transform: translateX(-120%); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none; will-change: transform;
-        }
+        .stat-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%); transform: translateX(-120%); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none; will-change: transform; }
         @keyframes cardSheen { 0%, 48% { transform: translateX(-120%) translateZ(0); } 78%, 100% { transform: translateX(120%) translateZ(0); } }
 
         .money-card { background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95)); border: 1px solid rgba(218, 165, 32, 0.65); }
@@ -292,6 +259,26 @@
         input:checked + .slider { background-color: #00cc66; box-shadow: 0 0 14px rgba(0,204,102,0.35); }
         input:checked + .slider:before { transform: translateX(24px); }
 
+        /* ================= KHUNG CHỨA IFRAME ================= */
+        .iframe-wrapper {
+            width: 100%;
+            margin-top: 10px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255, 255, 255, 0.7));
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 20px;
+            padding: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .iframe-wrapper iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 12px;
+            display: block;
+        }
+
         @media (max-width: 360px) {
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 12px; padding: 4px 10px; }
@@ -302,6 +289,8 @@
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
             .diagram-panel { flex: 1; max-width: none; }
             .stats-panel { flex: 1; justify-content: center; }
+            /* Cấu hình khung Iframe trên máy tính để ép xuống dòng */
+            .iframe-wrapper { flex-basis: 100%; padding: 15px; }
         }
     </style>
 </head>
@@ -433,9 +422,12 @@
                 <div id="switch-status-text" style="text-align: right; font-size: 12px; font-weight: 800; color: #888; margin-top: 5px; position: relative; z-index: 1;">Đang tải...</div>
             </div>
         </div>
-    </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+        <div class="iframe-wrapper">
+            <iframe src="https://mikasolar.com/14058648" title="Mika Solar Dashboard" allowfullscreen></iframe>
+        </div>
+
+    </div> <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
@@ -453,7 +445,8 @@
                 const res = await fetch(url, { cache: 'no-store' });
                 const data = await res.json();
                 if (data && data.current) {
-                    globalSunrise = data.daily.sunrise[0]; globalSunset = data.daily.sunset[0]; updateSunArc();
+                    globalSunrise = data.daily.sunrise[0];
+                    globalSunset = data.daily.sunset[0]; updateSunArc();
                 }
             } catch (e) { console.error("Lỗi kết nối Thời tiết:", e); }
         }
@@ -463,19 +456,23 @@
             const nowUnix = Math.floor(Date.now() / 1000); let progress = 0;
             if (nowUnix > globalSunrise && nowUnix < globalSunset) { progress = (nowUnix - globalSunrise) / (globalSunset - globalSunrise); } 
             else if (nowUnix >= globalSunset) { progress = 1; } else { progress = 0; }
-            const P0 = {x: 5, y: 35}; const P1 = {x: 40, y: -5}; const P2 = {x: 75, y: 35}; const t = progress;
+            const P0 = {x: 5, y: 35};
+            const P1 = {x: 40, y: -5}; const P2 = {x: 75, y: 35}; const t = progress;
             const x = Math.pow(1-t, 2)*P0.x + 2*(1-t)*t*P1.x + Math.pow(t, 2)*P2.x; const y = Math.pow(1-t, 2)*P0.y + 2*(1-t)*t*P1.y + Math.pow(t, 2)*P2.y;
             const sun = document.getElementById('moving-sun');
-            sun.style.left = (x / 80 * 100) + '%'; sun.style.top = (y / 40 * 100) + '%'; sun.style.opacity = (progress <= 0 || progress >= 1) ? "0.3" : "1";
+            sun.style.left = (x / 80 * 100) + '%';
+            sun.style.top = (y / 40 * 100) + '%'; sun.style.opacity = (progress <= 0 || progress >= 1) ? "0.3" : "1";
         }
 
         setInterval(fetchWeather, 30 * 60 * 1000); setInterval(updateSunArc, 60000); fetchWeather();
 
         function setFlow(groupId, isActive, animName, color) {
-            const group = document.getElementById(groupId); if (!group) return;
+            const group = document.getElementById(groupId);
+            if (!group) return;
             const isCurrentlyActive = group.style.display === 'block';
             if (isActive && !isCurrentlyActive) {
-                group.style.display = 'block'; group.style.setProperty('--c', color);
+                group.style.display = 'block';
+                group.style.setProperty('--c', color);
                 if (animName === 'flowInL' || animName === 'flowOutR') { group.classList.add('dir-right'); group.classList.remove('dir-left'); } 
                 else { group.classList.add('dir-left'); group.classList.remove('dir-right'); }
                 const dashes = group.querySelectorAll('.flow-dash');
@@ -489,13 +486,16 @@
         const lblStatus = document.getElementById('lbl-status');
         const battFill = document.getElementById('batt-fill');
 
-        let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
+        let currentMonthKey = "";
+        let currentMonthHistory = {}; let latestDailyData = null;
 
         function checkAndSwitchMonth() {
-            let d = new Date(); let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
+            let d = new Date();
+            let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
             if (mk !== currentMonthKey) {
                 if (currentMonthKey !== "") { database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).off(); }
-                currentMonthKey = mk; database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).on('value', (snap) => { currentMonthHistory = snap.val() || {}; recalculateEnergy(); });
+                currentMonthKey = mk;
+                database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).on('value', (snap) => { currentMonthHistory = snap.val() || {}; recalculateEnergy(); });
             }
         }
 
@@ -510,31 +510,33 @@
         }
 
         function recalculateEnergy() {
-            if (!latestDailyData) return; const data = latestDailyData;
+            if (!latestDailyData) return;
+            const data = latestDailyData;
             let pvToday = data.PV_Today || 0; let currentETotal = data.Load_Total || 0;
-
             updateDOMText('stat-grid-buy', (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-bat-dis', (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-bat-chg', (data.Bat_Charge_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-load-total', currentETotal.toFixed(1) + ' kWh');
 
-            let todayDate = new Date(); let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
+            let todayDate = new Date();
+            let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
             let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
             let savedPv = currentMonthHistory[curDayKey] || 0;
 
             if (pvToday > savedPv && pvToday > 0) { database.ref(`/SosenSystem/Monthly_History/${curMonthKey}/${curDayKey}`).set(pvToday); currentMonthHistory[curDayKey] = pvToday; savedPv = pvToday; }
 
-            let pvMonthTotal = 0; for (let key in currentMonthHistory) { pvMonthTotal += Number(currentMonthHistory[key]) || 0; }
-            let displayPvToday = Math.max(pvToday, savedPv); if (pvMonthTotal < displayPvToday) pvMonthTotal = displayPvToday;
+            let pvMonthTotal = 0;
+            for (let key in currentMonthHistory) { pvMonthTotal += Number(currentMonthHistory[key]) || 0; }
+            let displayPvToday = Math.max(pvToday, savedPv);
+            if (pvMonthTotal < displayPvToday) pvMonthTotal = displayPvToday;
             let monthMoney = calcEVN(pvMonthTotal); let todayMoney = 0;
-
             if (pvMonthTotal >= displayPvToday && displayPvToday > 0) { todayMoney = monthMoney - calcEVN(pvMonthTotal - displayPvToday); } else { todayMoney = calcEVN(displayPvToday); }
 
             let totalMoney = currentETotal * 3000;
-
             updateDOMText('stat-pv-today', displayPvToday.toFixed(1) + ' kWh'); updateDOMText('money-pv-today', displayPvToday.toFixed(1));
             updateDOMText('money-pv-month', pvMonthTotal.toFixed(1)); updateDOMText('money-pv-total', currentETotal.toFixed(1));
-            updateDOMText('money-today', Math.round(todayMoney).toLocaleString('vi-VN') + ' đ'); updateDOMText('money-month', Math.round(monthMoney).toLocaleString('vi-VN') + ' đ'); updateDOMText('money-total', Math.round(totalMoney).toLocaleString('vi-VN') + ' đ');
+            updateDOMText('money-today', Math.round(todayMoney).toLocaleString('vi-VN') + ' đ');
+            updateDOMText('money-month', Math.round(monthMoney).toLocaleString('vi-VN') + ' đ'); updateDOMText('money-total', Math.round(totalMoney).toLocaleString('vi-VN') + ' đ');
         }
 
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => { latestDailyData = snapshot.val(); checkAndSwitchMonth(); recalculateEnergy(); });
@@ -558,12 +560,15 @@
 
                 updateDOMText('lbl-grid', Math.abs(gridInW));
                 const elGrid = document.getElementById('lbl-grid');
+              
                 if (gridInW < 0) { 
                     elGrid.style.color = '#00cc66'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(0,204,102,0.45)';
                 } else if (gridInW > 0) { 
-                    elGrid.style.color = '#ff4444'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,68,68,0.45)';
+                    elGrid.style.color = '#ff4444';
+                    elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,68,68,0.45)';
                 } else { 
-                    elGrid.style.color = '#fff'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
+                    elGrid.style.color = '#fff';
+                    elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
                 }
 
                 updateDOMText('lbl-batt', Math.abs(battInW));
@@ -571,24 +576,29 @@
                 elBatt.classList.remove('val-charge', 'val-discharge');
                 
                 if (battInW < 0) { 
-                    elBatt.classList.add('val-charge'); 
+                    elBatt.classList.add('val-charge');
                 } else if (battInW > 0) { 
-                    elBatt.classList.add('val-discharge'); 
+                    elBatt.classList.add('val-discharge');
                 } else {
                     elBatt.style.color = '#fff';
                     elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
                 }
 
                 if (data.Inv_Temp !== undefined) {
-                    const tempLabel = document.getElementById('lbl-inv-temp'); const t = data.Inv_Temp;
+                    const tempLabel = document.getElementById('lbl-inv-temp');
+                    const t = data.Inv_Temp;
                     updateDOMText('lbl-inv-temp', '🌡️ ' + t + '°C');
-                    if (t < 40 && tempLabel.style.backgroundColor !== 'rgb(0, 204, 102)') { tempLabel.style.backgroundColor = '#00cc66'; } 
-                    else if (t >= 40 && t < 48 && tempLabel.style.backgroundColor !== 'rgb(255, 170, 0)') { tempLabel.style.backgroundColor = '#ffaa00'; } 
-                    else if (t >= 48 && tempLabel.style.backgroundColor !== 'rgb(255, 68, 68)') { tempLabel.style.backgroundColor = '#ff4444'; }
+                    if (t < 40 && tempLabel.style.backgroundColor !== 'rgb(0, 204, 102)') { tempLabel.style.backgroundColor = '#00cc66';
+                    } 
+                    else if (t >= 40 && t < 48 && tempLabel.style.backgroundColor !== 'rgb(255, 170, 0)') { tempLabel.style.backgroundColor = '#ffaa00';
+                    } 
+                    else if (t >= 48 && tempLabel.style.backgroundColor !== 'rgb(255, 68, 68)') { tempLabel.style.backgroundColor = '#ff4444';
+                    }
                 }
 
                 if (data.Inv_Switch !== undefined) {
-                    const toggle = document.getElementById('inv-switch-toggle'); const statusText = document.getElementById('switch-status-text');
+                    const toggle = document.getElementById('inv-switch-toggle');
+                    const statusText = document.getElementById('switch-status-text');
                     if (toggle.checked !== (data.Inv_Switch === 1)) { toggle.checked = (data.Inv_Switch === 1); }
                     updateDOMText('switch-status-text', (data.Inv_Switch === 1) ? "Đang BẬT" : "Đã TẮT");
                     statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444";
@@ -599,22 +609,16 @@
                 updateDOMText('stat-v', data.Batt_Voltage.toFixed(1) + ' V');
                 updateDOMText('stat-a', data.Batt_Current.toFixed(1) + ' A');
                 document.getElementById('bar-soc').style.width = soc + '%';
-                
                 let rawStatus = data.Batt_Status || ""; let statusLower = rawStatus.toLowerCase();
                 let displayStatus = rawStatus; let statusColor = '#888';
-
                 if (statusLower.includes("sac") || statusLower.includes("sạc") || statusLower.includes("charge")) {
                     displayStatus = "Đang Sạc"; statusColor = '#00cc66';
                 } else if (statusLower.includes("xa") || statusLower.includes("xả") || statusLower.includes("discharge")) {
                     displayStatus = "Đang Xả"; statusColor = '#ff4444';
-                } else {
-                    displayStatus = "Chờ"; statusColor = '#888';
-                }
+                } else { displayStatus = "Chờ"; statusColor = '#888'; }
 
                 updateDOMText('lbl-status', displayStatus);
-                if (lblStatus.style.color !== statusColor) { 
-                    lblStatus.style.color = statusColor; 
-                }
+                if (lblStatus.style.color !== statusColor) { lblStatus.style.color = statusColor; }
 
                 let colorTheme = 'fill-green';
                 if (soc <= 20) colorTheme = 'fill-red'; else if (soc <= 40) colorTheme = 'fill-yellow';
