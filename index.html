@@ -150,31 +150,32 @@
         .pos-batt { top: 82%; left: 16%; }
         .pos-load { top: 82%; left: 84%; }
 
-        /* Tinh chỉnh ảnh trên cùng để không đè mảng dưới */
+        /* Tinh chỉnh ảnh trên cùng to hơn một chút */
         .weather-container {
-            position: absolute; top: 14%; left: 50%; transform: translate(-50%, -50%); z-index: 15;
-            width: 125px; background: #fff; padding: 3px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%); z-index: 15;
+            width: 140px; background: #fff; padding: 3px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         .weather-container img { width: 100%; height: auto; display: block; border-radius: 12px; }
 
-        /* Tinh chỉnh ảnh biến tần nhỏ lại một chút */
+        /* Tinh chỉnh ảnh biến tần to hơn */
         .node-center {
             position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%);
-            width: 100px; height: 110px; padding: 3px; background: #fff; border-radius: 15px;
+            width: 115px; height: 125px; padding: 3px; background: #fff; border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.16), 0 0 22px rgba(0,204,102,0.3); z-index: 15;
         }
         .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
 
-        /* Hạ thấp nhiệt độ để nhường chỗ cho biến tần */
+        /* Hạ thấp nhiệt độ xuống sát vùng chữ, thoát khỏi đường luồng điện */
         #lbl-inv-temp {
-            position: absolute; top: 69%; left: 50%; transform: translate(-50%, -50%);
+            position: absolute; top: 78%; left: 50%; transform: translate(-50%, -50%);
             font-size: 14px; font-weight: 900; background: #00cc66; color: #fff;
             padding: 4px 16px; border-radius: 20px; z-index: 20; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
 
+        /* Container chữ Bát phương lai tài */
         .bpf-container {
-            position: absolute; top: 88%; left: 50%; transform: translate(-50%, -50%); z-index: 15; text-align: center; width: 100%; pointer-events: none; will-change: transform;
+            position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%); z-index: 15; text-align: center; width: 100%; pointer-events: none; will-change: transform;
         }
         .bpf-text {
             font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 32px; font-weight: 900; letter-spacing: 14px;
@@ -297,8 +298,9 @@
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 12px; padding: 4px 10px; }
             .bpf-text { font-size: 26px; letter-spacing: 8px; }
-            .weather-container { width: 105px; top: 13%; } /* Thu nhỏ thêm ảnh trên cùng */
-            .node-center { width: 90px; height: 100px; } /* Thu nhỏ thêm ảnh biến tần */
+            .weather-container { width: 120px; top: 14%; } /* Tăng nhẹ theo màn hình nhỏ */
+            .node-center { width: 105px; height: 115px; } /* Tăng nhẹ theo màn hình nhỏ */
+            #lbl-inv-temp { top: 79%; }
         }
         @media (min-width: 768px) {
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
