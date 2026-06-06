@@ -86,7 +86,6 @@
 
         @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
-        /* ================= KHÔI PHỤC VIỀN CẦU VỒNG ================= */
         .diagram-panel::after,
         .stat-card::after,
         .node-center::after,
@@ -150,14 +149,12 @@
         .pos-batt { top: 82%; left: 16%; }
         .pos-load { top: 82%; left: 84%; }
 
-        /* Tinh chỉnh ảnh trên cùng to hơn một chút */
         .weather-container {
             position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%); z-index: 15;
             width: 140px; background: #fff; padding: 3px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         .weather-container img { width: 100%; height: auto; display: block; border-radius: 12px; }
 
-        /* Tinh chỉnh ảnh biến tần to hơn */
         .node-center {
             position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%);
             width: 115px; height: 125px; padding: 3px; background: #fff; border-radius: 15px;
@@ -165,7 +162,6 @@
         }
         .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
 
-        /* Hạ thấp nhiệt độ xuống sát vùng chữ, thoát khỏi đường luồng điện */
         #lbl-inv-temp {
             position: absolute; top: 78%; left: 50%; transform: translate(-50%, -50%);
             font-size: 14px; font-weight: 900; background: #00cc66; color: #fff;
@@ -173,7 +169,6 @@
             white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
 
-        /* Container chữ Bát phương lai tài */
         .bpf-container {
             position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%); z-index: 15; text-align: center; width: 100%; pointer-events: none; will-change: transform;
         }
@@ -195,11 +190,6 @@
         .line-batt { top: 82%; left: 16%; transform-origin: left center; transform: rotate(-38deg); }
         .line-load { top: 82%; right: 16%; transform-origin: right center; transform: rotate(38deg); }
 
-        .sun-arc-mini { position: relative; width: 100%; height: 35px; margin-bottom: 2px; }
-        .sun-arc-mini svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        #moving-sun { position: absolute; font-size: 14px; transform: translate(-50%, -50%); text-shadow: 0 0 10px #ffaa00; transition: all 1s ease-out; left: 15%; top: 100%; will-change: left, top; }
-
-        /* ================= STATUS & CLOCK ================= */
         #lbl-status {
             position: absolute; top: 48%; left: 18%; transform: translate(-50%, -50%);
             font-size: 13px; font-weight: 800; background: rgba(255,255,255,0.95);
@@ -298,14 +288,135 @@
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 12px; padding: 4px 10px; }
             .bpf-text { font-size: 26px; letter-spacing: 8px; }
-            .weather-container { width: 120px; top: 14%; } /* Tăng nhẹ theo màn hình nhỏ */
-            .node-center { width: 105px; height: 115px; } /* Tăng nhẹ theo màn hình nhỏ */
+            .weather-container { width: 120px; top: 14%; } 
+            .node-center { width: 105px; height: 115px; } 
             #lbl-inv-temp { top: 79%; }
         }
         @media (min-width: 768px) {
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
             .diagram-panel { flex: 1; max-width: none; }
             .stats-panel { flex: 1; justify-content: center; }
+        }
+
+        /* ================= SUN POWER EFFECT ================= */
+
+        .solar-sun-box{
+            width:90px;
+            height:90px;
+            margin:auto;
+            position:relative;
+        }
+
+        #solar-sun{
+            width:100%;
+            height:100%;
+            position:relative;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        /* lõi mặt trời */
+
+        .sun-core{
+            width:42px;
+            height:42px;
+            border-radius:50%;
+            background:
+                radial-gradient(circle,
+                #fffef5 0%,
+                #fff7c2 20%,
+                #ffd700 55%,
+                #ff9800 100%);
+            box-shadow:
+                0 0 15px #ffd700,
+                0 0 30px #ffaa00;
+            animation:sunPulse 2s infinite ease-in-out;
+        }
+
+        /* tia nắng */
+
+        .sun-ray{
+            position:absolute;
+            width:4px;
+            height:22px;
+            border-radius:20px;
+            background:linear-gradient(
+                to bottom,
+                rgba(255,255,255,1),
+                rgba(255,215,0,0)
+            );
+            transform-origin:center 45px;
+        }
+
+        .r1{transform:rotate(0deg);}
+        .r2{transform:rotate(45deg);}
+        .r3{transform:rotate(90deg);}
+        .r4{transform:rotate(135deg);}
+        .r5{transform:rotate(180deg);}
+        .r6{transform:rotate(225deg);}
+        .r7{transform:rotate(270deg);}
+        .r8{transform:rotate(315deg);}
+
+        /* hạt lấp lánh */
+
+        #solar-sun .spark{
+            position:absolute;
+            width:4px;
+            height:4px;
+            border-radius:50%;
+            background:white;
+            box-shadow:0 0 10px white;
+            animation:sparkFly 2s infinite;
+        }
+
+        .s1{top:5px;left:40px;}
+        .s2{top:20px;right:8px;animation-delay:.4s;}
+        .s3{bottom:10px;left:10px;animation-delay:.8s;}
+        .s4{bottom:15px;right:15px;animation-delay:1.2s;}
+
+        @keyframes sparkFly{
+            0%{
+                opacity:0;
+                transform:scale(0);
+            }
+            50%{
+                opacity:1;
+                transform:scale(1.5);
+            }
+            100%{
+                opacity:0;
+                transform:translateY(-12px) scale(0);
+            }
+        }
+
+        @keyframes sunPulse{
+            0%{
+                transform:scale(1);
+            }
+            50%{
+                transform:scale(1.08);
+            }
+            100%{
+                transform:scale(1);
+            }
+        }
+
+        /* Mức sáng theo công suất PV */
+
+        .sun-low{
+            opacity:.35;
+            filter:brightness(.5);
+        }
+
+        .sun-medium{
+            opacity:.8;
+            filter:brightness(1.1);
+        }
+
+        .sun-high{
+            opacity:1;
+            filter:brightness(1.8);
         }
     </style>
 </head>
@@ -367,9 +478,24 @@
             </div>
 
             <div class="node pos-pv">
-                <div class="sun-arc-mini">
-                    <svg viewBox="0 0 80 40"><path d="M 5 35 Q 40 -5 75 35" fill="none" stroke="#ffaa00" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.75"/></svg>
-                    <div id="moving-sun">☀️</div>
+                <div class="solar-sun-box">
+                    <div id="solar-sun">
+                        <div class="sun-core"></div>
+
+                        <span class="sun-ray r1"></span>
+                        <span class="sun-ray r2"></span>
+                        <span class="sun-ray r3"></span>
+                        <span class="sun-ray r4"></span>
+                        <span class="sun-ray r5"></span>
+                        <span class="sun-ray r6"></span>
+                        <span class="sun-ray r7"></span>
+                        <span class="sun-ray r8"></span>
+
+                        <span class="spark s1"></span>
+                        <span class="spark s2"></span>
+                        <span class="spark s3"></span>
+                        <span class="spark s4"></span>
+                    </div>
                 </div>
                 <h3>MẶT TRỜI</h3><div class="val" id="lbl-pv">0</div><div class="unit">W</div>
             </div>
@@ -470,7 +596,10 @@
             const P0 = {x: 5, y: 35}; const P1 = {x: 40, y: -5}; const P2 = {x: 75, y: 35}; const t = progress;
             const x = Math.pow(1-t, 2)*P0.x + 2*(1-t)*t*P1.x + Math.pow(t, 2)*P2.x; const y = Math.pow(1-t, 2)*P0.y + 2*(1-t)*t*P1.y + Math.pow(t, 2)*P2.y;
             const sun = document.getElementById('moving-sun');
-            sun.style.left = (x / 80 * 100) + '%'; sun.style.top = (y / 40 * 100) + '%'; sun.style.opacity = (progress <= 0 || progress >= 1) ? "0.3" : "1";
+            // Bổ sung kiểm tra sun để không gây lỗi Javascript khi đã xóa id moving-sun
+            if (sun) {
+                sun.style.left = (x / 80 * 100) + '%'; sun.style.top = (y / 40 * 100) + '%'; sun.style.opacity = (progress <= 0 || progress >= 1) ? "0.3" : "1";
+            }
         }
 
         setInterval(fetchWeather, 30 * 60 * 1000); setInterval(updateSunArc, 60000); fetchWeather();
@@ -558,6 +687,22 @@
                 if (loadInW < 0) loadInW = 0;
                 
                 updateDOMText('lbl-pv', pvInW);
+
+                // ==========================================
+                // HIỆU ỨNG MẶT TRỜI TÙY CHỈNH THEO CÔNG SUẤT PV
+                // ==========================================
+                const solarSun = document.getElementById('solar-sun');
+                if (solarSun) {
+                    solarSun.classList.remove('sun-low', 'sun-medium', 'sun-high');
+                    if (pvInW < 100) {
+                        solarSun.classList.add('sun-low');
+                    } else if (pvInW < 3000) {
+                        solarSun.classList.add('sun-medium');
+                    } else {
+                        solarSun.classList.add('sun-high');
+                    }
+                }
+
                 updateDOMText('lbl-load', loadInW);
 
                 updateDOMText('lbl-grid', Math.abs(gridInW));
