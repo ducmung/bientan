@@ -86,7 +86,7 @@
 
         @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
-        /* ================= KHÔI PHỤC VIỀN CẦU VỒNG CHO STATUS VÀ CLOCK ================= */
+        /* ================= KHÔI PHỤC VIỀN CẦU VỒNG ================= */
         .diagram-panel::after,
         .stat-card::after,
         .node-center::after,
@@ -150,31 +150,34 @@
         .pos-batt { top: 82%; left: 16%; }
         .pos-load { top: 82%; left: 84%; }
 
+        /* Tinh chỉnh ảnh trên cùng để không đè mảng dưới */
         .weather-container {
-            position: absolute; top: 18%; left: 50%; transform: translate(-50%, -50%); z-index: 15;
-            width: 150px; background: #fff; padding: 3px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: absolute; top: 14%; left: 50%; transform: translate(-50%, -50%); z-index: 15;
+            width: 125px; background: #fff; padding: 3px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         .weather-container img { width: 100%; height: auto; display: block; border-radius: 12px; }
 
+        /* Tinh chỉnh ảnh biến tần nhỏ lại một chút */
         .node-center {
             position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%);
-            width: 120px; height: 130px; padding: 3px; background: #fff; border-radius: 15px;
+            width: 100px; height: 110px; padding: 3px; background: #fff; border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.16), 0 0 22px rgba(0,204,102,0.3); z-index: 15;
         }
         .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
 
+        /* Hạ thấp nhiệt độ để nhường chỗ cho biến tần */
         #lbl-inv-temp {
-            position: absolute; top: 66%; left: 50%; transform: translate(-50%, -50%);
+            position: absolute; top: 69%; left: 50%; transform: translate(-50%, -50%);
             font-size: 14px; font-weight: 900; background: #00cc66; color: #fff;
             padding: 4px 16px; border-radius: 20px; z-index: 20; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
 
         .bpf-container {
-            position: absolute; top: 90%; left: 50%; transform: translate(-50%, -50%); z-index: 15; text-align: center; width: 100%; pointer-events: none; will-change: transform;
+            position: absolute; top: 88%; left: 50%; transform: translate(-50%, -50%); z-index: 15; text-align: center; width: 100%; pointer-events: none; will-change: transform;
         }
         .bpf-text {
-            font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 38px; font-weight: 900; letter-spacing: 14px;
+            font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 32px; font-weight: 900; letter-spacing: 14px;
             position: relative; display: inline-block; background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
             -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.55));
             animation: goldPulse 2.6s ease-in-out infinite alternate; margin-left: 14px;
@@ -195,7 +198,7 @@
         .sun-arc-mini svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         #moving-sun { position: absolute; font-size: 14px; transform: translate(-50%, -50%); text-shadow: 0 0 10px #ffaa00; transition: all 1s ease-out; left: 15%; top: 100%; will-change: left, top; }
 
-        /* ================= STATUS & CLOCK (ĐÃ XÓA BORDER CỨNG ĐỂ HIỂN THỊ CẦU VỒNG) ================= */
+        /* ================= STATUS & CLOCK ================= */
         #lbl-status {
             position: absolute; top: 48%; left: 18%; transform: translate(-50%, -50%);
             font-size: 13px; font-weight: 800; background: rgba(255,255,255,0.95);
@@ -215,10 +218,9 @@
         .node .unit { font-size: 10px; color: rgba(255,255,255,0.86); font-weight: 800; }
         .icon { font-size: 18px; margin-bottom: 4px; } 
 
-        /* ================= VẼ LẠI QUẢ PIN & CHỮ 3D VÀO GIỮA ================= */
         .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; }
         .battery-body {
-            width: 72px; height: 32px; /* Kích thước chuẩn trở lại */
+            width: 72px; height: 32px;
             background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%);
             border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); border-right: 1px solid #111;
             position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8); transform: translateZ(0);
@@ -233,7 +235,6 @@
         .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
         .fill-green { background: linear-gradient(to bottom, #00ee77 0%, #88ffbb 30%, #00bb55 70%, #007733 100%); }
 
-        /* KHÔI PHỤC CHỮ 3D VÀO GIỮA */
         #lbl-soc {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a; 
@@ -241,7 +242,6 @@
             letter-spacing: 1px; margin: 0; 
         }
 
-        /* TEXT CÔNG SUẤT (Trắng Xanh 3D / Tím Đỏ 3D) */
         .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
         .val-charge { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.8) !important; font-size: 18px; }
         .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.8) !important; font-size: 18px; }
@@ -292,11 +292,13 @@
         input:checked + .slider { background-color: #00cc66; box-shadow: 0 0 14px rgba(0,204,102,0.35); }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        @media (max-width: 360px) {
+        /* ======== Bổ sung Responsive cho màn hình nhỏ ======= */
+        @media (max-width: 400px) {
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 12px; padding: 4px 10px; }
-            .bpf-text { font-size: 28px; letter-spacing: 8px; }
-            .weather-container { width: 120px; }
+            .bpf-text { font-size: 26px; letter-spacing: 8px; }
+            .weather-container { width: 105px; top: 13%; } /* Thu nhỏ thêm ảnh trên cùng */
+            .node-center { width: 90px; height: 100px; } /* Thu nhỏ thêm ảnh biến tần */
         }
         @media (min-width: 768px) {
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
