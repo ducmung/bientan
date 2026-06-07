@@ -217,18 +217,14 @@
         }
         .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
         
-        /* ================= CẤU HÌNH ẢNH NHÀ (MỚI NHẤT) ================= */
+        /* Cấu hình ảnh nhà mới nhất */
         .img-icon {
-            width: 85px; /* Tăng kích thước ảnh cho to rõ hơn */
+            width: 85px; 
             height: 85px;
             object-fit: cover;
             display: block;
-            margin: -10px auto 5px auto; /* Điều chỉnh vị trí cho đỡ lấn chữ */
-            
-            /* Giữ độ sáng và tương phản để ảnh tươi tắn */
+            margin: -10px auto 5px auto;
             filter: brightness(1.1) contrast(1.1);
-
-            /* Giảm độ mờ: Mở rộng vùng hiển thị rõ (65%), mờ sát biên (95%) */
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%);
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%);
         }
@@ -561,16 +557,35 @@
             if (el && el.innerText !== String(newValue)) { el.innerText = newValue; }
         }
 
+        // ĐÃ KHẮC PHỤC LỖI KHÔNG ĐẢO CHIỀU LUỒNG ĐIỆN KHI TRẠNG THÁI SẠC/XẢ THAY ĐỔI NHANH
         function setFlow(groupId, isActive, animName, color) {
-            const group = document.getElementById(groupId); if (!group) return;
-            const isCurrentlyActive = group.style.display === 'block';
-            if (isActive && !isCurrentlyActive) {
-                group.style.display = 'block'; group.style.setProperty('--c', color);
-                if (animName === 'flowInL' || animName === 'flowOutR') { group.classList.add('dir-right'); group.classList.remove('dir-left'); } 
-                else { group.classList.add('dir-left'); group.classList.remove('dir-right'); }
+            const group = document.getElementById(groupId); 
+            if (!group) return;
+            
+            if (isActive) {
+                group.style.display = 'block'; 
+                group.style.setProperty('--c', color);
+                
+                if (animName === 'flowInL' || animName === 'flowOutR') { 
+                    group.classList.add('dir-right'); 
+                    group.classList.remove('dir-left'); 
+                } else { 
+                    group.classList.add('dir-left'); 
+                    group.classList.remove('dir-right'); 
+                }
+                
                 const dashes = group.querySelectorAll('.flow-dash');
-                dashes.forEach((d) => { d.style.animationName = animName; d.style.animationDuration = '2.5s'; d.style.animationIterationCount = 'infinite'; d.style.animationTimingFunction = 'linear'; });
-            } else if (!isActive && isCurrentlyActive) { group.style.display = 'none'; }
+                dashes.forEach((d) => { 
+                    if (d.style.animationName !== animName) {
+                        d.style.animationName = animName; 
+                        d.style.animationDuration = '2.5s'; 
+                        d.style.animationIterationCount = 'infinite'; 
+                        d.style.animationTimingFunction = 'linear'; 
+                    }
+                });
+            } else { 
+                group.style.display = 'none'; 
+            }
         }
 
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
@@ -645,7 +660,6 @@
                 
                 updateDOMText('lbl-pv', pvInW);
 
-                // HIỆU ỨNG MẶT TRỜI TÙY CHỈNH THEO CÔNG SUẤT PV
                 const solarSun = document.getElementById('solar-sun');
                 if (solarSun) {
                     solarSun.classList.remove('sun-low', 'sun-medium', 'sun-high');
@@ -727,8 +741,15 @@
 
                 if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00'); else setFlow('flow-pv', false);
                 if(loadInW > 0) setFlow('flow-load', true, 'flowOutR', '#0088ff'); else setFlow('flow-load', false);
-                if (data.Batt_Current < -0.1) setFlow('flow-batt', true, 'flowOutL', '#00cc66'); else if (data.Batt_Current > 0.1) setFlow('flow-batt', true, 'flowInL', '#ff4444'); else setFlow('flow-batt', false);
-                if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444'); else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66'); else setFlow('flow-grid', false);
+                
+                // Pin xả là dòng dương, sạc là dòng âm (tùy định nghĩa hệ thống, giữ nguyên logic gốc của bạn)
+                if (data.Batt_Current < -0.1) setFlow('flow-batt', true, 'flowOutL', '#00cc66'); 
+                else if (data.Batt_Current > 0.1) setFlow('flow-batt', true, 'flowInL', '#ff4444'); 
+                else setFlow('flow-batt', false);
+                
+                if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444'); 
+                else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66'); 
+                else setFlow('flow-grid', false);
             }
         });
 
