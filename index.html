@@ -217,7 +217,6 @@
         }
         .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
         
-        /* Cấu hình ảnh nhà mới nhất */
         .img-icon {
             width: 85px; 
             height: 85px;
@@ -231,7 +230,21 @@
 
         .pos-load .icon { filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.8)); }
 
-        .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; }
+        /* Bổ sung CSS cho nút bấm Pin */
+        .battery-wrapper { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 10px auto 5px auto; 
+            position: relative; 
+            cursor: pointer; /* Đổi chuột thành hình bàn tay khi chỉ vào */
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+        .battery-wrapper:hover { 
+            transform: scale(1.05); /* Hơi phóng to khi di chuột vào */
+            filter: drop-shadow(0 0 8px rgba(0, 204, 102, 0.5)); /* Phát sáng nhẹ báo hiệu có thể click */
+        }
+        
         .battery-body {
             width: 72px; height: 32px;
             background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%);
@@ -481,7 +494,7 @@
             <div class="node pos-grid"><div class="icon">🗼</div><h3>LƯỚI EVN</h3><div class="val" id="lbl-grid">0</div><div class="unit">W</div></div>
 
             <div class="node pos-batt">
-                <div class="battery-wrapper">
+                <div class="battery-wrapper" onclick="window.open('https://mikasolar.com/14058648', '_blank')" title="Nhấn để xem chi tiết Pin">
                     <div class="battery-body">
                         <div class="battery-fill" id="batt-fill"></div>
                         <div id="lbl-soc">0%</div> 
@@ -557,7 +570,6 @@
             if (el && el.innerText !== String(newValue)) { el.innerText = newValue; }
         }
 
-        // ĐÃ KHẮC PHỤC LỖI KHÔNG ĐẢO CHIỀU LUỒNG ĐIỆN KHI TRẠNG THÁI SẠC/XẢ THAY ĐỔI NHANH
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId); 
             if (!group) return;
@@ -742,7 +754,6 @@
                 if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00'); else setFlow('flow-pv', false);
                 if(loadInW > 0) setFlow('flow-load', true, 'flowOutR', '#0088ff'); else setFlow('flow-load', false);
                 
-                // Pin xả là dòng dương, sạc là dòng âm (tùy định nghĩa hệ thống, giữ nguyên logic gốc của bạn)
                 if (data.Batt_Current < -0.1) setFlow('flow-batt', true, 'flowOutL', '#00cc66'); 
                 else if (data.Batt_Current > 0.1) setFlow('flow-batt', true, 'flowInL', '#ff4444'); 
                 else setFlow('flow-batt', false);
