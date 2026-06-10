@@ -230,19 +230,18 @@
 
         .pos-load .icon { filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.8)); }
 
-        /* Bổ sung CSS cho nút bấm Pin */
         .battery-wrapper { 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             margin: 10px auto 5px auto; 
             position: relative; 
-            cursor: pointer; /* Đổi chuột thành hình bàn tay khi chỉ vào */
+            cursor: pointer; 
             transition: transform 0.2s ease, filter 0.2s ease;
         }
         .battery-wrapper:hover { 
-            transform: scale(1.05); /* Hơi phóng to khi di chuột vào */
-            filter: drop-shadow(0 0 8px rgba(0, 204, 102, 0.5)); /* Phát sáng nhẹ báo hiệu có thể click */
+            transform: scale(1.05); 
+            filter: drop-shadow(0 0 8px rgba(0, 204, 102, 0.5)); 
         }
         
         .battery-body {
@@ -570,33 +569,44 @@
             if (el && el.innerText !== String(newValue)) { el.innerText = newValue; }
         }
 
+        // ĐÃ SỬA LỖI ĐƠ TRANG VÀ LỖI KẸT HƯỚNG PIN
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId); 
             if (!group) return;
             
+            const currentAnim = group.getAttribute('data-anim') || '';
+            const currentActive = group.style.display === 'block';
+
             if (isActive) {
-                group.style.display = 'block'; 
-                group.style.setProperty('--c', color);
-                
-                if (animName === 'flowInL' || animName === 'flowOutR') { 
-                    group.classList.add('dir-right'); 
-                    group.classList.remove('dir-left'); 
-                } else { 
-                    group.classList.add('dir-left'); 
-                    group.classList.remove('dir-right'); 
-                }
-                
-                const dashes = group.querySelectorAll('.flow-dash');
-                dashes.forEach((d) => { 
-                    if (d.style.animationName !== animName) {
-                        d.style.animationName = animName; 
+                // CHỈ cập nhật DOM nếu trạng thái Bật/Tắt đổi HOẶC hướng luồng đổi
+                if (!currentActive || currentAnim !== animName) {
+                    group.style.display = 'block'; 
+                    group.style.setProperty('--c', color);
+                    group.setAttribute('data-anim', animName);
+                    
+                    if (animName === 'flowInL' || animName === 'flowOutR') { 
+                        group.classList.add('dir-right'); 
+                        group.classList.remove('dir-left'); 
+                    } else { 
+                        group.classList.add('dir-left'); 
+                        group.classList.remove('dir-right'); 
+                    }
+                    
+                    const dashes = group.querySelectorAll('.flow-dash');
+                    dashes.forEach((d) => { 
+                        d.style.animationName = 'none'; // Xóa hiệu ứng cũ
+                        void d.offsetWidth; // Ép trình duyệt vẽ lại (reflow) để đảo chiều ngay lập tức
+                        d.style.animationName = animName; // Áp dụng hiệu ứng mới
                         d.style.animationDuration = '2.5s'; 
                         d.style.animationIterationCount = 'infinite'; 
                         d.style.animationTimingFunction = 'linear'; 
-                    }
-                });
+                    });
+                }
             } else { 
-                group.style.display = 'none'; 
+                if (currentActive) {
+                    group.style.display = 'none'; 
+                    group.setAttribute('data-anim', '');
+                }
             }
         }
 
