@@ -638,7 +638,10 @@
 
         function recalculateEnergy() {
             if (!latestDailyData) return; const data = latestDailyData;
-            let pvToday = data.PV_Today || 0; let currentETotal = data.Load_Total || 0;
+            let pvToday = data.PV_Today || 0; 
+            
+            // ĐÃ SỬA: Đồng bộ tên biến PV_Total_Lifetime khớp với mạch ESP32
+            let currentETotal = data.PV_Total_Lifetime || 0;
 
             updateDOMText('stat-grid-buy', (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-bat-dis', (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh');
