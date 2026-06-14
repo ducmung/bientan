@@ -444,6 +444,9 @@
                 <div class="stat-header"><h2>📊 THỐNG KÊ HÔM NAY</h2></div>
                 <div class="list-detail">
                     <div>☀️ Sản lượng PV: <span id="stat-pv-today">0 kWh</span></div>
+                    
+                    <div style="color: #0088ff;">🏠 Tiêu thụ hôm nay: <span id="stat-load-today">0 kWh</span></div>
+                    
                     <div>🗼 Lấy lưới hôm nay: <span id="stat-grid-buy">0 kWh</span></div>
                     <div>🔋 Pin đã xả: <span id="stat-bat-dis">0 kWh</span></div>
                     <div>⚡ Pin đã sạc: <span id="stat-bat-chg">0 kWh</span></div>
@@ -562,23 +565,24 @@
             if (!latestDailyData) return; 
             const data = latestDailyData;
             
-            // --- ĐỒNG BỘ 100% HIỂN THỊ TRỰC TIẾP TỪ ESP32 MÀ KHÔNG BỊ KẸT SỐ ---
+            // --- CẬP NHẬT GIAO DIỆN HIỂN THỊ ĐIỆN NĂNG HÀNG NGÀY ---
             let pvToday = data.PV_Today || 0; 
             let currentETotal = data.PV_Total_Lifetime || 0;
+            let loadToday = data.Load_Today || 0;
 
             updateDOMText('stat-pv-today', pvToday.toFixed(1) + ' kWh');
+            updateDOMText('stat-load-today', loadToday.toFixed(1) + ' kWh'); // Hiện Tiêu thụ hôm nay
             updateDOMText('stat-grid-buy', (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-bat-dis', (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-bat-chg', (data.Bat_Charge_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-pv-total', currentETotal.toFixed(1) + ' kWh');
 
-            // --- CƠ CHẾ LƯU LỊCH SỬ CHẠY NGẦM ĐỂ TÍNH TIỀN ĐIỆN ---
+            // --- LƯU TRỮ LỊCH SỬ CHẠY NGẦM ---
             let todayDate = new Date(); 
             let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
             let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
             let savedPv = currentMonthHistory[curDayKey] || 0;
 
-            // Chỉ cập nhật vào lịch sử Firebase nếu số mới lớn hơn (tránh bị reset 0 lúc đêm)
             if (pvToday > savedPv && pvToday > 0) { 
                 database.ref(`/SosenSystem/Monthly_History/${curMonthKey}/${curDayKey}`).set(pvToday); 
                 currentMonthHistory[curDayKey] = pvToday; 
@@ -592,7 +596,6 @@
                 }
             }
             
-            // Cộng tổng tháng với con số lớn nhất của ngày hôm nay để đảm bảo không thất thoát tiền
             let activePvForMoney = Math.max(pvToday, savedPv);
             pvMonthTotal += activePvForMoney;
 
