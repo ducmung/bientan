@@ -333,78 +333,27 @@
         }
 
         /* ================= SUN POWER EFFECT ================= */
-
-        .solar-sun-box{
-            width: 90px;
-            height: 90px;
-            margin: auto;
-            position: relative;
-        }
-
-        #solar-sun{
-            width: 100%;
-            height: 100%;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
+        .solar-sun-box{ width: 90px; height: 90px; margin: auto; position: relative; }
+        #solar-sun{ width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; }
         .sun-core{
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
+            width: 42px; height: 42px; border-radius: 50%;
             background: radial-gradient(circle, #fffef5 0%, #fff7c2 20%, #ffd700 55%, #ff9800 100%);
-            box-shadow: 0 0 15px #ffd700, 0 0 30px #ffaa00;
-            animation: sunPulse 2s infinite ease-in-out;
+            box-shadow: 0 0 15px #ffd700, 0 0 30px #ffaa00; animation: sunPulse 2s infinite ease-in-out;
         }
-
         .sun-ray{
-            position: absolute;
-            top: 0;
-            left: calc(50% - 2px);
-            width: 4px;
-            height: 22px;
-            border-radius: 20px;
-            background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,215,0,0));
-            transform-origin: center 45px;
+            position: absolute; top: 0; left: calc(50% - 2px); width: 4px; height: 22px; border-radius: 20px;
+            background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,215,0,0)); transform-origin: center 45px;
         }
 
-        .r1{transform:rotate(0deg);}
-        .r2{transform:rotate(45deg);}
-        .r3{transform:rotate(90deg);}
-        .r4{transform:rotate(135deg);}
-        .r5{transform:rotate(180deg);}
-        .r6{transform:rotate(225deg);}
-        .r7{transform:rotate(270deg);}
-        .r8{transform:rotate(315deg);}
+        .r1{transform:rotate(0deg);} .r2{transform:rotate(45deg);} .r3{transform:rotate(90deg);} .r4{transform:rotate(135deg);}
+        .r5{transform:rotate(180deg);} .r6{transform:rotate(225deg);} .r7{transform:rotate(270deg);} .r8{transform:rotate(315deg);}
 
-        #solar-sun .spark{
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: white;
-            box-shadow: 0 0 10px white;
-            animation: sparkFly 2s infinite;
-        }
+        #solar-sun .spark{ position: absolute; width: 4px; height: 4px; border-radius: 50%; background: white; box-shadow: 0 0 10px white; animation: sparkFly 2s infinite; }
+        .s1{top: 15px; left: 15px;} .s2{top: 20px; right: 15px; animation-delay: .4s;}
+        .s3{bottom: 15px; left: 20px; animation-delay: .8s;} .s4{bottom: 20px; right: 20px; animation-delay: 1.2s;}
 
-        .s1{top: 15px; left: 15px;}
-        .s2{top: 20px; right: 15px; animation-delay: .4s;}
-        .s3{bottom: 15px; left: 20px; animation-delay: .8s;}
-        .s4{bottom: 20px; right: 20px; animation-delay: 1.2s;}
-
-        @keyframes sparkFly{
-            0%{ opacity: 0; transform: scale(0); }
-            50%{ opacity: 1; transform: scale(1.5); }
-            100%{ opacity: 0; transform: translateY(-12px) scale(0); }
-        }
-
-        @keyframes sunPulse{
-            0%{ transform: scale(1); }
-            50%{ transform: scale(1.08); }
-            100%{ transform: scale(1); }
-        }
+        @keyframes sparkFly{ 0%{ opacity: 0; transform: scale(0); } 50%{ opacity: 1; transform: scale(1.5); } 100%{ opacity: 0; transform: translateY(-12px) scale(0); } }
+        @keyframes sunPulse{ 0%{ transform: scale(1); } 50%{ transform: scale(1.08); } 100%{ transform: scale(1); } }
 
         .sun-low{ opacity: .35; filter: brightness(.5); }
         .sun-medium{ opacity: .8; filter: brightness(1.1); }
@@ -455,36 +404,18 @@
 
             <div id="lbl-inv-temp">🌡️ --°C</div>
 
-            <div class="line line-pv">
-                <div class="flow-group" id="flow-pv"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div>
-            </div>
-            <div class="line line-grid">
-                <div class="flow-group" id="flow-grid"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div>
-            </div>
-            <div class="line line-batt">
-                <div class="flow-group" id="flow-batt"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div>
-            </div>
-            <div class="line line-load">
-                <div class="flow-group" id="flow-load"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div>
-            </div>
+            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div></div>
+            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div></div>
+            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div></div>
+            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div></div>
 
             <div class="node pos-pv">
                 <div class="solar-sun-box">
                     <div id="solar-sun">
                         <div class="sun-core"></div>
-                        <span class="sun-ray r1"></span>
-                        <span class="sun-ray r2"></span>
-                        <span class="sun-ray r3"></span>
-                        <span class="sun-ray r4"></span>
-                        <span class="sun-ray r5"></span>
-                        <span class="sun-ray r6"></span>
-                        <span class="sun-ray r7"></span>
-                        <span class="sun-ray r8"></span>
-
-                        <span class="spark s1"></span>
-                        <span class="spark s2"></span>
-                        <span class="spark s3"></span>
-                        <span class="spark s4"></span>
+                        <span class="sun-ray r1"></span><span class="sun-ray r2"></span><span class="sun-ray r3"></span><span class="sun-ray r4"></span>
+                        <span class="sun-ray r5"></span><span class="sun-ray r6"></span><span class="sun-ray r7"></span><span class="sun-ray r8"></span>
+                        <span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span><span class="spark s4"></span>
                     </div>
                 </div>
                 <h3>MẶT TRỜI</h3><div class="val" id="lbl-pv">0</div><div class="unit">W</div>
@@ -494,25 +425,18 @@
 
             <div class="node pos-batt">
                 <div class="battery-wrapper" onclick="window.open('https://mikasolar.com/14058648', '_blank')" title="Nhấn để xem chi tiết Pin">
-                    <div class="battery-body">
-                        <div class="battery-fill" id="batt-fill"></div>
-                        <div id="lbl-soc">0%</div> 
-                    </div>
+                    <div class="battery-body"><div class="battery-fill" id="batt-fill"></div><div id="lbl-soc">0%</div></div>
                     <div class="battery-cap"></div>
                 </div>
                 <h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div>
             </div>
 
             <div class="node pos-load">
-                <div class="icon">
-                    <img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon">
-                </div>
+                <div class="icon"><img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon"></div>
                 <h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div>
             </div>
 
-            <div class="bpf-container">
-                <div class="bpf-text" data-text="八方來財">八方來財</div>
-            </div>
+            <div class="bpf-container"><div class="bpf-text" data-text="八方來財">八方來財</div></div>
         </div>
 
         <div class="stats-panel">
@@ -523,7 +447,7 @@
                     <div>🗼 Lấy lưới hôm nay: <span id="stat-grid-buy">0 kWh</span></div>
                     <div>🔋 Pin đã xả: <span id="stat-bat-dis">0 kWh</span></div>
                     <div>⚡ Pin đã sạc: <span id="stat-bat-chg">0 kWh</span></div>
-                    <div style="color: #d35400;">🌐 E_Total (PV Trọn đời): <span id="stat-load-total">0 kWh</span></div>
+                    <div style="color: #d35400;">🌐 E_Total (PV Trọn đời): <span id="stat-pv-total">0 kWh</span></div>
                 </div>
             </div>
 
@@ -569,7 +493,6 @@
             if (el && el.innerText !== String(newValue)) { el.innerText = newValue; }
         }
 
-        // ĐÃ SỬA LỖI ĐƠ TRANG VÀ LỖI KẸT HƯỚNG PIN
         function setFlow(groupId, isActive, animName, color) {
             const group = document.getElementById(groupId); 
             if (!group) return;
@@ -578,7 +501,6 @@
             const currentActive = group.style.display === 'block';
 
             if (isActive) {
-                // CHỈ cập nhật DOM nếu trạng thái Bật/Tắt đổi HOẶC hướng luồng đổi
                 if (!currentActive || currentAnim !== animName) {
                     group.style.display = 'block'; 
                     group.style.setProperty('--c', color);
@@ -594,9 +516,9 @@
                     
                     const dashes = group.querySelectorAll('.flow-dash');
                     dashes.forEach((d) => { 
-                        d.style.animationName = 'none'; // Xóa hiệu ứng cũ
-                        void d.offsetWidth; // Ép trình duyệt vẽ lại (reflow) để đảo chiều ngay lập tức
-                        d.style.animationName = animName; // Áp dụng hiệu ứng mới
+                        d.style.animationName = 'none';
+                        void d.offsetWidth; 
+                        d.style.animationName = animName;
                         d.style.animationDuration = '2.5s'; 
                         d.style.animationIterationCount = 'infinite'; 
                         d.style.animationTimingFunction = 'linear'; 
@@ -637,34 +559,61 @@
         }
 
         function recalculateEnergy() {
-            if (!latestDailyData) return; const data = latestDailyData;
-            let pvToday = data.PV_Today || 0; 
+            if (!latestDailyData) return; 
+            const data = latestDailyData;
             
-            // ĐÃ SỬA: Đồng bộ tên biến PV_Total_Lifetime khớp với mạch ESP32
+            // --- ĐỒNG BỘ 100% HIỂN THỊ TRỰC TIẾP TỪ ESP32 MÀ KHÔNG BỊ KẸT SỐ ---
+            let pvToday = data.PV_Today || 0; 
             let currentETotal = data.PV_Total_Lifetime || 0;
 
+            updateDOMText('stat-pv-today', pvToday.toFixed(1) + ' kWh');
             updateDOMText('stat-grid-buy', (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-bat-dis', (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-bat-chg', (data.Bat_Charge_Today || 0).toFixed(1) + ' kWh');
-            updateDOMText('stat-load-total', currentETotal.toFixed(1) + ' kWh');
+            updateDOMText('stat-pv-total', currentETotal.toFixed(1) + ' kWh');
 
-            let todayDate = new Date(); let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
+            // --- CƠ CHẾ LƯU LỊCH SỬ CHẠY NGẦM ĐỂ TÍNH TIỀN ĐIỆN ---
+            let todayDate = new Date(); 
+            let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
             let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
             let savedPv = currentMonthHistory[curDayKey] || 0;
 
-            if (pvToday > savedPv && pvToday > 0) { database.ref(`/SosenSystem/Monthly_History/${curMonthKey}/${curDayKey}`).set(pvToday); currentMonthHistory[curDayKey] = pvToday; savedPv = pvToday; }
+            // Chỉ cập nhật vào lịch sử Firebase nếu số mới lớn hơn (tránh bị reset 0 lúc đêm)
+            if (pvToday > savedPv && pvToday > 0) { 
+                database.ref(`/SosenSystem/Monthly_History/${curMonthKey}/${curDayKey}`).set(pvToday); 
+                currentMonthHistory[curDayKey] = pvToday; 
+                savedPv = pvToday; 
+            }
 
-            let pvMonthTotal = 0; for (let key in currentMonthHistory) { pvMonthTotal += Number(currentMonthHistory[key]) || 0; }
-            let displayPvToday = Math.max(pvToday, savedPv); if (pvMonthTotal < displayPvToday) pvMonthTotal = displayPvToday;
-            let monthMoney = calcEVN(pvMonthTotal); let todayMoney = 0;
+            let pvMonthTotal = 0; 
+            for (let key in currentMonthHistory) { 
+                if (key !== curDayKey) {
+                    pvMonthTotal += Number(currentMonthHistory[key]) || 0; 
+                }
+            }
+            
+            // Cộng tổng tháng với con số lớn nhất của ngày hôm nay để đảm bảo không thất thoát tiền
+            let activePvForMoney = Math.max(pvToday, savedPv);
+            pvMonthTotal += activePvForMoney;
 
-            if (pvMonthTotal >= displayPvToday && displayPvToday > 0) { todayMoney = monthMoney - calcEVN(pvMonthTotal - displayPvToday); } else { todayMoney = calcEVN(displayPvToday); }
+            let monthMoney = calcEVN(pvMonthTotal); 
+            let todayMoney = 0;
+
+            if (pvMonthTotal >= activePvForMoney && activePvForMoney > 0) { 
+                todayMoney = monthMoney - calcEVN(pvMonthTotal - activePvForMoney); 
+            } else { 
+                todayMoney = calcEVN(activePvForMoney); 
+            }
 
             let totalMoney = currentETotal * 3000;
 
-            updateDOMText('stat-pv-today', displayPvToday.toFixed(1) + ' kWh'); updateDOMText('money-pv-today', displayPvToday.toFixed(1));
-            updateDOMText('money-pv-month', pvMonthTotal.toFixed(1)); updateDOMText('money-pv-total', currentETotal.toFixed(1));
-            updateDOMText('money-today', Math.round(todayMoney).toLocaleString('vi-VN') + ' đ'); updateDOMText('money-month', Math.round(monthMoney).toLocaleString('vi-VN') + ' đ'); updateDOMText('money-total', Math.round(totalMoney).toLocaleString('vi-VN') + ' đ');
+            updateDOMText('money-pv-today', activePvForMoney.toFixed(1));
+            updateDOMText('money-pv-month', pvMonthTotal.toFixed(1)); 
+            updateDOMText('money-pv-total', currentETotal.toFixed(1));
+            
+            updateDOMText('money-today', Math.round(todayMoney).toLocaleString('vi-VN') + ' đ'); 
+            updateDOMText('money-month', Math.round(monthMoney).toLocaleString('vi-VN') + ' đ'); 
+            updateDOMText('money-total', Math.round(totalMoney).toLocaleString('vi-VN') + ' đ');
         }
 
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => { latestDailyData = snapshot.val(); checkAndSwitchMonth(); recalculateEnergy(); });
@@ -688,13 +637,9 @@
                 const solarSun = document.getElementById('solar-sun');
                 if (solarSun) {
                     solarSun.classList.remove('sun-low', 'sun-medium', 'sun-high');
-                    if (pvInW < 100) {
-                        solarSun.classList.add('sun-low');
-                    } else if (pvInW < 3000) {
-                        solarSun.classList.add('sun-medium');
-                    } else {
-                        solarSun.classList.add('sun-high');
-                    }
+                    if (pvInW < 100) { solarSun.classList.add('sun-low'); } 
+                    else if (pvInW < 3000) { solarSun.classList.add('sun-medium'); } 
+                    else { solarSun.classList.add('sun-high'); }
                 }
 
                 updateDOMText('lbl-load', loadInW);
@@ -713,11 +658,9 @@
                 const elBatt = document.getElementById('lbl-batt');
                 elBatt.classList.remove('val-charge', 'val-discharge');
                 
-                if (battInW < 0) { 
-                    elBatt.classList.add('val-charge'); 
-                } else if (battInW > 0) { 
-                    elBatt.classList.add('val-discharge'); 
-                } else {
+                if (battInW < 0) { elBatt.classList.add('val-charge'); } 
+                else if (battInW > 0) { elBatt.classList.add('val-discharge'); } 
+                else {
                     elBatt.style.color = '#fff';
                     elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
                 }
@@ -755,9 +698,7 @@
                 }
 
                 updateDOMText('lbl-status', displayStatus);
-                if (lblStatus.style.color !== statusColor) { 
-                    lblStatus.style.color = statusColor; 
-                }
+                if (lblStatus.style.color !== statusColor) { lblStatus.style.color = statusColor; }
 
                 let colorTheme = 'fill-green';
                 if (soc <= 20) colorTheme = 'fill-red'; else if (soc <= 40) colorTheme = 'fill-yellow';
