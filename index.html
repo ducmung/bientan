@@ -441,15 +441,17 @@
 
         <div class="stats-panel">
             <div class="stat-card">
-                <div class="stat-header"><h2>📊 THỐNG KÊ HÔM NAY</h2></div>
+                <div class="stat-header"><h2>📊 THỐNG KÊ NĂNG LƯỢNG</h2></div>
                 <div class="list-detail">
                     <div>☀️ Sản lượng PV: <span id="stat-pv-today">0 kWh</span></div>
-                    
                     <div style="color: #0088ff;">🏠 Tiêu thụ hôm nay: <span id="stat-load-today">0 kWh</span></div>
-                    
                     <div>🗼 Lấy lưới hôm nay: <span id="stat-grid-buy">0 kWh</span></div>
-                    <div>🔋 Pin đã xả: <span id="stat-bat-dis">0 kWh</span></div>
-                    <div>⚡ Pin đã sạc: <span id="stat-bat-chg">0 kWh</span></div>
+                    <div>🔋 Pin đã xả (Nay): <span id="stat-bat-dis">0 kWh</span></div>
+                    <div>⚡ Pin đã sạc (Nay): <span id="stat-bat-chg">0 kWh</span></div>
+                    
+                    <div style="color: #b000ff;">🔋 Tổng Pin đã xả: <span id="stat-bat-dis-total">0 kWh</span></div>
+                    <div style="color: #ff8c00;">⚡ Tổng Pin đã sạc: <span id="stat-bat-chg-total">0 kWh</span></div>
+                    
                     <div style="color: #d35400;">🌐 E_Total (PV Trọn đời): <span id="stat-pv-total">0 kWh</span></div>
                 </div>
             </div>
@@ -571,10 +573,15 @@
             let loadToday = data.Load_Today || 0;
 
             updateDOMText('stat-pv-today', pvToday.toFixed(1) + ' kWh');
-            updateDOMText('stat-load-today', loadToday.toFixed(1) + ' kWh'); // Hiện Tiêu thụ hôm nay
+            updateDOMText('stat-load-today', loadToday.toFixed(1) + ' kWh'); 
             updateDOMText('stat-grid-buy', (data.Grid_Buy_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-bat-dis', (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-bat-chg', (data.Bat_Charge_Today || 0).toFixed(1) + ' kWh');
+            
+            // CẬP NHẬT 2 THÔNG SỐ TỔNG SẠC / XẢ TRỌN ĐỜI CỦA PIN
+            updateDOMText('stat-bat-dis-total', (data.Bat_Discharge_Total_Lifetime || 0).toFixed(1) + ' kWh');
+            updateDOMText('stat-bat-chg-total', (data.Bat_Charge_Total_Lifetime || 0).toFixed(1) + ' kWh');
+            
             updateDOMText('stat-pv-total', currentETotal.toFixed(1) + ' kWh');
 
             // --- LƯU TRỮ LỊCH SỬ CHẠY NGẦM ---
@@ -728,4 +735,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
