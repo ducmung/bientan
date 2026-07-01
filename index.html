@@ -332,36 +332,82 @@
             .stats-panel { flex: 1; justify-content: center; }
         }
 
-        /* ================= SUN POWER EFFECT ================= */
+        /* ================= SUN POWER EFFECT (CANVAS UPGRADE) ================= */
         .solar-sun-box{ width: 90px; height: 90px; margin: auto; position: relative; }
-        #solar-sun{ width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; }
+        #solar-sun{ width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; transition: all 0.5s ease; }
+        
+        /* Canvas sẽ nằm dưới core và tự tỏa tia ra */
+        #sun-canvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 260px; /* Cho phép tia bắn xa ra ngoài */
+            height: 260px;
+            pointer-events: none;
+            z-index: 0;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.4));
+        }
+
         .sun-core{
-            width: 42px; height: 42px; border-radius: 50%;
-            background: radial-gradient(circle, #fffef5 0%, #fff7c2 20%, #ffd700 55%, #ff9800 100%);
-            box-shadow: 0 0 15px #ffd700, 0 0 30px #ffaa00; animation: sunPulse 2s infinite ease-in-out;
-        }
-        .sun-ray{
-            position: absolute; top: 0; left: calc(50% - 2px); width: 4px; height: 22px; border-radius: 20px;
-            background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,215,0,0)); transform-origin: center 45px;
+            position: relative;
+            z-index: 2;
+            width:38px;
+            height:38px;
+            border-radius:50%;
+            background:
+                radial-gradient(circle,
+                #ffffff 0%,
+                #fff8c8 20%,
+                #ffe56a 45%,
+                #ffbf00 75%,
+                #ff9800 100%);
+            box-shadow:
+                0 0 20px #fff7c5,
+                0 0 40px #ffd700,
+                0 0 80px #ffb300,
+                0 0 120px rgba(255,190,0,.7);
+            animation: sunPulse 2s ease-in-out infinite;
         }
 
-        .r1{transform:rotate(0deg);} .r2{transform:rotate(45deg);} .r3{transform:rotate(90deg);} .r4{transform:rotate(135deg);}
-        .r5{transform:rotate(180deg);} .r6{transform:rotate(225deg);} .r7{transform:rotate(270deg);} .r8{transform:rotate(315deg);}
+        #solar-sun::before{
+            content:"";
+            position:absolute;
+            width:130px;
+            height:130px;
+            border-radius:50%;
+            background:
+                radial-gradient(circle,
+                rgba(255,255,255,.55),
+                rgba(255,220,80,.2) 40%,
+                transparent 75%);
+            animation: haloPulse 2.5s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
 
-        #solar-sun .spark{ position: absolute; width: 4px; height: 4px; border-radius: 50%; background: white; box-shadow: 0 0 10px white; animation: sparkFly 2s infinite; }
+        #solar-sun .spark{ position: absolute; width: 4px; height: 4px; border-radius: 50%; background: white; box-shadow: 0 0 10px white; animation: sparkFly 2s infinite; z-index: 3;}
         .s1{top: 15px; left: 15px;} .s2{top: 20px; right: 15px; animation-delay: .4s;}
         .s3{bottom: 15px; left: 20px; animation-delay: .8s;} .s4{bottom: 20px; right: 20px; animation-delay: 1.2s;}
 
         @keyframes sparkFly{ 0%{ opacity: 0; transform: scale(0); } 50%{ opacity: 1; transform: scale(1.5); } 100%{ opacity: 0; transform: translateY(-12px) scale(0); } }
-        @keyframes sunPulse{ 0%{ transform: scale(1); } 50%{ transform: scale(1.08); } 100%{ transform: scale(1); } }
+        @keyframes sunPulse{ 0%{ transform: scale(1); filter: brightness(1); } 50%{ transform: scale(1.05); filter: brightness(1.2); } 100%{ transform: scale(1); filter: brightness(1); } }
+        
+        @keyframes haloPulse{
+            0%{ filter:brightness(0.9) scale(1); }
+            50%{ filter:brightness(1.4) scale(1.1); }
+            100%{ filter:brightness(0.9) scale(1); }
+        }
 
+        /* Độ sáng động theo công suất */
         .sun-low{ opacity: .35; filter: brightness(.5); }
         .sun-medium{ opacity: .8; filter: brightness(1.1); }
-        .sun-high{ opacity: 1; filter: brightness(1.8); }
+        .sun-high{ opacity: 1; filter: brightness(1.6) drop-shadow(0 0 20px rgba(255,215,0,0.8)); }
     </style>
 </head>
 <body>
     <div class="color-sky" aria-hidden="true">
+        <!-- Ngôi sao nền giữ nguyên -->
         <span class="star" style="--x:4%; --y:8%; --s:2px; --c:#ffffff; --d:2.4s; --f:18s; --delay:-0.2s;"></span>
         <span class="star" style="--x:18%; --y:13%; --s:2px; --c:#00e5ff; --d:2.9s; --f:23s; --delay:-0.8s;"></span>
         <span class="star" style="--x:33%; --y:10%; --s:3px; --c:#8cff66; --d:2.7s; --f:25s; --delay:-2.1s;"></span>
@@ -412,10 +458,10 @@
             <div class="node pos-pv">
                 <div class="solar-sun-box">
                     <div id="solar-sun">
+                        <!-- THAY THẾ TOÀN BỘ CÁC TIA SPAN BẰNG CANVAS NÀY -->
+                        <canvas id="sun-canvas"></canvas>
                         <div class="sun-core"></div>
-                        <span class="sun-ray r1"></span><span class="sun-ray r2"></span><span class="sun-ray r3"></span><span class="sun-ray r4"></span>
-                        <span class="sun-ray r5"></span><span class="sun-ray r6"></span><span class="sun-ray r7"></span><span class="sun-ray r8"></span>
-                        <span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span><span class="spark s4"></span>
+                    
                     </div>
                 </div>
                 <h3>MẶT TRỜI</h3><div class="val" id="lbl-pv">0</div><div class="unit">W</div>
@@ -493,6 +539,78 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // ================= KỊCH BẢN VẼ MẶT TRỜI BẰNG CANVAS (Y NHƯ VIDEO) =================
+        function initCanvasSun() {
+            const canvas = document.getElementById('sun-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            // Tăng kích thước canvas để các tia bắn xa ra
+            const size = 260; 
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = size * dpr;
+            canvas.height = size * dpr;
+            ctx.scale(dpr, dpr);
+
+            const cx = size / 2;
+            const cy = size / 2;
+
+            const rays = [];
+            const numRays = 120; // Hơn 100 tia mảnh giống hệt starburst trong video
+
+            for (let i = 0; i < numRays; i++) {
+                rays.push({
+                    angle: Math.random() * Math.PI * 2,
+                    baseLength: 30 + Math.random() * 80, // Độ dài phân bổ ngẫu nhiên từ ngắn tới cực dài
+                    width: 0.3 + Math.random() * 1.5, // Tia cực mảnh
+                    speed: 0.02 + Math.random() * 0.08, // Tốc độ rung
+                    phase: Math.random() * Math.PI * 2, // Điểm bắt đầu dao động
+                    baseAlpha: 0.2 + Math.random() * 0.8 // Độ sáng cơ bản
+                });
+            }
+
+            function animateCanvasSun() {
+                ctx.clearRect(0, 0, size, size);
+                const time = Date.now() * 0.001;
+
+                rays.forEach(ray => {
+                    // Hiệu ứng tia thụt ra thụt vào liên tục
+                    const currentLength = ray.baseLength + Math.sin(ray.phase + time * (ray.speed * 80)) * 15;
+                    // Hiệu ứng nhấp nháy sáng tối 
+                    const currentAlpha = ray.baseAlpha * (0.5 + Math.sin(ray.phase * 3 + time * 30) * 0.5);
+
+                    // Hiệu ứng quầng sáng xoay cực chậm tổng thể
+                    const angle = ray.angle + time * 0.05; 
+
+                    const x = cx + Math.cos(angle) * currentLength;
+                    const y = cy + Math.sin(angle) * currentLength;
+
+                    // Gradient tạo cảm giác chân thực: sáng gắt ở gốc, mờ dần ra xa ngả vàng
+                    const grad = ctx.createLinearGradient(cx, cy, x, y);
+                    grad.addColorStop(0, `rgba(255, 255, 255, ${currentAlpha})`);
+                    grad.addColorStop(0.3, `rgba(255, 245, 150, ${currentAlpha * 0.8})`);
+                    grad.addColorStop(1, `rgba(255, 200, 0, 0)`);
+
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(x, y);
+                    ctx.lineWidth = ray.width;
+                    ctx.strokeStyle = grad;
+                    // Bóng đổ nhẹ cho cảm giác bloom/lóe sáng
+                    ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
+                    ctx.shadowBlur = 2;
+                    ctx.stroke();
+                });
+
+                requestAnimationFrame(animateCanvasSun);
+            }
+            animateCanvasSun();
+        }
+        
+        // Khởi chạy Animation mặt trời ngay khi tải DOM
+        document.addEventListener('DOMContentLoaded', initCanvasSun);
+
+        // ================= FIREBASE & LOGIC HIỂN THỊ CŨ (Giữ nguyên) =================
         function updateDOMText(id, newValue) {
             const el = document.getElementById(id);
             if (el && el.innerText !== String(newValue)) { el.innerText = newValue; }
@@ -567,7 +685,6 @@
             if (!latestDailyData) return; 
             const data = latestDailyData;
             
-            // --- CẬP NHẬT GIAO DIỆN HIỂN THỊ ĐIỆN NĂNG HÀNG NGÀY ---
             let pvToday = data.PV_Today || 0; 
             let currentETotal = data.PV_Total_Lifetime || 0;
             let loadToday = data.Load_Today || 0;
@@ -578,13 +695,11 @@
             updateDOMText('stat-bat-dis', (data.Bat_Discharge_Today || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-bat-chg', (data.Bat_Charge_Today || 0).toFixed(1) + ' kWh');
             
-            // CẬP NHẬT 2 THÔNG SỐ TỔNG SẠC / XẢ TRỌN ĐỜI CỦA PIN
             updateDOMText('stat-bat-dis-total', (data.Bat_Discharge_Total_Lifetime || 0).toFixed(1) + ' kWh');
             updateDOMText('stat-bat-chg-total', (data.Bat_Charge_Total_Lifetime || 0).toFixed(1) + ' kWh');
             
             updateDOMText('stat-pv-total', currentETotal.toFixed(1) + ' kWh');
 
-            // --- LƯU TRỮ LỊCH SỬ CHẠY NGẦM ---
             let todayDate = new Date(); 
             let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
             let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
