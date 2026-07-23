@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sosen Energy Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <!-- Tích hợp thư viện vẽ Biểu đồ Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
 
@@ -285,6 +287,26 @@
         }
         @keyframes cardSheen { 0%, 48% { transform: translateX(-120%) translateZ(0); } 78%, 100% { transform: translateX(120%) translateZ(0); } }
 
+        /* Style cho nút chuyển mode Biểu đồ */
+        .chart-btn-group { display: flex; gap: 6px; position: relative; z-index: 2; }
+        .chart-btn {
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(0,0,0,0.15);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #444;
+            transition: all 0.3s ease;
+        }
+        .chart-btn.active {
+            background: #00cc66;
+            color: #fff;
+            border-color: #00cc66;
+            box-shadow: 0 2px 8px rgba(0,204,102,0.4);
+        }
+
         .money-card { background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95)); border: 1px solid rgba(218, 165, 32, 0.65); }
         .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 1; }
         .stat-header h2 { font-size: 16px; color: #444; }
@@ -439,6 +461,7 @@
         </div>
 
         <div class="stats-panel">
+            <!-- 1. THỐNG KÊ NĂNG LƯỢNG -->
             <div class="stat-card">
                 <div class="stat-header"><h2>📊 THỐNG KÊ NĂNG LƯỢNG</h2></div>
                 <div class="list-detail">
@@ -455,6 +478,7 @@
                 </div>
             </div>
 
+            <!-- 2. DUNG LƯỢNG PIN & ÁP -->
             <div class="stat-card">
                 <div class="stat-header"><h2>Dung lượng Pin & Áp</h2></div>
                 <div class="progress-bar"><div class="bar-batt" id="bar-soc"></div></div>
@@ -464,6 +488,7 @@
                 </div>
             </div>
 
+            <!-- 3. QUY ĐỔI TIỀN ĐIỆN (EVN) -->
             <div class="stat-card money-card">
                 <div class="stat-header"><h2 style="color: #b8860b;">💰 QUY ĐỔI TIỀN ĐIỆN (EVN)</h2></div>
                 <div class="list-detail">
@@ -474,6 +499,22 @@
                 <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic; position: relative; z-index: 1;">*Hệ thống tự động cộng dồn theo ngày dương lịch</div>
             </div>
 
+            <!-- 4. BIỂU ĐỒ NĂNG LƯỢNG (KWH) - ĐÃ ĐƯỢC CHUYỂN XUỐNG DƯỚI THẺ TIỀN ĐIỆN -->
+            <div class="stat-card">
+                <div class="stat-header" style="flex-wrap: wrap; gap: 8px;">
+                    <h2>📈 BIỂU ĐỒ NĂNG LƯỢNG (kWh)</h2>
+                    <div class="chart-btn-group">
+                        <button class="chart-btn active" id="btn-chart-daily" onclick="setChartMode('daily')">Theo Ngày</button>
+                        <button class="chart-btn" id="btn-chart-monthly" onclick="setChartMode('monthly')">Theo Tháng</button>
+                        <button class="chart-btn" id="btn-chart-yearly" onclick="setChartMode('yearly')">Theo Năm</button>
+                    </div>
+                </div>
+                <div style="position: relative; height: 220px; width: 100%; margin-top: 10px;">
+                    <canvas id="energyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 5. ĐIỀU KHIỂN BIẾN TẦN -->
             <div class="stat-card">
                 <div class="stat-header"><h2>🎛️ ĐIỀU KHIỂN BIẾN TẦN</h2></div>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 5px; position: relative; z-index: 1;">
@@ -492,7 +533,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ================= HÀM ĐẾM SỐ MƯỢT TỰ ĐỘNG (TĂNG TỪ THẤP->CAO / GIẢM TỪ CAO->THẤP) =================
+        // ================= HÀM ĐẾM SỐ MƯỢT TỰ ĐỘNG =================
         const numberAnimState = {};
 
         function animateValue(id, targetVal, formatFn, duration = 650) {
@@ -501,7 +542,6 @@
 
             targetVal = Number(targetVal) || 0;
 
-            // Lần đầu tiên chạy
             if (!numberAnimState[id]) {
                 numberAnimState[id] = { currentVal: targetVal, frameId: null };
                 el.innerText = formatFn(targetVal);
@@ -511,13 +551,11 @@
             const state = numberAnimState[id];
             const startVal = state.currentVal;
 
-            // Nếu giá trị không đổi thì giữ nguyên
             if (Math.abs(startVal - targetVal) < 0.001) {
                 el.innerText = formatFn(targetVal);
                 return;
             }
 
-            // Hủy animation cũ nếu có dữ liệu mới đẩy về liên tục
             if (state.frameId) cancelAnimationFrame(state.frameId);
 
             const startTime = performance.now();
@@ -525,8 +563,6 @@
             function step(now) {
                 const elapsed = now - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                
-                // Công thức Ease-Out Cubic: Chạy nhanh lúc đầu, êm nhẹ khi tiệm cận đích
                 const ease = 1 - Math.pow(1 - progress, 3);
 
                 const current = startVal + (targetVal - startVal) * ease;
@@ -545,7 +581,7 @@
             state.frameId = requestAnimationFrame(step);
         }
 
-        // ================= ENGINE CANVAS NỀN: CỰC QUANG + BỤI KHÔNG GIAN =================
+        // ================= ENGINE CANVAS NỀN =================
         function initBgCanvas() {
             const canvas = document.getElementById('bg-canvas');
             if (!canvas) return;
@@ -697,9 +733,273 @@
         document.addEventListener('DOMContentLoaded', () => {
             initBgCanvas();
             initCanvasSun();
+            initChart();
         });
 
-        // ================= FIREBASE & LOGIC HIỂN THỊ =================
+        // ================= FIREBASE & BIỂU ĐỒ NĂNG LƯỢNG (CHART.JS) =================
+        const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const lblStatus = document.getElementById('lbl-status');
+        const battFill = document.getElementById('batt-fill');
+
+        let energyChart = null;
+        let currentChartMode = 'daily';
+
+        function initChart() {
+            const ctx = document.getElementById('energyChart').getContext('2d');
+            energyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Mặt Trời (kWh)',
+                            data: [],
+                            backgroundColor: 'rgba(255, 193, 7, 0.85)',
+                            borderColor: '#ffc107',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Tiêu Thụ (kWh)',
+                            data: [],
+                            backgroundColor: 'rgba(0, 136, 255, 0.75)',
+                            borderColor: '#0088ff',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { font: { family: 'Nunito', weight: 'bold', size: 11 }, color: '#333' } }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { family: 'Nunito', weight: 'bold', size: 10 }, color: '#555' } },
+                        y: { beginAtZero: true, ticks: { font: { family: 'Nunito', weight: 'bold', size: 10 }, color: '#555' } }
+                    }
+                }
+            });
+            loadChartData();
+        }
+
+        function setChartMode(mode) {
+            currentChartMode = mode;
+            document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-chart-${mode}`).classList.add('active');
+            loadChartData();
+        }
+
+        function loadChartData() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const monthKey = `${yyyy}_${mm}`;
+
+            if (currentChartMode === 'daily') {
+                database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value', (snap) => {
+                    const daysData = snap.val() || {};
+                    const labels = [];
+                    const pvData = [];
+                    const loadData = [];
+
+                    const daysInMonth = new Date(yyyy, now.getMonth() + 1, 0).getDate();
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const dayStr = String(d).padStart(2, '0');
+                        labels.push(`${dayStr}/${mm}`);
+                        const item = daysData[`day_${dayStr}`] || {};
+                        pvData.push(item.pv || 0);
+                        loadData.push(item.load || 0);
+                    }
+                    updateChart(labels, pvData, loadData);
+                });
+            } else if (currentChartMode === 'monthly') {
+                database.ref(`/SosenSystem/History/Monthly/${yyyy}`).once('value', (snap) => {
+                    const monthsData = snap.val() || {};
+                    const labels = [];
+                    const pvData = [];
+                    const loadData = [];
+
+                    for (let m = 1; m <= 12; m++) {
+                        const monthStr = String(m).padStart(2, '0');
+                        labels.push(`T${m}`);
+                        const item = monthsData[`month_${monthStr}`] || {};
+                        pvData.push(item.pv || 0);
+                        loadData.push(item.load || 0);
+                    }
+                    updateChart(labels, pvData, loadData);
+                });
+            } else if (currentChartMode === 'yearly') {
+                database.ref(`/SosenSystem/History/Yearly`).once('value', (snap) => {
+                    const yearsData = snap.val() || {};
+                    const labels = [];
+                    const pvData = [];
+                    const loadData = [];
+
+                    for (let yKey in yearsData) {
+                        labels.push(yKey.replace('year_', ''));
+                        pvData.push(yearsData[yKey].pv || 0);
+                        loadData.push(yearsData[yKey].load || 0);
+                    }
+                    if (labels.length === 0) {
+                        labels.push(String(yyyy));
+                        pvData.push(0);
+                        loadData.push(0);
+                    }
+                    updateChart(labels, pvData, loadData);
+                });
+            }
+        }
+
+        function updateChart(labels, pvData, loadData) {
+            if (!energyChart) return;
+            energyChart.data.labels = labels;
+            energyChart.data.datasets[0].data = pvData;
+            energyChart.data.datasets[1].data = loadData;
+            energyChart.update();
+        }
+
+        let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
+
+        function checkAndSwitchMonth() {
+            let d = new Date(); let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
+            if (mk !== currentMonthKey) {
+                if (currentMonthKey !== "") { database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).off(); }
+                currentMonthKey = mk; database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).on('value', (snap) => { currentMonthHistory = snap.val() || {}; recalculateEnergy(); });
+            }
+        }
+
+        function calcEVN(kWh) {
+            let cost = 0; let r = kWh;
+            if(r > 0) { let q = Math.min(r, 50); cost += q * 2142.72; r -= q; }
+            if(r > 0) { let q = Math.min(r, 50); cost += q * 2214.00; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 2570.40; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 3237.84; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 3618.00; r -= q; }
+            if(r > 0) { cost += r * 3736.80; } return cost;
+        }
+
+        function saveEnergyHistoryToFirebase(pvToday, loadToday, gridBuyToday) {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+
+            const monthKey = `${yyyy}_${mm}`;
+            const dayKey = `day_${dd}`;
+            const monthItemKey = `month_${mm}`;
+            const yearKey = `year_${yyyy}`;
+
+            const dailyRef = database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`);
+            dailyRef.update({
+                pv: Number(pvToday.toFixed(1)),
+                load: Number(loadToday.toFixed(1)),
+                grid: Number(gridBuyToday.toFixed(1))
+            });
+
+            database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value', (snap) => {
+                const daysData = snap.val() || {};
+                let monthPv = 0, monthLoad = 0, monthGrid = 0;
+                for (let d in daysData) {
+                    monthPv += Number(daysData[d].pv || 0);
+                    monthLoad += Number(daysData[d].load || 0);
+                    monthGrid += Number(daysData[d].grid || 0);
+                }
+
+                database.ref(`/SosenSystem/History/Monthly/${yyyy}/${monthItemKey}`).update({
+                    pv: Number(monthPv.toFixed(1)),
+                    load: Number(monthLoad.toFixed(1)),
+                    grid: Number(monthGrid.toFixed(1))
+                });
+
+                database.ref(`/SosenSystem/History/Monthly/${yyyy}`).once('value', (mSnap) => {
+                    const monthsData = mSnap.val() || {};
+                    let yearPv = 0, yearLoad = 0, yearGrid = 0;
+                    for (let m in monthsData) {
+                        yearPv += Number(monthsData[m].pv || 0);
+                        yearLoad += Number(monthsData[m].load || 0);
+                        yearGrid += Number(monthsData[m].grid || 0);
+                    }
+
+                    database.ref(`/SosenSystem/History/Yearly/${yearKey}`).update({
+                        pv: Number(yearPv.toFixed(1)),
+                        load: Number(yearLoad.toFixed(1)),
+                        grid: Number(yearGrid.toFixed(1))
+                    });
+
+                    loadChartData();
+                });
+            });
+        }
+
+        function recalculateEnergy() {
+            if (!latestDailyData) return; 
+            const data = latestDailyData;
+            
+            let pvToday = data.PV_Today || 0; 
+            let currentETotal = data.PV_Total_Lifetime || 0;
+            let loadToday = data.Load_Today || 0;
+            let gridBuyToday = data.Grid_Buy_Today || 0;
+
+            animateValue('stat-pv-today', pvToday, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-load-today', loadToday, v => v.toFixed(1) + ' kWh'); 
+            animateValue('stat-grid-buy', gridBuyToday, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-dis', data.Bat_Discharge_Today || 0, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-chg', data.Bat_Charge_Today || 0, v => v.toFixed(1) + ' kWh');
+            
+            animateValue('stat-bat-dis-total', data.Bat_Discharge_Total_Lifetime || 0, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-chg-total', data.Bat_Charge_Total_Lifetime || 0, v => v.toFixed(1) + ' kWh');
+            
+            animateValue('stat-pv-total', currentETotal, v => v.toFixed(1) + ' kWh');
+
+            if (pvToday > 0 || loadToday > 0) {
+                saveEnergyHistoryToFirebase(pvToday, loadToday, gridBuyToday);
+            }
+
+            let todayDate = new Date(); 
+            let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
+            let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
+            let savedPv = currentMonthHistory[curDayKey] || 0;
+
+            if (pvToday > savedPv && pvToday > 0) { 
+                database.ref(`/SosenSystem/Monthly_History/${curMonthKey}/${curDayKey}`).set(pvToday); 
+                currentMonthHistory[curDayKey] = pvToday; 
+                savedPv = pvToday; 
+            }
+
+            let pvMonthTotal = 0; 
+            for (let key in currentMonthHistory) { 
+                if (key !== curDayKey) {
+                    pvMonthTotal += Number(currentMonthHistory[key]) || 0; 
+                }
+            }
+            
+            let activePvForMoney = Math.max(pvToday, savedPv);
+            pvMonthTotal += activePvForMoney;
+
+            let monthMoney = calcEVN(pvMonthTotal); 
+            let todayMoney = 0;
+
+            if (pvMonthTotal >= activePvForMoney && activePvForMoney > 0) { 
+                todayMoney = monthMoney - calcEVN(pvMonthTotal - activePvForMoney); 
+            } else { 
+                todayMoney = calcEVN(activePvForMoney); 
+            }
+
+            let totalMoney = currentETotal * 3000;
+
+            animateValue('money-pv-today', activePvForMoney, v => v.toFixed(1));
+            animateValue('money-pv-month', pvMonthTotal, v => v.toFixed(1)); 
+            animateValue('money-pv-total', currentETotal, v => v.toFixed(1));
+            
+            animateValue('money-today', Math.round(todayMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
+            animateValue('money-month', Math.round(monthMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
+            animateValue('money-total', Math.round(totalMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ');
+        }
+
         function updateDOMText(id, newValue) {
             const el = document.getElementById(id);
             if (el && el.innerText !== String(newValue)) { el.innerText = newValue; }
@@ -744,94 +1044,6 @@
             }
         }
 
-        const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const lblStatus = document.getElementById('lbl-status');
-        const battFill = document.getElementById('batt-fill');
-
-        let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
-
-        function checkAndSwitchMonth() {
-            let d = new Date(); let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
-            if (mk !== currentMonthKey) {
-                if (currentMonthKey !== "") { database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).off(); }
-                currentMonthKey = mk; database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).on('value', (snap) => { currentMonthHistory = snap.val() || {}; recalculateEnergy(); });
-            }
-        }
-
-        function calcEVN(kWh) {
-            let cost = 0; let r = kWh;
-            if(r > 0) { let q = Math.min(r, 50); cost += q * 2142.72; r -= q; }
-            if(r > 0) { let q = Math.min(r, 50); cost += q * 2214.00; r -= q; }
-            if(r > 0) { let q = Math.min(r, 100); cost += q * 2570.40; r -= q; }
-            if(r > 0) { let q = Math.min(r, 100); cost += q * 3237.84; r -= q; }
-            if(r > 0) { let q = Math.min(r, 100); cost += q * 3618.00; r -= q; }
-            if(r > 0) { cost += r * 3736.80; } return cost;
-        }
-
-        function recalculateEnergy() {
-            if (!latestDailyData) return; 
-            const data = latestDailyData;
-            
-            let pvToday = data.PV_Today || 0; 
-            let currentETotal = data.PV_Total_Lifetime || 0;
-            let loadToday = data.Load_Today || 0;
-
-            // Đếm số mượt cho các thẻ kWh
-            animateValue('stat-pv-today', pvToday, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-load-today', loadToday, v => v.toFixed(1) + ' kWh'); 
-            animateValue('stat-grid-buy', data.Grid_Buy_Today || 0, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-bat-dis', data.Bat_Discharge_Today || 0, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-bat-chg', data.Bat_Charge_Today || 0, v => v.toFixed(1) + ' kWh');
-            
-            animateValue('stat-bat-dis-total', data.Bat_Discharge_Total_Lifetime || 0, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-bat-chg-total', data.Bat_Charge_Total_Lifetime || 0, v => v.toFixed(1) + ' kWh');
-            
-            animateValue('stat-pv-total', currentETotal, v => v.toFixed(1) + ' kWh');
-
-            let todayDate = new Date(); 
-            let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
-            let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
-            let savedPv = currentMonthHistory[curDayKey] || 0;
-
-            if (pvToday > savedPv && pvToday > 0) { 
-                database.ref(`/SosenSystem/Monthly_History/${curMonthKey}/${curDayKey}`).set(pvToday); 
-                currentMonthHistory[curDayKey] = pvToday; 
-                savedPv = pvToday; 
-            }
-
-            let pvMonthTotal = 0; 
-            for (let key in currentMonthHistory) { 
-                if (key !== curDayKey) {
-                    pvMonthTotal += Number(currentMonthHistory[key]) || 0; 
-                }
-            }
-            
-            let activePvForMoney = Math.max(pvToday, savedPv);
-            pvMonthTotal += activePvForMoney;
-
-            let monthMoney = calcEVN(pvMonthTotal); 
-            let todayMoney = 0;
-
-            if (pvMonthTotal >= activePvForMoney && activePvForMoney > 0) { 
-                todayMoney = monthMoney - calcEVN(pvMonthTotal - activePvForMoney); 
-            } else { 
-                todayMoney = calcEVN(activePvForMoney); 
-            }
-
-            let totalMoney = currentETotal * 3000;
-
-            // Đếm mượt số điện & số tiền quy đổi EVN
-            animateValue('money-pv-today', activePvForMoney, v => v.toFixed(1));
-            animateValue('money-pv-month', pvMonthTotal, v => v.toFixed(1)); 
-            animateValue('money-pv-total', currentETotal, v => v.toFixed(1));
-            
-            animateValue('money-today', Math.round(todayMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
-            animateValue('money-month', Math.round(monthMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
-            animateValue('money-total', Math.round(totalMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ');
-        }
-
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => { latestDailyData = snapshot.val(); checkAndSwitchMonth(); recalculateEnergy(); });
         setInterval(() => { checkAndSwitchMonth(); }, 60000);
 
@@ -848,7 +1060,6 @@
 
                 if (loadInW < 0) loadInW = 0;
                 
-                // Đếm mượt cho Công suất Watt thời gian thực
                 animateValue('lbl-pv', pvInW, v => Math.round(v));
 
                 const solarSun = document.getElementById('solar-sun');
@@ -900,7 +1111,6 @@
                 let soc = data.Batt_SOC;
                 animateValue('lbl-soc', soc, v => Math.round(v) + '%');
                 
-                // Đếm mượt cho Điện áp & Dòng điện Pin
                 animateValue('stat-v', data.Batt_Voltage, v => v.toFixed(1) + ' V');
                 animateValue('stat-a', data.Batt_Current, v => v.toFixed(1) + ' A');
                 document.getElementById('bar-soc').style.width = soc + '%';
