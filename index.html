@@ -89,8 +89,7 @@
         .weather-container::after,
         #update-clock::after,
         #lbl-status::after,
-        #lbl-inv-temp::after,
-        .top-right-inv-control::after {
+        #lbl-inv-temp::after {
             content: "";
             position: absolute;
             inset: -2px;
@@ -121,50 +120,11 @@
         .node-center::after { z-index: -1; border-radius: 15px; }
         #update-clock::after, #lbl-status::after { z-index: -1; border-radius: 20px; }
         #lbl-inv-temp::after { z-index: -1; border-radius: 20px; }
-        .top-right-inv-control::after { z-index: -1; border-radius: 12px; }
 
         @keyframes rainbowSlide { to { background-position: -200% 0; } }
         @keyframes rainbowBorderGlow {
             from { opacity: 0.7; filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.3)); }
             to { opacity: 1; filter: drop-shadow(0 0 10px rgba(176, 0, 255, 0.6)); }
-        }
-
-        /* Nút Công Tắc Siêu Nhỏ Gọn Đặt Sát Góc Trên Bên Phải */
-        .top-right-inv-control {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            z-index: 30;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            padding: 3px 6px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transform: translateZ(0);
-        }
-        .switch.mini-switch {
-            width: 32px;
-            height: 16px;
-        }
-        .switch.mini-switch .slider:before {
-            height: 10px;
-            width: 10px;
-            left: 3px;
-            bottom: 3px;
-        }
-        .switch.mini-switch input:checked + .slider:before {
-            transform: translateX(16px) translateZ(0);
-        }
-        .mini-inv-status {
-            font-size: 10px;
-            font-weight: 900;
-            color: #888;
-            white-space: nowrap;
         }
 
         .node { position: absolute; transform: translate(-50%, -50%) translateZ(0); background: transparent; border: none; padding: 10px 4px; text-align: center; width: 90px; z-index: 10; }
@@ -179,12 +139,50 @@
         }
         .weather-container img { width: 100%; height: auto; display: block; border-radius: 12px; }
 
+        /* Node Biến Tần Trung Tâm */
         .node-center {
             position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
             width: 115px; height: 125px; padding: 3px; background: #fff; border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.16), 0 0 22px rgba(0,204,102,0.3); z-index: 15;
         }
         .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+
+        /* NÚT CÔNG TẮC BẬT/TẮT DỌC SÁT GÓC TRÊN BÊN PHẢI (CHỮ Ở DƯỚI CÔNG TẮC) */
+        .inv-switch-overlay {
+            position: absolute;
+            top: 3px;
+            right: 4px;
+            z-index: 25;
+            background: transparent;
+            display: flex;
+            flex-direction: column; /* Xếp dọc: Công tắc ở trên, chữ ở dưới */
+            align-items: center;
+            gap: 1px;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+        }
+        .switch.mini-switch {
+            width: 26px;
+            height: 13px;
+        }
+        .switch.mini-switch .slider:before {
+            height: 9px;
+            width: 9px;
+            left: 2px;
+            bottom: 2px;
+        }
+        .switch.mini-switch input:checked + .slider:before {
+            transform: translateX(13px) translateZ(0);
+        }
+        .mini-inv-status {
+            font-size: 8px;
+            font-weight: 900;
+            color: #00cc66;
+            white-space: nowrap;
+            line-height: 1;
+            margin-top: 1px;
+        }
 
         #lbl-inv-temp {
             position: absolute; top: 78%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
@@ -506,15 +504,6 @@
 
     <div class="app-container">
         <div class="diagram-panel">
-            <!-- NÚT CÔNG TẮC SIÊU NHỎ GỌN NẰM SÁT GÓC TRÊN BÊN PHẢI (KHÔNG CHE ẢNH KỶ NIỆM) -->
-            <div class="top-right-inv-control" title="Gạt để Bật/Tắt Biến Tần">
-                <label class="switch mini-switch">
-                    <input type="checkbox" id="inv-switch-toggle">
-                    <span class="slider"></span>
-                </label>
-                <span id="switch-status-text" class="mini-inv-status">--</span>
-            </div>
-
             <div id="lbl-status">Đang tải...</div>
             <div id="update-clock">--:--:--</div>
 
@@ -522,8 +511,16 @@
                 <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image">
             </div>
 
+            <!-- NODE BIẾN TẦN TRUNG TÂM - CÔNG TẮC XẾP DỌC SÁT SẠT GÓC BÊN PHẢI -->
             <div class="node-center pos-inv">
                 <img src="68.jpg" alt="Inverter">
+                <div class="inv-switch-overlay" title="Gạt để Bật/Tắt Biến Tần">
+                    <label class="switch mini-switch">
+                        <input type="checkbox" id="inv-switch-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span id="switch-status-text" class="mini-inv-status">--</span>
+                </div>
             </div>
 
             <div id="lbl-inv-temp">🌡️ --°C</div>
