@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sosen Energy Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
-    <!-- Tích hợp thư viện vẽ Biểu đồ Chart.js -->
+    <!-- Thư viện vẽ Biểu đồ Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
@@ -89,7 +89,8 @@
         .weather-container::after,
         #update-clock::after,
         #lbl-status::after,
-        #lbl-inv-temp::after {
+        #lbl-inv-temp::after,
+        .top-right-inv-control::after {
             content: "";
             position: absolute;
             inset: -2px;
@@ -120,11 +121,56 @@
         .node-center::after { z-index: -1; border-radius: 15px; }
         #update-clock::after, #lbl-status::after { z-index: -1; border-radius: 20px; }
         #lbl-inv-temp::after { z-index: -1; border-radius: 20px; }
+        .top-right-inv-control::after { z-index: -1; border-radius: 16px; }
 
         @keyframes rainbowSlide { to { background-position: -200% 0; } }
         @keyframes rainbowBorderGlow {
             from { opacity: 0.7; filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.3)); }
             to { opacity: 1; filter: drop-shadow(0 0 10px rgba(176, 0, 255, 0.6)); }
+        }
+
+        /* Nút Công Tắc Biến Tần Đặt Nổi Góc Trên Cùng Bên Phải */
+        .top-right-inv-control {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 30;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 5px 10px;
+            border-radius: 16px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transform: translateZ(0);
+        }
+        .mini-inv-title {
+            font-size: 10px;
+            font-weight: 900;
+            color: #333;
+            letter-spacing: 0.2px;
+        }
+        .switch.mini-switch {
+            width: 36px;
+            height: 18px;
+        }
+        .switch.mini-switch .slider:before {
+            height: 12px;
+            width: 12px;
+            left: 3px;
+            bottom: 3px;
+        }
+        .switch.mini-switch input:checked + .slider:before {
+            transform: translateX(18px) translateZ(0);
+        }
+        .mini-inv-status {
+            font-size: 11px;
+            font-weight: 900;
+            color: #888;
+            white-space: nowrap;
         }
 
         .node { position: absolute; transform: translate(-50%, -50%) translateZ(0); background: transparent; border: none; padding: 10px 4px; text-align: center; width: 90px; z-index: 10; }
@@ -287,7 +333,7 @@
         }
         @keyframes cardSheen { 0%, 48% { transform: translateX(-120%) translateZ(0); } 78%, 100% { transform: translateX(120%) translateZ(0); } }
 
-        /* Style cho nút chuyển mode Biểu đồ */
+        /* Nút Biểu đồ */
         .chart-btn-group { display: flex; gap: 6px; position: relative; z-index: 2; }
         .chart-btn {
             background: rgba(255,255,255,0.6);
@@ -324,6 +370,58 @@
         input:checked + .slider { background-color: #00cc66; box-shadow: 0 0 14px rgba(0,204,102,0.35); }
         input:checked + .slider:before { transform: translateX(24px) translateZ(0); }
 
+        /* Modal Xác Nhận Bật/Tắt Biến Tần */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 22px 24px;
+            max-width: 320px;
+            width: 88%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transform: scale(0.85);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+        .modal-icon { font-size: 38px; margin-bottom: 6px; }
+        .modal-title { font-size: 16px; font-weight: 900; color: #111; margin-bottom: 6px; }
+        .modal-msg { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 18px; line-height: 1.4; }
+        .modal-actions { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .modal-btn-confirm { background: #00cc66; color: #fff; box-shadow: 0 4px 12px rgba(0, 204, 102, 0.4); }
+        .modal-btn-cancel { background: #eee; color: #444; }
+        .modal-btn:active { transform: scale(0.95); }
+
         /* Responsive */
         @media (max-width: 400px) {
             #update-clock { font-size: 11px; padding: 4px 8px; }
@@ -334,7 +432,7 @@
             #lbl-inv-temp { top: 79%; }
         }
         @media (min-width: 768px) {
-            .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
+            .app-container { flex-direction: row; flex-wrap: wrap; align- items: stretch; }
             .diagram-panel { flex: 1; max-width: none; }
             .stats-panel { flex: 1; justify-content: center; }
         }
@@ -414,6 +512,16 @@
 
     <div class="app-container">
         <div class="diagram-panel">
+            <!-- NÚT BẬT/TẮT BIẾN TẦN ĐẶT NỔI Ở GÓC TRÊN CÙNG BÊN PHẢI (TRÊN KHU VỰC CỘT ĐIỆN) -->
+            <div class="top-right-inv-control" title="Gạt để Bật/Tắt Biến Tần">
+                <span class="mini-inv-title">🎛️ BIẾN TẦN</span>
+                <label class="switch mini-switch">
+                    <input type="checkbox" id="inv-switch-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span id="switch-status-text" class="mini-inv-status">--</span>
+            </div>
+
             <div id="lbl-status">Đang tải...</div>
             <div id="update-clock">--:--:--</div>
 
@@ -442,7 +550,13 @@
                 <h3>MẶT TRỜI</h3><div class="val" id="lbl-pv">0</div><div class="unit">W</div>
             </div>
 
-            <div class="node pos-grid"><div class="icon">🗼</div><h3>LƯỚI EVN</h3><div class="val" id="lbl-grid">0</div><div class="unit">W</div></div>
+            <!-- NODE LƯỚI EVN ĐÃ ĐƯỢC LÀM SẠCH, KHÔNG BỊ CHE CHỮ HAY SỐ W -->
+            <div class="node pos-grid">
+                <div class="icon">🗼</div>
+                <h3>LƯỚI EVN</h3>
+                <div class="val" id="lbl-grid">0</div>
+                <div class="unit">W</div>
+            </div>
 
             <div class="node pos-batt">
                 <div class="battery-wrapper" onclick="window.open('https://mikasolar.com/14058648', '_blank')" title="Nhấn để xem chi tiết Pin">
@@ -461,7 +575,6 @@
         </div>
 
         <div class="stats-panel">
-            <!-- 1. THỐNG KÊ NĂNG LƯỢNG -->
             <div class="stat-card">
                 <div class="stat-header"><h2>📊 THỐNG KÊ NĂNG LƯỢNG</h2></div>
                 <div class="list-detail">
@@ -478,7 +591,6 @@
                 </div>
             </div>
 
-            <!-- 2. DUNG LƯỢNG PIN & ÁP -->
             <div class="stat-card">
                 <div class="stat-header"><h2>Dung lượng Pin & Áp</h2></div>
                 <div class="progress-bar"><div class="bar-batt" id="bar-soc"></div></div>
@@ -488,7 +600,6 @@
                 </div>
             </div>
 
-            <!-- 3. QUY ĐỔI TIỀN ĐIỆN (EVN) -->
             <div class="stat-card money-card">
                 <div class="stat-header"><h2 style="color: #b8860b;">💰 QUY ĐỔI TIỀN ĐIỆN (EVN)</h2></div>
                 <div class="list-detail">
@@ -499,7 +610,6 @@
                 <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic; position: relative; z-index: 1;">*Hệ thống tự động cộng dồn theo ngày dương lịch</div>
             </div>
 
-            <!-- 4. BIỂU ĐỒ NĂNG LƯỢNG (KWH) - ĐÃ ĐƯỢC CHUYỂN XUỐNG DƯỚI THẺ TIỀN ĐIỆN -->
             <div class="stat-card">
                 <div class="stat-header" style="flex-wrap: wrap; gap: 8px;">
                     <h2>📈 BIỂU ĐỒ NĂNG LƯỢNG (kWh)</h2>
@@ -513,18 +623,18 @@
                     <canvas id="energyChart"></canvas>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- 5. ĐIỀU KHIỂN BIẾN TẦN -->
-            <div class="stat-card">
-                <div class="stat-header"><h2>🎛️ ĐIỀU KHIỂN BIẾN TẦN</h2></div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 5px; position: relative; z-index: 1;">
-                    <span style="font-size: 14px; font-weight: 800; color: #444;">Trạng thái:</span>
-                    <label class="switch">
-                        <input type="checkbox" id="inv-switch-toggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div id="switch-status-text" style="text-align: right; font-size: 12px; font-weight: 800; color: #888; margin-top: 5px; position: relative; z-index: 1;">Đang tải...</div>
+    <!-- HỘP THOẠI XÁC NHẬN BẬT/TẮT BIẾN TẦN -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-box">
+            <div class="modal-icon">⚙️</div>
+            <div class="modal-title">Xác Nhận Điều Khiển</div>
+            <div class="modal-msg" id="modal-msg">Bạn có chắc chắn muốn thực hiện thao tác này?</div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" id="btn-modal-cancel">Hủy Bỏ</button>
+                <button class="modal-btn modal-btn-confirm" id="btn-modal-confirm">Xác Nhận</button>
             </div>
         </div>
     </div>
@@ -734,6 +844,7 @@
             initBgCanvas();
             initCanvasSun();
             initChart();
+            initModalEvents();
         });
 
         // ================= FIREBASE & BIỂU ĐỒ NĂNG LƯỢNG (CHART.JS) =================
@@ -1102,10 +1213,17 @@
                 }
 
                 if (data.Inv_Switch !== undefined) {
-                    const toggle = document.getElementById('inv-switch-toggle'); const statusText = document.getElementById('switch-status-text');
-                    if (toggle.checked !== (data.Inv_Switch === 1)) { toggle.checked = (data.Inv_Switch === 1); }
-                    updateDOMText('switch-status-text', (data.Inv_Switch === 1) ? "Đang BẬT" : "Đã TẮT");
-                    statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444";
+                    const toggle = document.getElementById('inv-switch-toggle'); 
+                    const statusText = document.getElementById('switch-status-text');
+                    const modalEl = document.getElementById('confirm-modal');
+                    
+                    if (toggle && !modalEl.classList.contains('active')) {
+                        toggle.checked = (data.Inv_Switch === 1);
+                    }
+                    if (statusText) {
+                        updateDOMText('switch-status-text', (data.Inv_Switch === 1) ? "BẬT" : "TẮT");
+                        statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444";
+                    }
                 }
 
                 let soc = data.Batt_SOC;
@@ -1147,11 +1265,58 @@
             }
         });
 
-        document.getElementById('inv-switch-toggle').addEventListener('change', function() {
-            const newState = this.checked ? 1 : 0; const statusText = document.getElementById('switch-status-text');
-            statusText.innerText = "Đang gửi lệnh..."; statusText.style.color = "#ffaa00";
-            database.ref('/SosenSystem/Control').update({ Inv_Switch: newState }).catch((error) => { console.error("Lỗi khi gửi lệnh:", error); statusText.innerText = "Lỗi kết nối!"; statusText.style.color = "#ff4444"; });
-        });
+        // ================= XỬ LÝ SỰ KIỆN XÁC NHẬN BẬT/TẮT BIẾN TẦN =================
+        let pendingState = null;
+
+        function initModalEvents() {
+            const toggleEl = document.getElementById('inv-switch-toggle');
+            const modalEl = document.getElementById('confirm-modal');
+            const modalMsg = document.getElementById('modal-msg');
+            const btnConfirm = document.getElementById('btn-modal-confirm');
+            const btnCancel = document.getElementById('btn-modal-cancel');
+
+            toggleEl.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                pendingState = !this.checked;
+                const actionText = pendingState ? "BẬT" : "TẮT";
+                modalMsg.innerText = `Bạn có chắc chắn muốn ${actionText} Biến Tần không?`;
+                
+                modalEl.classList.add('active');
+            });
+
+            btnConfirm.addEventListener('click', function() {
+                if (pendingState !== null) {
+                    toggleEl.checked = pendingState;
+                    const newState = pendingState ? 1 : 0;
+                    const statusText = document.getElementById('switch-status-text');
+                    if (statusText) {
+                        statusText.innerText = "Đang gửi...";
+                        statusText.style.color = "#ffaa00";
+                    }
+                    
+                    database.ref('/SosenSystem/Control').update({ Inv_Switch: newState })
+                        .catch((error) => {
+                            console.error("Lỗi khi gửi lệnh:", error);
+                            if (statusText) {
+                                statusText.innerText = "Lỗi!";
+                                statusText.style.color = "#ff4444";
+                            }
+                        });
+                }
+                closeModal();
+            });
+
+            btnCancel.addEventListener('click', function() {
+                closeModal();
+            });
+        }
+
+        function closeModal() {
+            const modalEl = document.getElementById('confirm-modal');
+            modalEl.classList.remove('active');
+            pendingState = null;
+        }
     </script>
 </body>
 </html>
