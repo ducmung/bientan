@@ -325,24 +325,176 @@
         }
         @keyframes cardSheen { 0%, 48% { transform: translateX(-120%) translateZ(0); } 78%, 100% { transform: translateX(120%) translateZ(0); } }
 
-        /* Nút Biểu đồ */
-        .chart-btn-group { display: flex; gap: 6px; position: relative; z-index: 2; }
-        .chart-btn {
-            background: rgba(255,255,255,0.6);
-            border: 1px solid rgba(0,0,0,0.15);
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            color: #444;
-            transition: all 0.3s ease;
+        /* Biểu đồ năng lượng */
+        .energy-chart-card {
+            padding: 14px;
+            background: rgba(255,255,255,0.94);
         }
+        .energy-chart-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        .chart-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .chart-btn {
+            min-width: 74px;
+            border: 0;
+            background: #e8e8e8;
+            color: #111;
+            padding: 10px 14px;
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 0;
+            cursor: pointer;
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+        }
+        .chart-btn:active,
+        .chart-nav-btn:active,
+        .day-nav-btn:active { transform: translateY(1px); }
         .chart-btn.active {
-            background: #00cc66;
+            background: #11c878;
             color: #fff;
-            border-color: #00cc66;
-            box-shadow: 0 2px 8px rgba(0,204,102,0.4);
+            box-shadow: 0 6px 14px rgba(17,200,120,0.28);
+        }
+        .chart-period-control {
+            display: grid;
+            grid-template-columns: 30px minmax(118px, 1fr) 30px;
+            align-items: center;
+            min-width: 206px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .chart-nav-btn,
+        .day-nav-btn {
+            height: 38px;
+            border: 0;
+            background: transparent;
+            color: #8b8b8b;
+            font-size: 26px;
+            font-weight: 900;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .chart-period-label {
+            min-width: 118px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-left: 1px solid rgba(0,0,0,0.08);
+            border-right: 1px solid rgba(0,0,0,0.08);
+            color: #111;
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
+        .chart-stage {
+            position: relative;
+            height: 275px;
+            width: 100%;
+            margin-top: 8px;
+            padding-top: 30px;
+        }
+        .chart-day-corner {
+            position: absolute;
+            top: 0;
+            right: 2px;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.92);
+            border: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 18px;
+            padding: 1px 7px;
+        }
+        .day-nav-btn {
+            width: 24px;
+            height: 26px;
+            font-size: 19px;
+            color: #777;
+        }
+        .chart-selected-label {
+            min-width: 68px;
+            text-align: center;
+            color: #111;
+            font-size: 12px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .chart-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+            position: relative;
+            z-index: 2;
+        }
+        .chart-detail-card {
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px 8px;
+            min-height: 78px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+            overflow: hidden;
+        }
+        .chart-detail-card .label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #4a4a4a;
+            font-size: 11px;
+            font-weight: 900;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+        .chart-color-dot {
+            flex: 0 0 10px;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+        .chart-detail-card .value {
+            margin-top: 8px;
+            color: #111;
+            font-size: 22px;
+            font-weight: 900;
+            line-height: 1;
+            white-space: nowrap;
+        }
+        .chart-detail-card .sub {
+            margin-top: 6px;
+            color: #777;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .dot-pv { background: #59ba35; }
+        .dot-batt { background: #45a8de; }
+        .dot-charge { background: #3322c9; }
+        .dot-load { background: #ffa247; }
+
+        @media (max-width: 620px) {
+            .energy-chart-toolbar { align-items: stretch; flex-direction: column; }
+            .chart-btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .chart-btn { min-width: 0; padding: 9px 8px; font-size: 12px; }
+            .chart-period-control { width: 100%; grid-template-columns: 38px 1fr 38px; }
+            .chart-stage { height: 245px; padding-top: 32px; }
+            .chart-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
 
         .money-card { background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95)); border: 1px solid rgba(218, 165, 32, 0.65); }
@@ -599,17 +751,48 @@
                 <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic; position: relative; z-index: 1;">*Hệ thống tự động cộng dồn theo ngày dương lịch</div>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-header" style="flex-wrap: wrap; gap: 8px;">
-                    <h2>📈 BIỂU ĐỒ NĂNG LƯỢNG (kWh)</h2>
+            <div class="stat-card energy-chart-card">
+                <div class="energy-chart-toolbar">
                     <div class="chart-btn-group">
-                        <button class="chart-btn active" id="btn-chart-daily" onclick="setChartMode('daily')">Theo Ngày</button>
-                        <button class="chart-btn" id="btn-chart-monthly" onclick="setChartMode('monthly')">Theo Tháng</button>
-                        <button class="chart-btn" id="btn-chart-yearly" onclick="setChartMode('yearly')">Theo Năm</button>
+                        <button class="chart-btn active" id="btn-chart-month" onclick="setChartMode('month')">THÁNG</button>
+                        <button class="chart-btn" id="btn-chart-year" onclick="setChartMode('year')">NĂM</button>
+                        <button class="chart-btn" id="btn-chart-total" onclick="setChartMode('total')">TỔNG</button>
+                    </div>
+                    <div class="chart-period-control">
+                        <button class="chart-nav-btn" type="button" onclick="shiftChartPeriod(-1)" aria-label="Kỳ trước">‹</button>
+                        <div class="chart-period-label" id="chart-period-label">2026-07</div>
+                        <button class="chart-nav-btn" type="button" onclick="shiftChartPeriod(1)" aria-label="Kỳ sau">›</button>
                     </div>
                 </div>
-                <div style="position: relative; height: 220px; width: 100%; margin-top: 10px;">
+                <div class="chart-stage">
+                    <div class="chart-day-corner">
+                        <button class="day-nav-btn" type="button" onclick="moveChartDay(-1)" aria-label="Mốc trước">‹</button>
+                        <span class="chart-selected-label" id="chart-selected-label">Ngày --</span>
+                        <button class="day-nav-btn" type="button" onclick="moveChartDay(1)" aria-label="Mốc sau">›</button>
+                    </div>
                     <canvas id="energyChart"></canvas>
+                </div>
+                <div class="chart-detail-grid">
+                    <div class="chart-detail-card">
+                        <div class="label"><span class="chart-color-dot dot-pv"></span>Sản lượng PV</div>
+                        <div class="value" id="chart-detail-pv">0.0</div>
+                        <div class="sub">kWh</div>
+                    </div>
+                    <div class="chart-detail-card">
+                        <div class="label"><span class="chart-color-dot dot-batt"></span>Xả pin</div>
+                        <div class="value" id="chart-detail-batt">0.0</div>
+                        <div class="sub">kWh</div>
+                    </div>
+                    <div class="chart-detail-card">
+                        <div class="label"><span class="chart-color-dot dot-charge"></span>Sạc pin</div>
+                        <div class="value" id="chart-detail-charge">0.0</div>
+                        <div class="sub">kWh</div>
+                    </div>
+                    <div class="chart-detail-card">
+                        <div class="label"><span class="chart-color-dot dot-load"></span>Tiêu thụ</div>
+                        <div class="value" id="chart-detail-load">0.0</div>
+                        <div class="sub">kWh</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -844,7 +1027,69 @@
         const battFill = document.getElementById('batt-fill');
 
         let energyChart = null;
-        let currentChartMode = 'daily';
+        let currentChartMode = 'month';
+        let chartCursorDate = new Date();
+        let chartSelectedIndex = 0;
+        let chartRows = [];
+        let chartAllRows = [];
+        let chartSelectedSourceIndex = 0;
+
+        const chartSeries = [
+            { label: 'Sản lượng PV', key: 'pv', color: '#59ba35', border: '#48a927' },
+            { label: 'Xả pin', key: 'batt', color: '#45a8de', border: '#278fc9' },
+            { label: 'Sạc pin', key: 'charge', color: '#3322c9', border: '#2416a8' },
+            { label: 'Tiêu thụ', key: 'load', color: '#ffa247', border: '#f08324' }
+        ];
+
+        const energySelectedBandPlugin = {
+            id: 'energySelectedBand',
+            beforeDatasetsDraw(chart) {
+                const area = chart.chartArea;
+                const meta = chart.getDatasetMeta(0);
+                const bar = meta && meta.data ? meta.data[chartSelectedIndex] : null;
+                if (!area || !bar || chart.data.labels.length === 0) return;
+
+                const step = (area.right - area.left) / chart.data.labels.length;
+                const x = bar.x - step / 2 + 3;
+                const width = Math.max(16, step - 6);
+                const ctx = chart.ctx;
+
+                ctx.save();
+                ctx.fillStyle = 'rgba(0,0,0,0.04)';
+                ctx.strokeStyle = 'rgba(0,0,0,0.22)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                drawChartRoundRect(ctx, x, area.top + 2, width, area.bottom - area.top - 4, 8);
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            }
+        };
+
+        const energyValueLabelPlugin = {
+            id: 'energyValueLabels',
+            afterDatasetsDraw(chart) {
+                const ctx = chart.ctx;
+                const area = chart.chartArea;
+
+                ctx.save();
+                ctx.fillStyle = '#111';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.font = '900 10px Nunito, sans-serif';
+
+                chart.data.datasets.forEach((dataset, datasetIndex) => {
+                    const meta = chart.getDatasetMeta(datasetIndex);
+                    meta.data.forEach((bar, index) => {
+                        const value = Number(dataset.data[index]) || 0;
+                        if (value <= 0.04) return;
+                        const y = Math.max(bar.y - 5, area.top + 10);
+                        ctx.fillText(formatChartNumber(value), bar.x, y);
+                    });
+                });
+                ctx.restore();
+            }
+        };
 
         function initChart() {
             const ctx = document.getElementById('energyChart').getContext('2d');
@@ -852,36 +1097,71 @@
                 type: 'bar',
                 data: {
                     labels: [],
-                    datasets: [
-                        {
-                            label: 'Mặt Trời (kWh)',
-                            data: [],
-                            backgroundColor: 'rgba(255, 193, 7, 0.85)',
-                            borderColor: '#ffc107',
-                            borderWidth: 1,
-                            borderRadius: 4
-                        },
-                        {
-                            label: 'Tiêu Thụ (kWh)',
-                            data: [],
-                            backgroundColor: 'rgba(0, 136, 255, 0.75)',
-                            borderColor: '#0088ff',
-                            borderWidth: 1,
-                            borderRadius: 4
-                        }
-                    ]
+                    datasets: chartSeries.map(series => ({
+                        label: series.label,
+                        dataKey: series.key,
+                        data: [],
+                        backgroundColor: series.color,
+                        borderColor: series.border,
+                        borderWidth: 1,
+                        borderRadius: 2,
+                        categoryPercentage: 0.88,
+                        barPercentage: 0.92,
+                        maxBarThickness: 38
+                    }))
                 },
+                plugins: [energySelectedBandPlugin, energyValueLabelPlugin],
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    onClick(event, elements) {
+                        if (elements.length > 0) {
+                            const clickedRow = chartRows[elements[0].index];
+                            if (clickedRow && Number.isInteger(clickedRow.sourceIndex)) {
+                                chartSelectedSourceIndex = clickedRow.sourceIndex;
+                                updateVisibleChartRows();
+                            }
+                        }
+                    },
                     plugins: {
-                        legend: { labels: { font: { family: 'Nunito', weight: 'bold', size: 11 }, color: '#333' } }
+                        legend: {
+                            align: 'start',
+                            labels: {
+                                boxWidth: 12,
+                                boxHeight: 12,
+                                padding: 10,
+                                font: { family: 'Nunito', weight: '900', size: 12 },
+                                color: '#222'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title(items) {
+                                    const row = chartRows[items[0].dataIndex];
+                                    return row ? row.detailLabel : '';
+                                },
+                                label(item) {
+                                    return `${item.dataset.label}: ${formatChartNumber(item.parsed.y)} kWh`;
+                                }
+                            }
+                        }
                     },
                     scales: {
-                        x: { grid: { display: false }, ticks: { font: { family: 'Nunito', weight: 'bold', size: 10 }, color: '#555' } },
-                        y: { beginAtZero: true, ticks: { font: { family: 'Nunito', weight: 'bold', size: 10 }, color: '#555' } }
+                        x: {
+                            grid: { display: true, color: 'rgba(0,0,0,0.18)', borderDash: [8, 8] },
+                            ticks: { font: { family: 'Nunito', weight: '900', size: 13 }, color: '#222' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grace: '18%',
+                            ticks: { font: { family: 'Nunito', weight: '900', size: 12 }, color: '#333' },
+                            grid: { color: 'rgba(0,0,0,0.16)' }
+                        }
                     }
                 }
+            });
+            window.addEventListener('resize', () => {
+                if (energyChart && chartAllRows.length > 0) updateVisibleChartRows();
             });
             loadChartData();
         }
@@ -889,77 +1169,209 @@
         function setChartMode(mode) {
             currentChartMode = mode;
             document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-chart-${mode}`).classList.add('active');
+            const activeBtn = document.getElementById(`btn-chart-${mode}`);
+            if (activeBtn) activeBtn.classList.add('active');
             loadChartData();
         }
 
-        function loadChartData() {
-            const now = new Date();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const monthKey = `${yyyy}_${mm}`;
+        function shiftChartPeriod(step) {
+            if (currentChartMode === 'month') {
+                chartCursorDate.setMonth(chartCursorDate.getMonth() + step);
+            } else if (currentChartMode === 'year') {
+                chartCursorDate.setFullYear(chartCursorDate.getFullYear() + step);
+            }
+            loadChartData();
+        }
 
-            if (currentChartMode === 'daily') {
+        function moveChartDay(step) {
+            if (chartAllRows.length === 0) return;
+            chartSelectedSourceIndex = Math.max(0, Math.min(chartAllRows.length - 1, chartSelectedSourceIndex + step));
+            updateVisibleChartRows();
+        }
+
+        function loadChartData() {
+            updateChartPeriodLabel();
+            const yyyy = chartCursorDate.getFullYear();
+            const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
+
+            if (currentChartMode === 'month') {
+                const monthKey = `${yyyy}_${mm}`;
                 database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value', (snap) => {
                     const daysData = snap.val() || {};
-                    const labels = [];
-                    const pvData = [];
-                    const loadData = [];
+                    const rows = [];
+                    const daysInMonth = new Date(yyyy, chartCursorDate.getMonth() + 1, 0).getDate();
 
-                    const daysInMonth = new Date(yyyy, now.getMonth() + 1, 0).getDate();
                     for (let d = 1; d <= daysInMonth; d++) {
                         const dayStr = String(d).padStart(2, '0');
-                        labels.push(`${dayStr}/${mm}`);
-                        const item = daysData[`day_${dayStr}`] || {};
-                        pvData.push(item.pv || 0);
-                        loadData.push(item.load || 0);
+                        rows.push({
+                            label: String(d),
+                            detailLabel: `Ngày ${dayStr}/${mm}/${yyyy}`,
+                            ...normalizeChartItem(daysData[`day_${dayStr}`])
+                        });
                     }
-                    updateChart(labels, pvData, loadData);
+                    renderChartRows(rows);
                 });
-            } else if (currentChartMode === 'monthly') {
+            } else if (currentChartMode === 'year') {
                 database.ref(`/SosenSystem/History/Monthly/${yyyy}`).once('value', (snap) => {
                     const monthsData = snap.val() || {};
-                    const labels = [];
-                    const pvData = [];
-                    const loadData = [];
+                    const rows = [];
 
                     for (let m = 1; m <= 12; m++) {
                         const monthStr = String(m).padStart(2, '0');
-                        labels.push(`T${m}`);
-                        const item = monthsData[`month_${monthStr}`] || {};
-                        pvData.push(item.pv || 0);
-                        loadData.push(item.load || 0);
+                        rows.push({
+                            label: `T${m}`,
+                            detailLabel: `Tháng ${monthStr}/${yyyy}`,
+                            ...normalizeChartItem(monthsData[`month_${monthStr}`])
+                        });
                     }
-                    updateChart(labels, pvData, loadData);
+                    renderChartRows(rows);
                 });
-            } else if (currentChartMode === 'yearly') {
+            } else if (currentChartMode === 'total') {
                 database.ref(`/SosenSystem/History/Yearly`).once('value', (snap) => {
                     const yearsData = snap.val() || {};
-                    const labels = [];
-                    const pvData = [];
-                    const loadData = [];
+                    let rows = Object.keys(yearsData).sort().map(yKey => {
+                        const yearLabel = yKey.replace('year_', '');
+                        return {
+                            label: yearLabel,
+                            detailLabel: `Năm ${yearLabel}`,
+                            ...normalizeChartItem(yearsData[yKey])
+                        };
+                    });
 
-                    for (let yKey in yearsData) {
-                        labels.push(yKey.replace('year_', ''));
-                        pvData.push(yearsData[yKey].pv || 0);
-                        loadData.push(yearsData[yKey].load || 0);
+                    if (rows.length === 0) {
+                        rows = [{
+                            label: String(yyyy),
+                            detailLabel: `Năm ${yyyy}`,
+                            pv: 0,
+                            batt: 0,
+                            charge: 0,
+                            load: 0
+                        }];
                     }
-                    if (labels.length === 0) {
-                        labels.push(String(yyyy));
-                        pvData.push(0);
-                        loadData.push(0);
-                    }
-                    updateChart(labels, pvData, loadData);
+                    renderChartRows(rows);
                 });
             }
         }
 
-        function updateChart(labels, pvData, loadData) {
+        function renderChartRows(rows) {
+            chartAllRows = rows;
+            chartSelectedSourceIndex = getDefaultChartIndex(rows);
+            updateVisibleChartRows();
+        }
+
+        function updateVisibleChartRows() {
+            const rows = chartAllRows;
             if (!energyChart) return;
-            energyChart.data.labels = labels;
-            energyChart.data.datasets[0].data = pvData;
-            energyChart.data.datasets[1].data = loadData;
+
+            if (rows.length === 0) {
+                chartRows = [];
+                chartSelectedIndex = 0;
+                energyChart.data.labels = [];
+                energyChart.data.datasets.forEach(dataset => { dataset.data = []; });
+                updateChartDetail();
+                energyChart.update();
+                return;
+            }
+
+            const limit = currentChartMode === 'month' ? Math.min(getMonthVisibleCount(), rows.length) : rows.length;
+            let start = 0;
+
+            if (currentChartMode === 'month' && rows.length > limit) {
+                start = chartSelectedSourceIndex - Math.floor(limit / 2);
+                start = Math.max(0, Math.min(start, rows.length - limit));
+            }
+
+            chartRows = rows.slice(start, start + limit).map((row, index) => ({
+                ...row,
+                sourceIndex: start + index
+            }));
+            chartSelectedIndex = chartRows.findIndex(row => row.sourceIndex === chartSelectedSourceIndex);
+            if (chartSelectedIndex < 0) chartSelectedIndex = 0;
+
+            energyChart.data.labels = chartRows.map(row => row.label);
+            energyChart.data.datasets.forEach(dataset => {
+                dataset.data = chartRows.map(row => row[dataset.dataKey] || 0);
+            });
+            updateChartDetail();
             energyChart.update();
+        }
+
+        function getMonthVisibleCount() {
+            return window.innerWidth <= 430 ? 3 : 4;
+        }
+
+        function getDefaultChartIndex(rows) {
+            if (rows.length === 0) return 0;
+
+            const now = new Date();
+            if (
+                currentChartMode === 'month' &&
+                chartCursorDate.getFullYear() === now.getFullYear() &&
+                chartCursorDate.getMonth() === now.getMonth()
+            ) {
+                return Math.min(rows.length - 1, Math.max(0, now.getDate() - 1));
+            }
+
+            for (let i = rows.length - 1; i >= 0; i--) {
+                const row = rows[i];
+                if ((row.pv + row.batt + row.charge + row.load) > 0) return i;
+            }
+            return 0;
+        }
+
+        function normalizeChartItem(item = {}) {
+            return {
+                pv: toChartNumber(item.pv),
+                batt: toChartNumber(item.batt ?? item.bat ?? item.battery ?? item.discharge ?? item.batDischarge),
+                charge: toChartNumber(item.charge ?? item.battCharge ?? item.batCharge ?? item.chargeBattery),
+                load: toChartNumber(item.load)
+            };
+        }
+
+        function drawChartRoundRect(ctx, x, y, width, height, radius) {
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(x, y, width, height, radius);
+                return;
+            }
+
+            const r = Math.min(radius, width / 2, height / 2);
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + width - r, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+            ctx.lineTo(x + width, y + height - r);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+            ctx.lineTo(x + r, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+        }
+
+        function toChartNumber(value) {
+            const number = Number(value);
+            return Number.isFinite(number) ? number : 0;
+        }
+
+        function formatChartNumber(value) {
+            const number = Number(value) || 0;
+            return number >= 100 ? number.toFixed(0) : number.toFixed(1);
+        }
+
+        function updateChartPeriodLabel() {
+            const el = document.getElementById('chart-period-label');
+            if (!el) return;
+
+            const yyyy = chartCursorDate.getFullYear();
+            const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
+            el.textContent = currentChartMode === 'month' ? `${yyyy}-${mm}` : (currentChartMode === 'year' ? String(yyyy) : 'TỔNG');
+        }
+
+        function updateChartDetail() {
+            const row = chartRows[chartSelectedIndex] || { detailLabel: '--', pv: 0, batt: 0, charge: 0, load: 0 };
+            updateDOMText('chart-selected-label', row.detailLabel);
+            updateDOMText('chart-detail-pv', formatChartNumber(row.pv));
+            updateDOMText('chart-detail-batt', formatChartNumber(row.batt));
+            updateDOMText('chart-detail-charge', formatChartNumber(row.charge));
+            updateDOMText('chart-detail-load', formatChartNumber(row.load));
         }
 
         let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
@@ -982,7 +1394,7 @@
             if(r > 0) { cost += r * 3736.80; } return cost;
         }
 
-        function saveEnergyHistoryToFirebase(pvToday, loadToday, gridBuyToday) {
+        function saveEnergyHistoryToFirebase(pvToday, loadToday, gridBuyToday, battDischargeToday = 0, battChargeToday = 0) {
             const now = new Date();
             const yyyy = now.getFullYear();
             const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -997,37 +1409,47 @@
             dailyRef.update({
                 pv: Number(pvToday.toFixed(1)),
                 load: Number(loadToday.toFixed(1)),
-                grid: Number(gridBuyToday.toFixed(1))
+                grid: Number(gridBuyToday.toFixed(1)),
+                batt: Number(battDischargeToday.toFixed(1)),
+                charge: Number(battChargeToday.toFixed(1))
             });
 
             database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value', (snap) => {
                 const daysData = snap.val() || {};
-                let monthPv = 0, monthLoad = 0, monthGrid = 0;
+                let monthPv = 0, monthLoad = 0, monthGrid = 0, monthBatt = 0, monthCharge = 0;
                 for (let d in daysData) {
                     monthPv += Number(daysData[d].pv || 0);
                     monthLoad += Number(daysData[d].load || 0);
                     monthGrid += Number(daysData[d].grid || 0);
+                    monthBatt += Number(daysData[d].batt || 0);
+                    monthCharge += Number(daysData[d].charge || 0);
                 }
 
                 database.ref(`/SosenSystem/History/Monthly/${yyyy}/${monthItemKey}`).update({
                     pv: Number(monthPv.toFixed(1)),
                     load: Number(monthLoad.toFixed(1)),
-                    grid: Number(monthGrid.toFixed(1))
+                    grid: Number(monthGrid.toFixed(1)),
+                    batt: Number(monthBatt.toFixed(1)),
+                    charge: Number(monthCharge.toFixed(1))
                 });
 
                 database.ref(`/SosenSystem/History/Monthly/${yyyy}`).once('value', (mSnap) => {
                     const monthsData = mSnap.val() || {};
-                    let yearPv = 0, yearLoad = 0, yearGrid = 0;
+                    let yearPv = 0, yearLoad = 0, yearGrid = 0, yearBatt = 0, yearCharge = 0;
                     for (let m in monthsData) {
                         yearPv += Number(monthsData[m].pv || 0);
                         yearLoad += Number(monthsData[m].load || 0);
                         yearGrid += Number(monthsData[m].grid || 0);
+                        yearBatt += Number(monthsData[m].batt || 0);
+                        yearCharge += Number(monthsData[m].charge || 0);
                     }
 
                     database.ref(`/SosenSystem/History/Yearly/${yearKey}`).update({
                         pv: Number(yearPv.toFixed(1)),
                         load: Number(yearLoad.toFixed(1)),
-                        grid: Number(yearGrid.toFixed(1))
+                        grid: Number(yearGrid.toFixed(1)),
+                        batt: Number(yearBatt.toFixed(1)),
+                        charge: Number(yearCharge.toFixed(1))
                     });
 
                     loadChartData();
@@ -1043,20 +1465,22 @@
             let currentETotal = data.PV_Total_Lifetime || 0;
             let loadToday = data.Load_Today || 0;
             let gridBuyToday = data.Grid_Buy_Today || 0;
+            let battDisToday = data.Bat_Discharge_Today || 0;
+            let battChgToday = data.Bat_Charge_Today || 0;
 
             animateValue('stat-pv-today', pvToday, v => v.toFixed(1) + ' kWh');
             animateValue('stat-load-today', loadToday, v => v.toFixed(1) + ' kWh'); 
             animateValue('stat-grid-buy', gridBuyToday, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-bat-dis', data.Bat_Discharge_Today || 0, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-bat-chg', data.Bat_Charge_Today || 0, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-dis', battDisToday, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-chg', battChgToday, v => v.toFixed(1) + ' kWh');
             
             animateValue('stat-bat-dis-total', data.Bat_Discharge_Total_Lifetime || 0, v => v.toFixed(1) + ' kWh');
             animateValue('stat-bat-chg-total', data.Bat_Charge_Total_Lifetime || 0, v => v.toFixed(1) + ' kWh');
             
             animateValue('stat-pv-total', currentETotal, v => v.toFixed(1) + ' kWh');
 
-            if (pvToday > 0 || loadToday > 0) {
-                saveEnergyHistoryToFirebase(pvToday, loadToday, gridBuyToday);
+            if (pvToday > 0 || loadToday > 0 || gridBuyToday > 0 || battDisToday > 0 || battChgToday > 0) {
+                saveEnergyHistoryToFirebase(pvToday, loadToday, gridBuyToday, battDisToday, battChgToday);
             }
 
             let todayDate = new Date(); 
