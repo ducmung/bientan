@@ -132,7 +132,7 @@
         .pos-grid { top: 18%; left: 84%; }
         .pos-batt { top: 82%; left: 16%; }
         .pos-load { top: 82%; left: 84%; }
-        .pos-batt.corner-node { top: 86%; left: 12%; }
+        .pos-batt.corner-node { top: 84%; left: 15%; width: 118px; }
         .pos-load.corner-node { top: 86%; left: 88%; }
 
         .weather-container {
@@ -242,8 +242,11 @@
         .corner-power .val { display: block; font-size: 18px; line-height: 1; }
         .corner-power .unit { display: block; line-height: 1.05; margin-top: 2px; }
         .corner-node .battery-wrapper, .corner-node .icon { order: 2; position: relative; z-index: 11; }
-        .pos-batt.corner-node .battery-wrapper { margin: -4px auto 0 auto; transform: translate(-6px, 9px) translateZ(0); }
-        .pos-batt.corner-node .battery-wrapper:hover { transform: translate(-6px, 9px) scale(1.05) translateZ(0); }
+        .pos-batt.corner-node .battery-wrapper { margin: -2px auto 0 auto; transform: translate(4px, -2px) translateZ(0); }
+        .pos-batt.corner-node .battery-wrapper:hover { transform: translate(4px, -2px) scale(1.05) translateZ(0); }
+        .pos-batt.corner-node .battery-body { width: 92px; height: 40px; border-radius: 5px; }
+        .pos-batt.corner-node .battery-cap { width: 7px; height: 19px; border-radius: 0 4px 4px 0; }
+        .pos-batt.corner-node #lbl-soc { font-size: 21px; }
         .pos-load.corner-node .icon { margin: -10px auto 0 auto; transform: translate(6px, 12px) translateZ(0); }
         .pos-load.corner-node .img-icon { width: 78px; height: 78px; margin: -8px auto 0 auto; }
         
