@@ -132,6 +132,8 @@
         .pos-grid { top: 18%; left: 84%; }
         .pos-batt { top: 82%; left: 16%; }
         .pos-load { top: 82%; left: 84%; }
+        .pos-batt.corner-node { top: 86%; left: 12%; }
+        .pos-load.corner-node { top: 86%; left: 88%; }
 
         .weather-container {
             position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15;
@@ -229,6 +231,21 @@
 
         .node h3 { font-size: 10px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
         .node .unit { font-size: 10px; color: rgba(255,255,255,0.86); font-weight: 800; }
+        .corner-node {
+            width: 96px; padding: 0 4px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+        }
+        .corner-power {
+            order: 1; transform: translateY(-13px) translateZ(0); line-height: 1; position: relative; z-index: 12;
+            text-align: center; pointer-events: none;
+        }
+        .corner-power h3 { margin: 0 0 3px 0; }
+        .corner-power .val { display: block; font-size: 18px; line-height: 1; }
+        .corner-power .unit { display: block; line-height: 1.05; margin-top: 2px; }
+        .corner-node .battery-wrapper, .corner-node .icon { order: 2; position: relative; z-index: 11; }
+        .pos-batt.corner-node .battery-wrapper { margin: -4px auto 0 auto; transform: translate(-6px, 9px) translateZ(0); }
+        .pos-batt.corner-node .battery-wrapper:hover { transform: translate(-6px, 9px) scale(1.05) translateZ(0); }
+        .pos-load.corner-node .icon { margin: -10px auto 0 auto; transform: translate(6px, 12px) translateZ(0); }
+        .pos-load.corner-node .img-icon { width: 78px; height: 78px; margin: -8px auto 0 auto; }
         
         .icon { 
             font-size: 46px; 
@@ -748,17 +765,17 @@
                 <div class="unit">W</div>
             </div>
 
-            <div class="node pos-batt">
+            <div class="node pos-batt corner-node">
+                <div class="corner-power"><h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div></div>
                 <div class="battery-wrapper" onclick="window.open('https://mikasolar.com/14058648', '_blank')" title="Nhấn để xem chi tiết Pin">
                     <div class="battery-body"><div class="battery-fill" id="batt-fill"></div><div id="lbl-soc">0%</div></div>
                     <div class="battery-cap"></div>
                 </div>
-                <h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div>
             </div>
 
-            <div class="node pos-load">
+            <div class="node pos-load corner-node">
+                <div class="corner-power"><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
                 <div class="icon"><img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon"></div>
-                <h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div>
             </div>
 
             <div class="bpf-container"><div class="bpf-text" data-text="八方來財">八方來財</div></div>
