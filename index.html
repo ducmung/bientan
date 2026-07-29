@@ -206,7 +206,7 @@
             text-shadow: 1px 1px 0 #ff0000, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 0 #660000, 5px 5px 0 #330000, 6px 6px 12px rgba(255, 0, 0, 0.8);
         }
 
-        .line { position: absolute; height: 10px; margin-top: -5px; background: transparent; width: 44%; z-index: 1; transform: translateZ(0); }
+        .line { position: absolute; height: 26px; margin-top: -13px; background: transparent; width: 44%; z-index: 1; transform: translateZ(0); pointer-events: none; }
         .line-pv { top: 18%; left: 16%; transform-origin: left center; transform: rotate(38deg) translateZ(0); }
         .line-grid { top: 18%; right: 16%; transform-origin: right center; transform: rotate(-38deg) translateZ(0); }
         .line-batt { top: 82%; left: 16%; transform-origin: left center; transform: rotate(-38deg) translateZ(0); }
@@ -295,20 +295,69 @@
         .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.8) !important; font-size: 18px; }
 
         .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; transform: translateZ(0); }
-        .flow-track { position: absolute; top: 50%; left: 0; width: 100%; height: 1px; transform: translateY(-50%) translateZ(0); background: rgba(255,255,255,0.2); box-shadow: 0 0 8px rgba(255,255,255,0.18); }
-        .flow-dash { position: absolute; top: 50%; width: 40px; height: 2px; border-radius: 10px; opacity: 0; will-change: transform, opacity; transform: translateZ(0); }
-        .dir-right .flow-dash { background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%); box-shadow: 0 0 4px var(--c), 0 0 10px var(--c); }
-        .dir-left .flow-dash { background: linear-gradient(270deg, transparent 0%, rgba(255,255,255,0.15) 20%, var(--c) 70%, #ffffff 100%); box-shadow: 0 0 4px var(--c), 0 0 10px var(--c); }
-        .flow-dash::before { content: ''; position: absolute; width: 5px; height: 5px; background: #fff; border-radius: 50%; top: 50%; transform: translateY(-50%) translateZ(0); box-shadow: 0 0 6px #fff, 0 0 10px var(--c); }
-        .flow-dash::after { content: ''; position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; top: 50%; transform: translateZ(0); box-shadow: -6px -4px 0 rgba(255,255,255,0.7); }
-        .dir-right .flow-dash::before, .dir-right .flow-dash::after { right: -2px; }
-        .dir-left .flow-dash::before, .dir-left .flow-dash::after { left: -2px; }
-        .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.5s; } .flow-dash:nth-child(4) { animation-delay: 1.0s; } .flow-dash:nth-child(5) { animation-delay: 1.5s; } .flow-dash:nth-child(6) { animation-delay: 2.0s; }
+        .flow-track {
+            position: absolute; top: 50%; left: -4%; width: 108%; height: 8px;
+            transform: translateY(-50%) translateZ(0); border-radius: 999px;
+            background:
+                repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 9px, rgba(255,255,255,0.86) 10px 12px, rgba(255,255,255,0) 13px 22px),
+                linear-gradient(90deg, rgba(255,255,255,0.04) 0%, var(--c) 18%, #ffffff 50%, var(--c) 82%, rgba(255,255,255,0.04) 100%);
+            background-size: 44px 100%, 100% 100%;
+            box-shadow: 0 0 8px var(--c), 0 0 18px var(--c), inset 0 0 5px rgba(255,255,255,0.75);
+            opacity: 0.9;
+            animation: electricWireSlide var(--wire-speed, 1s) linear infinite, electricWirePulse 1.7s ease-in-out infinite alternate;
+            z-index: 1;
+        }
+        .flow-track::before {
+            content: ''; position: absolute; left: -10px; right: -10px; top: 50%; height: 20px;
+            transform: translateY(-50%) translateZ(0); border-radius: 999px;
+            background: radial-gradient(ellipse at center, var(--c) 0%, rgba(255,255,255,0.08) 36%, rgba(255,255,255,0) 72%);
+            filter: blur(8px); opacity: 0.38; z-index: -1;
+        }
+        .flow-track::after {
+            content: ''; position: absolute; left: 2%; right: 2%; top: 50%; height: 2px;
+            transform: translateY(-50%) translateZ(0); border-radius: 999px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.15), #ffffff 48%, rgba(255,255,255,0.15));
+            box-shadow: 0 0 7px #fff, 0 0 14px var(--c);
+            animation: electricFilament 0.8s ease-in-out infinite alternate;
+        }
+        .flow-dash {
+            position: absolute; top: 50%; width: 13px; height: 13px; border-radius: 50%; opacity: 0; z-index: 3;
+            background: radial-gradient(circle at 35% 35%, #ffffff 0 18%, rgba(255,255,255,0.95) 19% 30%, var(--c) 46%, rgba(255,255,255,0) 74%);
+            box-shadow: 0 0 8px #fff, 0 0 14px var(--c), 0 0 26px var(--c);
+            will-change: left, right, transform, opacity;
+            transform: translate(-50%, -50%) translateZ(0);
+        }
+        .flow-dash::before {
+            content: ''; position: absolute; top: 50%; width: 34px; height: 4px; border-radius: 999px;
+            transform: translateY(-50%) translateZ(0); opacity: 0.82; filter: blur(0.2px);
+        }
+        .dir-right .flow-dash::before { right: 8px; background: linear-gradient(90deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
+        .dir-left .flow-dash::before { left: 8px; background: linear-gradient(270deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
+        .flow-dash::after {
+            content: ''; position: absolute; width: 3px; height: 3px; border-radius: 50%;
+            top: -3px; right: 1px; background: #ffffff;
+            box-shadow: -8px 9px 0 rgba(255,255,255,0.74), 6px 11px 0 var(--c);
+            animation: particleTwinkle 0.7s ease-in-out infinite alternate;
+        }
+        .flow-spark {
+            position: absolute; top: 50%; width: 4px; height: 4px; border-radius: 50%; opacity: 0; z-index: 4;
+            background: #ffffff; box-shadow: 0 0 6px #fff, 0 0 13px var(--c), 0 0 20px var(--c);
+            will-change: left, transform, opacity, top;
+            transform: translate(-50%, -50%) translateZ(0);
+        }
+        .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.28s; } .flow-dash:nth-child(4) { animation-delay: 0.56s; } .flow-dash:nth-child(5) { animation-delay: 0.84s; } .flow-dash:nth-child(6) { animation-delay: 1.12s; } .flow-dash:nth-child(7) { animation-delay: 1.40s; } .flow-dash:nth-child(8) { animation-delay: 1.68s; }
+        .flow-spark:nth-child(9) { animation-delay: 0.12s; } .flow-spark:nth-child(10) { animation-delay: 0.38s; } .flow-spark:nth-child(11) { animation-delay: 0.72s; } .flow-spark:nth-child(12) { animation-delay: 1.02s; } .flow-spark:nth-child(13) { animation-delay: 1.34s; } .flow-spark:nth-child(14) { animation-delay: 1.66s; }
         
-        @keyframes flowInL { 0% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.7) translateZ(0); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1) translateZ(0); } 100% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.8) translateZ(0); } }
-        @keyframes flowOutL { 0% { left: 100%; opacity: 0; transform: translateY(-50%) scale(0.7) translateZ(0); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1) translateZ(0); } 100% { left: -30%; opacity: 0; transform: translateY(-50%) scale(0.8) translateZ(0); } }
-        @keyframes flowInR { 0% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.7) translateZ(0); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1) translateZ(0); } 100% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.8) translateZ(0); } }
-        @keyframes flowOutR { 0% { right: 100%; opacity: 0; transform: translateY(-50%) scale(0.7) translateZ(0); } 10% { opacity: 1; } 50% { opacity: 1; transform: translateY(-50%) scale(1) translateZ(0); } 100% { right: -30%; opacity: 0; transform: translateY(-50%) scale(0.8) translateZ(0); } }
+        @keyframes electricWireSlide { to { background-position: 44px 0, 0 0; } }
+        @keyframes electricWirePulse { from { filter: brightness(1) saturate(1); opacity: 0.72; } to { filter: brightness(1.45) saturate(1.35); opacity: 1; } }
+        @keyframes electricFilament { from { opacity: 0.55; transform: translateY(-50%) scaleX(0.96) translateZ(0); } to { opacity: 1; transform: translateY(-50%) scaleX(1.02) translateZ(0); } }
+        @keyframes particleTwinkle { from { opacity: 0.35; transform: scale(0.75) translateZ(0); } to { opacity: 1; transform: scale(1.25) translateZ(0); } }
+        @keyframes flowInL { 0% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
+        @keyframes flowOutL { 0% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
+        @keyframes flowInR { 0% { right: -8%; opacity: 0; transform: translate(50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(50%, -50%) scale(1.06) translateZ(0); } 100% { right: 108%; opacity: 0; transform: translate(50%, -50%) scale(0.55) translateZ(0); } }
+        @keyframes flowOutR { 0% { right: 108%; opacity: 0; transform: translate(50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(50%, -50%) scale(1.06) translateZ(0); } 100% { right: -8%; opacity: 0; transform: translate(50%, -50%) scale(0.55) translateZ(0); } }
+        @keyframes sparkRight { 0% { left: -5%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.35) translateZ(0); } 12% { opacity: 1; } 36% { top: 38%; } 62% { top: 62%; } 100% { left: 105%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65) translateZ(0); } }
+        @keyframes sparkLeft { 0% { left: 105%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.35) translateZ(0); } 12% { opacity: 1; } 36% { top: 62%; } 62% { top: 38%; } 100% { left: -5%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65) translateZ(0); } }
 
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
         .stat-card {
@@ -677,10 +726,10 @@
 
             <div id="lbl-inv-temp">🌡️ --°C</div>
 
-            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div></div>
-            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div></div>
-            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div></div>
-            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div><div class="flow-dash"></div></div></div>
+            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
 
             <div class="node pos-pv">
                 <div class="solar-sun-box">
@@ -1529,20 +1578,43 @@
             if (el && el.innerText !== String(newValue)) { el.innerText = newValue; }
         }
 
-        function setFlow(groupId, isActive, animName, color) {
+        function getFlowIntensity(powerW) {
+            if (powerW === undefined || powerW === null) {
+                return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
+            }
+
+            const watts = Math.abs(Number(powerW)) || 0;
+            if (watts < 1) return { particles: 0, sparks: 0, dashDuration: 7.8, sparkDuration: 5.4, wireSpeed: 4.2 };
+            if (watts <= 1000) return { particles: 3, sparks: 2, dashDuration: 7.0, sparkDuration: 4.8, wireSpeed: 3.6 };
+            if (watts <= 2000) return { particles: 4, sparks: 3, dashDuration: 5.0, sparkDuration: 3.4, wireSpeed: 2.5 };
+            if (watts <= 4000) return { particles: 5, sparks: 4, dashDuration: 3.4, sparkDuration: 2.35, wireSpeed: 1.7 };
+            if (watts <= 5500) return { particles: 6, sparks: 5, dashDuration: 2.65, sparkDuration: 1.85, wireSpeed: 1.25 };
+            return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
+        }
+
+        function setFlow(groupId, isActive, animName, color, powerW) {
             const group = document.getElementById(groupId); 
             if (!group) return;
             
             const currentAnim = group.getAttribute('data-anim') || '';
             const currentActive = group.style.display === 'block';
+            const intensity = getFlowIntensity(powerW);
 
-            if (isActive) {
-                if (!currentActive || currentAnim !== animName) {
-                    group.style.display = 'block'; 
-                    group.style.setProperty('--c', color);
+            if (isActive && intensity.particles > 0) {
+                group.style.display = 'block';
+                group.style.setProperty('--c', color || '#00e5ff');
+                group.style.setProperty('--wire-speed', intensity.wireSpeed + 's');
+                const movesRight = animName === 'flowInL' || animName === 'flowOutR';
+                const currentParticles = group.getAttribute('data-particles') || '';
+                const currentDashDuration = group.getAttribute('data-dash-duration') || '';
+                const needsRefresh = !currentActive || currentAnim !== animName || currentParticles !== String(intensity.particles) || currentDashDuration !== String(intensity.dashDuration);
+
+                if (needsRefresh) {
                     group.setAttribute('data-anim', animName);
+                    group.setAttribute('data-particles', String(intensity.particles));
+                    group.setAttribute('data-dash-duration', String(intensity.dashDuration));
                     
-                    if (animName === 'flowInL' || animName === 'flowOutR') { 
+                    if (movesRight) { 
                         group.classList.add('dir-right'); 
                         group.classList.remove('dir-left'); 
                     } else { 
@@ -1551,19 +1623,45 @@
                     }
                     
                     const dashes = group.querySelectorAll('.flow-dash');
-                    dashes.forEach((d) => { 
+                    dashes.forEach((d, index) => { 
                         d.style.animationName = 'none';
-                        void d.offsetWidth; 
+                        d.style.opacity = '0';
+                        if (index >= intensity.particles) {
+                            d.style.display = 'none';
+                            return;
+                        }
+                        d.style.display = 'block';
+                        void d.offsetWidth;
                         d.style.animationName = animName;
-                        d.style.animationDuration = '2.5s'; 
+                        d.style.animationDelay = '-' + ((index * intensity.dashDuration) / intensity.particles).toFixed(2) + 's';
+                        d.style.animationDuration = intensity.dashDuration + 's'; 
                         d.style.animationIterationCount = 'infinite'; 
                         d.style.animationTimingFunction = 'linear'; 
+                    });
+
+                    const sparks = group.querySelectorAll('.flow-spark');
+                    sparks.forEach((s, index) => {
+                        s.style.animationName = 'none';
+                        s.style.opacity = '0';
+                        if (index >= intensity.sparks) {
+                            s.style.display = 'none';
+                            return;
+                        }
+                        s.style.display = 'block';
+                        void s.offsetWidth;
+                        s.style.animationName = movesRight ? 'sparkRight' : 'sparkLeft';
+                        s.style.animationDelay = '-' + ((index * intensity.sparkDuration) / Math.max(intensity.sparks, 1)).toFixed(2) + 's';
+                        s.style.animationDuration = intensity.sparkDuration + 's';
+                        s.style.animationIterationCount = 'infinite';
+                        s.style.animationTimingFunction = 'linear';
                     });
                 }
             } else { 
                 if (currentActive) {
                     group.style.display = 'none'; 
                     group.setAttribute('data-anim', '');
+                    group.setAttribute('data-particles', '');
+                    group.setAttribute('data-dash-duration', '');
                 }
             }
         }
@@ -1665,11 +1763,11 @@
                 if (battFill.style.width !== soc + '%') battFill.style.width = soc + '%';
                 if (!battFill.className.includes(colorTheme)) battFill.className = 'battery-fill ' + colorTheme;
 
-                if(pvInW > 0) setFlow('flow-pv', true, 'flowInL', '#ffaa00'); else setFlow('flow-pv', false);
-                if(loadInW > 0) setFlow('flow-load', true, 'flowOutR', '#0088ff'); else setFlow('flow-load', false);
+                if(pvInW >= 1) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
+                if(loadInW >= 1) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
                 
-                if (data.Batt_Current < -0.1) setFlow('flow-batt', true, 'flowOutL', '#00cc66'); 
-                else if (data.Batt_Current > 0.1) setFlow('flow-batt', true, 'flowInL', '#ff4444'); 
+                if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW)); 
+                else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); 
                 else setFlow('flow-batt', false);
                 
                 if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444'); 
