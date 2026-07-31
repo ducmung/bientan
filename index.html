@@ -12,7 +12,7 @@
 
         body {
             background:
-                linear-gradient(135deg, rgba(6, 12, 24, 0.4), rgba(18, 32, 58, 0.3)),
+                linear-gradient(135deg, rgba(6, 12, 24, 0.75), rgba(18, 32, 58, 0.65)),
                 url('1279_High_Defination_(HDTV).jpg');
             background-size: cover;
             background-position: center;
@@ -23,6 +23,18 @@
             padding: 10px;
             overflow-x: hidden;
             position: relative;
+        }
+
+        /* Canvas Nền GPU */
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: screen;
+            transform: translateZ(0);
         }
 
         .app-container { 
@@ -53,6 +65,23 @@
             transform: translateZ(0);
             contain: layout style paint;
         }
+
+        .diagram-panel::before {
+            content: "";
+            position: absolute;
+            inset: 8%;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 2px),
+                conic-gradient(from 0deg, transparent, rgba(255,215,0,0.18), transparent, rgba(0,229,255,0.16), transparent);
+            filter: blur(0.1px);
+            animation: softSpin 22s linear infinite;
+            z-index: -1;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
         .diagram-panel::after,
         .stat-card::after,
@@ -120,6 +149,7 @@
         }
         .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
 
+        /* NÚT CÔNG TẮC BẬT/TẮT DỌC SÁT GÓC TRÊN BÊN PHẢI (CHỮ Ở DƯỚI CÔNG TẮC) */
         .inv-switch-overlay {
             position: absolute;
             top: 3px;
@@ -127,7 +157,7 @@
             z-index: 25;
             background: transparent;
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Xếp dọc: Công tắc ở trên, chữ ở dưới */
             align-items: center;
             gap: 1px;
             padding: 0;
@@ -622,7 +652,27 @@
 
         /* Mặt trời Canvas */
         .solar-sun-box{ width: 82px; height: 82px; margin: auto; position: relative; transform: translate(-8px, -6px) translateZ(0); }
-        #solar-sun{ width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; transition: all 0.5s ease; transform: translateZ(0); }
+        #solar-sun{
+            --sun-opacity: .2;
+            --sun-brightness: .45;
+            --sun-core-scale: .72;
+            --sun-halo-opacity: .06;
+            --sun-halo-scale: .56;
+            --sun-canvas-filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.16));
+            --sun-core-shadow:
+                0 0 8px rgba(255, 230, 100, .28),
+                0 0 16px rgba(255, 190, 0, .18);
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: var(--sun-opacity);
+            filter: brightness(var(--sun-brightness));
+            transition: opacity 0.5s ease, filter 0.5s ease;
+            transform: translateZ(0);
+        }
         
         #sun-canvas {
             position: absolute;
@@ -633,8 +683,7 @@
             height: 230px;
             pointer-events: none;
             z-index: 0;
-            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.4));
-            transition: filter 0.5s ease, opacity 0.5s ease;
+            filter: var(--sun-canvas-filter);
         }
 
         .sun-core{
@@ -650,15 +699,10 @@
                 #ffe56a 45%,
                 #ffbf00 75%,
                 #ff9800 100%);
-            box-shadow:
-                0 0 20px #fff7c5,
-                0 0 40px #ffd700,
-                0 0 80px #ffb300,
-                0 0 120px rgba(255,190,0,.7);
+            box-shadow: var(--sun-core-shadow);
             animation: sunPulse 2s ease-in-out infinite;
-            transform: translateZ(0);
+            transform: scale(var(--sun-core-scale)) translateZ(0);
             will-change: transform, filter;
-            transition: transform 0.5s ease, filter 0.5s ease;
         }
 
         #solar-sun::before{
@@ -673,31 +717,111 @@
                 rgba(255,220,80,.2) 40%,
                 transparent 75%);
             animation: haloPulse 2.5s ease-in-out infinite;
+            opacity: var(--sun-halo-opacity);
             pointer-events: none;
             z-index: 1;
-            transform: translateZ(0);
+            transform: scale(var(--sun-halo-scale)) translateZ(0);
             will-change: transform, filter;
         }
 
-        @keyframes sunPulse{ 0%{ transform: scale(1) translateZ(0); filter: brightness(1); } 50%{ transform: scale(1.05) translateZ(0); filter: brightness(1.2); } 100%{ transform: scale(1) translateZ(0); filter: brightness(1); } }
+        @keyframes sunPulse{ 0%{ transform: scale(var(--sun-core-scale)) translateZ(0); filter: brightness(1); } 50%{ transform: scale(calc(var(--sun-core-scale) * 1.05)) translateZ(0); filter: brightness(1.2); } 100%{ transform: scale(var(--sun-core-scale)) translateZ(0); filter: brightness(1); } }
         
         @keyframes haloPulse{
-            0%{ filter:brightness(0.9); transform: scale(1) translateZ(0); }
-            50%{ filter:brightness(1.4); transform: scale(1.1) translateZ(0); }
-            100%{ filter:brightness(0.9); transform: scale(1) translateZ(0); }
+            0%{ filter:brightness(0.9); transform: scale(var(--sun-halo-scale)) translateZ(0); }
+            50%{ filter:brightness(1.4); transform: scale(calc(var(--sun-halo-scale) * 1.1)) translateZ(0); }
+            100%{ filter:brightness(0.9); transform: scale(var(--sun-halo-scale)) translateZ(0); }
         }
 
-        /* 6 CẤP ĐỘ CÔNG SUẤT MẶT TRỜI */
-        .sun-lvl-0 { opacity: 0.2; filter: brightness(0.3); } /* < 10W */
-        .sun-lvl-1 { opacity: 0.45; filter: brightness(0.65) drop-shadow(0 0 6px rgba(255, 215, 0, 0.3)); } /* 10W - 1000W */
-        .sun-lvl-2 { opacity: 0.65; filter: brightness(0.85) drop-shadow(0 0 12px rgba(255, 215, 0, 0.45)); } /* 1001W - 2000W */
-        .sun-lvl-3 { opacity: 0.8; filter: brightness(1.05) drop-shadow(0 0 18px rgba(255, 215, 0, 0.6)); } /* 2001W - 3000W */
-        .sun-lvl-4 { opacity: 0.9; filter: brightness(1.25) drop-shadow(0 0 22px rgba(255, 215, 0, 0.75)); } /* 3001W - 5000W */
-        .sun-lvl-5 { opacity: 0.96; filter: brightness(1.45) drop-shadow(0 0 26px rgba(255, 215, 0, 0.9)); } /* 5001W - 7000W */
-        .sun-lvl-6 { opacity: 1.0; filter: brightness(1.65) drop-shadow(0 0 30px rgba(255, 215, 0, 1.0)); } /* 7001W - 11000W+ */
+        #solar-sun.sun-idle{
+            --sun-opacity: .2;
+            --sun-brightness: .45;
+            --sun-core-scale: .72;
+            --sun-halo-opacity: .06;
+            --sun-halo-scale: .56;
+            --sun-canvas-filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.16));
+            --sun-core-shadow:
+                0 0 8px rgba(255, 230, 100, .28),
+                0 0 16px rgba(255, 190, 0, .18);
+        }
+        #solar-sun.sun-level-1{
+            --sun-opacity: .46;
+            --sun-brightness: .68;
+            --sun-core-scale: .8;
+            --sun-halo-opacity: .16;
+            --sun-halo-scale: .68;
+            --sun-canvas-filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.22));
+            --sun-core-shadow:
+                0 0 10px rgba(255, 245, 170, .38),
+                0 0 20px rgba(255, 205, 0, .28),
+                0 0 32px rgba(255, 180, 0, .18);
+        }
+        #solar-sun.sun-level-2{
+            --sun-opacity: .62;
+            --sun-brightness: .85;
+            --sun-core-scale: .86;
+            --sun-halo-opacity: .24;
+            --sun-halo-scale: .78;
+            --sun-canvas-filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.28));
+            --sun-core-shadow:
+                0 0 12px rgba(255, 247, 197, .48),
+                0 0 25px rgba(255, 215, 0, .36),
+                0 0 42px rgba(255, 179, 0, .24);
+        }
+        #solar-sun.sun-level-3{
+            --sun-opacity: .76;
+            --sun-brightness: 1.05;
+            --sun-core-scale: .91;
+            --sun-halo-opacity: .32;
+            --sun-halo-scale: .88;
+            --sun-canvas-filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.34));
+            --sun-core-shadow:
+                0 0 15px rgba(255, 247, 197, .62),
+                0 0 30px rgba(255, 215, 0, .46),
+                0 0 55px rgba(255, 179, 0, .32);
+        }
+        #solar-sun.sun-level-4{
+            --sun-opacity: .88;
+            --sun-brightness: 1.25;
+            --sun-core-scale: .95;
+            --sun-halo-opacity: .4;
+            --sun-halo-scale: .98;
+            --sun-canvas-filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.4));
+            --sun-core-shadow:
+                0 0 17px rgba(255, 247, 197, .75),
+                0 0 34px rgba(255, 215, 0, .56),
+                0 0 65px rgba(255, 179, 0, .42),
+                0 0 90px rgba(255,190,0,.38);
+        }
+        #solar-sun.sun-level-5{
+            --sun-opacity: .96;
+            --sun-brightness: 1.45;
+            --sun-core-scale: .98;
+            --sun-halo-opacity: .48;
+            --sun-halo-scale: 1.06;
+            --sun-canvas-filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.48));
+            --sun-core-shadow:
+                0 0 18px rgba(255, 247, 197, .9),
+                0 0 37px rgba(255, 215, 0, .7),
+                0 0 72px rgba(255, 179, 0, .52),
+                0 0 105px rgba(255,190,0,.5);
+        }
+        #solar-sun.sun-level-6{
+            --sun-opacity: 1;
+            --sun-brightness: 1.6;
+            --sun-core-scale: 1;
+            --sun-halo-opacity: .55;
+            --sun-halo-scale: 1.1;
+            --sun-canvas-filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.4));
+            --sun-core-shadow:
+                0 0 20px #fff7c5,
+                0 0 40px #ffd700,
+                0 0 80px #ffb300,
+                0 0 120px rgba(255,190,0,.7);
+        }
     </style>
 </head>
 <body>
+    <canvas id="bg-canvas"></canvas>
 
     <div class="app-container">
         <div class="diagram-panel">
@@ -708,7 +832,7 @@
                 <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image">
             </div>
 
-            <!-- NODE BIẾN TẦN TRUNG TÂM -->
+            <!-- NODE BIẾN TẦN TRUNG TÂM - CÔNG TẮC XẾP DỌC SÁT SẠT GÓC BÊN PHẢI -->
             <div class="node-center pos-inv">
                 <img src="68.jpg" alt="Inverter">
                 <div class="inv-switch-overlay" title="Gạt để Bật/Tắt Biến Tần">
@@ -908,8 +1032,128 @@
             state.frameId = requestAnimationFrame(step);
         }
 
-        // ================= BIẾN ĐIỀU KHIỂN CẤP ĐỘ MẶT TRỜI =================
-        let currentSunRayCount = 120; // Khởi tạo số lượng tia mặc định
+        // ================= ENGINE CANVAS NỀN =================
+        function initBgCanvas() {
+            const canvas = document.getElementById('bg-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d', { alpha: true });
+            let w, h, dpr;
+            let stars = [];
+
+            function resize() {
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                w = window.innerWidth;
+                h = window.innerHeight;
+                canvas.width = w * dpr;
+                canvas.height = h * dpr;
+                ctx.scale(dpr, dpr);
+                initStars();
+            }
+
+            function initStars() {
+                stars = [];
+                const numStars = Math.floor((w * h) / 3200);
+                const colors = ['#ffffff', '#00e5ff', '#8cff66', '#ff8c00', '#ff5c7a', '#fff7a1'];
+                for (let i = 0; i < numStars; i++) {
+                    stars.push({
+                        x: Math.random() * w,
+                        y: Math.random() * h,
+                        size: 0.8 + Math.random() * 1.6,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        alpha: 0.2 + Math.random() * 0.7,
+                        speedX: (Math.random() - 0.2) * 0.12,
+                        speedY: -0.1 - Math.random() * 0.2,
+                        blinkFreq: 1 + Math.random() * 2.5,
+                        phase: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            function renderBg(time) {
+                const t = time * 0.001;
+                ctx.clearRect(0, 0, w, h);
+
+                ctx.globalCompositeOperation = 'screen';
+                
+                let g1 = ctx.createRadialGradient(w * 0.15 + Math.sin(t * 0.4) * 40, h * 0.12 + Math.cos(t * 0.3) * 25, 10, w * 0.15, h * 0.12, w * 0.38);
+                g1.addColorStop(0, 'rgba(255, 215, 0, 0.22)');
+                g1.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                ctx.fillStyle = g1;
+                ctx.fillRect(0, 0, w, h);
+
+                let g2 = ctx.createRadialGradient(w * 0.84 + Math.cos(t * 0.35) * 35, h * 0.18 + Math.sin(t * 0.5) * 35, 10, w * 0.84, h * 0.18, w * 0.42);
+                g2.addColorStop(0, 'rgba(0, 229, 255, 0.20)');
+                g2.addColorStop(1, 'rgba(0, 229, 255, 0)');
+                ctx.fillStyle = g2;
+                ctx.fillRect(0, 0, w, h);
+
+                let g3 = ctx.createRadialGradient(w * 0.76 + Math.sin(t * 0.3) * 50, h * 0.86 + Math.cos(t * 0.4) * 30, 10, w * 0.76, h * 0.86, w * 0.45);
+                g3.addColorStop(0, 'rgba(0, 204, 102, 0.18)');
+                g3.addColorStop(1, 'rgba(0, 204, 102, 0)');
+                ctx.fillStyle = g3;
+                ctx.fillRect(0, 0, w, h);
+
+                ctx.globalCompositeOperation = 'source-over';
+                for (let i = 0; i < stars.length; i++) {
+                    let s = stars[i];
+                    s.x += s.speedX;
+                    s.y += s.speedY;
+
+                    if (s.y < 0) { s.y = h; s.x = Math.random() * w; }
+                    if (s.x > w) s.x = 0;
+                    if (s.x < 0) s.x = w;
+
+                    let currentAlpha = s.alpha * (0.4 + 0.6 * Math.sin(t * s.blinkFreq + s.phase));
+                    ctx.fillStyle = s.color;
+                    ctx.globalAlpha = Math.max(0, Math.min(1, currentAlpha));
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1.0;
+
+                requestAnimationFrame(renderBg);
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+            requestAnimationFrame(renderBg);
+        }
+
+        // ================= KỊCH BẢN VẼ MẶT TRỜI BẰNG CANVAS =================
+        const SOLAR_SUN_LEVELS = [
+            { className: 'sun-idle', rays: 0, alpha: 0, length: .35, frameMs: 140, rotation: .012, flicker: .2, shadow: 0 },
+            { className: 'sun-level-1', rays: 14, alpha: .24, length: .42, frameMs: 105, rotation: .014, flicker: .28, shadow: .4 },
+            { className: 'sun-level-2', rays: 26, alpha: .38, length: .55, frameMs: 86, rotation: .02, flicker: .4, shadow: .7 },
+            { className: 'sun-level-3', rays: 42, alpha: .54, length: .68, frameMs: 66, rotation: .027, flicker: .55, shadow: 1 },
+            { className: 'sun-level-4', rays: 64, alpha: .72, length: .82, frameMs: 46, rotation: .035, flicker: .72, shadow: 1.4 },
+            { className: 'sun-level-5', rays: 88, alpha: .88, length: .94, frameMs: 32, rotation: .043, flicker: .88, shadow: 1.7 },
+            { className: 'sun-level-6', rays: 120, alpha: 1, length: 1, frameMs: 16, rotation: .05, flicker: 1, shadow: 2 }
+        ];
+        const SOLAR_SUN_CLASS_NAMES = SOLAR_SUN_LEVELS.map(level => level.className);
+        let activeSolarSunLevel = SOLAR_SUN_LEVELS[0];
+
+        function getSolarSunLevelIndex(pvInW) {
+            const pv = Number.isFinite(pvInW) ? pvInW : 0;
+            if (pv < 100) return 0;
+            if (pv <= 1000) return 1;
+            if (pv <= 2000) return 2;
+            if (pv <= 3000) return 3;
+            if (pv <= 5000) return 4;
+            if (pv <= 7000) return 5;
+            return 6;
+        }
+
+        function updateSolarSunByPv(pvInW) {
+            const solarSun = document.getElementById('solar-sun');
+            const levelIndex = getSolarSunLevelIndex(pvInW);
+            activeSolarSunLevel = SOLAR_SUN_LEVELS[levelIndex];
+
+            if (!solarSun || solarSun.dataset.level === String(levelIndex)) return;
+            solarSun.classList.remove(...SOLAR_SUN_CLASS_NAMES);
+            solarSun.classList.add(activeSolarSunLevel.className);
+            solarSun.dataset.level = String(levelIndex);
+        }
 
         function initCanvasSun() {
             const canvas = document.getElementById('sun-canvas');
@@ -926,11 +1170,11 @@
             const cy = size / 2;
 
             const rays = [];
-            const numRays = 120; // Tổng số tia tối đa
+            const numRays = Math.max(...SOLAR_SUN_LEVELS.map(level => level.rays));
 
             for (let i = 0; i < numRays; i++) {
                 rays.push({
-                    angle: Math.random() * Math.PI * 2,
+                    angleJitter: (Math.random() - 0.5) * 0.18,
                     baseLength: 30 + Math.random() * 80,
                     width: 0.3 + Math.random() * 1.5,
                     speed: 0.02 + Math.random() * 0.08,
@@ -939,41 +1183,51 @@
                 });
             }
 
-            function animateCanvasSun() {
-                ctx.clearRect(0, 0, size, size);
-                const time = Date.now() * 0.001;
+            let lastDraw = 0;
 
-                // Tối ưu năng lượng: Chỉ lặp vẽ đúng số lượng tia theo cấp độ công suất hiện tại
-                for (let i = 0; i < currentSunRayCount; i++) {
-                    const ray = rays[i];
-                    const currentLength = ray.baseLength + Math.sin(ray.phase + time * (ray.speed * 80)) * 15;
-                    const currentAlpha = ray.baseAlpha * (0.5 + Math.sin(ray.phase * 3 + time * 30) * 0.5);
-                    const angle = ray.angle + time * 0.05; 
+            function animateCanvasSun(timestamp) {
+                const level = activeSolarSunLevel || SOLAR_SUN_LEVELS[0];
+                if (!lastDraw || timestamp - lastDraw >= level.frameMs) {
+                    lastDraw = timestamp;
+                    ctx.clearRect(0, 0, size, size);
 
-                    const x = cx + Math.cos(angle) * currentLength;
-                    const y = cy + Math.sin(angle) * currentLength;
+                    if (level.rays > 0 && level.alpha > 0) {
+                        const time = timestamp * 0.001;
+                        for (let i = 0; i < level.rays; i++) {
+                            const ray = rays[i];
+                            const pulse = 0.5 + Math.sin(ray.phase * 3 + time * (8 + level.flicker * 22)) * 0.5;
+                            const currentLength = ray.baseLength * level.length + Math.sin(ray.phase + time * (ray.speed * (25 + level.flicker * 55))) * (4 + level.length * 11);
+                            const currentAlpha = ray.baseAlpha * level.alpha * pulse;
+                            const angle = (i / level.rays) * Math.PI * 2 + ray.angleJitter + time * level.rotation;
 
-                    const grad = ctx.createLinearGradient(cx, cy, x, y);
-                    grad.addColorStop(0, `rgba(255, 255, 255, ${currentAlpha})`);
-                    grad.addColorStop(0.3, `rgba(255, 245, 150, ${currentAlpha * 0.8})`);
-                    grad.addColorStop(1, `rgba(255, 200, 0, 0)`);
+                            const x = cx + Math.cos(angle) * currentLength;
+                            const y = cy + Math.sin(angle) * currentLength;
 
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy);
-                    ctx.lineTo(x, y);
-                    ctx.lineWidth = ray.width;
-                    ctx.strokeStyle = grad;
-                    ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
-                    ctx.shadowBlur = 2;
-                    ctx.stroke();
+                            const grad = ctx.createLinearGradient(cx, cy, x, y);
+                            grad.addColorStop(0, `rgba(255, 255, 255, ${currentAlpha})`);
+                            grad.addColorStop(0.3, `rgba(255, 245, 150, ${currentAlpha * 0.8})`);
+                            grad.addColorStop(1, `rgba(255, 200, 0, 0)`);
+
+                            ctx.beginPath();
+                            ctx.moveTo(cx, cy);
+                            ctx.lineTo(x, y);
+                            ctx.lineWidth = ray.width;
+                            ctx.strokeStyle = grad;
+                            ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
+                            ctx.shadowBlur = level.shadow;
+                            ctx.stroke();
+                        }
+                    }
                 }
 
                 requestAnimationFrame(animateCanvasSun);
             }
-            animateCanvasSun();
+            requestAnimationFrame(animateCanvasSun);
         }
         
         document.addEventListener('DOMContentLoaded', () => {
+            initBgCanvas();
+            updateSolarSunByPv(0);
             initCanvasSun();
             initChart();
             initModalEvents();
@@ -1595,34 +1849,7 @@
                 
                 animateValue('lbl-pv', pvInW, v => Math.round(v));
 
-                // ================= PHÂN CẤP CÔNG SUẤT MẶT TRỜI =================
-                const solarSun = document.getElementById('solar-sun');
-                if (solarSun) {
-                    solarSun.className = ''; // Xóa tất cả các class cũ
-                    
-                    if (pvInW < 10) {
-                        currentSunRayCount = 0;
-                        solarSun.classList.add('sun-lvl-0');
-                    } else if (pvInW <= 1000) { // Cấp 1: 10 - 1000W
-                        currentSunRayCount = 15;
-                        solarSun.classList.add('sun-lvl-1');
-                    } else if (pvInW <= 2000) { // Cấp 2: 1001 - 2000W
-                        currentSunRayCount = 35;
-                        solarSun.classList.add('sun-lvl-2');
-                    } else if (pvInW <= 3000) { // Cấp 3: 2001 - 3000W
-                        currentSunRayCount = 55;
-                        solarSun.classList.add('sun-lvl-3');
-                    } else if (pvInW <= 5000) { // Cấp 4: 3001 - 5000W
-                        currentSunRayCount = 75;
-                        solarSun.classList.add('sun-lvl-4');
-                    } else if (pvInW <= 7000) { // Cấp 5: 5001 - 7000W
-                        currentSunRayCount = 95;
-                        solarSun.classList.add('sun-lvl-5');
-                    } else { // Cấp 6: 7001 - 11000W+
-                        currentSunRayCount = 120;
-                        solarSun.classList.add('sun-lvl-6');
-                    }
-                }
+                updateSolarSunByPv(pvInW);
 
                 animateValue('lbl-load', loadInW, v => Math.round(v));
                 animateValue('lbl-grid', Math.abs(gridInW), v => Math.round(v));
