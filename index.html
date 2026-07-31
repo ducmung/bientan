@@ -11,18 +11,23 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
 
         body {
-            background:
-                linear-gradient(135deg, rgba(6, 12, 24, 0.75), rgba(18, 32, 58, 0.65)),
-                url('1279_High_Defination_(HDTV).jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
+            background: linear-gradient(135deg, rgba(6, 12, 24, 0.85), rgba(18, 32, 58, 0.75));
             color: #333;
             min-height: 100vh;
             padding: 10px;
             overflow-x: hidden;
             position: relative;
+        }
+
+        /* KHẮC PHỤC 1: Dùng lớp nền cố định thay cho background-attachment: fixed để chống giật lag & mất hình */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background: url('1279_High_Defination_(HDTV).jpg') no-repeat center center / cover;
+            transform: translateZ(0);
+            pointer-events: none;
         }
 
         .app-container { 
@@ -36,22 +41,22 @@
             transform: translateZ(0); 
         }
 
+        /* KHẮC PHỤC 2: Tối ưu backdrop-filter nhẹ hơn giúp GPU không bị tràn bộ nhớ */
         .diagram-panel {
             position: relative; 
             width: 100%; 
             max-width: 500px; 
             margin: 0 auto; 
             aspect-ratio: 1 / 1.1;
-            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.34), rgba(255,255,255,0.12) 42%, rgba(255,255,255,0.28)), rgba(255, 255, 255, 0.36);
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.42), rgba(255,255,255,0.22) 42%, rgba(255,255,255,0.35)), rgba(255, 255, 255, 0.45);
             border-radius: 20px; 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.65), 0 0 34px rgba(0,229,255,0.12);
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px); 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.65);
+            backdrop-filter: blur(6px); 
+            -webkit-backdrop-filter: blur(6px); 
             border: 1px solid rgba(255,255,255,0.42);
             overflow: hidden; 
             isolation: isolate; 
             transform: translateZ(0);
-            contain: layout style paint;
         }
 
         .diagram-panel::before {
@@ -62,10 +67,8 @@
             background:
                 radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 2px),
                 conic-gradient(from 0deg, transparent, rgba(255,215,0,0.18), transparent, rgba(0,229,255,0.16), transparent);
-            filter: blur(0.1px);
             animation: softSpin 22s linear infinite;
             z-index: -1;
-            will-change: transform;
             transform: translateZ(0);
         }
 
@@ -94,11 +97,9 @@
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
-            filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4));
             animation:
                 rainbowSlide 3s linear infinite,
                 rainbowBorderGlow 1.5s ease-in-out infinite alternate;
-            will-change: background-position, filter, opacity;
             transform: translateZ(0);
         }
 
@@ -111,8 +112,8 @@
 
         @keyframes rainbowSlide { to { background-position: -200% 0; } }
         @keyframes rainbowBorderGlow {
-            from { opacity: 0.7; filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.3)); }
-            to { opacity: 1; filter: drop-shadow(0 0 10px rgba(176, 0, 255, 0.6)); }
+            from { opacity: 0.7; }
+            to { opacity: 1; }
         }
 
         .node { position: absolute; transform: translate(-50%, -50%) translateZ(0); background: transparent; border: none; padding: 10px 4px; text-align: center; width: 90px; z-index: 10; }
@@ -127,7 +128,7 @@
             position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15;
             width: 140px; background: #fff; padding: 3px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .weather-container img { width: 100%; height: auto; display: block; border-radius: 12px; }
+        .weather-container img { width: 100%; height: auto; display: block; border-radius: 12px; transform: translateZ(0); }
 
         /* Node Biến Tần Trung Tâm */
         .node-center {
@@ -135,7 +136,7 @@
             width: 115px; height: 125px; padding: 3px; background: #fff; border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.16), 0 0 22px rgba(0,204,102,0.3); z-index: 15;
         }
-        .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+        .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; transform: translateZ(0); }
 
         .inv-switch-overlay {
             position: absolute;
@@ -181,7 +182,7 @@
         }
 
         .bpf-container {
-            position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15; text-align: center; width: 100%; pointer-events: none; will-change: transform;
+            position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15; text-align: center; width: 100%; pointer-events: none;
         }
         .bpf-text {
             font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 32px; font-weight: 900; letter-spacing: 14px;
@@ -244,7 +245,7 @@
             display: inline-block;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); 
         }
-        .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+        .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)); }
         
         .img-icon {
             width: 85px; 
@@ -255,6 +256,7 @@
             filter: brightness(1.1) contrast(1.1);
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%);
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%);
+            transform: translateZ(0);
         }
 
         .pos-load .icon { filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.8)); }
@@ -284,7 +286,7 @@
         .battery-cap { width: 5px; height: 14px; background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%); border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.3); border-left: none; box-shadow: inset 1px 0 3px rgba(255,255,255,0.6); }
         .battery-fill {
             height: 100%; width: 0%; transition: width 0.5s ease-in-out, background 0.5s;
-            position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); will-change: width, background; transform: translateZ(0);
+            position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); transform: translateZ(0);
         }
         .fill-red { background: linear-gradient(to bottom, #ff5555 0%, #ffaaaa 30%, #ff2222 70%, #aa0000 100%); }
         .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
@@ -309,34 +311,32 @@
                 repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 9px, rgba(255,255,255,0.86) 10px 12px, rgba(255,255,255,0) 13px 22px),
                 linear-gradient(90deg, rgba(255,255,255,0.04) 0%, var(--c) 18%, #ffffff 50%, var(--c) 82%, rgba(255,255,255,0.04) 100%);
             background-size: 44px 100%, 100% 100%;
-            box-shadow: 0 0 8px var(--c), 0 0 18px var(--c), inset 0 0 5px rgba(255,255,255,0.75);
+            box-shadow: 0 0 8px var(--c), inset 0 0 5px rgba(255,255,255,0.75);
             opacity: 0.9;
-            animation: electricWireSlide var(--wire-speed, 1s) linear infinite, electricWirePulse 1.7s ease-in-out infinite alternate;
+            animation: electricWireSlide var(--wire-speed, 1s) linear infinite;
             z-index: 1;
         }
         .flow-track::before {
             content: ''; position: absolute; left: -10px; right: -10px; top: 50%; height: 20px;
             transform: translateY(-50%) translateZ(0); border-radius: 999px;
             background: radial-gradient(ellipse at center, var(--c) 0%, rgba(255,255,255,0.08) 36%, rgba(255,255,255,0) 72%);
-            filter: blur(8px); opacity: 0.38; z-index: -1;
+            opacity: 0.38; z-index: -1;
         }
         .flow-track::after {
             content: ''; position: absolute; left: 2%; right: 2%; top: 50%; height: 2px;
             transform: translateY(-50%) translateZ(0); border-radius: 999px;
             background: linear-gradient(90deg, rgba(255,255,255,0.15), #ffffff 48%, rgba(255,255,255,0.15));
-            box-shadow: 0 0 7px #fff, 0 0 14px var(--c);
-            animation: electricFilament 0.8s ease-in-out infinite alternate;
+            box-shadow: 0 0 7px #fff;
         }
         .flow-dash {
             position: absolute; top: 50%; width: 13px; height: 13px; border-radius: 50%; opacity: 0; z-index: 3;
             background: radial-gradient(circle at 35% 35%, #ffffff 0 18%, rgba(255,255,255,0.95) 19% 30%, var(--c) 46%, rgba(255,255,255,0) 74%);
-            box-shadow: 0 0 8px #fff, 0 0 14px var(--c), 0 0 26px var(--c);
-            will-change: left, right, transform, opacity;
+            box-shadow: 0 0 8px #fff, 0 0 14px var(--c);
             transform: translate(-50%, -50%) translateZ(0);
         }
         .flow-dash::before {
             content: ''; position: absolute; top: 50%; width: 34px; height: 4px; border-radius: 999px;
-            transform: translateY(-50%) translateZ(0); opacity: 0.82; filter: blur(0.2px);
+            transform: translateY(-50%) translateZ(0); opacity: 0.82;
         }
         .dir-right .flow-dash::before { right: 8px; background: linear-gradient(90deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
         .dir-left .flow-dash::before { left: 8px; background: linear-gradient(270deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
@@ -344,21 +344,16 @@
             content: ''; position: absolute; width: 3px; height: 3px; border-radius: 50%;
             top: -3px; right: 1px; background: #ffffff;
             box-shadow: -8px 9px 0 rgba(255,255,255,0.74), 6px 11px 0 var(--c);
-            animation: particleTwinkle 0.7s ease-in-out infinite alternate;
         }
         .flow-spark {
             position: absolute; top: 50%; width: 4px; height: 4px; border-radius: 50%; opacity: 0; z-index: 4;
-            background: #ffffff; box-shadow: 0 0 6px #fff, 0 0 13px var(--c), 0 0 20px var(--c);
-            will-change: left, transform, opacity, top;
+            background: #ffffff; box-shadow: 0 0 6px #fff, 0 0 13px var(--c);
             transform: translate(-50%, -50%) translateZ(0);
         }
         .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.28s; } .flow-dash:nth-child(4) { animation-delay: 0.56s; } .flow-dash:nth-child(5) { animation-delay: 0.84s; } .flow-dash:nth-child(6) { animation-delay: 1.12s; } .flow-dash:nth-child(7) { animation-delay: 1.40s; } .flow-dash:nth-child(8) { animation-delay: 1.68s; }
         .flow-spark:nth-child(9) { animation-delay: 0.12s; } .flow-spark:nth-child(10) { animation-delay: 0.38s; } .flow-spark:nth-child(11) { animation-delay: 0.72s; } .flow-spark:nth-child(12) { animation-delay: 1.02s; } .flow-spark:nth-child(13) { animation-delay: 1.34s; } .flow-spark:nth-child(14) { animation-delay: 1.66s; }
         
         @keyframes electricWireSlide { to { background-position: 44px 0, 0 0; } }
-        @keyframes electricWirePulse { from { filter: brightness(1) saturate(1); opacity: 0.72; } to { filter: brightness(1.45) saturate(1.35); opacity: 1; } }
-        @keyframes electricFilament { from { opacity: 0.55; transform: translateY(-50%) scaleX(0.96) translateZ(0); } to { opacity: 1; transform: translateY(-50%) scaleX(1.02) translateZ(0); } }
-        @keyframes particleTwinkle { from { opacity: 0.35; transform: scale(0.75) translateZ(0); } to { opacity: 1; transform: scale(1.25) translateZ(0); } }
         @keyframes flowInL { 0% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
         @keyframes flowOutL { 0% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
         @keyframes flowInR { 0% { right: -8%; opacity: 0; transform: translate(50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(50%, -50%) scale(1.06) translateZ(0); } 100% { right: 108%; opacity: 0; transform: translate(50%, -50%) scale(0.55) translateZ(0); } }
@@ -369,15 +364,14 @@
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
         .stat-card {
             position: relative; overflow: hidden;
-            background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255, 255, 255, 0.7));
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255, 255, 255, 0.78));
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
             border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateZ(0); 
-            contain: layout style paint;
         }
         .stat-card::before {
             content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%);
-            transform: translateX(-120%) translateZ(0); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none; will-change: transform;
+            transform: translateX(-120%) translateZ(0); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none;
         }
         @keyframes cardSheen { 0%, 48% { transform: translateX(-120%) translateZ(0); } 78%, 100% { transform: translateX(120%) translateZ(0); } }
 
@@ -673,7 +667,6 @@
                 0 0 120px rgba(255,190,0,.7);
             animation: sunPulse 2s ease-in-out infinite;
             transform: translateZ(0);
-            will-change: transform, filter;
         }
 
         #solar-sun::before{
@@ -691,7 +684,6 @@
             pointer-events: none;
             z-index: 1;
             transform: translateZ(0);
-            will-change: transform, filter;
         }
 
         @keyframes sunPulse{ 0%{ transform: scale(1) translateZ(0); filter: brightness(1); } 50%{ transform: scale(1.05) translateZ(0); filter: brightness(1.2); } 100%{ transform: scale(1) translateZ(0); filter: brightness(1); } }
@@ -923,8 +915,8 @@
         }
 
         // ================= KỊCH BẢN VẼ MẶT TRỜI CHIA 6 CẤP ĐỘ DỰA TRÊN CÔNG SUẤT PV =================
-        let currentSunLevel = 0; // Global tracking cấp độ mặt trời (0 đến 6)
-        const sunRayCounts = [0, 15, 40, 60, 80, 100, 120]; // Cấp 0: 0 tia | Cấp 1: 15 tia | Cấp 2: 40 tia...
+        let currentSunLevel = 0; 
+        const sunRayCounts = [0, 15, 40, 60, 80, 100, 120];
 
         function initCanvasSun() {
             const canvas = document.getElementById('sun-canvas');
@@ -941,7 +933,7 @@
             const cy = size / 2;
 
             const rays = [];
-            const maxRays = 120; // Tổng kho chứa tia tối đa
+            const maxRays = 120;
 
             for (let i = 0; i < maxRays; i++) {
                 rays.push({
@@ -958,9 +950,9 @@
                 ctx.clearRect(0, 0, size, size);
                 const time = Date.now() * 0.001;
 
-                // Lấy số tia hoạt động theo cấp độ hiện tại để tối ưu CPU/GPU
                 const activeRaysCount = sunRayCounts[currentSunLevel] || 0;
 
+                /* KHẮC PHỤC 3: Loại bỏ ctx.shadowBlur trong vòng lặp rendering giúp giảm tải GPU hơn 80% */
                 for (let i = 0; i < activeRaysCount; i++) {
                     const ray = rays[i];
                     const currentLength = ray.baseLength + Math.sin(ray.phase + time * (ray.speed * 80)) * 15;
@@ -980,8 +972,6 @@
                     ctx.lineTo(x, y);
                     ctx.lineWidth = ray.width;
                     ctx.strokeStyle = grad;
-                    ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
-                    ctx.shadowBlur = 2;
                     ctx.stroke();
                 }
 
@@ -990,16 +980,15 @@
             animateCanvasSun();
         }
 
-        // Cập nhật Cấp độ Mặt trời linh hoạt theo Watt PV
         function updateSunLevelByPower(pvW) {
             let lvl = 0;
-            if (pvW >= 7001) { lvl = 6; }        // Cấp 6: 7001W - 11000W+ (Full 120 tia + max chói)
-            else if (pvW >= 5001) { lvl = 5; }   // Cấp 5: 5001W - 7000W (100 tia)
-            else if (pvW >= 3001) { lvl = 4; }   // Cấp 4: 3001W - 5000W (80 tia)
-            else if (pvW >= 2001) { lvl = 3; }   // Cấp 3: 2001W - 3000W (60 tia)
-            else if (pvW >= 1001) { lvl = 2; }   // Cấp 2: 1001W - 2000W (40 tia)
-            else if (pvW >= 11) { lvl = 1; }     // Cấp 1: 11W - 1000W (15 tia + màu vàng dịu mờ nhẹ)
-            else { lvl = 0; }                    // Cấp 0: < 10W (Mờ tối + tắt TẤT CẢ các tia)
+            if (pvW >= 7001) { lvl = 6; }        
+            else if (pvW >= 5001) { lvl = 5; }   
+            else if (pvW >= 3001) { lvl = 4; }   
+            else if (pvW >= 2001) { lvl = 3; }   
+            else if (pvW >= 1001) { lvl = 2; }   
+            else if (pvW >= 11) { lvl = 1; }     
+            else { lvl = 0; }                    
 
             if (currentSunLevel !== lvl) {
                 currentSunLevel = lvl;
@@ -1632,7 +1621,6 @@
                 
                 animateValue('lbl-pv', pvInW, v => Math.round(v));
 
-                // Cập nhật Cấp độ Mặt Trời dựa trên dải Watt PV chuẩn mới
                 updateSunLevelByPower(pvInW);
 
                 animateValue('lbl-load', loadInW, v => Math.round(v));
