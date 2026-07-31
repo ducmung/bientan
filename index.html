@@ -11,9 +11,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
 
         body {
-            background:
-                linear-gradient(135deg, rgba(6, 12, 24, 0.75), rgba(18, 32, 58, 0.65)),
-                url('1279_High_Defination_(HDTV).jpg');
+            background-color: #10202d;
+            background-image: url('1279_High_Defination_(HDTV).jpg');
             background-size: cover;
             background-position: center;
             background-attachment: scroll;
@@ -42,7 +41,7 @@
             max-width: 500px; 
             margin: 0 auto; 
             aspect-ratio: 1 / 1.1;
-            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.34), rgba(255,255,255,0.12) 42%, rgba(255,255,255,0.28)), rgba(255, 255, 255, 0.36);
+            background: rgba(255, 255, 255, 0.34);
             border-radius: 20px; 
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.65), 0 0 34px rgba(0,229,255,0.12);
             backdrop-filter: blur(12px); 
@@ -301,10 +300,7 @@
             z-index: 1;
         }
         .flow-track::before {
-            content: ''; position: absolute; left: -10px; right: -10px; top: 50%; height: 20px;
-            transform: translateY(-50%) translateZ(0); border-radius: 999px;
-            background: radial-gradient(ellipse at center, var(--c) 0%, rgba(255,255,255,0.08) 36%, rgba(255,255,255,0) 72%);
-            filter: blur(8px); opacity: 0.38; z-index: -1;
+            display: none;
         }
         .flow-track::after {
             content: ''; position: absolute; left: 2%; right: 2%; top: 50%; height: 2px;
@@ -691,6 +687,123 @@
         .sun-low{ opacity: .35; filter: brightness(.5); }
         .sun-medium{ opacity: .8; filter: brightness(1.1); }
         .sun-high{ opacity: 1; filter: brightness(1.6) drop-shadow(0 0 20px rgba(255,215,0,0.8)); }
+
+        body.bg-fallback {
+            background-image: linear-gradient(135deg, rgba(6, 12, 24, 0.78), rgba(18, 48, 42, 0.68));
+        }
+
+        .asset-missing {
+            background: rgba(255,255,255,0.85) !important;
+        }
+        .node-center.asset-missing::before,
+        .weather-container.asset-missing::before,
+        .icon.asset-missing::before {
+            display: grid;
+            place-items: center;
+            width: 100%;
+            height: 100%;
+            min-height: 54px;
+            color: #111;
+            font-size: 12px;
+            font-weight: 900;
+            text-align: center;
+        }
+        .node-center.asset-missing::before { content: "INV"; }
+        .weather-container.asset-missing::before { content: "42C"; }
+        .icon.asset-missing::before { content: "HOME"; }
+
+        @media (max-width: 768px), (pointer: coarse) {
+            body {
+                background-attachment: scroll;
+                background-color: #10202d;
+            }
+            .app-container,
+            .diagram-panel,
+            .stat-card,
+            .battery-fill,
+            .progress-bar {
+                transform: none;
+                will-change: auto;
+            }
+            .flow-group,
+            .flow-track,
+            .flow-dash,
+            .flow-spark,
+            .solar-sun-box,
+            #solar-sun,
+            .sun-core,
+            #solar-sun::before,
+            .bpf-container,
+            .bpf-text,
+            .icon,
+            .img-icon,
+            .battery-wrapper,
+            .battery-body {
+                will-change: auto;
+            }
+            .icon,
+            .img-icon,
+            .pos-grid .icon,
+            .pos-load .icon {
+                filter: none;
+            }
+            .img-icon {
+                -webkit-mask-image: none;
+                mask-image: none;
+            }
+            .diagram-panel,
+            .stat-card,
+            .modal-overlay {
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+            }
+            .diagram-panel {
+                background: rgba(255,255,255,0.30);
+                box-shadow: 0 4px 16px rgba(0,0,0,0.16);
+            }
+            .stat-card {
+                background: rgba(255,255,255,0.88);
+                box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            }
+            .diagram-panel::after,
+            .stat-card::after,
+            .node-center::after,
+            .weather-container::after,
+            #update-clock::after,
+            #lbl-status::after,
+            #lbl-inv-temp::after {
+                animation: none;
+                filter: none;
+                background-size: 100% 100%;
+            }
+            .stat-card::before,
+            .flow-track::before,
+            .flow-dash::after,
+            .flow-spark {
+                display: none !important;
+            }
+            .flow-track {
+                box-shadow: 0 0 5px var(--c), inset 0 0 3px rgba(255,255,255,0.55);
+                animation: electricWireSlide var(--wire-speed, 1s) linear infinite;
+            }
+            .flow-track::after,
+            .flow-dash {
+                box-shadow: 0 0 6px var(--c);
+            }
+            .sun-core,
+            #solar-sun::before,
+            .bpf-text {
+                animation: none;
+            }
+            #sun-canvas {
+                display: none;
+            }
+            html.flow-paused .flow-track,
+            html.flow-paused .flow-dash,
+            html.flow-paused .flow-spark {
+                animation-play-state: paused !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -855,6 +968,31 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        const MOBILE_COOL = window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
+        const BACKGROUND_IMAGE_URL = '1279_High_Defination_(HDTV).jpg';
+
+        function clampNumber(value, min, max, fallback = min) {
+            const number = Number(value);
+            if (!Number.isFinite(number)) return fallback;
+            return Math.max(min, Math.min(max, number));
+        }
+
+        function initAssetFallbacks() {
+            const bg = new Image();
+            bg.onload = () => document.body.classList.remove('bg-fallback');
+            bg.onerror = () => document.body.classList.add('bg-fallback');
+            bg.src = BACKGROUND_IMAGE_URL;
+
+            document.querySelectorAll('img').forEach((img) => {
+                img.decoding = 'async';
+                img.loading = 'eager';
+                img.addEventListener('error', () => {
+                    img.style.visibility = 'hidden';
+                    img.closest('.icon, .weather-container, .node-center')?.classList.add('asset-missing');
+                }, { once: true });
+            });
+        }
+
         // ================= HÀM ĐẾM SỐ MƯỢT TỰ ĐỘNG =================
         const numberAnimState = {};
 
@@ -863,6 +1001,17 @@
             if (!el) return;
 
             targetVal = Number(targetVal) || 0;
+            if (MOBILE_COOL || document.hidden || duration <= 0) {
+                if (!numberAnimState[id]) numberAnimState[id] = { currentVal: targetVal, frameId: null };
+                const state = numberAnimState[id];
+                if (state.frameId) {
+                    cancelAnimationFrame(state.frameId);
+                    state.frameId = null;
+                }
+                state.currentVal = targetVal;
+                el.innerText = formatFn(targetVal);
+                return;
+            }
 
             if (!numberAnimState[id]) {
                 numberAnimState[id] = { currentVal: targetVal, frameId: null };
@@ -907,6 +1056,10 @@
         function initCanvasSun() {
             const canvas = document.getElementById('sun-canvas');
             if (!canvas) return;
+            if (MOBILE_COOL) {
+                canvas.remove();
+                return;
+            }
             const ctx = canvas.getContext('2d');
             
             const size = 260; 
@@ -963,8 +1116,51 @@
             }
             animateCanvasSun();
         }
+
+        function initMobilePerformanceMode() {
+            if (!MOBILE_COOL) return;
+            const root = document.documentElement;
+            const diagram = document.querySelector('.diagram-panel');
+
+            function setPaused(paused) {
+                root.classList.toggle('flow-paused', paused || document.hidden);
+            }
+
+            if ('IntersectionObserver' in window && diagram) {
+                const observer = new IntersectionObserver((entries) => {
+                    const entry = entries[0];
+                    setPaused(!entry || entry.intersectionRatio < 0.12);
+                }, { threshold: [0, 0.12] });
+                observer.observe(diagram);
+            } else if (diagram) {
+                let ticking = false;
+                const check = () => {
+                    ticking = false;
+                    const rect = diagram.getBoundingClientRect();
+                    setPaused(rect.bottom < 60 || rect.top > window.innerHeight - 60);
+                };
+                window.addEventListener('scroll', () => {
+                    if (!ticking) {
+                        ticking = true;
+                        requestAnimationFrame(check);
+                    }
+                }, { passive: true });
+                check();
+            }
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden || !diagram) {
+                    setPaused(true);
+                    return;
+                }
+                const rect = diagram.getBoundingClientRect();
+                setPaused(rect.bottom < 60 || rect.top > window.innerHeight - 60);
+            });
+        }
         
         document.addEventListener('DOMContentLoaded', () => {
+            initAssetFallbacks();
+            initMobilePerformanceMode();
             initCanvasSun();
             initChart();
             initModalEvents();
@@ -1043,7 +1239,9 @@
         };
 
         function initChart() {
-            const ctx = document.getElementById('energyChart').getContext('2d');
+            const chartCanvas = document.getElementById('energyChart');
+            if (!chartCanvas || typeof Chart === 'undefined') return;
+            const ctx = chartCanvas.getContext('2d');
             energyChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -1061,10 +1259,13 @@
                         maxBarThickness: 38
                     }))
                 },
-                plugins: [energySelectedBandPlugin, energyValueLabelPlugin],
+                plugins: MOBILE_COOL ? [energySelectedBandPlugin] : [energySelectedBandPlugin, energyValueLabelPlugin],
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: MOBILE_COOL ? false : { duration: 450 },
+                    resizeDelay: MOBILE_COOL ? 250 : 0,
+                    devicePixelRatio: MOBILE_COOL ? 1 : window.devicePixelRatio,
                     onClick(event, elements) {
                         if (elements.length > 0) {
                             const clickedRow = chartRows[elements[0].index];
@@ -1111,9 +1312,12 @@
                     }
                 }
             });
+            let chartResizeTimer = null;
             window.addEventListener('resize', () => {
-                if (energyChart && chartAllRows.length > 0) updateVisibleChartRows();
-            });
+                if (!energyChart || chartAllRows.length === 0) return;
+                clearTimeout(chartResizeTimer);
+                chartResizeTimer = setTimeout(updateVisibleChartRows, MOBILE_COOL ? 260 : 90);
+            }, { passive: true });
             loadChartData();
         }
 
@@ -1326,6 +1530,21 @@
         }
 
         let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
+        let energyHistorySaveTimer = null;
+        let lastEnergyHistorySignature = "";
+
+        function scheduleEnergyHistorySave(pvToday, loadToday, gridBuyToday, battDisToday, battChgToday) {
+            const values = [pvToday, loadToday, gridBuyToday, battDisToday, battChgToday].map(value => Number(value) || 0);
+            const signature = values.map(value => value.toFixed(2)).join('|');
+            if (signature === lastEnergyHistorySignature) return;
+
+            lastEnergyHistorySignature = signature;
+            clearTimeout(energyHistorySaveTimer);
+            energyHistorySaveTimer = setTimeout(() => {
+                energyHistorySaveTimer = null;
+                saveEnergyHistoryToFirebase(...values);
+            }, MOBILE_COOL ? 60000 : 15000);
+        }
 
         function checkAndSwitchMonth() {
             let d = new Date(); let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
@@ -1403,7 +1622,7 @@
                         charge: Number(yearCharge.toFixed(1))
                     });
 
-                    loadChartData();
+                    if (energyChart) loadChartData();
                 });
             });
         }
@@ -1412,12 +1631,12 @@
             if (!latestDailyData) return; 
             const data = latestDailyData;
             
-            let pvToday = data.PV_Today || 0; 
-            let currentETotal = data.PV_Total_Lifetime || 0;
-            let loadToday = data.Load_Today || 0;
-            let gridBuyToday = data.Grid_Buy_Today || 0;
-            let battDisToday = data.Bat_Discharge_Today || 0;
-            let battChgToday = data.Bat_Charge_Today || 0;
+            let pvToday = Number(data.PV_Today) || 0; 
+            let currentETotal = Number(data.PV_Total_Lifetime) || 0;
+            let loadToday = Number(data.Load_Today) || 0;
+            let gridBuyToday = Number(data.Grid_Buy_Today) || 0;
+            let battDisToday = Number(data.Bat_Discharge_Today) || 0;
+            let battChgToday = Number(data.Bat_Charge_Today) || 0;
 
             animateValue('stat-pv-today', pvToday, v => v.toFixed(1) + ' kWh');
             animateValue('stat-load-today', loadToday, v => v.toFixed(1) + ' kWh'); 
@@ -1425,13 +1644,13 @@
             animateValue('stat-bat-dis', battDisToday, v => v.toFixed(1) + ' kWh');
             animateValue('stat-bat-chg', battChgToday, v => v.toFixed(1) + ' kWh');
             
-            animateValue('stat-bat-dis-total', data.Bat_Discharge_Total_Lifetime || 0, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-bat-chg-total', data.Bat_Charge_Total_Lifetime || 0, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-dis-total', Number(data.Bat_Discharge_Total_Lifetime) || 0, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-chg-total', Number(data.Bat_Charge_Total_Lifetime) || 0, v => v.toFixed(1) + ' kWh');
             
             animateValue('stat-pv-total', currentETotal, v => v.toFixed(1) + ' kWh');
 
             if (pvToday > 0 || loadToday > 0 || gridBuyToday > 0 || battDisToday > 0 || battChgToday > 0) {
-                saveEnergyHistoryToFirebase(pvToday, loadToday, gridBuyToday, battDisToday, battChgToday);
+                scheduleEnergyHistorySave(pvToday, loadToday, gridBuyToday, battDisToday, battChgToday);
             }
 
             let todayDate = new Date(); 
@@ -1480,13 +1699,23 @@
             if (el && el.innerText !== String(newValue)) { el.innerText = newValue; }
         }
 
-        function getFlowIntensity(powerW) {
+        function getFlowIntensity(powerW, profile = 'battery') {
             if (powerW === undefined || powerW === null) {
                 return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
             }
 
             const watts = Math.abs(Number(powerW)) || 0;
             if (watts < 1) return { particles: 0, sparks: 0, dashDuration: 7.8, sparkDuration: 5.4, wireSpeed: 4.2 };
+
+            if (profile === 'solar-load') {
+                if (watts < 200) return { particles: 0, sparks: 0, dashDuration: 7.8, sparkDuration: 5.4, wireSpeed: 4.2 };
+                if (watts <= 1000) return { particles: 2, sparks: 1, dashDuration: 7.0, sparkDuration: 4.8, wireSpeed: 3.6 };
+                if (watts <= 2000) return { particles: 4, sparks: 3, dashDuration: 5.0, sparkDuration: 3.4, wireSpeed: 2.5 };
+                if (watts <= 4000) return { particles: 5, sparks: 4, dashDuration: 3.4, sparkDuration: 2.35, wireSpeed: 1.7 };
+                if (watts <= 5500) return { particles: 6, sparks: 5, dashDuration: 2.65, sparkDuration: 1.85, wireSpeed: 1.25 };
+                return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
+            }
+
             if (watts <= 1000) return { particles: 3, sparks: 2, dashDuration: 7.0, sparkDuration: 4.8, wireSpeed: 3.6 };
             if (watts <= 2000) return { particles: 4, sparks: 3, dashDuration: 5.0, sparkDuration: 3.4, wireSpeed: 2.5 };
             if (watts <= 4000) return { particles: 5, sparks: 4, dashDuration: 3.4, sparkDuration: 2.35, wireSpeed: 1.7 };
@@ -1494,13 +1723,13 @@
             return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
         }
 
-        function setFlow(groupId, isActive, animName, color, powerW) {
+        function setFlow(groupId, isActive, animName, color, powerW, profile = 'battery') {
             const group = document.getElementById(groupId); 
             if (!group) return;
             
             const currentAnim = group.getAttribute('data-anim') || '';
             const currentActive = group.style.display === 'block';
-            const intensity = getFlowIntensity(powerW);
+            const intensity = getFlowIntensity(powerW, profile);
 
             if (isActive && intensity.particles > 0) {
                 group.style.display = 'block';
@@ -1577,9 +1806,11 @@
                 const now = new Date();
                 updateDOMText('update-clock', now.toLocaleTimeString('vi-VN', { hour12: false }));
                 
-                let pvInW = Math.round(data.PV_Power * 1000);
-                let gridInW = Math.round(data.Grid_Power);
-                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current);
+                const battVoltage = Number(data.Batt_Voltage) || 0;
+                const battCurrent = Number(data.Batt_Current) || 0;
+                let pvInW = Math.round((Number(data.PV_Power) || 0) * 1000);
+                let gridInW = Math.round(Number(data.Grid_Power) || 0);
+                let battInW = Math.round(battVoltage * battCurrent);
                 let loadInW = pvInW + gridInW + battInW;
 
                 if (loadInW < 0) loadInW = 0;
@@ -1598,31 +1829,31 @@
                 animateValue('lbl-grid', Math.abs(gridInW), v => Math.round(v));
 
                 const elGrid = document.getElementById('lbl-grid');
-                if (gridInW < 0) { 
+                if (elGrid && gridInW < 0) { 
                     elGrid.style.color = '#00cc66'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(0,204,102,0.45)';
-                } else if (gridInW > 0) { 
+                } else if (elGrid && gridInW > 0) { 
                     elGrid.style.color = '#ff4444'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,68,68,0.45)';
-                } else { 
+                } else if (elGrid) { 
                     elGrid.style.color = '#fff'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
                 }
 
                 animateValue('lbl-batt', Math.abs(battInW), v => Math.round(v));
                 const elBatt = document.getElementById('lbl-batt');
-                elBatt.classList.remove('val-charge', 'val-discharge');
+                if (elBatt) elBatt.classList.remove('val-charge', 'val-discharge');
                 
-                if (battInW < 0) { elBatt.classList.add('val-charge'); } 
-                else if (battInW > 0) { elBatt.classList.add('val-discharge'); } 
-                else {
+                if (elBatt && battInW < 0) { elBatt.classList.add('val-charge'); } 
+                else if (elBatt && battInW > 0) { elBatt.classList.add('val-discharge'); } 
+                else if (elBatt) {
                     elBatt.style.color = '#fff';
                     elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
                 }
 
                 if (data.Inv_Temp !== undefined) {
-                    const tempLabel = document.getElementById('lbl-inv-temp'); const t = data.Inv_Temp;
+                    const tempLabel = document.getElementById('lbl-inv-temp'); const t = Number(data.Inv_Temp) || 0;
                     animateValue('lbl-inv-temp', t, v => '🌡️ ' + v.toFixed(0) + '°C');
-                    if (t < 40 && tempLabel.style.backgroundColor !== 'rgb(0, 204, 102)') { tempLabel.style.backgroundColor = '#00cc66'; } 
-                    else if (t >= 40 && t < 48 && tempLabel.style.backgroundColor !== 'rgb(255, 170, 0)') { tempLabel.style.backgroundColor = '#ffaa00'; } 
-                    else if (t >= 48 && tempLabel.style.backgroundColor !== 'rgb(255, 68, 68)') { tempLabel.style.backgroundColor = '#ff4444'; }
+                    if (tempLabel && t < 40 && tempLabel.style.backgroundColor !== 'rgb(0, 204, 102)') { tempLabel.style.backgroundColor = '#00cc66'; } 
+                    else if (tempLabel && t >= 40 && t < 48 && tempLabel.style.backgroundColor !== 'rgb(255, 170, 0)') { tempLabel.style.backgroundColor = '#ffaa00'; } 
+                    else if (tempLabel && t >= 48 && tempLabel.style.backgroundColor !== 'rgb(255, 68, 68)') { tempLabel.style.backgroundColor = '#ff4444'; }
                 }
 
                 if (data.Inv_Switch !== undefined) {
@@ -1630,7 +1861,7 @@
                     const statusText = document.getElementById('switch-status-text');
                     const modalEl = document.getElementById('confirm-modal');
                     
-                    if (toggle && !modalEl.classList.contains('active')) {
+                    if (toggle && modalEl && !modalEl.classList.contains('active')) {
                         toggle.checked = (data.Inv_Switch === 1);
                     }
                     if (statusText) {
@@ -1639,12 +1870,13 @@
                     }
                 }
 
-                let soc = data.Batt_SOC;
+                let soc = clampNumber(data.Batt_SOC, 0, 100, 0);
                 animateValue('lbl-soc', soc, v => Math.round(v) + '%');
                 
-                animateValue('stat-v', data.Batt_Voltage, v => v.toFixed(1) + ' V');
-                animateValue('stat-a', data.Batt_Current, v => v.toFixed(1) + ' A');
-                document.getElementById('bar-soc').style.width = soc + '%';
+                animateValue('stat-v', battVoltage, v => v.toFixed(1) + ' V');
+                animateValue('stat-a', battCurrent, v => v.toFixed(1) + ' A');
+                const barSoc = document.getElementById('bar-soc');
+                if (barSoc) barSoc.style.width = soc + '%';
                 
                 let rawStatus = data.Batt_Status || ""; let statusLower = rawStatus.toLowerCase();
                 let displayStatus = rawStatus; let statusColor = '#888';
@@ -1658,15 +1890,17 @@
                 }
 
                 updateDOMText('lbl-status', displayStatus);
-                if (lblStatus.style.color !== statusColor) { lblStatus.style.color = statusColor; }
+                if (lblStatus && lblStatus.style.color !== statusColor) { lblStatus.style.color = statusColor; }
 
                 let colorTheme = 'fill-green';
                 if (soc <= 20) colorTheme = 'fill-red'; else if (soc <= 40) colorTheme = 'fill-yellow';
-                if (battFill.style.width !== soc + '%') battFill.style.width = soc + '%';
-                if (!battFill.className.includes(colorTheme)) battFill.className = 'battery-fill ' + colorTheme;
+                if (battFill) {
+                    if (battFill.style.width !== soc + '%') battFill.style.width = soc + '%';
+                    if (battFill.className !== 'battery-fill ' + colorTheme) battFill.className = 'battery-fill ' + colorTheme;
+                }
 
-                if(pvInW >= 1) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
-                if(loadInW >= 1) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
+                if(pvInW >= 200) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW, 'solar-load'); else setFlow('flow-pv', false);
+                if(loadInW >= 200) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW, 'solar-load'); else setFlow('flow-load', false);
                 
                 if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW)); 
                 else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); 
@@ -1687,6 +1921,8 @@
             const modalMsg = document.getElementById('modal-msg');
             const btnConfirm = document.getElementById('btn-modal-confirm');
             const btnCancel = document.getElementById('btn-modal-cancel');
+
+            if (!toggleEl || !modalEl || !modalMsg || !btnConfirm || !btnCancel) return;
 
             toggleEl.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -1727,7 +1963,7 @@
 
         function closeModal() {
             const modalEl = document.getElementById('confirm-modal');
-            modalEl.classList.remove('active');
+            if (modalEl) modalEl.classList.remove('active');
             pendingState = null;
         }
     </script>
