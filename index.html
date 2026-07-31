@@ -16,25 +16,13 @@
                 url('1279_High_Defination_(HDTV).jpg');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
+            background-attachment: scroll;
             background-repeat: no-repeat;
             color: #333;
             min-height: 100vh;
             padding: 10px;
             overflow-x: hidden;
             position: relative;
-        }
-
-        /* Canvas Nền GPU */
-        #bg-canvas {
-            position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 0;
-            mix-blend-mode: screen;
-            transform: translateZ(0);
         }
 
         .app-container { 
@@ -66,22 +54,7 @@
             contain: layout style paint;
         }
 
-        .diagram-panel::before {
-            content: "";
-            position: absolute;
-            inset: 8%;
-            border-radius: 50%;
-            background:
-                radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 2px),
-                conic-gradient(from 0deg, transparent, rgba(255,215,0,0.18), transparent, rgba(0,229,255,0.16), transparent);
-            filter: blur(0.1px);
-            animation: softSpin 22s linear infinite;
-            z-index: -1;
-            will-change: transform;
-            transform: translateZ(0);
-        }
-
-        @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
+        .diagram-panel::before { display: none; }
 
         .diagram-panel::after,
         .stat-card::after,
@@ -721,8 +694,6 @@
     </style>
 </head>
 <body>
-    <canvas id="bg-canvas"></canvas>
-
     <div class="app-container">
         <div class="diagram-panel">
             <div id="lbl-status">Đang tải...</div>
@@ -932,94 +903,6 @@
             state.frameId = requestAnimationFrame(step);
         }
 
-        // ================= ENGINE CANVAS NỀN =================
-        function initBgCanvas() {
-            const canvas = document.getElementById('bg-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d', { alpha: true });
-            let w, h, dpr;
-            let stars = [];
-
-            function resize() {
-                dpr = Math.min(window.devicePixelRatio || 1, 2);
-                w = window.innerWidth;
-                h = window.innerHeight;
-                canvas.width = w * dpr;
-                canvas.height = h * dpr;
-                ctx.scale(dpr, dpr);
-                initStars();
-            }
-
-            function initStars() {
-                stars = [];
-                const numStars = Math.floor((w * h) / 3200);
-                const colors = ['#ffffff', '#00e5ff', '#8cff66', '#ff8c00', '#ff5c7a', '#fff7a1'];
-                for (let i = 0; i < numStars; i++) {
-                    stars.push({
-                        x: Math.random() * w,
-                        y: Math.random() * h,
-                        size: 0.8 + Math.random() * 1.6,
-                        color: colors[Math.floor(Math.random() * colors.length)],
-                        alpha: 0.2 + Math.random() * 0.7,
-                        speedX: (Math.random() - 0.2) * 0.12,
-                        speedY: -0.1 - Math.random() * 0.2,
-                        blinkFreq: 1 + Math.random() * 2.5,
-                        phase: Math.random() * Math.PI * 2
-                    });
-                }
-            }
-
-            function renderBg(time) {
-                const t = time * 0.001;
-                ctx.clearRect(0, 0, w, h);
-
-                ctx.globalCompositeOperation = 'screen';
-                
-                let g1 = ctx.createRadialGradient(w * 0.15 + Math.sin(t * 0.4) * 40, h * 0.12 + Math.cos(t * 0.3) * 25, 10, w * 0.15, h * 0.12, w * 0.38);
-                g1.addColorStop(0, 'rgba(255, 215, 0, 0.22)');
-                g1.addColorStop(1, 'rgba(255, 215, 0, 0)');
-                ctx.fillStyle = g1;
-                ctx.fillRect(0, 0, w, h);
-
-                let g2 = ctx.createRadialGradient(w * 0.84 + Math.cos(t * 0.35) * 35, h * 0.18 + Math.sin(t * 0.5) * 35, 10, w * 0.84, h * 0.18, w * 0.42);
-                g2.addColorStop(0, 'rgba(0, 229, 255, 0.20)');
-                g2.addColorStop(1, 'rgba(0, 229, 255, 0)');
-                ctx.fillStyle = g2;
-                ctx.fillRect(0, 0, w, h);
-
-                let g3 = ctx.createRadialGradient(w * 0.76 + Math.sin(t * 0.3) * 50, h * 0.86 + Math.cos(t * 0.4) * 30, 10, w * 0.76, h * 0.86, w * 0.45);
-                g3.addColorStop(0, 'rgba(0, 204, 102, 0.18)');
-                g3.addColorStop(1, 'rgba(0, 204, 102, 0)');
-                ctx.fillStyle = g3;
-                ctx.fillRect(0, 0, w, h);
-
-                ctx.globalCompositeOperation = 'source-over';
-                for (let i = 0; i < stars.length; i++) {
-                    let s = stars[i];
-                    s.x += s.speedX;
-                    s.y += s.speedY;
-
-                    if (s.y < 0) { s.y = h; s.x = Math.random() * w; }
-                    if (s.x > w) s.x = 0;
-                    if (s.x < 0) s.x = w;
-
-                    let currentAlpha = s.alpha * (0.4 + 0.6 * Math.sin(t * s.blinkFreq + s.phase));
-                    ctx.fillStyle = s.color;
-                    ctx.globalAlpha = Math.max(0, Math.min(1, currentAlpha));
-                    ctx.beginPath();
-                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                ctx.globalAlpha = 1.0;
-
-                requestAnimationFrame(renderBg);
-            }
-
-            window.addEventListener('resize', resize);
-            resize();
-            requestAnimationFrame(renderBg);
-        }
-
         // ================= KỊCH BẢN VẼ MẶT TRỜI BẰNG CANVAS =================
         function initCanvasSun() {
             const canvas = document.getElementById('sun-canvas');
@@ -1082,7 +965,6 @@
         }
         
         document.addEventListener('DOMContentLoaded', () => {
-            initBgCanvas();
             initCanvasSun();
             initChart();
             initModalEvents();
