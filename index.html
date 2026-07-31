@@ -606,7 +606,23 @@
 
         /* Mặt trời Canvas */
         .solar-sun-box{ width: 82px; height: 82px; margin: auto; position: relative; transform: translate(-8px, -6px) translateZ(0); }
-        #solar-sun{ width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; transition: all 0.5s ease; transform: translateZ(0); }
+        #solar-sun{
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, filter 0.5s ease;
+            transform: translateZ(0);
+            opacity: .28;
+            filter: brightness(.5);
+            --sun-canvas-opacity: 0;
+            --sun-canvas-glow: 0px;
+            --sun-canvas-glow-alpha: 0;
+            --sun-pulse-duration: 3.2s;
+            --sun-halo-duration: 3.8s;
+        }
         
         #sun-canvas {
             position: absolute;
@@ -617,7 +633,8 @@
             height: 230px;
             pointer-events: none;
             z-index: 0;
-            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.4));
+            opacity: var(--sun-canvas-opacity);
+            filter: drop-shadow(0 0 var(--sun-canvas-glow) rgba(255, 215, 0, var(--sun-canvas-glow-alpha)));
         }
 
         .sun-core{
@@ -638,7 +655,7 @@
                 0 0 40px #ffd700,
                 0 0 80px #ffb300,
                 0 0 120px rgba(255,190,0,.7);
-            animation: sunPulse 2s ease-in-out infinite;
+            animation: sunPulse var(--sun-pulse-duration) ease-in-out infinite;
             transform: translateZ(0);
             will-change: transform, filter;
         }
@@ -654,7 +671,7 @@
                 rgba(255,255,255,.55),
                 rgba(255,220,80,.2) 40%,
                 transparent 75%);
-            animation: haloPulse 2.5s ease-in-out infinite;
+            animation: haloPulse var(--sun-halo-duration) ease-in-out infinite;
             pointer-events: none;
             z-index: 1;
             transform: translateZ(0);
@@ -669,9 +686,64 @@
             100%{ filter:brightness(0.9); transform: scale(1) translateZ(0); }
         }
 
-        .sun-low{ opacity: .35; filter: brightness(.5); }
-        .sun-medium{ opacity: .8; filter: brightness(1.1); }
-        .sun-high{ opacity: 1; filter: brightness(1.6) drop-shadow(0 0 20px rgba(255,215,0,0.8)); }
+        .sun-level-0{
+            opacity: .28;
+            filter: brightness(.5);
+        }
+        .sun-level-1{
+            opacity: .55;
+            filter: brightness(.72) drop-shadow(0 0 4px rgba(255,215,0,.18));
+            --sun-canvas-opacity: .30;
+            --sun-canvas-glow: 3px;
+            --sun-canvas-glow-alpha: .16;
+            --sun-pulse-duration: 3s;
+            --sun-halo-duration: 3.5s;
+        }
+        .sun-level-2{
+            opacity: .68;
+            filter: brightness(.88) drop-shadow(0 0 7px rgba(255,215,0,.28));
+            --sun-canvas-opacity: .45;
+            --sun-canvas-glow: 5px;
+            --sun-canvas-glow-alpha: .22;
+            --sun-pulse-duration: 2.8s;
+            --sun-halo-duration: 3.2s;
+        }
+        .sun-level-3{
+            opacity: .78;
+            filter: brightness(1.05) drop-shadow(0 0 10px rgba(255,215,0,.4));
+            --sun-canvas-opacity: .62;
+            --sun-canvas-glow: 7px;
+            --sun-canvas-glow-alpha: .30;
+            --sun-pulse-duration: 2.6s;
+            --sun-halo-duration: 3s;
+        }
+        .sun-level-4{
+            opacity: .88;
+            filter: brightness(1.22) drop-shadow(0 0 13px rgba(255,215,0,.52));
+            --sun-canvas-opacity: .78;
+            --sun-canvas-glow: 8px;
+            --sun-canvas-glow-alpha: .34;
+            --sun-pulse-duration: 2.4s;
+            --sun-halo-duration: 2.8s;
+        }
+        .sun-level-5{
+            opacity: .95;
+            filter: brightness(1.4) drop-shadow(0 0 16px rgba(255,215,0,.65));
+            --sun-canvas-opacity: .9;
+            --sun-canvas-glow: 9px;
+            --sun-canvas-glow-alpha: .38;
+            --sun-pulse-duration: 2.2s;
+            --sun-halo-duration: 2.6s;
+        }
+        .sun-level-6{
+            opacity: 1;
+            filter: brightness(1.6) drop-shadow(0 0 20px rgba(255,215,0,0.8));
+            --sun-canvas-opacity: 1;
+            --sun-canvas-glow: 10px;
+            --sun-canvas-glow-alpha: .4;
+            --sun-pulse-duration: 2s;
+            --sun-halo-duration: 2.5s;
+        }
     </style>
 </head>
 <body>
@@ -705,8 +777,8 @@
 
             <div class="node pos-pv">
                 <div class="solar-sun-box">
-                    <div id="solar-sun">
-                        <canvas id="sun-canvas"></canvas>
+                    <div id="solar-sun" class="sun-level-0" data-sun-level="0">
+                        <canvas id="sun-canvas" data-sun-level="0"></canvas>
                         <div class="sun-core"></div>
                     </div>
                 </div>
@@ -885,6 +957,33 @@
         }
 
         // ================= KỊCH BẢN VẼ MẶT TRỜI BẰNG CANVAS =================
+        const solarSunLevelClasses = ['sun-level-0', 'sun-level-1', 'sun-level-2', 'sun-level-3', 'sun-level-4', 'sun-level-5', 'sun-level-6'];
+
+        function getSolarSunLevel(pvInW) {
+            const power = Number(pvInW) || 0;
+
+            if (power < 100) return 0;
+            if (power <= 1000) return 1;
+            if (power <= 2000) return 2;
+            if (power <= 3000) return 3;
+            if (power <= 5000) return 4;
+            if (power <= 7000) return 5;
+            return 6;
+        }
+
+        function updateSolarSunLevel(pvInW) {
+            const level = getSolarSunLevel(pvInW);
+            const solarSun = document.getElementById('solar-sun');
+            if (!solarSun) return;
+
+            solarSun.classList.remove(...solarSunLevelClasses);
+            solarSun.classList.add(`sun-level-${level}`);
+            solarSun.dataset.sunLevel = String(level);
+
+            const canvas = document.getElementById('sun-canvas');
+            if (canvas) canvas.dataset.sunLevel = String(level);
+        }
+
         function initCanvasSun() {
             const canvas = document.getElementById('sun-canvas');
             if (!canvas) return;
@@ -901,10 +1000,20 @@
 
             const rays = [];
             const numRays = 120;
+            const levelConfigs = [
+                { alphaScale: 0, lengthScale: 0, widthScale: 0, wave: 0, shadowBlur: 0 },
+                { alphaScale: .35, lengthScale: .48, widthScale: .55, wave: 5, shadowBlur: .4 },
+                { alphaScale: .48, lengthScale: .58, widthScale: .62, wave: 7, shadowBlur: .7 },
+                { alphaScale: .62, lengthScale: .70, widthScale: .72, wave: 9, shadowBlur: 1 },
+                { alphaScale: .76, lengthScale: .82, widthScale: .82, wave: 11, shadowBlur: 1.3 },
+                { alphaScale: .9, lengthScale: .92, widthScale: .92, wave: 13, shadowBlur: 1.7 },
+                { alphaScale: 1, lengthScale: 1, widthScale: 1, wave: 15, shadowBlur: 2 }
+            ];
 
             for (let i = 0; i < numRays; i++) {
                 rays.push({
-                    angle: Math.random() * Math.PI * 2,
+                    level: (i % 6) + 1,
+                    angle: (i / numRays) * Math.PI * 2 + (Math.random() - 0.5) * 0.08,
                     baseLength: 30 + Math.random() * 80,
                     width: 0.3 + Math.random() * 1.5,
                     speed: 0.02 + Math.random() * 0.08,
@@ -913,13 +1022,26 @@
                 });
             }
 
-            function animateCanvasSun() {
+            let lastFrameTime = 0;
+            const frameInterval = 1000 / 30;
+
+            function animateCanvasSun(timestamp) {
+                if (timestamp - lastFrameTime < frameInterval) {
+                    requestAnimationFrame(animateCanvasSun);
+                    return;
+                }
+                lastFrameTime = timestamp;
+
                 ctx.clearRect(0, 0, size, size);
-                const time = Date.now() * 0.001;
+                const sunLevel = Math.max(0, Math.min(6, Number(canvas.dataset.sunLevel || 0)));
+                const config = levelConfigs[sunLevel];
+                const time = timestamp * 0.001;
 
                 rays.forEach(ray => {
-                    const currentLength = ray.baseLength + Math.sin(ray.phase + time * (ray.speed * 80)) * 15;
-                    const currentAlpha = ray.baseAlpha * (0.5 + Math.sin(ray.phase * 3 + time * 30) * 0.5);
+                    if (ray.level > sunLevel) return;
+
+                    const currentLength = (ray.baseLength + Math.sin(ray.phase + time * (ray.speed * 80)) * config.wave) * config.lengthScale;
+                    const currentAlpha = ray.baseAlpha * config.alphaScale * (0.5 + Math.sin(ray.phase * 3 + time * 30) * 0.5);
                     const angle = ray.angle + time * 0.05; 
 
                     const x = cx + Math.cos(angle) * currentLength;
@@ -933,10 +1055,10 @@
                     ctx.beginPath();
                     ctx.moveTo(cx, cy);
                     ctx.lineTo(x, y);
-                    ctx.lineWidth = ray.width;
+                    ctx.lineWidth = ray.width * config.widthScale;
                     ctx.strokeStyle = grad;
                     ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
-                    ctx.shadowBlur = 2;
+                    ctx.shadowBlur = config.shadowBlur;
                     ctx.stroke();
                 });
 
@@ -1550,13 +1672,7 @@
                 
                 animateValue('lbl-pv', pvInW, v => Math.round(v));
 
-                const solarSun = document.getElementById('solar-sun');
-                if (solarSun) {
-                    solarSun.classList.remove('sun-low', 'sun-medium', 'sun-high');
-                    if (pvInW < 100) { solarSun.classList.add('sun-low'); } 
-                    else if (pvInW < 3000) { solarSun.classList.add('sun-medium'); } 
-                    else { solarSun.classList.add('sun-high'); }
-                }
+                updateSolarSunLevel(pvInW);
 
                 animateValue('lbl-load', loadInW, v => Math.round(v));
                 animateValue('lbl-grid', Math.abs(gridInW), v => Math.round(v));
