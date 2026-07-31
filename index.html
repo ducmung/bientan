@@ -19,7 +19,7 @@
             position: relative;
         }
 
-        /* KHẮC PHỤC 1: Dùng lớp nền cố định thay cho background-attachment: fixed để chống giật lag & mất hình */
+        /* Lớp nền cố định tối ưu chống giật lag & mất hình */
         body::before {
             content: "";
             position: fixed;
@@ -41,7 +41,6 @@
             transform: translateZ(0); 
         }
 
-        /* KHẮC PHỤC 2: Tối ưu backdrop-filter nhẹ hơn giúp GPU không bị tràn bộ nhớ */
         .diagram-panel {
             position: relative; 
             width: 100%; 
@@ -300,8 +299,15 @@
         }
 
         .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
-        .val-charge { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.8) !important; font-size: 18px; }
-        .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.8) !important; font-size: 18px; }
+        
+        /* CÁC STYLE MÀU CHỮ NỔI 3D CHO TỪNG LUỒNG NĂNG LƯỢNG (RÕ NÉT TRÊN NỀN SÁNG) */
+        .val-pv-style { color: #ffffff !important; text-shadow: 0 1px 0 #b45309, 0 2px 0 #92400e, 0 3px 0 #78350f, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(245, 158, 11, 0.9) !important; font-size: 18px; }
+        .val-load-style { color: #ffffff !important; text-shadow: 0 1px 0 #1d4ed8, 0 2px 0 #1e40af, 0 3px 0 #1e3a8a, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(59, 130, 246, 0.9) !important; font-size: 18px; }
+        .val-grid-buy-style { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
+        .val-grid-sell-style { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
+        
+        .val-charge { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
+        .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
 
         .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; transform: translateZ(0); }
         .flow-track {
@@ -694,14 +700,13 @@
             100%{ filter:brightness(0.9); transform: scale(1) translateZ(0); }
         }
 
-        /* 6 CẤP ĐỘ ĐỘ SÁNG & HÀO QUANG MẶT TRỜI DỰA TRÊN WATT PV */
-        .sun-lvl-0 { opacity: 0.15; filter: brightness(0.25) grayscale(0.8); } /* Cấp 0: <10W (Mờ tối, 0 tia) */
-        .sun-lvl-1 { opacity: 0.55; filter: brightness(0.68) drop-shadow(0 0 5px rgba(255, 215, 0, 0.28)); } /* Cấp 1: 11W - 1000W (Mờ vàng dịu nhẹ, 15 tia) */
-        .sun-lvl-2 { opacity: 0.72; filter: brightness(0.90) drop-shadow(0 0 10px rgba(255, 215, 0, 0.50)); } /* Cấp 2: 1001W - 2000W (40 tia) */
-        .sun-lvl-3 { opacity: 0.85; filter: brightness(1.10) drop-shadow(0 0 14px rgba(255, 215, 0, 0.65)); } /* Cấp 3: 2001W - 3000W (60 tia) */
-        .sun-lvl-4 { opacity: 0.95; filter: brightness(1.30) drop-shadow(0 0 18px rgba(255, 215, 0, 0.78)); } /* Cấp 4: 3001W - 5000W (80 tia) */
-        .sun-lvl-5 { opacity: 1.00; filter: brightness(1.48) drop-shadow(0 0 22px rgba(255, 215, 0, 0.88)); } /* Cấp 5: 5001W - 7000W (100 tia) */
-        .sun-lvl-6 { opacity: 1.00; filter: brightness(1.68) drop-shadow(0 0 28px rgba(255, 215, 0, 0.98)); } /* Cấp 6: 7001W - 11000W+ (Full 120 tia + max chói) */
+        .sun-lvl-0 { opacity: 0.15; filter: brightness(0.25) grayscale(0.8); }
+        .sun-lvl-1 { opacity: 0.55; filter: brightness(0.68) drop-shadow(0 0 5px rgba(255, 215, 0, 0.28)); }
+        .sun-lvl-2 { opacity: 0.72; filter: brightness(0.90) drop-shadow(0 0 10px rgba(255, 215, 0, 0.50)); }
+        .sun-lvl-3 { opacity: 0.85; filter: brightness(1.10) drop-shadow(0 0 14px rgba(255, 215, 0, 0.65)); }
+        .sun-lvl-4 { opacity: 0.95; filter: brightness(1.30) drop-shadow(0 0 18px rgba(255, 215, 0, 0.78)); }
+        .sun-lvl-5 { opacity: 1.00; filter: brightness(1.48) drop-shadow(0 0 22px rgba(255, 215, 0, 0.88)); }
+        .sun-lvl-6 { opacity: 1.00; filter: brightness(1.68) drop-shadow(0 0 28px rgba(255, 215, 0, 0.98)); }
     </style>
 </head>
 <body>
@@ -740,7 +745,7 @@
                         <div class="sun-core"></div>
                     </div>
                 </div>
-                <h3>MẶT TRỜI</h3><div class="val" id="lbl-pv">0</div><div class="unit">W</div>
+                <h3>MẶT TRỜI</h3><div class="val val-pv-style" id="lbl-pv">0</div><div class="unit">W</div>
             </div>
 
             <div class="node pos-grid">
@@ -759,7 +764,7 @@
             </div>
 
             <div class="node pos-load corner-node">
-                <div class="corner-power"><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
+                <div class="corner-power"><h3>TIÊU THỤ</h3><div class="val val-load-style" id="lbl-load">0</div><div class="unit">W</div></div>
                 <div class="icon"><img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon"></div>
             </div>
 
@@ -952,7 +957,6 @@
 
                 const activeRaysCount = sunRayCounts[currentSunLevel] || 0;
 
-                /* KHẮC PHỤC 3: Loại bỏ ctx.shadowBlur trong vòng lặp rendering giúp giảm tải GPU hơn 80% */
                 for (let i = 0; i < activeRaysCount; i++) {
                     const ray = rays[i];
                     const currentLength = ray.baseLength + Math.sin(ray.phase + time * (ray.speed * 80)) * 15;
@@ -1620,19 +1624,24 @@
                 if (loadInW < 0) loadInW = 0;
                 
                 animateValue('lbl-pv', pvInW, v => Math.round(v));
+                document.getElementById('lbl-pv').classList.add('val-pv-style');
 
                 updateSunLevelByPower(pvInW);
 
                 animateValue('lbl-load', loadInW, v => Math.round(v));
+                document.getElementById('lbl-load').classList.add('val-load-style');
+
                 animateValue('lbl-grid', Math.abs(gridInW), v => Math.round(v));
 
                 const elGrid = document.getElementById('lbl-grid');
+                elGrid.classList.remove('val-grid-buy-style', 'val-grid-sell-style');
                 if (gridInW < 0) { 
-                    elGrid.style.color = '#00cc66'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(0,204,102,0.45)';
+                    elGrid.classList.add('val-grid-sell-style'); // Phát lưới (Xanh lá)
                 } else if (gridInW > 0) { 
-                    elGrid.style.color = '#ff4444'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,68,68,0.45)';
+                    elGrid.classList.add('val-grid-buy-style'); // Lấy lưới (Đỏ hồng)
                 } else { 
-                    elGrid.style.color = '#fff'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
+                    elGrid.style.color = '#fff'; 
+                    elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
                 }
 
                 animateValue('lbl-batt', Math.abs(battInW), v => Math.round(v));
