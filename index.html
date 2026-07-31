@@ -11,30 +11,17 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
 
         body {
-            background:
-                linear-gradient(135deg, rgba(6, 12, 24, 0.75), rgba(18, 32, 58, 0.65)),
-                url('1279_High_Defination_(HDTV).jpg');
+            background-color: #092416;
+            background-image: url('1279_High_Defination_(HDTV).jpg');
             background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-position: center top;
+            background-attachment: scroll;
             background-repeat: no-repeat;
             color: #333;
             min-height: 100vh;
             padding: 10px;
             overflow-x: hidden;
             position: relative;
-        }
-
-        /* Canvas Nền GPU */
-        #bg-canvas {
-            position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 0;
-            mix-blend-mode: screen;
-            transform: translateZ(0);
         }
 
         .app-container { 
@@ -54,7 +41,7 @@
             max-width: 500px; 
             margin: 0 auto; 
             aspect-ratio: 1 / 1.1;
-            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.34), rgba(255,255,255,0.12) 42%, rgba(255,255,255,0.28)), rgba(255, 255, 255, 0.36);
+            background: rgba(255, 255, 255, 0.32);
             border-radius: 20px; 
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.65), 0 0 34px rgba(0,229,255,0.12);
             backdrop-filter: blur(12px); 
@@ -65,23 +52,6 @@
             transform: translateZ(0);
             contain: layout style paint;
         }
-
-        .diagram-panel::before {
-            content: "";
-            position: absolute;
-            inset: 8%;
-            border-radius: 50%;
-            background:
-                radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 2px),
-                conic-gradient(from 0deg, transparent, rgba(255,215,0,0.18), transparent, rgba(0,229,255,0.16), transparent);
-            filter: blur(0.1px);
-            animation: softSpin 22s linear infinite;
-            z-index: -1;
-            will-change: transform;
-            transform: translateZ(0);
-        }
-
-        @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
         .diagram-panel::after,
         .stat-card::after,
@@ -353,31 +323,15 @@
         }
         .dir-right .flow-dash::before { right: 8px; background: linear-gradient(90deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
         .dir-left .flow-dash::before { left: 8px; background: linear-gradient(270deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
-        .flow-dash::after {
-            content: ''; position: absolute; width: 3px; height: 3px; border-radius: 50%;
-            top: -3px; right: 1px; background: #ffffff;
-            box-shadow: -8px 9px 0 rgba(255,255,255,0.74), 6px 11px 0 var(--c);
-            animation: particleTwinkle 0.7s ease-in-out infinite alternate;
-        }
-        .flow-spark {
-            position: absolute; top: 50%; width: 4px; height: 4px; border-radius: 50%; opacity: 0; z-index: 4;
-            background: #ffffff; box-shadow: 0 0 6px #fff, 0 0 13px var(--c), 0 0 20px var(--c);
-            will-change: left, transform, opacity, top;
-            transform: translate(-50%, -50%) translateZ(0);
-        }
         .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.28s; } .flow-dash:nth-child(4) { animation-delay: 0.56s; } .flow-dash:nth-child(5) { animation-delay: 0.84s; } .flow-dash:nth-child(6) { animation-delay: 1.12s; } .flow-dash:nth-child(7) { animation-delay: 1.40s; } .flow-dash:nth-child(8) { animation-delay: 1.68s; }
-        .flow-spark:nth-child(9) { animation-delay: 0.12s; } .flow-spark:nth-child(10) { animation-delay: 0.38s; } .flow-spark:nth-child(11) { animation-delay: 0.72s; } .flow-spark:nth-child(12) { animation-delay: 1.02s; } .flow-spark:nth-child(13) { animation-delay: 1.34s; } .flow-spark:nth-child(14) { animation-delay: 1.66s; }
         
         @keyframes electricWireSlide { to { background-position: 44px 0, 0 0; } }
         @keyframes electricWirePulse { from { filter: brightness(1) saturate(1); opacity: 0.72; } to { filter: brightness(1.45) saturate(1.35); opacity: 1; } }
         @keyframes electricFilament { from { opacity: 0.55; transform: translateY(-50%) scaleX(0.96) translateZ(0); } to { opacity: 1; transform: translateY(-50%) scaleX(1.02) translateZ(0); } }
-        @keyframes particleTwinkle { from { opacity: 0.35; transform: scale(0.75) translateZ(0); } to { opacity: 1; transform: scale(1.25) translateZ(0); } }
         @keyframes flowInL { 0% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
         @keyframes flowOutL { 0% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
         @keyframes flowInR { 0% { right: -8%; opacity: 0; transform: translate(50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(50%, -50%) scale(1.06) translateZ(0); } 100% { right: 108%; opacity: 0; transform: translate(50%, -50%) scale(0.55) translateZ(0); } }
         @keyframes flowOutR { 0% { right: 108%; opacity: 0; transform: translate(50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(50%, -50%) scale(1.06) translateZ(0); } 100% { right: -8%; opacity: 0; transform: translate(50%, -50%) scale(0.55) translateZ(0); } }
-        @keyframes sparkRight { 0% { left: -5%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.35) translateZ(0); } 12% { opacity: 1; } 36% { top: 38%; } 62% { top: 62%; } 100% { left: 105%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65) translateZ(0); } }
-        @keyframes sparkLeft { 0% { left: 105%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.35) translateZ(0); } 12% { opacity: 1; } 36% { top: 62%; } 62% { top: 38%; } 100% { left: -5%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65) translateZ(0); } }
 
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
         .stat-card {
@@ -721,8 +675,6 @@
     </style>
 </head>
 <body>
-    <canvas id="bg-canvas"></canvas>
-
     <div class="app-container">
         <div class="diagram-panel">
             <div id="lbl-status">Đang tải...</div>
@@ -746,10 +698,10 @@
 
             <div id="lbl-inv-temp">🌡️ --°C</div>
 
-            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
-            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
-            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
-            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
+            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
+            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
+            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
 
             <div class="node pos-pv">
                 <div class="solar-sun-box">
@@ -932,94 +884,6 @@
             state.frameId = requestAnimationFrame(step);
         }
 
-        // ================= ENGINE CANVAS NỀN =================
-        function initBgCanvas() {
-            const canvas = document.getElementById('bg-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d', { alpha: true });
-            let w, h, dpr;
-            let stars = [];
-
-            function resize() {
-                dpr = Math.min(window.devicePixelRatio || 1, 2);
-                w = window.innerWidth;
-                h = window.innerHeight;
-                canvas.width = w * dpr;
-                canvas.height = h * dpr;
-                ctx.scale(dpr, dpr);
-                initStars();
-            }
-
-            function initStars() {
-                stars = [];
-                const numStars = Math.floor((w * h) / 3200);
-                const colors = ['#ffffff', '#00e5ff', '#8cff66', '#ff8c00', '#ff5c7a', '#fff7a1'];
-                for (let i = 0; i < numStars; i++) {
-                    stars.push({
-                        x: Math.random() * w,
-                        y: Math.random() * h,
-                        size: 0.8 + Math.random() * 1.6,
-                        color: colors[Math.floor(Math.random() * colors.length)],
-                        alpha: 0.2 + Math.random() * 0.7,
-                        speedX: (Math.random() - 0.2) * 0.12,
-                        speedY: -0.1 - Math.random() * 0.2,
-                        blinkFreq: 1 + Math.random() * 2.5,
-                        phase: Math.random() * Math.PI * 2
-                    });
-                }
-            }
-
-            function renderBg(time) {
-                const t = time * 0.001;
-                ctx.clearRect(0, 0, w, h);
-
-                ctx.globalCompositeOperation = 'screen';
-                
-                let g1 = ctx.createRadialGradient(w * 0.15 + Math.sin(t * 0.4) * 40, h * 0.12 + Math.cos(t * 0.3) * 25, 10, w * 0.15, h * 0.12, w * 0.38);
-                g1.addColorStop(0, 'rgba(255, 215, 0, 0.22)');
-                g1.addColorStop(1, 'rgba(255, 215, 0, 0)');
-                ctx.fillStyle = g1;
-                ctx.fillRect(0, 0, w, h);
-
-                let g2 = ctx.createRadialGradient(w * 0.84 + Math.cos(t * 0.35) * 35, h * 0.18 + Math.sin(t * 0.5) * 35, 10, w * 0.84, h * 0.18, w * 0.42);
-                g2.addColorStop(0, 'rgba(0, 229, 255, 0.20)');
-                g2.addColorStop(1, 'rgba(0, 229, 255, 0)');
-                ctx.fillStyle = g2;
-                ctx.fillRect(0, 0, w, h);
-
-                let g3 = ctx.createRadialGradient(w * 0.76 + Math.sin(t * 0.3) * 50, h * 0.86 + Math.cos(t * 0.4) * 30, 10, w * 0.76, h * 0.86, w * 0.45);
-                g3.addColorStop(0, 'rgba(0, 204, 102, 0.18)');
-                g3.addColorStop(1, 'rgba(0, 204, 102, 0)');
-                ctx.fillStyle = g3;
-                ctx.fillRect(0, 0, w, h);
-
-                ctx.globalCompositeOperation = 'source-over';
-                for (let i = 0; i < stars.length; i++) {
-                    let s = stars[i];
-                    s.x += s.speedX;
-                    s.y += s.speedY;
-
-                    if (s.y < 0) { s.y = h; s.x = Math.random() * w; }
-                    if (s.x > w) s.x = 0;
-                    if (s.x < 0) s.x = w;
-
-                    let currentAlpha = s.alpha * (0.4 + 0.6 * Math.sin(t * s.blinkFreq + s.phase));
-                    ctx.fillStyle = s.color;
-                    ctx.globalAlpha = Math.max(0, Math.min(1, currentAlpha));
-                    ctx.beginPath();
-                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                ctx.globalAlpha = 1.0;
-
-                requestAnimationFrame(renderBg);
-            }
-
-            window.addEventListener('resize', resize);
-            resize();
-            requestAnimationFrame(renderBg);
-        }
-
         // ================= KỊCH BẢN VẼ MẶT TRỜI BẰNG CANVAS =================
         function initCanvasSun() {
             const canvas = document.getElementById('sun-canvas');
@@ -1082,7 +946,6 @@
         }
         
         document.addEventListener('DOMContentLoaded', () => {
-            initBgCanvas();
             initCanvasSun();
             initChart();
             initModalEvents();
@@ -1600,16 +1463,15 @@
 
         function getFlowIntensity(powerW) {
             if (powerW === undefined || powerW === null) {
-                return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
+                return { particles: 6, dashDuration: 2.2, wireSpeed: 1 };
             }
 
             const watts = Math.abs(Number(powerW)) || 0;
-            if (watts < 1) return { particles: 0, sparks: 0, dashDuration: 7.8, sparkDuration: 5.4, wireSpeed: 4.2 };
-            if (watts <= 1000) return { particles: 3, sparks: 2, dashDuration: 7.0, sparkDuration: 4.8, wireSpeed: 3.6 };
-            if (watts <= 2000) return { particles: 4, sparks: 3, dashDuration: 5.0, sparkDuration: 3.4, wireSpeed: 2.5 };
-            if (watts <= 4000) return { particles: 5, sparks: 4, dashDuration: 3.4, sparkDuration: 2.35, wireSpeed: 1.7 };
-            if (watts <= 5500) return { particles: 6, sparks: 5, dashDuration: 2.65, sparkDuration: 1.85, wireSpeed: 1.25 };
-            return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
+            if (watts < 1) return { particles: 0, dashDuration: 7.8, wireSpeed: 4.2 };
+            if (watts <= 1000) return { particles: 3, dashDuration: 7.0, wireSpeed: 3.6 };
+            if (watts <= 2000) return { particles: 4, dashDuration: 5.0, wireSpeed: 2.5 };
+            if (watts <= 4000) return { particles: 5, dashDuration: 3.4, wireSpeed: 1.7 };
+            return { particles: 6, dashDuration: 2.65, wireSpeed: 1.25 };
         }
 
         function setFlow(groupId, isActive, animName, color, powerW) {
@@ -1659,22 +1521,6 @@
                         d.style.animationTimingFunction = 'linear'; 
                     });
 
-                    const sparks = group.querySelectorAll('.flow-spark');
-                    sparks.forEach((s, index) => {
-                        s.style.animationName = 'none';
-                        s.style.opacity = '0';
-                        if (index >= intensity.sparks) {
-                            s.style.display = 'none';
-                            return;
-                        }
-                        s.style.display = 'block';
-                        void s.offsetWidth;
-                        s.style.animationName = movesRight ? 'sparkRight' : 'sparkLeft';
-                        s.style.animationDelay = '-' + ((index * intensity.sparkDuration) / Math.max(intensity.sparks, 1)).toFixed(2) + 's';
-                        s.style.animationDuration = intensity.sparkDuration + 's';
-                        s.style.animationIterationCount = 'infinite';
-                        s.style.animationTimingFunction = 'linear';
-                    });
                 }
             } else { 
                 if (currentActive) {
@@ -1790,8 +1636,8 @@
                 else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); 
                 else setFlow('flow-batt', false);
                 
-                if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444'); 
-                else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66'); 
+                if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444', Math.abs(gridInW)); 
+                else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66', Math.abs(gridInW)); 
                 else setFlow('flow-grid', false);
             }
         });
