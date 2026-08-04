@@ -10,12 +10,8 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
 
-        html {
-            background: #000;
-        }
-
         body {
-            background: #000;
+            background: linear-gradient(135deg, rgba(6, 12, 24, 0.85), rgba(18, 32, 58, 0.75));
             color: #333;
             min-height: 100vh;
             padding: 10px;
@@ -23,19 +19,25 @@
             position: relative;
         }
 
-        body::before,
+        /* Lớp nền cố định tối ưu chống giật lag & mất hình */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background: url('1279_High_Defination_(HDTV).jpg') no-repeat center center / cover;
+            transform: translateZ(0);
+            pointer-events: none;
+        }
+
         body::after {
             content: "";
             position: fixed;
             inset: 0;
-            z-index: 0;
+            z-index: -1;
+            opacity: 0;
             pointer-events: none;
             background-repeat: repeat;
-            will-change: opacity, transform, filter;
-        }
-
-        body::before {
-            opacity: 0.62;
             background-image:
                 radial-gradient(ellipse 24px 2px at 9% 16%, rgba(255,255,255,0.95) 0 18%, rgba(170,220,255,0.65) 36%, transparent 72%),
                 radial-gradient(ellipse 2px 24px at 9% 16%, rgba(255,255,255,0.95) 0 18%, rgba(170,220,255,0.65) 36%, transparent 72%),
@@ -51,45 +53,33 @@
                 radial-gradient(circle at 88% 58%, #fff 0 1.7px, rgba(255,255,255,0.5) 2.7px, transparent 4.6px),
                 radial-gradient(ellipse 19px 1.5px at 22% 76%, rgba(185,230,255,0.96) 0 18%, rgba(185,230,255,0.5) 36%, transparent 72%),
                 radial-gradient(ellipse 1.5px 19px at 22% 76%, rgba(185,230,255,0.96) 0 18%, rgba(185,230,255,0.5) 36%, transparent 72%),
-                radial-gradient(circle at 22% 76%, #fff 0 1.5px, rgba(255,255,255,0.48) 2.4px, transparent 4.2px),
-                radial-gradient(ellipse 22px 1.6px at 55% 88%, rgba(255,255,255,0.94) 0 18%, rgba(255,255,255,0.56) 36%, transparent 72%),
-                radial-gradient(ellipse 1.6px 22px at 55% 88%, rgba(255,255,255,0.94) 0 18%, rgba(255,255,255,0.56) 36%, transparent 72%),
-                radial-gradient(circle at 55% 88%, #fff 0 1.7px, rgba(255,255,255,0.5) 2.7px, transparent 4.6px);
+                radial-gradient(circle at 22% 76%, #fff 0 1.5px, rgba(255,255,255,0.48) 2.4px, transparent 4.2px);
             background-size: 980px 760px;
             filter: brightness(1.08) drop-shadow(0 0 5px rgba(255,255,255,0.78));
-            animation: starTwinkleLarge 2.8s ease-in-out infinite alternate;
+            transition: opacity 0.8s ease;
+            will-change: opacity, filter;
+            transform: translateZ(0);
         }
 
-        body::after {
-            opacity: 0.42;
-            background-image:
-                radial-gradient(ellipse 16px 1.5px at 16% 36%, rgba(255,255,255,0.94) 0 18%, rgba(170,220,255,0.56) 36%, transparent 72%),
-                radial-gradient(ellipse 1.5px 16px at 16% 36%, rgba(255,255,255,0.94) 0 18%, rgba(170,220,255,0.56) 36%, transparent 72%),
-                radial-gradient(circle at 16% 36%, #fff 0 1.3px, rgba(255,255,255,0.46) 2.2px, transparent 3.9px),
-                radial-gradient(ellipse 19px 1.5px at 47% 61%, rgba(255,245,190,0.94) 0 18%, rgba(255,218,120,0.52) 36%, transparent 72%),
-                radial-gradient(ellipse 1.5px 19px at 47% 61%, rgba(255,245,190,0.94) 0 18%, rgba(255,218,120,0.52) 36%, transparent 72%),
-                radial-gradient(circle at 47% 61%, #fff 0 1.5px, rgba(255,255,255,0.46) 2.4px, transparent 4.2px),
-                radial-gradient(ellipse 18px 1.5px at 76% 12%, rgba(175,225,255,0.95) 0 18%, rgba(175,225,255,0.5) 36%, transparent 72%),
-                radial-gradient(ellipse 1.5px 18px at 76% 12%, rgba(175,225,255,0.95) 0 18%, rgba(175,225,255,0.5) 36%, transparent 72%),
-                radial-gradient(circle at 76% 12%, #fff 0 1.4px, rgba(255,255,255,0.46) 2.3px, transparent 4px),
-                radial-gradient(ellipse 21px 1.6px at 92% 86%, rgba(255,255,255,0.96) 0 18%, rgba(255,255,255,0.5) 36%, transparent 72%),
-                radial-gradient(ellipse 1.6px 21px at 92% 86%, rgba(255,255,255,0.96) 0 18%, rgba(255,255,255,0.5) 36%, transparent 72%),
-                radial-gradient(circle at 92% 86%, #fff 0 1.6px, rgba(255,255,255,0.48) 2.5px, transparent 4.4px);
-            background-size: 1280px 940px;
-            filter: brightness(1.04) drop-shadow(0 0 5px rgba(255,255,255,0.68));
-            animation:
-                starTwinkleLarge 2.1s ease-in-out infinite alternate-reverse,
-                starFloat 36s linear infinite;
+        body.night-stars {
+            background: #000;
         }
 
-        @keyframes starTwinkleLarge {
-            from { opacity: 0.42; filter: brightness(0.8) drop-shadow(0 0 2px rgba(255,255,255,0.5)); }
-            55% { opacity: 1; filter: brightness(1.8) drop-shadow(0 0 8px rgba(255,255,255,0.92)); }
-            to { opacity: 0.78; filter: brightness(1.22) drop-shadow(0 0 5px rgba(190,230,255,0.78)); }
+        body.night-stars::before {
+            z-index: 0;
+            background: #000;
         }
 
-        @keyframes starFloat {
-            to { transform: translate3d(-80px, 55px, 0); }
+        body.night-stars::after {
+            z-index: 0;
+            opacity: 0.82;
+            animation: starTwinkleSmall 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes starTwinkleSmall {
+            from { opacity: 0.46; filter: brightness(0.8) drop-shadow(0 0 2px rgba(255,255,255,0.5)); }
+            55% { opacity: 0.95; filter: brightness(1.8) drop-shadow(0 0 8px rgba(255,255,255,0.92)); }
+            to { opacity: 0.72; filter: brightness(1.22) drop-shadow(0 0 5px rgba(190,230,255,0.78)); }
         }
 
         .app-container { 
@@ -109,26 +99,43 @@
             max-width: 500px; 
             margin: 0 auto; 
             aspect-ratio: 1 / 1.1;
-            background: #000;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.42), rgba(255,255,255,0.22) 42%, rgba(255,255,255,0.35)), rgba(255, 255, 255, 0.45);
             border-radius: 20px; 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.78), inset 0 0 18px rgba(255,255,255,0.06), 0 0 34px rgba(0,229,255,0.18);
-            backdrop-filter: none; 
-            -webkit-backdrop-filter: none; 
-            border: 1px solid rgba(255,255,255,0.55);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.65);
+            backdrop-filter: blur(6px); 
+            -webkit-backdrop-filter: blur(6px); 
+            border: 1px solid rgba(255,255,255,0.42);
             overflow: hidden; 
             isolation: isolate; 
             transform: translateZ(0);
-            contain: layout style paint;
         }
 
         .diagram-panel::before {
             content: "";
             position: absolute;
+            inset: 8%;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 2px),
+                conic-gradient(from 0deg, transparent, rgba(255,215,0,0.18), transparent, rgba(0,229,255,0.16), transparent);
+            animation: softSpin 22s linear infinite;
+            z-index: -1;
+            transform: translateZ(0);
+        }
+
+        body.night-stars .diagram-panel {
+            background: #000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85), inset 0 0 16px rgba(255,255,255,0.06), 0 0 28px rgba(0,229,255,0.16);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.night-stars .diagram-panel::before {
             inset: 0;
-            z-index: 0;
-            pointer-events: none;
             border-radius: inherit;
-            background-image:
+            z-index: 0;
+            opacity: 0.88;
+            background:
                 radial-gradient(ellipse 20px 1.8px at 12% 11%, rgba(255,255,255,0.96) 0 18%, rgba(160,220,255,0.6) 36%, transparent 72%),
                 radial-gradient(ellipse 1.8px 20px at 12% 11%, rgba(255,255,255,0.96) 0 18%, rgba(160,220,255,0.6) 36%, transparent 72%),
                 radial-gradient(circle at 12% 11%, #fff 0 1.6px, rgba(255,255,255,0.5) 2.6px, transparent 4.4px),
@@ -152,27 +159,15 @@
                 radial-gradient(circle at 31% 76%, #fff 0 1.7px, rgba(255,255,255,0.5) 2.7px, transparent 4.6px),
                 radial-gradient(ellipse 19px 1.5px at 80% 82%, rgba(255,255,255,0.94) 0 18%, rgba(255,255,255,0.5) 36%, transparent 72%),
                 radial-gradient(ellipse 1.5px 19px at 80% 82%, rgba(255,255,255,0.94) 0 18%, rgba(255,255,255,0.5) 36%, transparent 72%),
-                radial-gradient(circle at 80% 82%, #fff 0 1.5px, rgba(255,255,255,0.46) 2.4px, transparent 4.2px),
-                radial-gradient(ellipse 16px 1.4px at 7% 62%, rgba(255,255,255,0.92) 0 18%, rgba(180,225,255,0.5) 36%, transparent 72%),
-                radial-gradient(ellipse 1.4px 16px at 7% 62%, rgba(255,255,255,0.92) 0 18%, rgba(180,225,255,0.5) 36%, transparent 72%),
-                radial-gradient(circle at 7% 62%, #fff 0 1.2px, rgba(255,255,255,0.44) 2px, transparent 3.6px),
-                radial-gradient(ellipse 20px 1.5px at 50% 30%, rgba(255,247,205,0.94) 0 18%, rgba(255,226,132,0.5) 36%, transparent 72%),
-                radial-gradient(ellipse 1.5px 20px at 50% 30%, rgba(255,247,205,0.94) 0 18%, rgba(255,226,132,0.5) 36%, transparent 72%),
-                radial-gradient(circle at 50% 30%, #fff 0 1.5px, rgba(255,255,255,0.46) 2.4px, transparent 4.2px),
-                radial-gradient(ellipse 18px 1.5px at 70% 68%, rgba(185,230,255,0.94) 0 18%, rgba(185,230,255,0.5) 36%, transparent 72%),
-                radial-gradient(ellipse 1.5px 18px at 70% 68%, rgba(185,230,255,0.94) 0 18%, rgba(185,230,255,0.5) 36%, transparent 72%),
-                radial-gradient(circle at 70% 68%, #fff 0 1.4px, rgba(255,255,255,0.46) 2.3px, transparent 4px),
-                radial-gradient(ellipse 15px 1.3px at 94% 30%, rgba(255,255,255,0.92) 0 18%, rgba(255,255,255,0.46) 36%, transparent 72%),
-                radial-gradient(ellipse 1.3px 15px at 94% 30%, rgba(255,255,255,0.92) 0 18%, rgba(255,255,255,0.46) 36%, transparent 72%),
-                radial-gradient(circle at 94% 30%, #fff 0 1.2px, rgba(255,255,255,0.42) 1.9px, transparent 3.4px),
-                radial-gradient(ellipse 17px 1.4px at 45% 93%, rgba(255,255,255,0.94) 0 18%, rgba(255,255,255,0.5) 36%, transparent 72%),
-                radial-gradient(ellipse 1.4px 17px at 45% 93%, rgba(255,255,255,0.94) 0 18%, rgba(255,255,255,0.5) 36%, transparent 72%),
-                radial-gradient(circle at 45% 93%, #fff 0 1.3px, rgba(255,255,255,0.44) 2.2px, transparent 3.8px);
+                radial-gradient(circle at 80% 82%, #fff 0 1.5px, rgba(255,255,255,0.46) 2.4px, transparent 4.2px);
             background-size: 100% 100%;
-            opacity: 0.94;
             filter: brightness(1.16) drop-shadow(0 0 6px rgba(255,255,255,0.82));
-            animation: starTwinkleLarge 1.9s ease-in-out infinite alternate;
+            animation: starTwinkleSmall 2.1s ease-in-out infinite alternate;
+            pointer-events: none;
+            transform: translateZ(0);
         }
+
+        @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
         .diagram-panel::after,
         .stat-card::after,
@@ -197,11 +192,9 @@
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
-            filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4));
             animation:
                 rainbowSlide 3s linear infinite,
                 rainbowBorderGlow 1.5s ease-in-out infinite alternate;
-            will-change: background-position, filter, opacity;
             transform: translateZ(0);
         }
 
@@ -214,8 +207,8 @@
 
         @keyframes rainbowSlide { to { background-position: -200% 0; } }
         @keyframes rainbowBorderGlow {
-            from { opacity: 0.7; filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.3)); }
-            to { opacity: 1; filter: drop-shadow(0 0 10px rgba(176, 0, 255, 0.6)); }
+            from { opacity: 0.7; }
+            to { opacity: 1; }
         }
 
         .node { position: absolute; transform: translate(-50%, -50%) translateZ(0); background: transparent; border: none; padding: 10px 4px; text-align: center; width: 90px; z-index: 10; }
@@ -230,7 +223,7 @@
             position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15;
             width: 140px; background: #fff; padding: 3px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .weather-container img { width: 100%; height: auto; display: block; border-radius: 12px; }
+        .weather-container img { width: 100%; height: auto; display: block; border-radius: 12px; transform: translateZ(0); }
 
         /* Node Biến Tần Trung Tâm */
         .node-center {
@@ -238,9 +231,8 @@
             width: 115px; height: 125px; padding: 3px; background: #fff; border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.16), 0 0 22px rgba(0,204,102,0.3); z-index: 15;
         }
-        .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+        .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; transform: translateZ(0); }
 
-        /* NÚT CÔNG TẮC BẬT/TẮT DỌC SÁT GÓC TRÊN BÊN PHẢI (CHỮ Ở DƯỚI CÔNG TẮC) */
         .inv-switch-overlay {
             position: absolute;
             top: 3px;
@@ -248,7 +240,7 @@
             z-index: 25;
             background: transparent;
             display: flex;
-            flex-direction: column; /* Xếp dọc: Công tắc ở trên, chữ ở dưới */
+            flex-direction: column;
             align-items: center;
             gap: 1px;
             padding: 0;
@@ -285,7 +277,7 @@
         }
 
         .bpf-container {
-            position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15; text-align: center; width: 100%; pointer-events: none; will-change: transform;
+            position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15; text-align: center; width: 100%; pointer-events: none;
         }
         .bpf-text {
             font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 32px; font-weight: 900; letter-spacing: 14px;
@@ -348,7 +340,7 @@
             display: inline-block;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); 
         }
-        .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+        .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)); }
         
         .img-icon {
             width: 85px; 
@@ -359,6 +351,7 @@
             filter: brightness(1.1) contrast(1.1);
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%);
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%);
+            transform: translateZ(0);
         }
 
         .pos-load .icon { filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.8)); }
@@ -388,7 +381,7 @@
         .battery-cap { width: 5px; height: 14px; background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%); border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.3); border-left: none; box-shadow: inset 1px 0 3px rgba(255,255,255,0.6); }
         .battery-fill {
             height: 100%; width: 0%; transition: width 0.5s ease-in-out, background 0.5s;
-            position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); will-change: width, background; transform: translateZ(0);
+            position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); transform: translateZ(0);
         }
         .fill-red { background: linear-gradient(to bottom, #ff5555 0%, #ffaaaa 30%, #ff2222 70%, #aa0000 100%); }
         .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
@@ -402,8 +395,15 @@
         }
 
         .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
-        .val-charge { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.8) !important; font-size: 18px; }
-        .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.8) !important; font-size: 18px; }
+        
+        /* CÁC STYLE MÀU CHỮ NỔI 3D CHO TỪNG LUỒNG NĂNG LƯỢNG (RÕ NÉT TRÊN NỀN SÁNG) */
+        .val-pv-style { color: #ffffff !important; text-shadow: 0 1px 0 #b45309, 0 2px 0 #92400e, 0 3px 0 #78350f, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(245, 158, 11, 0.9) !important; font-size: 18px; }
+        .val-load-style { color: #ffffff !important; text-shadow: 0 1px 0 #1d4ed8, 0 2px 0 #1e40af, 0 3px 0 #1e3a8a, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(59, 130, 246, 0.9) !important; font-size: 18px; }
+        .val-grid-buy-style { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
+        .val-grid-sell-style { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
+        
+        .val-charge { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
+        .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
 
         .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; transform: translateZ(0); }
         .flow-track {
@@ -413,59 +413,67 @@
                 repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 9px, rgba(255,255,255,0.86) 10px 12px, rgba(255,255,255,0) 13px 22px),
                 linear-gradient(90deg, rgba(255,255,255,0.04) 0%, var(--c) 18%, #ffffff 50%, var(--c) 82%, rgba(255,255,255,0.04) 100%);
             background-size: 44px 100%, 100% 100%;
-            box-shadow: 0 0 8px var(--c), 0 0 18px var(--c), inset 0 0 5px rgba(255,255,255,0.75);
+            box-shadow: 0 0 8px var(--c), inset 0 0 5px rgba(255,255,255,0.75);
             opacity: 0.9;
-            animation: electricWireSlide var(--wire-speed, 1s) linear infinite, electricWirePulse 1.7s ease-in-out infinite alternate;
+            animation: electricWireSlide var(--wire-speed, 1s) linear infinite;
             z-index: 1;
         }
         .flow-track::before {
             content: ''; position: absolute; left: -10px; right: -10px; top: 50%; height: 20px;
             transform: translateY(-50%) translateZ(0); border-radius: 999px;
             background: radial-gradient(ellipse at center, var(--c) 0%, rgba(255,255,255,0.08) 36%, rgba(255,255,255,0) 72%);
-            filter: blur(8px); opacity: 0.38; z-index: -1;
+            opacity: 0.38; z-index: -1;
         }
         .flow-track::after {
             content: ''; position: absolute; left: 2%; right: 2%; top: 50%; height: 2px;
             transform: translateY(-50%) translateZ(0); border-radius: 999px;
             background: linear-gradient(90deg, rgba(255,255,255,0.15), #ffffff 48%, rgba(255,255,255,0.15));
-            box-shadow: 0 0 7px #fff, 0 0 14px var(--c);
-            animation: electricFilament 0.8s ease-in-out infinite alternate;
+            box-shadow: 0 0 7px #fff;
         }
         .flow-dash {
             position: absolute; top: 50%; width: 13px; height: 13px; border-radius: 50%; opacity: 0; z-index: 3;
             background: radial-gradient(circle at 35% 35%, #ffffff 0 18%, rgba(255,255,255,0.95) 19% 30%, var(--c) 46%, rgba(255,255,255,0) 74%);
-            box-shadow: 0 0 8px #fff, 0 0 14px var(--c), 0 0 26px var(--c);
-            will-change: left, right, transform, opacity;
+            box-shadow: 0 0 8px #fff, 0 0 14px var(--c);
             transform: translate(-50%, -50%) translateZ(0);
         }
         .flow-dash::before {
             content: ''; position: absolute; top: 50%; width: 34px; height: 4px; border-radius: 999px;
-            transform: translateY(-50%) translateZ(0); opacity: 0.82; filter: blur(0.2px);
+            transform: translateY(-50%) translateZ(0); opacity: 0.82;
         }
         .dir-right .flow-dash::before { right: 8px; background: linear-gradient(90deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
         .dir-left .flow-dash::before { left: 8px; background: linear-gradient(270deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
+        .flow-dash::after {
+            content: ''; position: absolute; width: 3px; height: 3px; border-radius: 50%;
+            top: -3px; right: 1px; background: #ffffff;
+            box-shadow: -8px 9px 0 rgba(255,255,255,0.74), 6px 11px 0 var(--c);
+        }
+        .flow-spark {
+            position: absolute; top: 50%; width: 4px; height: 4px; border-radius: 50%; opacity: 0; z-index: 4;
+            background: #ffffff; box-shadow: 0 0 6px #fff, 0 0 13px var(--c);
+            transform: translate(-50%, -50%) translateZ(0);
+        }
         .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.28s; } .flow-dash:nth-child(4) { animation-delay: 0.56s; } .flow-dash:nth-child(5) { animation-delay: 0.84s; } .flow-dash:nth-child(6) { animation-delay: 1.12s; } .flow-dash:nth-child(7) { animation-delay: 1.40s; } .flow-dash:nth-child(8) { animation-delay: 1.68s; }
+        .flow-spark:nth-child(9) { animation-delay: 0.12s; } .flow-spark:nth-child(10) { animation-delay: 0.38s; } .flow-spark:nth-child(11) { animation-delay: 0.72s; } .flow-spark:nth-child(12) { animation-delay: 1.02s; } .flow-spark:nth-child(13) { animation-delay: 1.34s; } .flow-spark:nth-child(14) { animation-delay: 1.66s; }
         
         @keyframes electricWireSlide { to { background-position: 44px 0, 0 0; } }
-        @keyframes electricWirePulse { from { filter: brightness(1) saturate(1); opacity: 0.72; } to { filter: brightness(1.45) saturate(1.35); opacity: 1; } }
-        @keyframes electricFilament { from { opacity: 0.55; transform: translateY(-50%) scaleX(0.96) translateZ(0); } to { opacity: 1; transform: translateY(-50%) scaleX(1.02) translateZ(0); } }
         @keyframes flowInL { 0% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
         @keyframes flowOutL { 0% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
         @keyframes flowInR { 0% { right: -8%; opacity: 0; transform: translate(50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(50%, -50%) scale(1.06) translateZ(0); } 100% { right: 108%; opacity: 0; transform: translate(50%, -50%) scale(0.55) translateZ(0); } }
         @keyframes flowOutR { 0% { right: 108%; opacity: 0; transform: translate(50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(50%, -50%) scale(1.06) translateZ(0); } 100% { right: -8%; opacity: 0; transform: translate(50%, -50%) scale(0.55) translateZ(0); } }
+        @keyframes sparkRight { 0% { left: -5%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.35) translateZ(0); } 12% { opacity: 1; } 36% { top: 38%; } 62% { top: 62%; } 100% { left: 105%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65) translateZ(0); } }
+        @keyframes sparkLeft { 0% { left: 105%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.35) translateZ(0); } 12% { opacity: 1; } 36% { top: 62%; } 62% { top: 38%; } 100% { left: -5%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65) translateZ(0); } }
 
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
         .stat-card {
             position: relative; overflow: hidden;
-            background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255, 255, 255, 0.7));
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255, 255, 255, 0.78));
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
             border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateZ(0); 
-            contain: layout style paint;
         }
         .stat-card::before {
             content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%);
-            transform: translateX(-120%) translateZ(0); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none; will-change: transform;
+            transform: translateX(-120%) translateZ(0); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none;
         }
         @keyframes cardSheen { 0%, 48% { transform: translateX(-120%) translateZ(0); } 78%, 100% { transform: translateX(120%) translateZ(0); } }
 
@@ -725,25 +733,9 @@
             .stats-panel { flex: 1; justify-content: center; }
         }
 
-        /* Mặt trời Canvas */
+        /* Mặt trời Canvas & Các cấp độ hiển thị (Cấp 0 -> Cấp 6) */
         .solar-sun-box{ width: 82px; height: 82px; margin: auto; position: relative; transform: translate(-8px, -6px) translateZ(0); }
-        #solar-sun{
-            width: 100%;
-            height: 100%;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s ease, filter 0.5s ease;
-            transform: translateZ(0);
-            opacity: .28;
-            filter: brightness(.5);
-            --sun-canvas-opacity: 0;
-            --sun-canvas-glow: 0px;
-            --sun-canvas-glow-alpha: 0;
-            --sun-pulse-duration: 3.2s;
-            --sun-halo-duration: 3.8s;
-        }
+        #solar-sun{ width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; transition: all 0.5s ease; transform: translateZ(0); }
         
         #sun-canvas {
             position: absolute;
@@ -754,8 +746,7 @@
             height: 230px;
             pointer-events: none;
             z-index: 0;
-            opacity: var(--sun-canvas-opacity);
-            filter: drop-shadow(0 0 var(--sun-canvas-glow) rgba(255, 215, 0, var(--sun-canvas-glow-alpha)));
+            transition: filter 0.5s ease;
         }
 
         .sun-core{
@@ -776,9 +767,8 @@
                 0 0 40px #ffd700,
                 0 0 80px #ffb300,
                 0 0 120px rgba(255,190,0,.7);
-            animation: sunPulse var(--sun-pulse-duration) ease-in-out infinite;
+            animation: sunPulse 2s ease-in-out infinite;
             transform: translateZ(0);
-            will-change: transform, filter;
         }
 
         #solar-sun::before{
@@ -792,11 +782,10 @@
                 rgba(255,255,255,.55),
                 rgba(255,220,80,.2) 40%,
                 transparent 75%);
-            animation: haloPulse var(--sun-halo-duration) ease-in-out infinite;
+            animation: haloPulse 2.5s ease-in-out infinite;
             pointer-events: none;
             z-index: 1;
             transform: translateZ(0);
-            will-change: transform, filter;
         }
 
         @keyframes sunPulse{ 0%{ transform: scale(1) translateZ(0); filter: brightness(1); } 50%{ transform: scale(1.05) translateZ(0); filter: brightness(1.2); } 100%{ transform: scale(1) translateZ(0); filter: brightness(1); } }
@@ -807,64 +796,13 @@
             100%{ filter:brightness(0.9); transform: scale(1) translateZ(0); }
         }
 
-        .sun-level-0{
-            opacity: .28;
-            filter: brightness(.5);
-        }
-        .sun-level-1{
-            opacity: .55;
-            filter: brightness(.72) drop-shadow(0 0 4px rgba(255,215,0,.18));
-            --sun-canvas-opacity: .30;
-            --sun-canvas-glow: 3px;
-            --sun-canvas-glow-alpha: .16;
-            --sun-pulse-duration: 3s;
-            --sun-halo-duration: 3.5s;
-        }
-        .sun-level-2{
-            opacity: .68;
-            filter: brightness(.88) drop-shadow(0 0 7px rgba(255,215,0,.28));
-            --sun-canvas-opacity: .45;
-            --sun-canvas-glow: 5px;
-            --sun-canvas-glow-alpha: .22;
-            --sun-pulse-duration: 2.8s;
-            --sun-halo-duration: 3.2s;
-        }
-        .sun-level-3{
-            opacity: .78;
-            filter: brightness(1.05) drop-shadow(0 0 10px rgba(255,215,0,.4));
-            --sun-canvas-opacity: .62;
-            --sun-canvas-glow: 7px;
-            --sun-canvas-glow-alpha: .30;
-            --sun-pulse-duration: 2.6s;
-            --sun-halo-duration: 3s;
-        }
-        .sun-level-4{
-            opacity: .88;
-            filter: brightness(1.22) drop-shadow(0 0 13px rgba(255,215,0,.52));
-            --sun-canvas-opacity: .78;
-            --sun-canvas-glow: 8px;
-            --sun-canvas-glow-alpha: .34;
-            --sun-pulse-duration: 2.4s;
-            --sun-halo-duration: 2.8s;
-        }
-        .sun-level-5{
-            opacity: .95;
-            filter: brightness(1.4) drop-shadow(0 0 16px rgba(255,215,0,.65));
-            --sun-canvas-opacity: .9;
-            --sun-canvas-glow: 9px;
-            --sun-canvas-glow-alpha: .38;
-            --sun-pulse-duration: 2.2s;
-            --sun-halo-duration: 2.6s;
-        }
-        .sun-level-6{
-            opacity: 1;
-            filter: brightness(1.6) drop-shadow(0 0 20px rgba(255,215,0,0.8));
-            --sun-canvas-opacity: 1;
-            --sun-canvas-glow: 10px;
-            --sun-canvas-glow-alpha: .4;
-            --sun-pulse-duration: 2s;
-            --sun-halo-duration: 2.5s;
-        }
+        .sun-lvl-0 { opacity: 0.15; filter: brightness(0.25) grayscale(0.8); }
+        .sun-lvl-1 { opacity: 0.55; filter: brightness(0.68) drop-shadow(0 0 5px rgba(255, 215, 0, 0.28)); }
+        .sun-lvl-2 { opacity: 0.72; filter: brightness(0.90) drop-shadow(0 0 10px rgba(255, 215, 0, 0.50)); }
+        .sun-lvl-3 { opacity: 0.85; filter: brightness(1.10) drop-shadow(0 0 14px rgba(255, 215, 0, 0.65)); }
+        .sun-lvl-4 { opacity: 0.95; filter: brightness(1.30) drop-shadow(0 0 18px rgba(255, 215, 0, 0.78)); }
+        .sun-lvl-5 { opacity: 1.00; filter: brightness(1.48) drop-shadow(0 0 22px rgba(255, 215, 0, 0.88)); }
+        .sun-lvl-6 { opacity: 1.00; filter: brightness(1.68) drop-shadow(0 0 28px rgba(255, 215, 0, 0.98)); }
     </style>
 </head>
 <body>
@@ -877,7 +815,7 @@
                 <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image">
             </div>
 
-            <!-- NODE BIẾN TẦN TRUNG TÂM - CÔNG TẮC XẾP DỌC SÁT SẠT GÓC BÊN PHẢI -->
+            <!-- NODE BIẾN TẦN TRUNG TÂM -->
             <div class="node-center pos-inv">
                 <img src="68.jpg" alt="Inverter">
                 <div class="inv-switch-overlay" title="Gạt để Bật/Tắt Biến Tần">
@@ -891,19 +829,19 @@
 
             <div id="lbl-inv-temp">🌡️ --°C</div>
 
-            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
-            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
-            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
-            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
+            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
 
             <div class="node pos-pv">
                 <div class="solar-sun-box">
-                    <div id="solar-sun" class="sun-level-0" data-sun-level="0">
-                        <canvas id="sun-canvas" data-sun-level="0"></canvas>
+                    <div id="solar-sun" class="sun-lvl-0">
+                        <canvas id="sun-canvas"></canvas>
                         <div class="sun-core"></div>
                     </div>
                 </div>
-                <h3>MẶT TRỜI</h3><div class="val" id="lbl-pv">0</div><div class="unit">W</div>
+                <h3>MẶT TRỜI</h3><div class="val val-pv-style" id="lbl-pv">0</div><div class="unit">W</div>
             </div>
 
             <div class="node pos-grid">
@@ -922,7 +860,7 @@
             </div>
 
             <div class="node pos-load corner-node">
-                <div class="corner-power"><h3>TIÊU THỤ</h3><div class="val" id="lbl-load">0</div><div class="unit">W</div></div>
+                <div class="corner-power"><h3>TIÊU THỤ</h3><div class="val val-load-style" id="lbl-load">0</div><div class="unit">W</div></div>
                 <div class="icon"><img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon"></div>
             </div>
 
@@ -1077,32 +1015,22 @@
             state.frameId = requestAnimationFrame(step);
         }
 
-        // ================= KỊCH BẢN VẼ MẶT TRỜI BẰNG CANVAS =================
-        const solarSunLevelClasses = ['sun-level-0', 'sun-level-1', 'sun-level-2', 'sun-level-3', 'sun-level-4', 'sun-level-5', 'sun-level-6'];
+        // ================= KỊCH BẢN VẼ MẶT TRỜI CHIA 6 CẤP ĐỘ DỰA TRÊN CÔNG SUẤT PV =================
+        let currentSunLevel = 0; 
+        const sunRayCounts = [0, 15, 40, 60, 80, 100, 120];
+        let latestPvPowerW = 0;
 
-        function getSolarSunLevel(pvInW) {
-            const power = Number(pvInW) || 0;
+        function updateBackgroundByTimeAndPv(pvW = latestPvPowerW) {
+            const pvPower = Number.isFinite(Number(pvW)) ? Number(pvW) : 0;
+            latestPvPowerW = pvPower;
 
-            if (power < 100) return 0;
-            if (power <= 1000) return 1;
-            if (power <= 2000) return 2;
-            if (power <= 3000) return 3;
-            if (power <= 5000) return 4;
-            if (power <= 7000) return 5;
-            return 6;
-        }
+            const hour = new Date().getHours();
+            const isNightTime = hour >= 18 || hour < 6;
+            const shouldShowStars = isNightTime && pvPower < 1;
 
-        function updateSolarSunLevel(pvInW) {
-            const level = getSolarSunLevel(pvInW);
-            const solarSun = document.getElementById('solar-sun');
-            if (!solarSun) return;
-
-            solarSun.classList.remove(...solarSunLevelClasses);
-            solarSun.classList.add(`sun-level-${level}`);
-            solarSun.dataset.sunLevel = String(level);
-
-            const canvas = document.getElementById('sun-canvas');
-            if (canvas) canvas.dataset.sunLevel = String(level);
+            if (document.body) {
+                document.body.classList.toggle('night-stars', shouldShowStars);
+            }
         }
 
         function initCanvasSun() {
@@ -1120,21 +1048,11 @@
             const cy = size / 2;
 
             const rays = [];
-            const numRays = 120;
-            const levelConfigs = [
-                { alphaScale: 0, lengthScale: 0, widthScale: 0, wave: 0, shadowBlur: 0 },
-                { alphaScale: .35, lengthScale: .48, widthScale: .55, wave: 5, shadowBlur: .4 },
-                { alphaScale: .48, lengthScale: .58, widthScale: .62, wave: 7, shadowBlur: .7 },
-                { alphaScale: .62, lengthScale: .70, widthScale: .72, wave: 9, shadowBlur: 1 },
-                { alphaScale: .76, lengthScale: .82, widthScale: .82, wave: 11, shadowBlur: 1.3 },
-                { alphaScale: .9, lengthScale: .92, widthScale: .92, wave: 13, shadowBlur: 1.7 },
-                { alphaScale: 1, lengthScale: 1, widthScale: 1, wave: 15, shadowBlur: 2 }
-            ];
+            const maxRays = 120;
 
-            for (let i = 0; i < numRays; i++) {
+            for (let i = 0; i < maxRays; i++) {
                 rays.push({
-                    level: (i % 6) + 1,
-                    angle: (i / numRays) * Math.PI * 2 + (Math.random() - 0.5) * 0.08,
+                    angle: Math.random() * Math.PI * 2,
                     baseLength: 30 + Math.random() * 80,
                     width: 0.3 + Math.random() * 1.5,
                     speed: 0.02 + Math.random() * 0.08,
@@ -1143,26 +1061,16 @@
                 });
             }
 
-            let lastFrameTime = 0;
-            const frameInterval = 1000 / 30;
-
-            function animateCanvasSun(timestamp) {
-                if (timestamp - lastFrameTime < frameInterval) {
-                    requestAnimationFrame(animateCanvasSun);
-                    return;
-                }
-                lastFrameTime = timestamp;
-
+            function animateCanvasSun() {
                 ctx.clearRect(0, 0, size, size);
-                const sunLevel = Math.max(0, Math.min(6, Number(canvas.dataset.sunLevel || 0)));
-                const config = levelConfigs[sunLevel];
-                const time = timestamp * 0.001;
+                const time = Date.now() * 0.001;
 
-                rays.forEach(ray => {
-                    if (ray.level > sunLevel) return;
+                const activeRaysCount = sunRayCounts[currentSunLevel] || 0;
 
-                    const currentLength = (ray.baseLength + Math.sin(ray.phase + time * (ray.speed * 80)) * config.wave) * config.lengthScale;
-                    const currentAlpha = ray.baseAlpha * config.alphaScale * (0.5 + Math.sin(ray.phase * 3 + time * 30) * 0.5);
+                for (let i = 0; i < activeRaysCount; i++) {
+                    const ray = rays[i];
+                    const currentLength = ray.baseLength + Math.sin(ray.phase + time * (ray.speed * 80)) * 15;
+                    const currentAlpha = ray.baseAlpha * (0.5 + Math.sin(ray.phase * 3 + time * 30) * 0.5);
                     const angle = ray.angle + time * 0.05; 
 
                     const x = cx + Math.cos(angle) * currentLength;
@@ -1176,19 +1084,37 @@
                     ctx.beginPath();
                     ctx.moveTo(cx, cy);
                     ctx.lineTo(x, y);
-                    ctx.lineWidth = ray.width * config.widthScale;
+                    ctx.lineWidth = ray.width;
                     ctx.strokeStyle = grad;
-                    ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
-                    ctx.shadowBlur = config.shadowBlur;
                     ctx.stroke();
-                });
+                }
 
                 requestAnimationFrame(animateCanvasSun);
             }
             animateCanvasSun();
         }
+
+        function updateSunLevelByPower(pvW) {
+            let lvl = 0;
+            if (pvW >= 7001) { lvl = 6; }        
+            else if (pvW >= 5001) { lvl = 5; }   
+            else if (pvW >= 3001) { lvl = 4; }   
+            else if (pvW >= 2001) { lvl = 3; }   
+            else if (pvW >= 1001) { lvl = 2; }   
+            else if (pvW >= 11) { lvl = 1; }     
+            else { lvl = 0; }                    
+
+            if (currentSunLevel !== lvl) {
+                currentSunLevel = lvl;
+                const solarSun = document.getElementById('solar-sun');
+                if (solarSun) {
+                    solarSun.className = 'sun-lvl-' + lvl;
+                }
+            }
+        }
         
         document.addEventListener('DOMContentLoaded', () => {
+            updateBackgroundByTimeAndPv();
             initCanvasSun();
             initChart();
             initModalEvents();
@@ -1706,15 +1632,16 @@
 
         function getFlowIntensity(powerW) {
             if (powerW === undefined || powerW === null) {
-                return { particles: 6, dashDuration: 2.2, wireSpeed: 1 };
+                return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
             }
 
             const watts = Math.abs(Number(powerW)) || 0;
-            if (watts < 1) return { particles: 0, dashDuration: 7.8, wireSpeed: 4.2 };
-            if (watts <= 1000) return { particles: 3, dashDuration: 7.0, wireSpeed: 3.6 };
-            if (watts <= 2000) return { particles: 4, dashDuration: 5.0, wireSpeed: 2.5 };
-            if (watts <= 4000) return { particles: 5, dashDuration: 3.4, wireSpeed: 1.7 };
-            return { particles: 6, dashDuration: 2.65, wireSpeed: 1.25 };
+            if (watts < 1) return { particles: 0, sparks: 0, dashDuration: 7.8, sparkDuration: 5.4, wireSpeed: 4.2 };
+            if (watts <= 1000) return { particles: 3, sparks: 2, dashDuration: 7.0, sparkDuration: 4.8, wireSpeed: 3.6 };
+            if (watts <= 2000) return { particles: 4, sparks: 3, dashDuration: 5.0, sparkDuration: 3.4, wireSpeed: 2.5 };
+            if (watts <= 4000) return { particles: 5, sparks: 4, dashDuration: 3.4, sparkDuration: 2.35, wireSpeed: 1.7 };
+            if (watts <= 5500) return { particles: 6, sparks: 5, dashDuration: 2.65, sparkDuration: 1.85, wireSpeed: 1.25 };
+            return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
         }
 
         function setFlow(groupId, isActive, animName, color, powerW) {
@@ -1764,6 +1691,22 @@
                         d.style.animationTimingFunction = 'linear'; 
                     });
 
+                    const sparks = group.querySelectorAll('.flow-spark');
+                    sparks.forEach((s, index) => {
+                        s.style.animationName = 'none';
+                        s.style.opacity = '0';
+                        if (index >= intensity.sparks) {
+                            s.style.display = 'none';
+                            return;
+                        }
+                        s.style.display = 'block';
+                        void s.offsetWidth;
+                        s.style.animationName = movesRight ? 'sparkRight' : 'sparkLeft';
+                        s.style.animationDelay = '-' + ((index * intensity.sparkDuration) / Math.max(intensity.sparks, 1)).toFixed(2) + 's';
+                        s.style.animationDuration = intensity.sparkDuration + 's';
+                        s.style.animationIterationCount = 'infinite';
+                        s.style.animationTimingFunction = 'linear';
+                    });
                 }
             } else { 
                 if (currentActive) {
@@ -1777,6 +1720,7 @@
 
         database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => { latestDailyData = snapshot.val(); checkAndSwitchMonth(); recalculateEnergy(); });
         setInterval(() => { checkAndSwitchMonth(); }, 60000);
+        setInterval(() => { updateBackgroundByTimeAndPv(); }, 60000);
 
         database.ref('/SosenSystem/Live').on('value', (snapshot) => {
             const data = snapshot.val();
@@ -1788,23 +1732,29 @@
                 let gridInW = Math.round(data.Grid_Power);
                 let battInW = Math.round(data.Batt_Voltage * data.Batt_Current);
                 let loadInW = pvInW + gridInW + battInW;
+                updateBackgroundByTimeAndPv(pvInW);
 
                 if (loadInW < 0) loadInW = 0;
                 
                 animateValue('lbl-pv', pvInW, v => Math.round(v));
+                document.getElementById('lbl-pv').classList.add('val-pv-style');
 
-                updateSolarSunLevel(pvInW);
+                updateSunLevelByPower(pvInW);
 
                 animateValue('lbl-load', loadInW, v => Math.round(v));
+                document.getElementById('lbl-load').classList.add('val-load-style');
+
                 animateValue('lbl-grid', Math.abs(gridInW), v => Math.round(v));
 
                 const elGrid = document.getElementById('lbl-grid');
+                elGrid.classList.remove('val-grid-buy-style', 'val-grid-sell-style');
                 if (gridInW < 0) { 
-                    elGrid.style.color = '#00cc66'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(0,204,102,0.45)';
+                    elGrid.classList.add('val-grid-sell-style'); // Phát lưới (Xanh lá)
                 } else if (gridInW > 0) { 
-                    elGrid.style.color = '#ff4444'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,68,68,0.45)';
+                    elGrid.classList.add('val-grid-buy-style'); // Lấy lưới (Đỏ hồng)
                 } else { 
-                    elGrid.style.color = '#fff'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
+                    elGrid.style.color = '#fff'; 
+                    elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
                 }
 
                 animateValue('lbl-batt', Math.abs(battInW), v => Math.round(v));
@@ -1873,8 +1823,8 @@
                 else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); 
                 else setFlow('flow-batt', false);
                 
-                if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444', Math.abs(gridInW)); 
-                else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66', Math.abs(gridInW)); 
+                if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444'); 
+                else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66'); 
                 else setFlow('flow-grid', false);
             }
         });
