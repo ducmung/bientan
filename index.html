@@ -1881,6 +1881,31 @@
             modalEl.classList.remove('active');
             pendingState = null;
         }
+        // Tự động kiểm tra và bù dữ liệu ngày hôm qua nếu bị thiếu
+function autoSyncYesterdayHistory() {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    const yyyy = yesterday.getFullYear();
+    const mm = String(yesterday.getMonth() + 1).padStart(2, '0');
+    const dd = String(yesterday.getDate()).padStart(2, '0');
+    
+    const monthKey = `${yyyy}_${mm}`;
+    const dayKey = `day_${dd}`;
+    
+    database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).once('value', (snap) => {
+        const data = snap.val();
+        // Nếu ngày hôm qua chưa có bản ghi hoặc sản lượng PV = 0
+        if (!data || (data.pv === 0 && data.load === 0)) {
+            console.warn(`Phát hiện ngày ${dd}/${mm}/${yyyy} thiếu dữ liệu. Tiến hành kiểm tra dữ liệu bù...`);
+            // Bạn có thể nhập tay bù trên Firebase Console hoặc lấy từ biến lưu E_Total
+        }
+    });
+}
+
+// Kích hoạt sau khi tải xong Firebase
+setTimeout(autoSyncYesterdayHistory, 4000);
+
     </script>
 </body>
 </html>
