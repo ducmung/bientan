@@ -172,7 +172,7 @@
         .diagram-panel::after,
         .stat-card::after,
         .node-center::after,
-        .weather-container::after,
+        .image-frame::after,
         #update-clock::after,
         #lbl-status::after,
         #lbl-inv-temp::after {
@@ -200,7 +200,7 @@
 
         .diagram-panel::after { z-index: 4; inset: 0; border-radius: 20px; }
         .stat-card::after { z-index: 2; inset: 0; border-radius: 20px; }
-        .weather-container::after { z-index: -1; border-radius: 15px; }
+        .image-frame::after { z-index: 2; border-radius: 15px; }
         .node-center::after { z-index: -1; border-radius: 15px; }
         #update-clock::after, #lbl-status::after { z-index: -1; border-radius: 20px; }
         #lbl-inv-temp::after { z-index: -1; border-radius: 20px; }
@@ -219,11 +219,14 @@
         .pos-batt.corner-node { top: 84%; left: 15%; width: 118px; }
         .pos-load.corner-node { top: 86%; left: 88%; }
 
-        .weather-container {
+        .image-frame {
             position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15;
-            width: 140px; background: #fff; padding: 3px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            width: 140px; aspect-ratio: 4 / 3; background: #fff; padding: 3px; border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            contain: layout paint;
         }
-        .weather-container img { width: 100%; height: auto; display: block; border-radius: 12px; transform: translateZ(0); }
+        .image-frame img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 12px; transform: translateZ(0); }
 
         /* Node Biến Tần Trung Tâm */
         .node-center {
@@ -232,6 +235,13 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.16), 0 0 22px rgba(0,204,102,0.3); z-index: 15;
         }
         .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; transform: translateZ(0); }
+
+        #lbl-inv-temp {
+            position: absolute; top: 78%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
+            font-size: 14px; font-weight: 900; background: #00cc66; color: #fff;
+            padding: 4px 16px; border-radius: 20px; z-index: 20; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
+        }
 
         .inv-switch-overlay {
             position: absolute;
@@ -267,13 +277,6 @@
             white-space: nowrap;
             line-height: 1;
             margin-top: 1px;
-        }
-
-        #lbl-inv-temp {
-            position: absolute; top: 78%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
-            font-size: 14px; font-weight: 900; background: #00cc66; color: #fff;
-            padding: 4px 16px; border-radius: 20px; z-index: 20; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
 
         .bpf-container {
@@ -723,7 +726,7 @@
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 12px; padding: 4px 10px; }
             .bpf-text { font-size: 26px; letter-spacing: 8px; }
-            .weather-container { width: 120px; top: 14%; } 
+            .image-frame { width: 120px; top: 14%; } 
             .node-center { width: 105px; height: 115px; } 
             #lbl-inv-temp { top: 79%; }
         }
@@ -811,8 +814,8 @@
             <div id="lbl-status">Đang tải...</div>
             <div id="update-clock">--:--:--</div>
 
-            <div class="weather-container">
-                <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image">
+            <div class="image-frame">
+                <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Khung ảnh">
             </div>
 
             <!-- NODE BIẾN TẦN TRUNG TÂM -->
@@ -1015,13 +1018,24 @@
             state.frameId = requestAnimationFrame(step);
         }
 
+        function toSafeNumber(value, fallback = 0) {
+            const number = Number(value);
+            return Number.isFinite(number) ? number : fallback;
+        }
+
+        function clampNumber(value, min, max) {
+            return Math.min(max, Math.max(min, toSafeNumber(value, min)));
+        }
+
         // ================= KỊCH BẢN VẼ MẶT TRỜI CHIA 6 CẤP ĐỘ DỰA TRÊN CÔNG SUẤT PV =================
         let currentSunLevel = 0; 
         const sunRayCounts = [0, 15, 40, 60, 80, 100, 120];
         let latestPvPowerW = 0;
+        let sunAnimationFrameId = null;
+        let sunCanvasRender = null;
 
         function updateBackgroundByTimeAndPv(pvW = latestPvPowerW) {
-            const pvPower = Number.isFinite(Number(pvW)) ? Number(pvW) : 0;
+            const pvPower = toSafeNumber(pvW);
             latestPvPowerW = pvPower;
 
             const hour = new Date().getHours();
@@ -1039,10 +1053,10 @@
             const ctx = canvas.getContext('2d');
             
             const size = 260; 
-            const dpr = window.devicePixelRatio || 1;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
             canvas.width = size * dpr;
             canvas.height = size * dpr;
-            ctx.scale(dpr, dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
             const cx = size / 2;
             const cy = size / 2;
@@ -1061,11 +1075,14 @@
                 });
             }
 
-            function animateCanvasSun() {
+            function animateCanvasSun(now) {
+                sunAnimationFrameId = null;
                 ctx.clearRect(0, 0, size, size);
-                const time = Date.now() * 0.001;
 
                 const activeRaysCount = sunRayCounts[currentSunLevel] || 0;
+                if (document.hidden || activeRaysCount <= 0) return;
+
+                const time = now * 0.001;
 
                 for (let i = 0; i < activeRaysCount; i++) {
                     const ray = rays[i];
@@ -1089,28 +1106,48 @@
                     ctx.stroke();
                 }
 
-                requestAnimationFrame(animateCanvasSun);
+                sunAnimationFrameId = requestAnimationFrame(animateCanvasSun);
             }
-            animateCanvasSun();
+
+            sunCanvasRender = () => {
+                if (sunAnimationFrameId === null && !document.hidden) {
+                    sunAnimationFrameId = requestAnimationFrame(animateCanvasSun);
+                }
+            };
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && sunAnimationFrameId !== null) {
+                    cancelAnimationFrame(sunAnimationFrameId);
+                    sunAnimationFrameId = null;
+                    return;
+                }
+                sunCanvasRender();
+            });
+
+            sunCanvasRender();
         }
 
         function updateSunLevelByPower(pvW) {
+            const pvPower = toSafeNumber(pvW);
             let lvl = 0;
-            if (pvW >= 7001) { lvl = 6; }        
-            else if (pvW >= 5001) { lvl = 5; }   
-            else if (pvW >= 3001) { lvl = 4; }   
-            else if (pvW >= 2001) { lvl = 3; }   
-            else if (pvW >= 1001) { lvl = 2; }   
-            else if (pvW >= 11) { lvl = 1; }     
+            if (pvPower >= 7001) { lvl = 6; }        
+            else if (pvPower >= 5001) { lvl = 5; }   
+            else if (pvPower >= 3001) { lvl = 4; }   
+            else if (pvPower >= 2001) { lvl = 3; }   
+            else if (pvPower >= 1001) { lvl = 2; }   
+            else if (pvPower >= 11) { lvl = 1; }     
             else { lvl = 0; }                    
 
-            if (currentSunLevel !== lvl) {
+            const levelChanged = currentSunLevel !== lvl;
+            if (levelChanged) {
                 currentSunLevel = lvl;
                 const solarSun = document.getElementById('solar-sun');
                 if (solarSun) {
                     solarSun.className = 'sun-lvl-' + lvl;
                 }
             }
+
+            if (sunCanvasRender && (lvl > 0 || levelChanged)) sunCanvasRender();
         }
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -1122,8 +1159,16 @@
 
         // ================= FIREBASE & BIỂU ĐỒ NĂNG LƯỢNG (CHART.JS) =================
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        let database = null;
+        if (typeof firebase !== 'undefined' && firebase.database) {
+            if (!firebase.apps || firebase.apps.length === 0) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            database = firebase.database();
+        } else {
+            console.error('Firebase SDK chưa tải được.');
+            updateDOMText('lbl-status', 'Mất kết nối');
+        }
         const lblStatus = document.getElementById('lbl-status');
         const battFill = document.getElementById('batt-fill');
 
@@ -1134,6 +1179,9 @@
         let chartRows = [];
         let chartAllRows = [];
         let chartSelectedSourceIndex = 0;
+        let chartResizeTimer = null;
+        let chartLoadRequestId = 0;
+        let chartRefreshTimer = null;
 
         const chartSeries = [
             { label: 'Sản lượng PV', key: 'pv', color: '#59ba35', border: '#48a927' },
@@ -1193,7 +1241,13 @@
         };
 
         function initChart() {
-            const ctx = document.getElementById('energyChart').getContext('2d');
+            const chartCanvas = document.getElementById('energyChart');
+            if (!chartCanvas || typeof Chart === 'undefined') {
+                console.warn('Chart.js chưa tải được, bỏ qua phần biểu đồ.');
+                return;
+            }
+
+            const ctx = chartCanvas.getContext('2d');
             energyChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -1262,12 +1316,23 @@
                 }
             });
             window.addEventListener('resize', () => {
-                if (energyChart && chartAllRows.length > 0) updateVisibleChartRows();
+                clearTimeout(chartResizeTimer);
+                chartResizeTimer = setTimeout(() => {
+                    if (energyChart && chartAllRows.length > 0) updateVisibleChartRows();
+                }, 120);
             });
             loadChartData();
         }
 
+        function scheduleChartDataRefresh(delay = 800) {
+            clearTimeout(chartRefreshTimer);
+            chartRefreshTimer = setTimeout(() => {
+                if (database && energyChart) loadChartData();
+            }, delay);
+        }
+
         function setChartMode(mode) {
+            if (!['month', 'year', 'total'].includes(mode)) return;
             currentChartMode = mode;
             document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
             const activeBtn = document.getElementById(`btn-chart-${mode}`);
@@ -1291,6 +1356,8 @@
         }
 
         function loadChartData() {
+            if (!database) return;
+            const requestId = ++chartLoadRequestId;
             updateChartPeriodLabel();
             const yyyy = chartCursorDate.getFullYear();
             const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
@@ -1298,6 +1365,7 @@
             if (currentChartMode === 'month') {
                 const monthKey = `${yyyy}_${mm}`;
                 database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value', (snap) => {
+                    if (requestId !== chartLoadRequestId) return;
                     const daysData = snap.val() || {};
                     const rows = [];
                     const daysInMonth = new Date(yyyy, chartCursorDate.getMonth() + 1, 0).getDate();
@@ -1314,6 +1382,7 @@
                 });
             } else if (currentChartMode === 'year') {
                 database.ref(`/SosenSystem/History/Monthly/${yyyy}`).once('value', (snap) => {
+                    if (requestId !== chartLoadRequestId) return;
                     const monthsData = snap.val() || {};
                     const rows = [];
 
@@ -1329,6 +1398,7 @@
                 });
             } else if (currentChartMode === 'total') {
                 database.ref(`/SosenSystem/History/Yearly`).once('value', (snap) => {
+                    if (requestId !== chartLoadRequestId) return;
                     const yearsData = snap.val() || {};
                     let rows = Object.keys(yearsData).sort().map(yKey => {
                         const yearLabel = yKey.replace('year_', '');
@@ -1370,7 +1440,7 @@
                 energyChart.data.labels = [];
                 energyChart.data.datasets.forEach(dataset => { dataset.data = []; });
                 updateChartDetail();
-                energyChart.update();
+                energyChart.update('none');
                 return;
             }
 
@@ -1394,7 +1464,7 @@
                 dataset.data = chartRows.map(row => row[dataset.dataKey] || 0);
             });
             updateChartDetail();
-            energyChart.update();
+            energyChart.update('none');
         }
 
         function getMonthVisibleCount() {
@@ -1476,8 +1546,11 @@
         }
 
         let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
+        let lastHistorySaveSignature = "";
+        let historySaveTimer = null;
 
         function checkAndSwitchMonth() {
+            if (!database) return;
             let d = new Date(); let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
             if (mk !== currentMonthKey) {
                 if (currentMonthKey !== "") { database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).off(); }
@@ -1495,7 +1568,37 @@
             if(r > 0) { cost += r * 3736.80; } return cost;
         }
 
+        function queueEnergyHistorySave(pvToday, loadToday, gridBuyToday, battDischargeToday = 0, battChargeToday = 0) {
+            if (!database) return;
+
+            const now = new Date();
+            const dateKey = [
+                now.getFullYear(),
+                String(now.getMonth() + 1).padStart(2, '0'),
+                String(now.getDate()).padStart(2, '0')
+            ].join('_');
+            const values = [pvToday, loadToday, gridBuyToday, battDischargeToday, battChargeToday]
+                .map(value => Number(toSafeNumber(value).toFixed(1)));
+            const signature = `${dateKey}|${values.join('|')}`;
+
+            if (signature === lastHistorySaveSignature) return;
+            clearTimeout(historySaveTimer);
+            historySaveTimer = setTimeout(() => {
+                if (signature === lastHistorySaveSignature) return;
+                lastHistorySaveSignature = signature;
+                saveEnergyHistoryToFirebase(...values);
+            }, 1200);
+        }
+
         function saveEnergyHistoryToFirebase(pvToday, loadToday, gridBuyToday, battDischargeToday = 0, battChargeToday = 0) {
+            if (!database) return;
+
+            pvToday = toSafeNumber(pvToday);
+            loadToday = toSafeNumber(loadToday);
+            gridBuyToday = toSafeNumber(gridBuyToday);
+            battDischargeToday = toSafeNumber(battDischargeToday);
+            battChargeToday = toSafeNumber(battChargeToday);
+
             const now = new Date();
             const yyyy = now.getFullYear();
             const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -1507,67 +1610,73 @@
             const yearKey = `year_${yyyy}`;
 
             const dailyRef = database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`);
-            dailyRef.update({
+            const dailyPayload = {
                 pv: Number(pvToday.toFixed(1)),
                 load: Number(loadToday.toFixed(1)),
                 grid: Number(gridBuyToday.toFixed(1)),
                 batt: Number(battDischargeToday.toFixed(1)),
                 charge: Number(battChargeToday.toFixed(1))
-            });
+            };
 
-            database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value', (snap) => {
-                const daysData = snap.val() || {};
-                let monthPv = 0, monthLoad = 0, monthGrid = 0, monthBatt = 0, monthCharge = 0;
-                for (let d in daysData) {
-                    monthPv += Number(daysData[d].pv || 0);
-                    monthLoad += Number(daysData[d].load || 0);
-                    monthGrid += Number(daysData[d].grid || 0);
-                    monthBatt += Number(daysData[d].batt || 0);
-                    monthCharge += Number(daysData[d].charge || 0);
-                }
+            dailyRef.update(dailyPayload)
+                .then(() => database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value'))
+                .then((snap) => {
+                    const daysData = snap.val() || {};
+                    let monthPv = 0, monthLoad = 0, monthGrid = 0, monthBatt = 0, monthCharge = 0;
+                    for (let d in daysData) {
+                        monthPv += toSafeNumber(daysData[d].pv);
+                        monthLoad += toSafeNumber(daysData[d].load);
+                        monthGrid += toSafeNumber(daysData[d].grid);
+                        monthBatt += toSafeNumber(daysData[d].batt);
+                        monthCharge += toSafeNumber(daysData[d].charge);
+                    }
 
-                database.ref(`/SosenSystem/History/Monthly/${yyyy}/${monthItemKey}`).update({
-                    pv: Number(monthPv.toFixed(1)),
-                    load: Number(monthLoad.toFixed(1)),
-                    grid: Number(monthGrid.toFixed(1)),
-                    batt: Number(monthBatt.toFixed(1)),
-                    charge: Number(monthCharge.toFixed(1))
-                });
-
-                database.ref(`/SosenSystem/History/Monthly/${yyyy}`).once('value', (mSnap) => {
+                    return database.ref(`/SosenSystem/History/Monthly/${yyyy}/${monthItemKey}`).update({
+                        pv: Number(monthPv.toFixed(1)),
+                        load: Number(monthLoad.toFixed(1)),
+                        grid: Number(monthGrid.toFixed(1)),
+                        batt: Number(monthBatt.toFixed(1)),
+                        charge: Number(monthCharge.toFixed(1))
+                    });
+                })
+                .then(() => database.ref(`/SosenSystem/History/Monthly/${yyyy}`).once('value'))
+                .then((mSnap) => {
                     const monthsData = mSnap.val() || {};
                     let yearPv = 0, yearLoad = 0, yearGrid = 0, yearBatt = 0, yearCharge = 0;
                     for (let m in monthsData) {
-                        yearPv += Number(monthsData[m].pv || 0);
-                        yearLoad += Number(monthsData[m].load || 0);
-                        yearGrid += Number(monthsData[m].grid || 0);
-                        yearBatt += Number(monthsData[m].batt || 0);
-                        yearCharge += Number(monthsData[m].charge || 0);
+                        yearPv += toSafeNumber(monthsData[m].pv);
+                        yearLoad += toSafeNumber(monthsData[m].load);
+                        yearGrid += toSafeNumber(monthsData[m].grid);
+                        yearBatt += toSafeNumber(monthsData[m].batt);
+                        yearCharge += toSafeNumber(monthsData[m].charge);
                     }
 
-                    database.ref(`/SosenSystem/History/Yearly/${yearKey}`).update({
+                    return database.ref(`/SosenSystem/History/Yearly/${yearKey}`).update({
                         pv: Number(yearPv.toFixed(1)),
                         load: Number(yearLoad.toFixed(1)),
                         grid: Number(yearGrid.toFixed(1)),
                         batt: Number(yearBatt.toFixed(1)),
                         charge: Number(yearCharge.toFixed(1))
                     });
-
-                    loadChartData();
+                })
+                .then(() => {
+                    scheduleChartDataRefresh();
+                })
+                .catch((error) => {
+                    console.error('Lỗi khi lưu lịch sử năng lượng:', error);
                 });
-            });
         }
 
         function recalculateEnergy() {
             if (!latestDailyData) return; 
             const data = latestDailyData;
             
-            let pvToday = data.PV_Today || 0; 
-            let currentETotal = data.PV_Total_Lifetime || 0;
-            let loadToday = data.Load_Today || 0;
-            let gridBuyToday = data.Grid_Buy_Today || 0;
-            let battDisToday = data.Bat_Discharge_Today || 0;
-            let battChgToday = data.Bat_Charge_Today || 0;
+            let pvToday = toSafeNumber(data.PV_Today); 
+            let currentETotal = toSafeNumber(data.PV_Total_Lifetime);
+            let loadToday = toSafeNumber(data.Load_Today);
+            let gridBuyToday = toSafeNumber(data.Grid_Buy_Today);
+            let battDisToday = toSafeNumber(data.Bat_Discharge_Today);
+            let battChgToday = toSafeNumber(data.Bat_Charge_Today);
 
             animateValue('stat-pv-today', pvToday, v => v.toFixed(1) + ' kWh');
             animateValue('stat-load-today', loadToday, v => v.toFixed(1) + ' kWh'); 
@@ -1575,24 +1684,25 @@
             animateValue('stat-bat-dis', battDisToday, v => v.toFixed(1) + ' kWh');
             animateValue('stat-bat-chg', battChgToday, v => v.toFixed(1) + ' kWh');
             
-            animateValue('stat-bat-dis-total', data.Bat_Discharge_Total_Lifetime || 0, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-bat-chg-total', data.Bat_Charge_Total_Lifetime || 0, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-dis-total', toSafeNumber(data.Bat_Discharge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-chg-total', toSafeNumber(data.Bat_Charge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
             
             animateValue('stat-pv-total', currentETotal, v => v.toFixed(1) + ' kWh');
 
             if (pvToday > 0 || loadToday > 0 || gridBuyToday > 0 || battDisToday > 0 || battChgToday > 0) {
-                saveEnergyHistoryToFirebase(pvToday, loadToday, gridBuyToday, battDisToday, battChgToday);
+                queueEnergyHistorySave(pvToday, loadToday, gridBuyToday, battDisToday, battChgToday);
             }
 
             let todayDate = new Date(); 
             let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
             let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
-            let savedPv = currentMonthHistory[curDayKey] || 0;
+            let savedPv = toSafeNumber(currentMonthHistory[curDayKey]);
+            const roundedPvToday = Number(pvToday.toFixed(1));
 
-            if (pvToday > savedPv && pvToday > 0) { 
-                database.ref(`/SosenSystem/Monthly_History/${curMonthKey}/${curDayKey}`).set(pvToday); 
-                currentMonthHistory[curDayKey] = pvToday; 
-                savedPv = pvToday; 
+            if (database && roundedPvToday > savedPv && roundedPvToday > 0) { 
+                database.ref(`/SosenSystem/Monthly_History/${curMonthKey}/${curDayKey}`).set(roundedPvToday); 
+                currentMonthHistory[curDayKey] = roundedPvToday; 
+                savedPv = roundedPvToday; 
             }
 
             let pvMonthTotal = 0; 
@@ -1635,7 +1745,7 @@
                 return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
             }
 
-            const watts = Math.abs(Number(powerW)) || 0;
+            const watts = Math.abs(toSafeNumber(powerW));
             if (watts < 1) return { particles: 0, sparks: 0, dashDuration: 7.8, sparkDuration: 5.4, wireSpeed: 4.2 };
             if (watts <= 1000) return { particles: 3, sparks: 2, dashDuration: 7.0, sparkDuration: 4.8, wireSpeed: 3.6 };
             if (watts <= 2000) return { particles: 4, sparks: 3, dashDuration: 5.0, sparkDuration: 3.4, wireSpeed: 2.5 };
@@ -1718,116 +1828,135 @@
             }
         }
 
-        database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => { latestDailyData = snapshot.val(); checkAndSwitchMonth(); recalculateEnergy(); });
-        setInterval(() => { checkAndSwitchMonth(); }, 60000);
+        if (database) {
+            database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
+                latestDailyData = snapshot.val();
+                checkAndSwitchMonth();
+                recalculateEnergy();
+            });
+            setInterval(() => { checkAndSwitchMonth(); }, 60000);
+
+            database.ref('/SosenSystem/Live').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    const now = new Date();
+                    updateDOMText('update-clock', now.toLocaleTimeString('vi-VN', { hour12: false }));
+
+                    const battVoltage = toSafeNumber(data.Batt_Voltage);
+                    const battCurrent = toSafeNumber(data.Batt_Current);
+                    let pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power) * 1000));
+                    let gridInW = Math.round(toSafeNumber(data.Grid_Power));
+                    let battInW = Math.round(battVoltage * battCurrent);
+                    let loadInW = Math.max(0, pvInW + gridInW + battInW);
+                    updateBackgroundByTimeAndPv(pvInW);
+
+                    animateValue('lbl-pv', pvInW, v => Math.round(v));
+                    const elPv = document.getElementById('lbl-pv');
+                    if (elPv) elPv.classList.add('val-pv-style');
+
+                    updateSunLevelByPower(pvInW);
+
+                    animateValue('lbl-load', loadInW, v => Math.round(v));
+                    const elLoad = document.getElementById('lbl-load');
+                    if (elLoad) elLoad.classList.add('val-load-style');
+
+                    animateValue('lbl-grid', Math.abs(gridInW), v => Math.round(v));
+
+                    const elGrid = document.getElementById('lbl-grid');
+                    if (elGrid) {
+                        elGrid.classList.remove('val-grid-buy-style', 'val-grid-sell-style');
+                        if (gridInW < 0) {
+                            elGrid.classList.add('val-grid-sell-style');
+                        } else if (gridInW > 0) {
+                            elGrid.classList.add('val-grid-buy-style');
+                        } else {
+                            elGrid.style.color = '#fff';
+                            elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
+                        }
+                    }
+
+                    animateValue('lbl-batt', Math.abs(battInW), v => Math.round(v));
+                    const elBatt = document.getElementById('lbl-batt');
+                    if (elBatt) {
+                        elBatt.classList.remove('val-charge', 'val-discharge');
+                        if (battInW < 0) { elBatt.classList.add('val-charge'); }
+                        else if (battInW > 0) { elBatt.classList.add('val-discharge'); }
+                        else {
+                            elBatt.style.color = '#fff';
+                            elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
+                        }
+                    }
+
+                    if (data.Inv_Temp !== undefined) {
+                        const tempLabel = document.getElementById('lbl-inv-temp');
+                        const t = toSafeNumber(data.Inv_Temp);
+                        if (tempLabel) {
+                            animateValue('lbl-inv-temp', t, v => '🌡️ ' + v.toFixed(0) + '°C');
+                            if (t < 40 && tempLabel.style.backgroundColor !== 'rgb(0, 204, 102)') { tempLabel.style.backgroundColor = '#00cc66'; }
+                            else if (t >= 40 && t < 48 && tempLabel.style.backgroundColor !== 'rgb(255, 170, 0)') { tempLabel.style.backgroundColor = '#ffaa00'; }
+                            else if (t >= 48 && tempLabel.style.backgroundColor !== 'rgb(255, 68, 68)') { tempLabel.style.backgroundColor = '#ff4444'; }
+                        }
+                    }
+
+                    if (data.Inv_Switch !== undefined) {
+                        const toggle = document.getElementById('inv-switch-toggle');
+                        const statusText = document.getElementById('switch-status-text');
+                        const modalEl = document.getElementById('confirm-modal');
+
+                        if (toggle && (!modalEl || !modalEl.classList.contains('active'))) {
+                            toggle.checked = (data.Inv_Switch === 1);
+                        }
+                        if (statusText) {
+                            updateDOMText('switch-status-text', (data.Inv_Switch === 1) ? "BẬT" : "TẮT");
+                            statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444";
+                        }
+                    }
+
+                    let soc = clampNumber(data.Batt_SOC, 0, 100);
+                    animateValue('lbl-soc', soc, v => Math.round(v) + '%');
+
+                    animateValue('stat-v', battVoltage, v => v.toFixed(1) + ' V');
+                    animateValue('stat-a', battCurrent, v => v.toFixed(1) + ' A');
+                    const barSoc = document.getElementById('bar-soc');
+                    if (barSoc && barSoc.style.width !== soc + '%') barSoc.style.width = soc + '%';
+
+                    let rawStatus = String(data.Batt_Status || "");
+                    let statusLower = rawStatus.toLowerCase();
+                    let displayStatus = rawStatus;
+                    let statusColor = '#888';
+
+                    if (statusLower.includes("sac") || statusLower.includes("sạc") || statusLower.includes("charge")) {
+                        displayStatus = "Đang Sạc"; statusColor = '#00cc66';
+                    } else if (statusLower.includes("xa") || statusLower.includes("xả") || statusLower.includes("discharge")) {
+                        displayStatus = "Đang Xả"; statusColor = '#ff4444';
+                    } else {
+                        displayStatus = "Chờ"; statusColor = '#888';
+                    }
+
+                    updateDOMText('lbl-status', displayStatus);
+                    if (lblStatus && lblStatus.style.color !== statusColor) { lblStatus.style.color = statusColor; }
+
+                    let colorTheme = 'fill-green';
+                    if (soc <= 20) colorTheme = 'fill-red'; else if (soc <= 40) colorTheme = 'fill-yellow';
+                    if (battFill) {
+                        if (battFill.style.width !== soc + '%') battFill.style.width = soc + '%';
+                        if (!battFill.className.includes(colorTheme)) battFill.className = 'battery-fill ' + colorTheme;
+                    }
+
+                    if(pvInW >= 1) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
+                    if(loadInW >= 1) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
+
+                    if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW));
+                    else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW));
+                    else setFlow('flow-batt', false);
+
+                    if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444', Math.abs(gridInW));
+                    else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66', Math.abs(gridInW));
+                    else setFlow('flow-grid', false);
+                }
+            });
+        }
         setInterval(() => { updateBackgroundByTimeAndPv(); }, 60000);
-
-        database.ref('/SosenSystem/Live').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if(data) {
-                const now = new Date();
-                updateDOMText('update-clock', now.toLocaleTimeString('vi-VN', { hour12: false }));
-                
-                let pvInW = Math.round(data.PV_Power * 1000);
-                let gridInW = Math.round(data.Grid_Power);
-                let battInW = Math.round(data.Batt_Voltage * data.Batt_Current);
-                let loadInW = pvInW + gridInW + battInW;
-                updateBackgroundByTimeAndPv(pvInW);
-
-                if (loadInW < 0) loadInW = 0;
-                
-                animateValue('lbl-pv', pvInW, v => Math.round(v));
-                document.getElementById('lbl-pv').classList.add('val-pv-style');
-
-                updateSunLevelByPower(pvInW);
-
-                animateValue('lbl-load', loadInW, v => Math.round(v));
-                document.getElementById('lbl-load').classList.add('val-load-style');
-
-                animateValue('lbl-grid', Math.abs(gridInW), v => Math.round(v));
-
-                const elGrid = document.getElementById('lbl-grid');
-                elGrid.classList.remove('val-grid-buy-style', 'val-grid-sell-style');
-                if (gridInW < 0) { 
-                    elGrid.classList.add('val-grid-sell-style'); // Phát lưới (Xanh lá)
-                } else if (gridInW > 0) { 
-                    elGrid.classList.add('val-grid-buy-style'); // Lấy lưới (Đỏ hồng)
-                } else { 
-                    elGrid.style.color = '#fff'; 
-                    elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
-                }
-
-                animateValue('lbl-batt', Math.abs(battInW), v => Math.round(v));
-                const elBatt = document.getElementById('lbl-batt');
-                elBatt.classList.remove('val-charge', 'val-discharge');
-                
-                if (battInW < 0) { elBatt.classList.add('val-charge'); } 
-                else if (battInW > 0) { elBatt.classList.add('val-discharge'); } 
-                else {
-                    elBatt.style.color = '#fff';
-                    elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
-                }
-
-                if (data.Inv_Temp !== undefined) {
-                    const tempLabel = document.getElementById('lbl-inv-temp'); const t = data.Inv_Temp;
-                    animateValue('lbl-inv-temp', t, v => '🌡️ ' + v.toFixed(0) + '°C');
-                    if (t < 40 && tempLabel.style.backgroundColor !== 'rgb(0, 204, 102)') { tempLabel.style.backgroundColor = '#00cc66'; } 
-                    else if (t >= 40 && t < 48 && tempLabel.style.backgroundColor !== 'rgb(255, 170, 0)') { tempLabel.style.backgroundColor = '#ffaa00'; } 
-                    else if (t >= 48 && tempLabel.style.backgroundColor !== 'rgb(255, 68, 68)') { tempLabel.style.backgroundColor = '#ff4444'; }
-                }
-
-                if (data.Inv_Switch !== undefined) {
-                    const toggle = document.getElementById('inv-switch-toggle'); 
-                    const statusText = document.getElementById('switch-status-text');
-                    const modalEl = document.getElementById('confirm-modal');
-                    
-                    if (toggle && !modalEl.classList.contains('active')) {
-                        toggle.checked = (data.Inv_Switch === 1);
-                    }
-                    if (statusText) {
-                        updateDOMText('switch-status-text', (data.Inv_Switch === 1) ? "BẬT" : "TẮT");
-                        statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444";
-                    }
-                }
-
-                let soc = data.Batt_SOC;
-                animateValue('lbl-soc', soc, v => Math.round(v) + '%');
-                
-                animateValue('stat-v', data.Batt_Voltage, v => v.toFixed(1) + ' V');
-                animateValue('stat-a', data.Batt_Current, v => v.toFixed(1) + ' A');
-                document.getElementById('bar-soc').style.width = soc + '%';
-                
-                let rawStatus = data.Batt_Status || ""; let statusLower = rawStatus.toLowerCase();
-                let displayStatus = rawStatus; let statusColor = '#888';
-
-                if (statusLower.includes("sac") || statusLower.includes("sạc") || statusLower.includes("charge")) {
-                    displayStatus = "Đang Sạc"; statusColor = '#00cc66';
-                } else if (statusLower.includes("xa") || statusLower.includes("xả") || statusLower.includes("discharge")) {
-                    displayStatus = "Đang Xả"; statusColor = '#ff4444';
-                } else {
-                    displayStatus = "Chờ"; statusColor = '#888';
-                }
-
-                updateDOMText('lbl-status', displayStatus);
-                if (lblStatus.style.color !== statusColor) { lblStatus.style.color = statusColor; }
-
-                let colorTheme = 'fill-green';
-                if (soc <= 20) colorTheme = 'fill-red'; else if (soc <= 40) colorTheme = 'fill-yellow';
-                if (battFill.style.width !== soc + '%') battFill.style.width = soc + '%';
-                if (!battFill.className.includes(colorTheme)) battFill.className = 'battery-fill ' + colorTheme;
-
-                if(pvInW >= 1) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
-                if(loadInW >= 1) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
-                
-                if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW)); 
-                else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); 
-                else setFlow('flow-batt', false);
-                
-                if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444'); 
-                else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66'); 
-                else setFlow('flow-grid', false);
-            }
-        });
 
         // ================= XỬ LÝ SỰ KIỆN XÁC NHẬN BẬT/TẮT BIẾN TẦN =================
         let pendingState = null;
@@ -1838,6 +1967,7 @@
             const modalMsg = document.getElementById('modal-msg');
             const btnConfirm = document.getElementById('btn-modal-confirm');
             const btnCancel = document.getElementById('btn-modal-cancel');
+            if (!toggleEl || !modalEl || !modalMsg || !btnConfirm || !btnCancel) return;
 
             toggleEl.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -1857,6 +1987,15 @@
                     if (statusText) {
                         statusText.innerText = "...";
                         statusText.style.color = "#ffaa00";
+                    }
+
+                    if (!database) {
+                        if (statusText) {
+                            statusText.innerText = "Lỗi!";
+                            statusText.style.color = "#ff4444";
+                        }
+                        closeModal();
+                        return;
                     }
                     
                     database.ref('/SosenSystem/Control').update({ Inv_Switch: newState })
@@ -1878,11 +2017,12 @@
 
         function closeModal() {
             const modalEl = document.getElementById('confirm-modal');
-            modalEl.classList.remove('active');
+            if (modalEl) modalEl.classList.remove('active');
             pendingState = null;
         }
         // Tự động kiểm tra và bù dữ liệu ngày hôm qua nếu bị thiếu
 function autoSyncYesterdayHistory() {
+    if (!database) return;
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     
@@ -1904,7 +2044,7 @@ function autoSyncYesterdayHistory() {
 }
 
 // Kích hoạt sau khi tải xong Firebase
-setTimeout(autoSyncYesterdayHistory, 4000);
+if (database) setTimeout(autoSyncYesterdayHistory, 4000);
 
     </script>
 </body>
