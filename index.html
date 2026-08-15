@@ -174,7 +174,6 @@
         .node-center::after,
         .image-frame::after,
         #update-clock::after,
-        #lbl-status::after,
         #lbl-inv-temp::after {
             content: "";
             position: absolute;
@@ -202,7 +201,7 @@
         .stat-card::after { z-index: 2; inset: 0; border-radius: 20px; }
         .image-frame::after { z-index: 2; inset: 0; border-radius: 15px; padding: 4px; }
         .node-center::after { z-index: -1; border-radius: 15px; }
-        #update-clock::after, #lbl-status::after { z-index: -1; border-radius: 20px; }
+        #update-clock::after { z-index: -1; border-radius: 20px; }
         #lbl-inv-temp::after { z-index: -1; border-radius: 20px; }
 
         @keyframes rainbowSlide { to { background-position: -200% 0; } }
@@ -307,18 +306,17 @@
         .line-load { top: 82%; right: 16%; transform-origin: right center; transform: rotate(38deg) translateZ(0); }
 
         #lbl-status {
-            position: absolute; top: 48%; left: 18%; transform: translate(-50%, -50%) translateZ(0);
-            font-size: 13px; font-weight: 800; background: rgba(255,255,255,0.95);
-            padding: 6px 16px; border-radius: 20px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1);
-            color: #888; white-space: nowrap; z-index: 25; transition: color 0.5s;
+            position: relative; z-index: 1; display: block; margin: 0 0 5px 0;
+            transform: translateZ(0); font-size: 11px; font-weight: 900;
+            background: transparent; padding: 0; border-radius: 0; box-shadow: none;
+            color: #a8b0ba; text-align: center; white-space: nowrap; transition: color 0.5s;
         }
 
         .battery-mini-meter {
             --mini-color: #888;
             --mini-glow: rgba(255,255,255,0.45);
-            position: absolute; top: 55%; left: 18%; transform: translate(-50%, -50%) translateZ(0);
-            z-index: 24; min-width: 112px; padding: 5px 9px 8px 9px; border-radius: 15px;
+            position: absolute; top: 50%; left: 18%; transform: translate(-50%, -50%) translateZ(0);
+            z-index: 25; min-width: 112px; padding: 6px 9px 9px 9px; border-radius: 16px;
             background: rgba(12, 18, 30, 0.72); border: 1px solid rgba(255,255,255,0.36);
             box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 14px var(--mini-glow);
             overflow: hidden; pointer-events: none; color: #fff;
@@ -782,12 +780,12 @@
         /* Responsive */
         @media (max-width: 400px) {
             #update-clock { font-size: 11px; padding: 4px 8px; }
-            #lbl-status { font-size: 12px; padding: 4px 10px; }
+            #lbl-status { font-size: 10px; }
             .bpf-text { font-size: 26px; letter-spacing: 8px; }
             .image-frame { width: 120px; top: 14%; } 
             .node-center { width: 105px; height: 115px; } 
             #lbl-inv-temp { top: 79%; }
-            .battery-mini-meter { top: 55.5%; min-width: 98px; padding: 4px 7px 7px 7px; }
+            .battery-mini-meter { top: 50%; min-width: 96px; padding: 5px 7px 8px 7px; }
             .battery-mini-row { font-size: 9px; }
         }
         @media (min-width: 768px) {
@@ -871,8 +869,8 @@
 <body>
     <div class="app-container">
         <div class="diagram-panel">
-            <div id="lbl-status">Đang tải...</div>
             <div id="battery-mini-meter" class="battery-mini-meter idle">
+                <div id="lbl-status">Đang tải...</div>
                 <div class="battery-mini-row"><span class="battery-mini-label">Áp</span><span class="battery-mini-value" id="mini-stat-v">-- V</span></div>
                 <div class="battery-mini-row"><span class="battery-mini-label">Dòng</span><span class="battery-mini-value" id="mini-stat-a">-- A</span></div>
             </div>
