@@ -200,7 +200,7 @@
 
         .diagram-panel::after { z-index: 4; inset: 0; border-radius: 20px; }
         .stat-card::after { z-index: 2; inset: 0; border-radius: 20px; }
-        .image-frame::after { z-index: 2; border-radius: 15px; }
+        .image-frame::after { z-index: 2; inset: 0; border-radius: 15px; padding: 4px; }
         .node-center::after { z-index: -1; border-radius: 15px; }
         #update-clock::after, #lbl-status::after { z-index: -1; border-radius: 20px; }
         #lbl-inv-temp::after { z-index: -1; border-radius: 20px; }
@@ -221,12 +221,18 @@
 
         .image-frame {
             position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15;
-            width: 140px; aspect-ratio: 4 / 3; background: #fff; padding: 3px; border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2); overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-            contain: layout paint;
+            width: 140px; padding: 4px; border-radius: 15px; overflow: hidden;
+            background: linear-gradient(90deg, 
+                #ff004c, #ff8c00, #ffd700, #00cc66, 
+                #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00
+            );
+            background-size: 200% 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 12px rgba(0,229,255,0.32);
+            animation:
+                rainbowSlide 3s linear infinite,
+                rainbowBorderGlow 1.5s ease-in-out infinite alternate;
         }
-        .image-frame img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 12px; transform: translateZ(0); }
+        .image-frame img { position: relative; z-index: 1; width: 100%; height: auto; display: block; border-radius: 11px; transform: translateZ(0); }
 
         /* Node Biến Tần Trung Tâm */
         .node-center {
@@ -306,6 +312,60 @@
             padding: 6px 16px; border-radius: 20px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1);
             color: #888; white-space: nowrap; z-index: 25; transition: color 0.5s;
+        }
+
+        .battery-mini-meter {
+            --mini-color: #888;
+            --mini-glow: rgba(255,255,255,0.45);
+            position: absolute; top: 55%; left: 18%; transform: translate(-50%, -50%) translateZ(0);
+            z-index: 24; min-width: 112px; padding: 5px 9px 8px 9px; border-radius: 15px;
+            background: rgba(12, 18, 30, 0.72); border: 1px solid rgba(255,255,255,0.36);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 14px var(--mini-glow);
+            overflow: hidden; pointer-events: none; color: #fff;
+        }
+        .battery-mini-meter::before {
+            content: ""; position: absolute; inset: 0; opacity: 0.62;
+            background: linear-gradient(90deg, transparent 0%, var(--mini-glow) 48%, transparent 100%);
+            transform: translateX(-120%) translateZ(0);
+            animation: miniEnergySweep 1.7s linear infinite;
+            pointer-events: none;
+        }
+        .battery-mini-meter::after {
+            content: ""; position: absolute; left: 9px; right: 9px; bottom: 4px; height: 2px; border-radius: 999px;
+            background: repeating-linear-gradient(90deg, transparent 0 7px, var(--mini-color) 7px 14px, #fff 14px 17px);
+            background-size: 34px 100%;
+            box-shadow: 0 0 7px var(--mini-color), 0 0 11px var(--mini-color);
+            animation: miniEnergyFlow 0.9s linear infinite;
+            pointer-events: none;
+        }
+        .battery-mini-meter.charge {
+            --mini-color: #00cc66;
+            --mini-glow: rgba(0, 204, 102, 0.48);
+        }
+        .battery-mini-meter.discharge {
+            --mini-color: #ff4444;
+            --mini-glow: rgba(255, 68, 68, 0.48);
+        }
+        .battery-mini-meter.idle {
+            --mini-color: #a8b0ba;
+            --mini-glow: rgba(168, 176, 186, 0.28);
+        }
+        .battery-mini-meter.charge::after { animation-direction: reverse; }
+        .battery-mini-row {
+            position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between;
+            gap: 8px; font-size: 10px; font-weight: 900; line-height: 1.15;
+        }
+        .battery-mini-row + .battery-mini-row { margin-top: 3px; }
+        .battery-mini-label { color: rgba(255,255,255,0.78); }
+        .battery-mini-value {
+            color: #fff; text-shadow: 0 0 6px var(--mini-color), 0 1px 3px rgba(0,0,0,0.85);
+            font-variant-numeric: tabular-nums;
+        }
+        @keyframes miniEnergySweep {
+            to { transform: translateX(120%) translateZ(0); }
+        }
+        @keyframes miniEnergyFlow {
+            to { background-position: 34px 0; }
         }
 
         #update-clock {
@@ -655,8 +715,6 @@
         .money-card { background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95)); border: 1px solid rgba(218, 165, 32, 0.65); }
         .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 1; }
         .stat-header h2 { font-size: 16px; color: #444; }
-        .progress-bar { width: 100%; height: 12px; background: rgba(0,0,0,0.05); border-radius: 10px; display: flex; overflow: hidden; margin-bottom: 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); position: relative; z-index: 1; transform: translateZ(0); }
-        .bar-batt { background: linear-gradient(90deg, #00cc66, #33ff99, #d8ffe8); width: 0%; transition: width 1s; box-shadow: 0 0 12px rgba(0,204,102,0.42); transform: translateZ(0); }
         .list-detail { font-size: 13px; color: #555; position: relative; z-index: 1; }
         .list-detail div { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px; }
         .list-detail div:last-child { border: none; }
@@ -729,6 +787,8 @@
             .image-frame { width: 120px; top: 14%; } 
             .node-center { width: 105px; height: 115px; } 
             #lbl-inv-temp { top: 79%; }
+            .battery-mini-meter { top: 55.5%; min-width: 98px; padding: 4px 7px 7px 7px; }
+            .battery-mini-row { font-size: 9px; }
         }
         @media (min-width: 768px) {
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
@@ -812,10 +872,14 @@
     <div class="app-container">
         <div class="diagram-panel">
             <div id="lbl-status">Đang tải...</div>
+            <div id="battery-mini-meter" class="battery-mini-meter idle">
+                <div class="battery-mini-row"><span class="battery-mini-label">Áp</span><span class="battery-mini-value" id="mini-stat-v">-- V</span></div>
+                <div class="battery-mini-row"><span class="battery-mini-label">Dòng</span><span class="battery-mini-value" id="mini-stat-a">-- A</span></div>
+            </div>
             <div id="update-clock">--:--:--</div>
 
             <div class="image-frame">
-                <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Khung ảnh">
+                <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image">
             </div>
 
             <!-- NODE BIẾN TẦN TRUNG TÂM -->
@@ -884,15 +948,6 @@
                     <div style="color: #ff8c00;">⚡ Tổng Pin đã sạc: <span id="stat-bat-chg-total">0 kWh</span></div>
                     
                     <div style="color: #d35400;">🌐 E_Total (PV Trọn đời): <span id="stat-pv-total">0 kWh</span></div>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-header"><h2>Dung lượng Pin & Áp</h2></div>
-                <div class="progress-bar"><div class="bar-batt" id="bar-soc"></div></div>
-                <div class="list-detail">
-                    <div>Điện áp Pin: <span id="stat-v">0 V</span></div>
-                    <div>Dòng điện: <span id="stat-a">0 A</span></div>
                 </div>
             </div>
 
@@ -1915,10 +1970,13 @@
                     let soc = clampNumber(data.Batt_SOC, 0, 100);
                     animateValue('lbl-soc', soc, v => Math.round(v) + '%');
 
-                    animateValue('stat-v', battVoltage, v => v.toFixed(1) + ' V');
-                    animateValue('stat-a', battCurrent, v => v.toFixed(1) + ' A');
-                    const barSoc = document.getElementById('bar-soc');
-                    if (barSoc && barSoc.style.width !== soc + '%') barSoc.style.width = soc + '%';
+                    animateValue('mini-stat-v', battVoltage, v => v.toFixed(1) + ' V');
+                    animateValue('mini-stat-a', battCurrent, v => v.toFixed(1) + ' A');
+                    const miniMeter = document.getElementById('battery-mini-meter');
+                    if (miniMeter) {
+                        miniMeter.classList.remove('charge', 'discharge', 'idle');
+                        miniMeter.classList.add(battInW < -1 ? 'charge' : (battInW > 1 ? 'discharge' : 'idle'));
+                    }
 
                     let rawStatus = String(data.Batt_Status || "");
                     let statusLower = rawStatus.toLowerCase();
