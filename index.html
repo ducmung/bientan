@@ -328,14 +328,6 @@
             animation: miniEnergySweep 1.7s linear infinite;
             pointer-events: none;
         }
-        .battery-mini-meter::after {
-            content: ""; position: absolute; left: 9px; right: 9px; bottom: 4px; height: 2px; border-radius: 999px;
-            background: repeating-linear-gradient(90deg, transparent 0 7px, var(--mini-color) 7px 14px, #fff 14px 17px);
-            background-size: 34px 100%;
-            box-shadow: 0 0 7px var(--mini-color), 0 0 11px var(--mini-color);
-            animation: miniEnergyFlow 0.9s linear infinite;
-            pointer-events: none;
-        }
         .battery-mini-meter.charge {
             --mini-color: #00cc66;
             --mini-glow: rgba(0, 204, 102, 0.48);
@@ -348,7 +340,6 @@
             --mini-color: #a8b0ba;
             --mini-glow: rgba(168, 176, 186, 0.28);
         }
-        .battery-mini-meter.charge::after { animation-direction: reverse; }
         .battery-mini-row {
             position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between;
             gap: 8px; font-size: 10px; font-weight: 900; line-height: 1.15;
@@ -361,9 +352,6 @@
         }
         @keyframes miniEnergySweep {
             to { transform: translateX(120%) translateZ(0); }
-        }
-        @keyframes miniEnergyFlow {
-            to { background-position: 34px 0; }
         }
 
         #update-clock {
