@@ -62,13 +62,8 @@
 
         body.night-stars::after {
             z-index: 0;
-            opacity: 0.72;
-            animation: starTwinkleOptimized 3s ease-in-out infinite alternate;
-        }
-
-        @keyframes starTwinkleOptimized {
-            from { opacity: 0.34; transform: scale(1) translateZ(0); }
-            to { opacity: 0.78; transform: scale(1.02) translateZ(0); }
+            opacity: 0;
+            animation: none;
         }
 
         .app-container { 
@@ -130,11 +125,33 @@
                 radial-gradient(1.8px 1.8px at 76% 18%, rgba(180,226,255,0.88), transparent),
                 radial-gradient(1.5px 1.5px at 20% 43%, rgba(185,230,255,0.86), transparent),
                 radial-gradient(1.6px 1.6px at 68% 34%, rgba(255,255,255,0.88), transparent),
-                radial-gradient(1.5px 1.5px at 82% 63%, rgba(255,255,255,0.82), transparent);
+                radial-gradient(1.5px 1.5px at 82% 63%, rgba(255,255,255,0.82), transparent),
+                radial-gradient(2px 2px at 88% 46%, rgba(255,247,205,0.94), transparent),
+                radial-gradient(1.8px 1.8px at 27% 61%, rgba(170,220,255,0.86), transparent),
+                radial-gradient(1.5px 1.5px at 15% 76%, rgba(255,255,255,0.9), transparent),
+                radial-gradient(1.8px 1.8px at 58% 85%, rgba(180,226,255,0.88), transparent),
+                radial-gradient(2px 2px at 92% 82%, rgba(255,247,205,0.92), transparent),
+                radial-gradient(1.2px 1.2px at 34% 92%, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1.6px 1.6px at 54% 22%, rgba(185,230,255,0.85), transparent),
+                radial-gradient(1.8px 1.8px at 38% 54%, rgba(255,255,255,0.95), transparent),
+                radial-gradient(2px 2px at 70% 70%, rgba(255,247,205,0.88), transparent),
+                radial-gradient(1.4px 1.4px at 8% 28%, rgba(255,255,255,0.82), transparent),
+                radial-gradient(1.5px 1.5px at 85% 25%, rgba(180,226,255,0.8), transparent),
+                radial-gradient(2.2px 2.2px at 45% 75%, rgba(255,255,255,0.9), transparent),
+                radial-gradient(1.8px 1.8px at 62% 12%, rgba(255,247,205,0.85), transparent),
+                radial-gradient(1.5px 1.5px at 95% 55%, rgba(255,255,255,0.88), transparent),
+                radial-gradient(1.6px 1.6px at 25% 88%, rgba(170,220,255,0.9), transparent),
+                radial-gradient(2px 2px at 50% 45%, rgba(255,255,255,0.92), transparent);
             background-size: 100% 100%;
-            animation: starTwinkleOptimized 3s ease-in-out infinite alternate;
+            animation: panelStarTwinkle 2.2s ease-in-out infinite alternate;
             pointer-events: none;
             transform: translateZ(0);
+        }
+
+        @keyframes panelStarTwinkle {
+            from { opacity: 0.52; transform: scale(1) translateZ(0); }
+            55% { opacity: 1; transform: scale(1.006) translateZ(0); }
+            to { opacity: 0.76; transform: scale(1.012) translateZ(0); }
         }
 
         @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
