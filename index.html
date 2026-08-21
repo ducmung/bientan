@@ -366,6 +366,42 @@
         .pos-batt.corner-node .battery-body { width: 92px; height: 40px; border-radius: 5px; }
         .pos-batt.corner-node .battery-cap { width: 7px; height: 19px; border-radius: 0 4px 4px 0; }
         .pos-batt.corner-node #lbl-soc { font-size: 21px; }
+        .battery-temp-label {
+            order: 3;
+            position: relative;
+            z-index: 13;
+            margin-top: -1px;
+            transform: translate(4px, -1px) translateZ(0);
+            min-width: 72px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 900;
+            line-height: 1.1;
+            color: #ffffff;
+            background: rgba(10, 18, 30, 0.72);
+            border: 1px solid rgba(255,255,255,0.34);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.28), 0 0 9px rgba(0,204,102,0.22);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.85);
+            white-space: nowrap;
+            pointer-events: none;
+            transition: color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+        .battery-temp-label.temp-warm {
+            color: #ffe082;
+            border-color: rgba(255,193,7,0.58);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.28), 0 0 10px rgba(255,193,7,0.28);
+        }
+        .battery-temp-label.temp-hot {
+            color: #ff8a80;
+            border-color: rgba(255,68,68,0.64);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.28), 0 0 11px rgba(255,68,68,0.34);
+        }
+        .battery-temp-label.temp-stale {
+            color: #a8b0ba;
+            border-color: rgba(168,176,186,0.35);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.24);
+        }
         .pos-load.corner-node .icon { margin: -10px auto 0 auto; transform: translate(6px, 3px) translateZ(0); }
         .pos-load.corner-node .img-icon { width: 78px; height: 78px; margin: -8px auto 0 auto; }
         
@@ -897,6 +933,7 @@
                     <div class="battery-body"><div class="battery-fill" id="batt-fill"></div><div id="lbl-soc">0%</div></div>
                     <div class="battery-cap"></div>
                 </div>
+                <div id="lbl-batt-temp" class="battery-temp-label temp-stale">🌡️ Pin --°C</div>
             </div>
 
             <div class="node pos-load corner-node">
@@ -1882,6 +1919,8 @@
 
                     const battVoltage = toSafeNumber(data.Batt_Voltage);
                     const battCurrent = toSafeNumber(data.Batt_Current);
+                    const battTemp = toSafeNumber(data.Batt_Temp, NaN);
+                    const battTempFresh = data.Battery_Temp_Data_Fresh !== false && Number.isFinite(battTemp);
                     let pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power) * 1000));
                     let gridInW = Math.round(toSafeNumber(data.Grid_Power));
                     let battInW = Math.round(battVoltage * battCurrent);
@@ -1952,6 +1991,23 @@
 
                     let soc = clampNumber(data.Batt_SOC, 0, 100);
                     animateValue('lbl-soc', soc, v => Math.round(v) + '%');
+
+                    const battTempLabel = document.getElementById('lbl-batt-temp');
+                    if (battTempLabel) {
+                        battTempLabel.classList.remove('temp-warm', 'temp-hot', 'temp-stale');
+                        if (battTempFresh) {
+                            animateValue('lbl-batt-temp', battTemp, v => '🌡️ Pin ' + v.toFixed(1) + '°C');
+                            if (battTemp >= 45) battTempLabel.classList.add('temp-hot');
+                            else if (battTemp >= 38) battTempLabel.classList.add('temp-warm');
+                        } else {
+                            if (numberAnimState['lbl-batt-temp']?.frameId) {
+                                cancelAnimationFrame(numberAnimState['lbl-batt-temp'].frameId);
+                                numberAnimState['lbl-batt-temp'].frameId = null;
+                            }
+                            updateDOMText('lbl-batt-temp', '🌡️ Pin --°C');
+                            battTempLabel.classList.add('temp-stale');
+                        }
+                    }
 
                     animateValue('mini-stat-v', battVoltage, v => v.toFixed(1) + ' V');
                     animateValue('mini-stat-a', battCurrent, v => v.toFixed(1) + ' A');
