@@ -398,21 +398,36 @@
             transition: color 0.35s ease, text-shadow 0.35s ease;
             font-variant-numeric: tabular-nums;
         }
+        /* Trạng thái nhiệt độ pin: <18 mát, 18-29.9 xanh, 30-35.9 vàng, 36-42.9 đỏ, >=43 đỏ cảnh báo */
+        .battery-temp-label.temp-cool .temp-value {
+            color: #7ddfff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,223,255,0.38);
+        }
         .battery-temp-label.temp-normal .temp-value {
-            color: #7dffb2;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,255,178,0.35);
+            color: #38ff7a;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 9px rgba(56,255,122,0.48);
         }
         .battery-temp-label.temp-warm .temp-value {
-            color: #ffe082;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(255,224,130,0.35);
+            color: #ffd600;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 10px rgba(255,214,0,0.52);
         }
         .battery-temp-label.temp-hot .temp-value {
-            color: #ff8a80;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(255,138,128,0.42);
+            color: #ff3b30;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.88), 0 0 10px rgba(255,59,48,0.62);
+        }
+        .battery-temp-label.temp-danger .temp-value {
+            color: #ff1f1f;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.92), 0 0 8px #ff0000, 0 0 16px rgba(255,0,0,0.92);
+            animation: batteryTempDangerBlink 0.72s steps(2, end) infinite;
+        }
+        @keyframes batteryTempDangerBlink {
+            0%, 45% { opacity: 1; transform: scale(1) translateZ(0); filter: brightness(1.15); }
+            46%, 100% { opacity: 0.22; transform: scale(1.06) translateZ(0); filter: brightness(1.8); }
         }
         .battery-temp-label.temp-stale .temp-value {
             color: #a8b0ba;
             text-shadow: 0 1px 3px rgba(0,0,0,0.75);
+            animation: none;
         }
         .pos-load.corner-node .icon { margin: -10px auto 0 auto; transform: translate(6px, 3px) translateZ(0); }
         .pos-load.corner-node .img-icon { width: 78px; height: 78px; margin: -8px auto 0 auto; }
@@ -2006,12 +2021,22 @@
 
                     const battTempLabel = document.getElementById('lbl-batt-temp');
                     if (battTempLabel) {
-                        battTempLabel.classList.remove('temp-normal', 'temp-warm', 'temp-hot', 'temp-stale');
+                        battTempLabel.classList.remove('temp-cool', 'temp-normal', 'temp-warm', 'temp-hot', 'temp-danger', 'temp-stale');
                         if (battTempFresh) {
                             animateValue('lbl-batt-temp-value', battTemp, v => v.toFixed(1) + '°C');
-                            if (battTemp >= 45) battTempLabel.classList.add('temp-hot');
-                            else if (battTemp >= 38) battTempLabel.classList.add('temp-warm');
-                            else battTempLabel.classList.add('temp-normal');
+
+                            // Phân mức nhiệt độ pin theo giá trị thực (có phần thập phân).
+                            if (battTemp >= 43.0) {
+                                battTempLabel.classList.add('temp-danger');   // >=43°C: đỏ nhấp nháy cảnh báo nguy hiểm
+                            } else if (battTemp >= 36.0) {
+                                battTempLabel.classList.add('temp-hot');      // 36.0-42.9°C: đỏ
+                            } else if (battTemp >= 30.0) {
+                                battTempLabel.classList.add('temp-warm');     // 30.0-35.9°C: vàng
+                            } else if (battTemp >= 18.0) {
+                                battTempLabel.classList.add('temp-normal');   // 18.0-29.9°C: xanh
+                            } else {
+                                battTempLabel.classList.add('temp-cool');     // <18°C: xanh nhạt/mát
+                            }
                         } else {
                             if (numberAnimState['lbl-batt-temp-value']?.frameId) {
                                 cancelAnimationFrame(numberAnimState['lbl-batt-temp-value'].frameId);
