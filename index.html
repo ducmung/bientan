@@ -341,6 +341,57 @@
             to { transform: translateX(120%) translateZ(0); }
         }
 
+        #device-status {
+            position: absolute;
+            top: 41.5%;
+            right: 18%;
+            transform: translate(50%, -50%) translateZ(0);
+            z-index: 26;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.35px;
+            white-space: nowrap;
+            pointer-events: none;
+            color: #ffd166;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 8px rgba(255,209,102,0.32);
+        }
+        #device-status .device-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex: 0 0 7px;
+            background: #ffd166;
+            box-shadow: 0 0 7px rgba(255,209,102,0.75);
+        }
+        #device-status.online {
+            color: #45ff91;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(69,255,145,0.48);
+        }
+        #device-status.online .device-dot {
+            background: #20e878;
+            box-shadow: 0 0 8px rgba(32,232,120,0.95), 0 0 14px rgba(32,232,120,0.45);
+        }
+        #device-status.offline {
+            color: #ff5555;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 10px rgba(255,68,68,0.6);
+            animation: deviceOfflineBlink 0.9s ease-in-out infinite alternate;
+        }
+        #device-status.offline .device-dot {
+            background: #ff2f2f;
+            box-shadow: 0 0 9px rgba(255,47,47,1), 0 0 16px rgba(255,47,47,0.55);
+        }
+        #device-status.checking {
+            color: #ffd166;
+        }
+        @keyframes deviceOfflineBlink {
+            from { opacity: 0.48; }
+            to { opacity: 1; }
+        }
+
         #update-clock {
             position: absolute; top: 48%; right: 18%; transform: translate(50%, -50%) translateZ(0);
             font-size: 13px; font-weight: 900; color: #ff0000; font-family: monospace; background: rgba(255, 255, 255, 0.95);
@@ -817,6 +868,8 @@
 
         /* Responsive */
         @media (max-width: 400px) {
+            #device-status { top: 42%; font-size: 8.5px; gap: 4px; }
+            #device-status .device-dot { width: 6px; height: 6px; flex-basis: 6px; }
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 10px; }
             .bpf-text { font-size: 26px; letter-spacing: 8px; }
@@ -912,6 +965,7 @@
                 <div class="battery-mini-row"><span class="battery-mini-label">Áp</span><span class="battery-mini-value" id="mini-stat-v">-- V</span></div>
                 <div class="battery-mini-row"><span class="battery-mini-label">Dòng</span><span class="battery-mini-value" id="mini-stat-a">-- A</span></div>
             </div>
+            <div id="device-status" class="checking"><span class="device-dot"></span><span id="device-status-text">ĐANG KIỂM TRA</span></div>
             <div id="update-clock">--:--:--</div>
 
             <div class="image-frame">
@@ -1920,6 +1974,90 @@
             }
         }
 
+        // ================= TRẠNG THÁI ONLINE / OFFLINE CỦA ESP32 =================
+        // Firmware gửi Device_Heartbeat thay đổi ở mỗi lần Live upload (force heartbeat ~15 giây).
+        // Cho phép dư thời gian mạng/Firebase: quá 40 giây không thấy heartbeat mới => OFFLINE.
+        const DEVICE_OFFLINE_TIMEOUT_MS = 40000;
+        const DEVICE_FIRST_CHECK_TIMEOUT_MS = 30000;
+        const DEVICE_HB_STORAGE_KEY = 'sosen_device_hb_value';
+        const DEVICE_HB_TIME_STORAGE_KEY = 'sosen_device_hb_seen_at';
+
+        let deviceStatusStartAt = Date.now();
+        let lastDeviceHeartbeat = null;
+        let lastDeviceHeartbeatAt = 0;
+
+        try {
+            const storedHb = localStorage.getItem(DEVICE_HB_STORAGE_KEY);
+            const storedAt = Number(localStorage.getItem(DEVICE_HB_TIME_STORAGE_KEY) || 0);
+            if (storedHb !== null && storedHb !== '') lastDeviceHeartbeat = Number(storedHb);
+            if (Number.isFinite(storedAt) && storedAt > 0) lastDeviceHeartbeatAt = storedAt;
+        } catch (e) {}
+
+        function setDeviceStatus(state) {
+            const box = document.getElementById('device-status');
+            const text = document.getElementById('device-status-text');
+            if (!box || !text) return;
+            box.classList.remove('online', 'offline', 'checking');
+            box.classList.add(state);
+            if (state === 'online') updateDOMText('device-status-text', 'THIẾT BỊ ONLINE');
+            else if (state === 'offline') updateDOMText('device-status-text', 'THIẾT BỊ OFFLINE');
+            else updateDOMText('device-status-text', 'ĐANG KIỂM TRA');
+        }
+
+        function processDeviceHeartbeat(data) {
+            const hb = Number(data && data.Device_Heartbeat);
+            if (!Number.isFinite(hb)) return;
+
+            const nowMs = Date.now();
+
+            // Lần đầu tiên trình duyệt này nhìn thấy heartbeat: chỉ lấy làm mốc.
+            // Không vội báo ONLINE vì Firebase có thể đang giữ heartbeat cũ từ lúc ESP32 đã bị rút.
+            if (lastDeviceHeartbeat === null) {
+                lastDeviceHeartbeat = hb;
+                try { localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb)); } catch (e) {}
+                setDeviceStatus('checking');
+                return;
+            }
+
+            // Chỉ khi heartbeat THỰC SỰ đổi mới xác nhận ESP32 vừa gửi dữ liệu mới.
+            if (hb !== lastDeviceHeartbeat) {
+                lastDeviceHeartbeat = hb;
+                lastDeviceHeartbeatAt = nowMs;
+                try {
+                    localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb));
+                    localStorage.setItem(DEVICE_HB_TIME_STORAGE_KEY, String(nowMs));
+                } catch (e) {}
+                setDeviceStatus('online');
+                return;
+            }
+
+            // Cùng heartbeat: chỉ ONLINE nếu trình duyệt đã xác nhận heartbeat này gần đây.
+            if (lastDeviceHeartbeatAt > 0 && (nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS) {
+                setDeviceStatus('online');
+            }
+        }
+
+        function updateDeviceStatusByTimeout() {
+            const nowMs = Date.now();
+            if (lastDeviceHeartbeatAt > 0) {
+                setDeviceStatus((nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS ? 'online' : 'offline');
+            } else if ((nowMs - deviceStatusStartAt) >= DEVICE_FIRST_CHECK_TIMEOUT_MS) {
+                setDeviceStatus('offline');
+            } else {
+                setDeviceStatus('checking');
+            }
+        }
+
+        // Đồng hồ chạy độc lập với dữ liệu ESP32, nên OFFLINE vẫn xem được giờ hiện tại.
+        function refreshDashboardClock() {
+            const now = new Date();
+            updateDOMText('update-clock', now.toLocaleTimeString('vi-VN', { hour12: false }));
+        }
+        refreshDashboardClock();
+        setInterval(refreshDashboardClock, 1000);
+        setInterval(updateDeviceStatusByTimeout, 2000);
+        updateDeviceStatusByTimeout();
+
         let pendingLiveData = null;
         let liveDomFrameId = null;
 
@@ -1933,6 +2071,7 @@
 
             database.ref('/SosenSystem/Live').on('value', (snapshot) => {
                 pendingLiveData = snapshot.val();
+                if (pendingLiveData) processDeviceHeartbeat(pendingLiveData);
                 if (!pendingLiveData || liveDomFrameId !== null) return;
 
                 liveDomFrameId = requestAnimationFrame(() => {
