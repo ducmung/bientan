@@ -1976,21 +1976,25 @@
 
         // ================= TRẠNG THÁI ONLINE / OFFLINE CỦA ESP32 =================
         // Firmware gửi Device_Heartbeat thay đổi ở mỗi lần Live upload (force heartbeat ~15 giây).
-        // Cho phép dư thời gian mạng/Firebase: quá 40 giây không thấy heartbeat mới => OFFLINE.
-        const DEVICE_OFFLINE_TIMEOUT_MS = 40000;
-        const DEVICE_FIRST_CHECK_TIMEOUT_MS = 30000;
+        // Quá 20 giây không thấy heartbeat mới => OFFLINE.
+        const DEVICE_OFFLINE_TIMEOUT_MS = 20000;
+        const DEVICE_FIRST_CHECK_TIMEOUT_MS = 20000;
         const DEVICE_HB_STORAGE_KEY = 'sosen_device_hb_value';
         const DEVICE_HB_TIME_STORAGE_KEY = 'sosen_device_hb_seen_at';
+        const DEVICE_LAST_DATA_TIME_STORAGE_KEY = 'sosen_last_live_received_at';
 
         let deviceStatusStartAt = Date.now();
         let lastDeviceHeartbeat = null;
         let lastDeviceHeartbeatAt = 0;
+        let lastLiveReceivedAt = 0;
 
         try {
             const storedHb = localStorage.getItem(DEVICE_HB_STORAGE_KEY);
             const storedAt = Number(localStorage.getItem(DEVICE_HB_TIME_STORAGE_KEY) || 0);
+            const storedLiveAt = Number(localStorage.getItem(DEVICE_LAST_DATA_TIME_STORAGE_KEY) || 0);
             if (storedHb !== null && storedHb !== '') lastDeviceHeartbeat = Number(storedHb);
             if (Number.isFinite(storedAt) && storedAt > 0) lastDeviceHeartbeatAt = storedAt;
+            if (Number.isFinite(storedLiveAt) && storedLiveAt > 0) lastLiveReceivedAt = storedLiveAt;
         } catch (e) {}
 
         function setDeviceStatus(state) {
@@ -2002,6 +2006,23 @@
             if (state === 'online') updateDOMText('device-status-text', 'THIẾT BỊ ONLINE');
             else if (state === 'offline') updateDOMText('device-status-text', 'THIẾT BỊ OFFLINE');
             else updateDOMText('device-status-text', 'ĐANG KIỂM TRA');
+        }
+
+        // Đây KHÔNG phải đồng hồ chạy liên tục. Nó là thời điểm nhận gói Live mới nhất.
+        // Chỉ đổi khi heartbeat của ESP32 đổi; khi ESP32 OFFLINE thì giá trị đứng yên.
+        function renderLastLiveReceivedTime() {
+            if (!(lastLiveReceivedAt > 0)) {
+                updateDOMText('update-clock', '--:--:--');
+                return;
+            }
+            const t = new Date(lastLiveReceivedAt);
+            updateDOMText('update-clock', t.toLocaleTimeString('vi-VN', { hour12: false }));
+        }
+
+        function markLiveDataReceived(nowMs = Date.now()) {
+            lastLiveReceivedAt = nowMs;
+            try { localStorage.setItem(DEVICE_LAST_DATA_TIME_STORAGE_KEY, String(nowMs)); } catch (e) {}
+            renderLastLiveReceivedTime();
         }
 
         function processDeviceHeartbeat(data) {
@@ -2027,6 +2048,7 @@
                     localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb));
                     localStorage.setItem(DEVICE_HB_TIME_STORAGE_KEY, String(nowMs));
                 } catch (e) {}
+                markLiveDataReceived(nowMs);
                 setDeviceStatus('online');
                 return;
             }
@@ -2048,14 +2070,9 @@
             }
         }
 
-        // Đồng hồ chạy độc lập với dữ liệu ESP32, nên OFFLINE vẫn xem được giờ hiện tại.
-        function refreshDashboardClock() {
-            const now = new Date();
-            updateDOMText('update-clock', now.toLocaleTimeString('vi-VN', { hour12: false }));
-        }
-        refreshDashboardClock();
-        setInterval(refreshDashboardClock, 1000);
-        setInterval(updateDeviceStatusByTimeout, 2000);
+        // Hiển thị lại lần cập nhật cuối đã lưu; không tự chạy theo từng giây.
+        renderLastLiveReceivedTime();
+        setInterval(updateDeviceStatusByTimeout, 1000);
         updateDeviceStatusByTimeout();
 
         let pendingLiveData = null;
@@ -2079,9 +2096,6 @@
                     pendingLiveData = null;
                     liveDomFrameId = null;
                     if (!data) return;
-
-                    const now = new Date();
-                    updateDOMText('update-clock', now.toLocaleTimeString('vi-VN', { hour12: false }));
 
                     const battVoltage = toSafeNumber(data.Batt_Voltage);
                     const battCurrent = toSafeNumber(data.Batt_Current);
