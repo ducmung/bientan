@@ -229,7 +229,7 @@
         .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; transform: translateZ(0); }
 
         #lbl-inv-temp {
-            position: absolute; top: 78%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
+            position: absolute; top: 69%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
             font-size: 14px; font-weight: 900; background: #00cc66; color: #fff;
             padding: 4px 16px; border-radius: 20px; z-index: 20; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
@@ -370,37 +370,49 @@
             order: 3;
             position: relative;
             z-index: 13;
-            margin-top: -1px;
+            margin-top: 1px;
             transform: translate(4px, -1px) translateZ(0);
-            min-width: 72px;
-            padding: 3px 8px;
-            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-width: auto;
+            padding: 0;
+            border-radius: 0;
             font-size: 11px;
             font-weight: 900;
             line-height: 1.1;
-            color: #ffffff;
-            background: rgba(10, 18, 30, 0.72);
-            border: 1px solid rgba(255,255,255,0.34);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.28), 0 0 9px rgba(0,204,102,0.22);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.85);
+            background: transparent;
+            border: none;
+            box-shadow: none;
             white-space: nowrap;
             pointer-events: none;
-            transition: color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
         }
-        .battery-temp-label.temp-warm {
+        .battery-temp-label .temp-icon {
+            color: rgba(255,255,255,0.82);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.75);
+        }
+        .battery-temp-label .temp-value {
+            color: #7dffb2;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,255,178,0.35);
+            transition: color 0.35s ease, text-shadow 0.35s ease;
+            font-variant-numeric: tabular-nums;
+        }
+        .battery-temp-label.temp-normal .temp-value {
+            color: #7dffb2;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,255,178,0.35);
+        }
+        .battery-temp-label.temp-warm .temp-value {
             color: #ffe082;
-            border-color: rgba(255,193,7,0.58);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.28), 0 0 10px rgba(255,193,7,0.28);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(255,224,130,0.35);
         }
-        .battery-temp-label.temp-hot {
+        .battery-temp-label.temp-hot .temp-value {
             color: #ff8a80;
-            border-color: rgba(255,68,68,0.64);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.28), 0 0 11px rgba(255,68,68,0.34);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(255,138,128,0.42);
         }
-        .battery-temp-label.temp-stale {
+        .battery-temp-label.temp-stale .temp-value {
             color: #a8b0ba;
-            border-color: rgba(168,176,186,0.35);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.24);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.75);
         }
         .pos-load.corner-node .icon { margin: -10px auto 0 auto; transform: translate(6px, 3px) translateZ(0); }
         .pos-load.corner-node .img-icon { width: 78px; height: 78px; margin: -8px auto 0 auto; }
@@ -795,7 +807,7 @@
             .bpf-text { font-size: 26px; letter-spacing: 8px; }
             .image-frame { width: 120px; top: 14%; } 
             .node-center { width: 105px; height: 115px; } 
-            #lbl-inv-temp { top: 79%; }
+            #lbl-inv-temp { top: 70%; }
             .battery-mini-meter { top: 50%; min-width: 96px; padding: 5px 7px 8px 7px; }
             .battery-mini-row { font-size: 9px; }
         }
@@ -933,7 +945,7 @@
                     <div class="battery-body"><div class="battery-fill" id="batt-fill"></div><div id="lbl-soc">0%</div></div>
                     <div class="battery-cap"></div>
                 </div>
-                <div id="lbl-batt-temp" class="battery-temp-label temp-stale">🌡️ Pin --°C</div>
+                <div id="lbl-batt-temp" class="battery-temp-label temp-stale"><span class="temp-icon">🌡️</span><span id="lbl-batt-temp-value" class="temp-value">--°C</span></div>
             </div>
 
             <div class="node pos-load corner-node">
@@ -1994,17 +2006,18 @@
 
                     const battTempLabel = document.getElementById('lbl-batt-temp');
                     if (battTempLabel) {
-                        battTempLabel.classList.remove('temp-warm', 'temp-hot', 'temp-stale');
+                        battTempLabel.classList.remove('temp-normal', 'temp-warm', 'temp-hot', 'temp-stale');
                         if (battTempFresh) {
-                            animateValue('lbl-batt-temp', battTemp, v => '🌡️ Pin ' + v.toFixed(1) + '°C');
+                            animateValue('lbl-batt-temp-value', battTemp, v => v.toFixed(1) + '°C');
                             if (battTemp >= 45) battTempLabel.classList.add('temp-hot');
                             else if (battTemp >= 38) battTempLabel.classList.add('temp-warm');
+                            else battTempLabel.classList.add('temp-normal');
                         } else {
-                            if (numberAnimState['lbl-batt-temp']?.frameId) {
-                                cancelAnimationFrame(numberAnimState['lbl-batt-temp'].frameId);
-                                numberAnimState['lbl-batt-temp'].frameId = null;
+                            if (numberAnimState['lbl-batt-temp-value']?.frameId) {
+                                cancelAnimationFrame(numberAnimState['lbl-batt-temp-value'].frameId);
+                                numberAnimState['lbl-batt-temp-value'].frameId = null;
                             }
-                            updateDOMText('lbl-batt-temp', '🌡️ Pin --°C');
+                            updateDOMText('lbl-batt-temp-value', '--°C');
                             battTempLabel.classList.add('temp-stale');
                         }
                     }
