@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sosen Energy Dashboard</title>
+    <title>Sosen Energy Dashboard V9 W-ONLY</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <!-- Thư viện vẽ Biểu đồ Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -551,6 +551,37 @@
         .val-load-style { color: #ffffff !important; text-shadow: 0 1px 0 #1d4ed8, 0 2px 0 #1e40af, 0 3px 0 #1e3a8a, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(59, 130, 246, 0.9) !important; font-size: 18px; }
         .val-grid-buy-style { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
         .val-grid-sell-style { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
+
+        /* V8.1 - Nhãn trực tiếp MUA/ĐẨY điện lưới */
+        .pos-grid { width: 118px; }
+        .grid-live-mode {
+            margin-top: 4px;
+            min-height: 15px;
+            font-size: 10px;
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: 0.1px;
+            white-space: nowrap;
+            transition: color 0.25s ease, text-shadow 0.25s ease, opacity 0.25s ease;
+            font-variant-numeric: tabular-nums;
+        }
+        .grid-live-mode.buy {
+            color: #ff5b6e;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(255,68,68,0.55);
+        }
+        .grid-live-mode.sell {
+            color: #22e58a;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(0,204,102,0.55);
+        }
+        .grid-live-mode.idle {
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.75);
+        }
+        .grid-live-mode.no-grid,
+        .grid-live-mode.stale {
+            color: #ffb74d;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 8px rgba(255,183,77,0.4);
+        }
         
         .val-charge { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
         .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
@@ -1006,6 +1037,7 @@
                 <h3>LƯỚI EVN</h3>
                 <div class="val" id="lbl-grid">0</div>
                 <div class="unit">W</div>
+                <div id="lbl-grid-mode" class="grid-live-mode idle">CÂN BẰNG 0 W</div>
             </div>
 
             <div class="node pos-batt corner-node">
@@ -1975,8 +2007,8 @@
         }
 
         // ================= TRẠNG THÁI ONLINE / OFFLINE CỦA ESP32 =================
-        // Firmware gửi Device_Heartbeat thay đổi ở mỗi lần Live upload (force heartbeat ~15 giây).
-        // Quá 20 giây không thấy heartbeat mới => OFFLINE.
+        // Firmware V9 gửi Device_Heartbeat độc lập mỗi ~5 giây.
+        // Quá 20 giây không thấy heartbeat mới => OFFLINE (4 nhịp heartbeat dự phòng).
         const DEVICE_OFFLINE_TIMEOUT_MS = 20000;
         const DEVICE_FIRST_CHECK_TIMEOUT_MS = 20000;
         const DEVICE_HB_STORAGE_KEY = 'sosen_device_hb_value';
@@ -2097,14 +2129,42 @@
                     liveDomFrameId = null;
                     if (!data) return;
 
+                    // Power_Unit = W la schema chuan cua firmware V9.
+                    // Khong tu dong nhan/doi kW de tranh tai dien loi don vi cu.
+
                     const battVoltage = toSafeNumber(data.Batt_Voltage);
                     const battCurrent = toSafeNumber(data.Batt_Current);
                     const battTemp = toSafeNumber(data.Batt_Temp, NaN);
                     const battTempFresh = data.Battery_Temp_Data_Fresh !== false && Number.isFinite(battTemp);
-                    let pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power) * 1000));
-                    let gridInW = Math.round(toSafeNumber(data.Grid_Power));
-                    let battInW = Math.round(battVoltage * battCurrent);
-                    let loadInW = Math.max(0, pvInW + gridInW + battInW);
+
+                    // V9 W-ONLY: TOAN BO cong suat tu Firebase da la W.
+                    // Khong con nhan *1000 cho PV.
+                    const pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power)));
+                    const gridInW = Math.round(toSafeNumber(data.Grid_Power));
+                    const gridImportRaw = Number(data.Grid_Import_Power);
+                    const gridExportRaw = Number(data.Grid_Export_Power);
+                    const gridImportW = Number.isFinite(gridImportRaw)
+                        ? Math.max(0, Math.round(gridImportRaw))
+                        : Math.max(0, -gridInW);
+                    const gridExportW = Number.isFinite(gridExportRaw)
+                        ? Math.max(0, Math.round(gridExportRaw))
+                        : Math.max(0, gridInW);
+                    const gridDataFresh = data.Grid_Data_Fresh !== false;
+                    const gridPresentKnown = typeof data.Grid_Present === 'boolean';
+                    const gridPresent = gridPresentKnown ? data.Grid_Present : true;
+
+                    // V9: uu tien cong suat pin truc tiep register 293 do ESP32 gui len, don vi W.
+                    // Fallback V*I chi de tuong thich khi field Batt_Power chua xuat hien.
+                    const rawBattPower = Number(data.Batt_Power);
+                    const battInW = Number.isFinite(rawBattPower)
+                        ? Math.round(rawBattPower)
+                        : Math.round(battVoltage * battCurrent);
+
+                    // Load_Power tu Modbus da la W. Chi fallback can bang neu field chua co.
+                    const rawLoadPower = Number(data.Load_Power);
+                    const loadInW = Number.isFinite(rawLoadPower)
+                        ? Math.max(0, Math.round(rawLoadPower))
+                        : Math.max(0, Math.round(pvInW - gridInW + battInW));
                     updateBackgroundByTimeAndPv(pvInW);
 
                     animateValue('lbl-pv', pvInW, v => Math.round(v));
@@ -2117,18 +2177,43 @@
                     const elLoad = document.getElementById('lbl-load');
                     if (elLoad) elLoad.classList.add('val-load-style');
 
-                    animateValue('lbl-grid', Math.abs(gridInW), v => Math.round(v));
+                    const gridActiveW = gridImportW > 0 ? gridImportW : gridExportW;
+                    animateValue('lbl-grid', gridActiveW, v => Math.round(v));
 
                     const elGrid = document.getElementById('lbl-grid');
+                    const elGridMode = document.getElementById('lbl-grid-mode');
                     if (elGrid) {
                         elGrid.classList.remove('val-grid-buy-style', 'val-grid-sell-style');
-                        if (gridInW < 0) {
-                            elGrid.classList.add('val-grid-sell-style');
-                        } else if (gridInW > 0) {
+                        elGrid.style.color = '';
+                        elGrid.style.textShadow = '';
+
+                        if (gridDataFresh && gridPresent && gridImportW > 0) {
                             elGrid.classList.add('val-grid-buy-style');
+                        } else if (gridDataFresh && gridPresent && gridExportW > 0) {
+                            elGrid.classList.add('val-grid-sell-style');
                         } else {
                             elGrid.style.color = '#fff';
                             elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
+                        }
+                    }
+
+                    if (elGridMode) {
+                        elGridMode.classList.remove('buy', 'sell', 'idle', 'no-grid', 'stale');
+                        if (!gridDataFresh) {
+                            updateDOMText('lbl-grid-mode', '⚠ MẤT DATA LƯỚI');
+                            elGridMode.classList.add('stale');
+                        } else if (!gridPresent) {
+                            updateDOMText('lbl-grid-mode', '⚠ KHÔNG CÓ LƯỚI');
+                            elGridMode.classList.add('no-grid');
+                        } else if (gridImportW > 0) {
+                            updateDOMText('lbl-grid-mode', '← MUA EVN ' + gridImportW.toLocaleString('vi-VN') + ' W');
+                            elGridMode.classList.add('buy');
+                        } else if (gridExportW > 0) {
+                            updateDOMText('lbl-grid-mode', 'ĐẨY EVN ' + gridExportW.toLocaleString('vi-VN') + ' W →');
+                            elGridMode.classList.add('sell');
+                        } else {
+                            updateDOMText('lbl-grid-mode', 'CÂN BẰNG 0 W');
+                            elGridMode.classList.add('idle');
                         }
                     }
 
@@ -2238,9 +2323,18 @@
                     else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW));
                     else setFlow('flow-batt', false);
 
-                    if (gridInW > 0) setFlow('flow-grid', true, 'flowInR', '#ff4444', Math.abs(gridInW));
-                    else if (gridInW < 0) setFlow('flow-grid', true, 'flowOutR', '#00cc66', Math.abs(gridInW));
-                    else setFlow('flow-grid', false);
+                    // V9 W-ONLY: dùng trực tiếp Import/Export do firmware gửi lên, don vi W.
+                    // MUA: EVN (bên phải) -> inverter, màu đỏ.
+                    // ĐẨY: inverter -> EVN (bên phải), màu xanh.
+                    if (!gridDataFresh || !gridPresent) {
+                        setFlow('flow-grid', false);
+                    } else if (gridImportW > 0) {
+                        setFlow('flow-grid', true, 'flowInR', '#ff4444', gridImportW);
+                    } else if (gridExportW > 0) {
+                        setFlow('flow-grid', true, 'flowOutR', '#00cc66', gridExportW);
+                    } else {
+                        setFlow('flow-grid', false);
+                    }
                 });
             });
         }
