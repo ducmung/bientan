@@ -2137,7 +2137,7 @@
                     const battTemp = toSafeNumber(data.Batt_Temp, NaN);
                     const battTempFresh = data.Battery_Temp_Data_Fresh !== false && Number.isFinite(battTemp);
 
-                    // V9 W-ONLY: TOAN BO cong suat tu Firebase da la W.
+                    // V10 FLOW FIX: TOAN BO cong suat tu Firebase da la W.
                     // Khong con nhan *1000 cho PV.
                     const pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power)));
                     const gridInW = Math.round(toSafeNumber(data.Grid_Power));
@@ -2153,18 +2153,39 @@
                     const gridPresentKnown = typeof data.Grid_Present === 'boolean';
                     const gridPresent = gridPresentKnown ? data.Grid_Present : true;
 
-                    // V9: uu tien cong suat pin truc tiep register 293 do ESP32 gui len, don vi W.
-                    // Fallback V*I chi de tuong thich khi field Batt_Power chua xuat hien.
+                    // V10: Batt_Power da duoc firmware chon tu reg293/VxI.
+                    // Bao ve them o HTML: neu Batt_Power=0 do register 293 lam tron 10W
+                    // nhung BMS current van cho thay dong nho, dung V*I de khong mat luong pin.
                     const rawBattPower = Number(data.Batt_Power);
-                    const battInW = Number.isFinite(rawBattPower)
-                        ? Math.round(rawBattPower)
-                        : Math.round(battVoltage * battCurrent);
+                    const rawBattPowerVi = Number(data.Batt_Power_VI);
+                    const localBattPowerVi = battVoltage * battCurrent;
+                    let battInW = 0;
+                    if (Number.isFinite(rawBattPower) && Math.abs(rawBattPower) >= 1) {
+                        battInW = Math.round(rawBattPower);
+                    } else if (Number.isFinite(rawBattPowerVi) && Math.abs(rawBattPowerVi) >= 2) {
+                        battInW = Math.round(rawBattPowerVi);
+                    } else if (Number.isFinite(localBattPowerVi) && Math.abs(localBattPowerVi) >= 2) {
+                        battInW = Math.round(localBattPowerVi);
+                    } else if (Number.isFinite(rawBattPower)) {
+                        battInW = Math.round(rawBattPower);
+                    }
 
-                    // Load_Power tu Modbus da la W. Chi fallback can bang neu field chua co.
+                    // Can bang cong suat W: Load = PV + GridImport - GridExport + Batt(+xa/-sac).
+                    // V10 firmware doc 175/194/198 va gui Load_Power da chon.
+                    // Neu direct van =0 (topology khong map vao load register), dashboard dung balance.
+                    const balanceLoadW = Math.max(0, Math.round(
+                        pvInW + gridImportW - gridExportW + battInW
+                    ));
                     const rawLoadPower = Number(data.Load_Power);
-                    const loadInW = Number.isFinite(rawLoadPower)
-                        ? Math.max(0, Math.round(rawLoadPower))
-                        : Math.max(0, Math.round(pvInW - gridInW + battInW));
+                    const loadDataFresh = data.Load_Data_Fresh !== false;
+                    let loadInW = 0;
+                    if (loadDataFresh && Number.isFinite(rawLoadPower) && rawLoadPower >= 1) {
+                        loadInW = Math.round(rawLoadPower);
+                    } else if (balanceLoadW >= 20) {
+                        loadInW = balanceLoadW;
+                    } else if (Number.isFinite(rawLoadPower) && rawLoadPower >= 0) {
+                        loadInW = Math.round(rawLoadPower);
+                    }
                     updateBackgroundByTimeAndPv(pvInW);
 
                     animateValue('lbl-pv', pvInW, v => Math.round(v));
@@ -2323,7 +2344,7 @@
                     else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW));
                     else setFlow('flow-batt', false);
 
-                    // V9 W-ONLY: dùng trực tiếp Import/Export do firmware gửi lên, don vi W.
+                    // V10 FLOW FIX: dùng trực tiếp Import/Export do firmware gửi lên, don vi W.
                     // MUA: EVN (bên phải) -> inverter, màu đỏ.
                     // ĐẨY: inverter -> EVN (bên phải), màu xanh.
                     if (!gridDataFresh || !gridPresent) {
