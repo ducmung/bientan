@@ -1117,9 +1117,100 @@
             }
         }
 
+    
+        /* =====================================================
+           V12.11.1 - COMPACT CLOCK FRAME
+           Nam gon giua vien phai inverter va vien phai diagram-panel.
+           ===================================================== */
+        #update-clock.status-clock {
+            top: 48%;
+            left: calc(50% + 66px);
+            right: 12px;
+            width: auto;
+            min-width: 0;
+            max-width: 150px;
+            transform: translateY(-50%) translateZ(0);
+            padding: 5px 6px 6px 6px;
+            border-radius: 9px;
+            gap: 3px;
+            letter-spacing: 0;
+            box-sizing: border-box;
+        }
+
+        #update-clock.status-clock::after { border-radius: 9px; }
+
+        #clock-time-text {
+            font-size: 12px;
+            letter-spacing: 1.2px;
+            line-height: 1;
+        }
+
+        .clock-status-row {
+            gap: 4px;
+            width: 100%;
+            flex-wrap: nowrap;
+        }
+
+        .clock-grid-status,
+        #update-clock #device-status {
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 2px 3px;
+            border-radius: 5px;
+            font-size: 7px;
+            gap: 3px;
+            letter-spacing: 0;
+        }
+
+        .clock-grid-dot,
+        #update-clock #device-status .device-dot {
+            width: 5px;
+            height: 5px;
+            flex: 0 0 5px;
+        }
+
+        @media (max-width: 600px) {
+            #update-clock.status-clock {
+                top: 48%;
+                left: calc(50% + 58px);
+                right: 8px;
+                width: auto;
+                min-width: 0;
+                max-width: none;
+                transform: translateY(-50%) translateZ(0);
+                padding: 4px 5px 5px 5px;
+                border-radius: 8px;
+                gap: 3px;
+            }
+
+            #update-clock.status-clock::after { border-radius: 8px; }
+
+            #clock-time-text {
+                font-size: 11px;
+                letter-spacing: 1px;
+            }
+
+            .clock-status-row { gap: 3px; }
+
+            .clock-grid-status,
+            #update-clock #device-status {
+                font-size: 6.8px;
+                padding: 2px;
+                border-radius: 4px;
+                gap: 2px;
+            }
+
+            .clock-grid-dot,
+            #update-clock #device-status .device-dot {
+                width: 4px;
+                height: 4px;
+                flex-basis: 4px;
+            }
+        }
+
     </style>
 </head>
-<body data-dashboard-version="V12.11">
+<body data-dashboard-version="V12.11.1">
     <div class="app-container">
         <div class="diagram-panel">
             <div id="battery-mini-meter" class="battery-mini-meter idle">
@@ -1179,7 +1270,7 @@
                 <h3>LƯỚI EVN</h3>
                 <div class="val" id="lbl-grid">0</div>
                 <div class="unit">W</div>
-                <div id="lbl-grid-mode" class="grid-live-mode idle">CÂN BẰNG 0 W</div>
+                <div id="lbl-grid-mode" class="grid-live-mode idle" style="display:none"></div>
             </div>
 
             <div class="node pos-batt corner-node">
@@ -2444,21 +2535,32 @@
 
                     if (elGridMode) {
                         elGridMode.classList.remove('buy', 'sell', 'idle', 'no-grid', 'stale');
+
                         if (!gridDataFresh) {
-                            updateDOMText('lbl-grid-mode', '⚠ MẤT DATA LƯỚI');
+                            // Trang thai data Grid da nam o khung dong ho.
                             elGridMode.classList.add('stale');
+                            elGridMode.style.display = 'none';
+                            updateDOMText('lbl-grid-mode', '');
                         } else if (gridPresent === false) {
-                            updateDOMText('lbl-grid-mode', '⚠ KHÔNG CÓ LƯỚI');
+                            // V12.11.1: bo dong "KHONG CO LUOI" gan cot EVN.
                             elGridMode.classList.add('no-grid');
+                            elGridMode.style.display = 'none';
+                            updateDOMText('lbl-grid-mode', '');
                         } else if (gridImportW > 0) {
-                            updateDOMText('lbl-grid-mode', '← MUA EVN ' + gridImportW.toLocaleString('vi-VN') + ' W');
+                            // V12.11.1: bo dong "MUA EVN ..." gan cot EVN.
                             elGridMode.classList.add('buy');
+                            elGridMode.style.display = 'none';
+                            updateDOMText('lbl-grid-mode', '');
                         } else if (gridExportW > 0) {
-                            updateDOMText('lbl-grid-mode', 'ĐẨY EVN ' + gridExportW.toLocaleString('vi-VN') + ' W →');
+                            // Chi giu thong bao DAY EVN khi co export.
                             elGridMode.classList.add('sell');
+                            elGridMode.style.display = '';
+                            updateDOMText('lbl-grid-mode', 'ĐẨY EVN ' + gridExportW.toLocaleString('vi-VN') + ' W →');
                         } else {
-                            updateDOMText('lbl-grid-mode', 'CÂN BẰNG 0 W');
+                            // Can bang 0W khong can them chu.
                             elGridMode.classList.add('idle');
+                            elGridMode.style.display = 'none';
+                            updateDOMText('lbl-grid-mode', '');
                         }
                     }
 
