@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sosen Energy Dashboard V9 W-ONLY</title>
+    <title>Sosen Energy Dashboard V11 T1 GRID FINE</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <!-- Thư viện vẽ Biểu đồ Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -980,9 +980,230 @@
         .sun-lvl-4 { opacity: 0.95; filter: brightness(1.30) drop-shadow(0 0 18px rgba(255, 215, 0, 0.78)); }
         .sun-lvl-5 { opacity: 1.00; filter: brightness(1.48) drop-shadow(0 0 22px rgba(255, 215, 0, 0.88)); }
         .sun-lvl-6 { opacity: 1.00; filter: brightness(1.68) drop-shadow(0 0 28px rgba(255, 215, 0, 0.98)); }
+    
+        /* =====================================================
+           V12.11 CLOCK STATUS: GRID + ESP32 ngay tren khung dong ho
+           ===================================================== */
+        #update-clock.status-clock {
+            min-width: 172px;
+            padding: 6px 9px 7px 9px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            line-height: 1;
+        }
+
+        #clock-time-text {
+            font-size: 13px;
+            font-weight: 900;
+            color: #ff0000;
+            font-family: monospace;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        .clock-status-row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            line-height: 1;
+        }
+
+        .clock-grid-status,
+        #update-clock #device-status {
+            position: static;
+            inset: auto;
+            top: auto;
+            right: auto;
+            left: auto;
+            transform: none;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 2px 5px;
+            border-radius: 8px;
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: 0.15px;
+            white-space: nowrap;
+            pointer-events: none;
+            animation: none;
+            background: rgba(10, 16, 28, 0.12);
+            border: 1px solid rgba(0,0,0,0.07);
+            text-shadow: none;
+        }
+
+        .clock-grid-dot,
+        #update-clock #device-status .device-dot {
+            width: 6px;
+            height: 6px;
+            flex: 0 0 6px;
+            border-radius: 50%;
+        }
+
+        .clock-grid-status.on,
+        #update-clock #device-status.online {
+            color: #00a94f;
+            background: rgba(0, 204, 102, 0.10);
+        }
+        .clock-grid-status.on .clock-grid-dot,
+        #update-clock #device-status.online .device-dot {
+            background: #00cc66;
+            box-shadow: 0 0 6px rgba(0, 204, 102, 0.8);
+        }
+
+        .clock-grid-status.off,
+        #update-clock #device-status.offline {
+            color: #e32121;
+            background: rgba(255, 68, 68, 0.10);
+            animation: clockStatusBlink 1s ease-in-out infinite alternate;
+        }
+        .clock-grid-status.off .clock-grid-dot,
+        #update-clock #device-status.offline .device-dot {
+            background: #ff3333;
+            box-shadow: 0 0 6px rgba(255, 51, 51, 0.85);
+        }
+
+        .clock-grid-status.unknown,
+        .clock-grid-status.stale,
+        #update-clock #device-status.checking {
+            color: #b77900;
+            background: rgba(255, 193, 7, 0.10);
+        }
+        .clock-grid-status.unknown .clock-grid-dot,
+        .clock-grid-status.stale .clock-grid-dot,
+        #update-clock #device-status.checking .device-dot {
+            background: #ffb000;
+            box-shadow: 0 0 5px rgba(255, 176, 0, 0.75);
+        }
+        @keyframes clockStatusBlink {
+            from { opacity: 0.62; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            #update-clock.status-clock {
+                min-width: 146px;
+                padding: 5px 7px 6px 7px;
+                gap: 3px;
+            }
+            #clock-time-text { font-size: 11px; }
+            .clock-status-row { gap: 4px; }
+            .clock-grid-status,
+            #update-clock #device-status {
+                font-size: 7px;
+                padding: 2px 4px;
+                gap: 3px;
+            }
+            .clock-grid-dot,
+            #update-clock #device-status .device-dot {
+                width: 5px;
+                height: 5px;
+                flex-basis: 5px;
+            }
+        }
+
+    
+        /* =====================================================
+           V12.11.1 - COMPACT CLOCK FRAME
+           Nam gon giua vien phai inverter va vien phai diagram-panel.
+           ===================================================== */
+        #update-clock.status-clock {
+            top: 48%;
+            left: calc(50% + 66px);
+            right: 12px;
+            width: auto;
+            min-width: 0;
+            max-width: 150px;
+            transform: translateY(-50%) translateZ(0);
+            padding: 5px 6px 6px 6px;
+            border-radius: 9px;
+            gap: 3px;
+            letter-spacing: 0;
+            box-sizing: border-box;
+        }
+
+        #update-clock.status-clock::after { border-radius: 9px; }
+
+        #clock-time-text {
+            font-size: 12px;
+            letter-spacing: 1.2px;
+            line-height: 1;
+        }
+
+        .clock-status-row {
+            gap: 4px;
+            width: 100%;
+            flex-wrap: nowrap;
+        }
+
+        .clock-grid-status,
+        #update-clock #device-status {
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 2px 3px;
+            border-radius: 5px;
+            font-size: 7px;
+            gap: 3px;
+            letter-spacing: 0;
+        }
+
+        .clock-grid-dot,
+        #update-clock #device-status .device-dot {
+            width: 5px;
+            height: 5px;
+            flex: 0 0 5px;
+        }
+
+        @media (max-width: 600px) {
+            #update-clock.status-clock {
+                top: 48%;
+                left: calc(50% + 58px);
+                right: 8px;
+                width: auto;
+                min-width: 0;
+                max-width: none;
+                transform: translateY(-50%) translateZ(0);
+                padding: 4px 5px 5px 5px;
+                border-radius: 8px;
+                gap: 3px;
+            }
+
+            #update-clock.status-clock::after { border-radius: 8px; }
+
+            #clock-time-text {
+                font-size: 11px;
+                letter-spacing: 1px;
+            }
+
+            .clock-status-row { gap: 3px; }
+
+            .clock-grid-status,
+            #update-clock #device-status {
+                font-size: 6.8px;
+                padding: 2px;
+                border-radius: 4px;
+                gap: 2px;
+            }
+
+            .clock-grid-dot,
+            #update-clock #device-status .device-dot {
+                width: 4px;
+                height: 4px;
+                flex-basis: 4px;
+            }
+        }
+
     </style>
 </head>
-<body>
+<body data-dashboard-version="V12.11.1">
     <div class="app-container">
         <div class="diagram-panel">
             <div id="battery-mini-meter" class="battery-mini-meter idle">
@@ -990,8 +1211,19 @@
                 <div class="battery-mini-row"><span class="battery-mini-label">Áp</span><span class="battery-mini-value" id="mini-stat-v">-- V</span></div>
                 <div class="battery-mini-row"><span class="battery-mini-label">Dòng</span><span class="battery-mini-value" id="mini-stat-a">-- A</span></div>
             </div>
-            <div id="device-status" class="checking"><span class="device-dot"></span><span id="device-status-text">ĐANG KIỂM TRA</span></div>
-            <div id="update-clock">--:--:--</div>
+            <div id="update-clock" class="status-clock" title="Trạng thái lưới, ESP32 và thời điểm nhận dữ liệu gần nhất">
+                <div class="clock-status-row">
+                    <span id="clock-grid-status" class="clock-grid-status unknown">
+                        <span class="clock-grid-dot"></span>
+                        <span id="clock-grid-status-text">GRID --</span>
+                    </span>
+                    <span id="device-status" class="checking">
+                        <span class="device-dot"></span>
+                        <span id="device-status-text">ESP32 ...</span>
+                    </span>
+                </div>
+                <div id="clock-time-text">--:--:--</div>
+            </div>
 
             <div class="image-frame">
                 <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image" onerror="this.style.opacity='0'">
@@ -1031,7 +1263,7 @@
                 <h3>LƯỚI EVN</h3>
                 <div class="val" id="lbl-grid">0</div>
                 <div class="unit">W</div>
-                <div id="lbl-grid-mode" class="grid-live-mode idle">CÂN BẰNG 0 W</div>
+                <div id="lbl-grid-mode" class="grid-live-mode idle" style="display:none"></div>
             </div>
 
             <div class="node pos-batt corner-node">
@@ -1144,7 +1376,6 @@
     <script>
         // ================= HÀM ĐẾM SỐ MƯỢT TỰ ĐỘNG =================
         const numberAnimState = {};
-
         function animateValue(id, targetVal, formatFn, duration = 650) {
             const el = document.getElementById(id);
             if (!el) return;
@@ -1186,7 +1417,6 @@
                     state.frameId = null;
                 }
             }
-
             state.frameId = requestAnimationFrame(step);
         }
 
@@ -1209,6 +1439,7 @@
         function updateBackgroundByTimeAndPv(pvW = latestPvPowerW) {
             const pvPower = toSafeNumber(pvW);
             latestPvPowerW = pvPower;
+
             const hour = new Date().getHours();
             const isNightTime = hour >= 18 || hour < 6;
             const shouldShowStars = isNightTime && pvPower < 1;
@@ -1353,7 +1584,6 @@
         let chartResizeTimer = null;
         let chartLoadRequestId = 0;
         let chartRefreshTimer = null;
-
         const chartSeries = [
             { label: 'Sản lượng PV', key: 'pv', color: '#59ba35', border: '#48a927' },
             { label: 'Xả pin', key: 'batt', color: '#45a8de', border: '#278fc9' },
@@ -1397,6 +1627,7 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
                 ctx.font = '900 10px Nunito, sans-serif';
+
                 chart.data.datasets.forEach((dataset, datasetIndex) => {
                     const meta = chart.getDatasetMeta(datasetIndex);
                     meta.data.forEach((bar, index) => {
@@ -1858,6 +2089,7 @@
             animateValue('stat-bat-chg-total', toSafeNumber(data.Bat_Charge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
             
             animateValue('stat-pv-total', currentETotal, v => v.toFixed(1) + ' kWh');
+
             if (pvToday > 0 || loadToday > 0 || gridBuyToday > 0 || battDisToday > 0 || battChgToday > 0) {
                 queueEnergyHistorySave(pvToday, loadToday, gridBuyToday, battDisToday, battChgToday);
             }
@@ -1939,7 +2171,6 @@
                 const currentParticles = group.getAttribute('data-particles') || '';
                 const currentDashDuration = group.getAttribute('data-dash-duration') || '';
                 const needsRefresh = !currentActive || currentAnim !== animName || currentParticles !== String(intensity.particles) || currentDashDuration !== String(intensity.dashDuration);
-
                 if (needsRefresh) {
                     group.setAttribute('data-anim', animName);
                     group.setAttribute('data-particles', String(intensity.particles));
@@ -1998,7 +2229,7 @@
         }
 
         // ================= TRẠNG THÁI ONLINE / OFFLINE CỦA ESP32 =================
-        // Firmware V9 gửi Device_Heartbeat độc lập mỗi ~5 giây.
+        // Firmware V12 gửi Device_Heartbeat độc lập mỗi ~5 giây qua client Firebase riêng.
         // Quá 20 giây không thấy heartbeat mới => OFFLINE (4 nhịp heartbeat dự phòng).
         const DEVICE_OFFLINE_TIMEOUT_MS = 20000;
         const DEVICE_FIRST_CHECK_TIMEOUT_MS = 20000;
@@ -2010,6 +2241,42 @@
         let lastDeviceHeartbeat = null;
         let lastDeviceHeartbeatAt = 0;
         let lastLiveReceivedAt = 0;
+        let firebaseBrowserConnected = null;
+        let liveListenerPrimed = false;
+        let currentDeviceState = 'checking';
+
+        function setClockGridStatus(gridPresent, gridFresh = true) {
+            const box = document.getElementById('clock-grid-status');
+            const label = document.getElementById('clock-grid-status-text');
+            if (!box || !label) return;
+
+            box.classList.remove('on', 'off', 'unknown', 'stale');
+
+            // Neu ESP32/Firebase khong duoc xac nhan online, khong duoc dung data Grid cu
+            // de ket luan luoi hien tai ON/OFF.
+            if (currentDeviceState !== 'online') {
+                box.classList.add('unknown');
+                updateDOMText('clock-grid-status-text', 'GRID --');
+                return;
+            }
+
+            if (!gridFresh) {
+                box.classList.add('stale');
+                updateDOMText('clock-grid-status-text', 'GRID ?');
+                return;
+            }
+
+            if (gridPresent === true) {
+                box.classList.add('on');
+                updateDOMText('clock-grid-status-text', 'GRID ON');
+            } else if (gridPresent === false) {
+                box.classList.add('off');
+                updateDOMText('clock-grid-status-text', 'GRID OFF');
+            } else {
+                box.classList.add('unknown');
+                updateDOMText('clock-grid-status-text', 'GRID --');
+            }
+        }
 
         try {
             const storedHb = localStorage.getItem(DEVICE_HB_STORAGE_KEY);
@@ -2024,22 +2291,34 @@
             const box = document.getElementById('device-status');
             const text = document.getElementById('device-status-text');
             if (!box || !text) return;
-            box.classList.remove('online', 'offline', 'checking');
-            box.classList.add(state);
-            if (state === 'online') updateDOMText('device-status-text', 'THIẾT BỊ ONLINE');
-            else if (state === 'offline') updateDOMText('device-status-text', 'THIẾT BỊ OFFLINE');
-            else updateDOMText('device-status-text', 'ĐANG KIỂM TRA');
+
+            currentDeviceState = state;
+            box.classList.remove('online', 'offline', 'checking', 'firebase-offline');
+            box.classList.add(state === 'firebase-offline' ? 'checking' : state);
+
+            if (state === 'online') {
+                updateDOMText('device-status-text', 'ESP32 ON');
+            } else if (state === 'offline') {
+                updateDOMText('device-status-text', 'ESP32 OFF');
+                setClockGridStatus(null, false);
+            } else if (state === 'firebase-offline') {
+                updateDOMText('device-status-text', 'ESP32 ?');
+                setClockGridStatus(null, false);
+            } else {
+                updateDOMText('device-status-text', 'ESP32 ...');
+                setClockGridStatus(null, false);
+            }
         }
 
         // Đây KHÔNG phải đồng hồ chạy liên tục. Nó là thời điểm nhận gói Live mới nhất.
         // Chỉ đổi khi heartbeat của ESP32 đổi; khi ESP32 OFFLINE thì giá trị đứng yên.
         function renderLastLiveReceivedTime() {
             if (!(lastLiveReceivedAt > 0)) {
-                updateDOMText('update-clock', '--:--:--');
+                updateDOMText('clock-time-text', '--:--:--');
                 return;
             }
             const t = new Date(lastLiveReceivedAt);
-            updateDOMText('update-clock', t.toLocaleTimeString('vi-VN', { hour12: false }));
+            updateDOMText('clock-time-text', t.toLocaleTimeString('vi-VN', { hour12: false }));
         }
 
         function markLiveDataReceived(nowMs = Date.now()) {
@@ -2084,6 +2363,11 @@
 
         function updateDeviceStatusByTimeout() {
             const nowMs = Date.now();
+            // Neu chinh trinh duyet mat ket noi Firebase thi KHONG ket luan ESP32 offline.
+            if (firebaseBrowserConnected === false) {
+                setDeviceStatus('firebase-offline');
+                return;
+            }
             if (lastDeviceHeartbeatAt > 0) {
                 setDeviceStatus((nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS ? 'online' : 'offline');
             } else if ((nowMs - deviceStatusStartAt) >= DEVICE_FIRST_CHECK_TIMEOUT_MS) {
@@ -2102,6 +2386,18 @@
         let liveDomFrameId = null;
 
         if (database) {
+            // Tach 3 trang thai: ESP32 offline / trinh duyet mat Firebase / online.
+            database.ref('.info/connected').on('value', (snapshot) => {
+                firebaseBrowserConnected = snapshot.val() === true;
+                updateDeviceStatusByTimeout();
+            });
+
+            // V12.11 heartbeat nam o node /DeviceStatus rieng, khong kich hoat render ca /Live moi 5 giay.
+            database.ref('/SosenSystem/DeviceStatus').on('value', (snapshot) => {
+                const statusData = snapshot.val();
+                if (statusData) processDeviceHeartbeat(statusData);
+            });
+
             database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
                 latestDailyData = snapshot.val();
                 checkAndSwitchMonth();
@@ -2111,8 +2407,14 @@
 
             database.ref('/SosenSystem/Live').on('value', (snapshot) => {
                 pendingLiveData = snapshot.val();
-                if (pendingLiveData) processDeviceHeartbeat(pendingLiveData);
-                if (!pendingLiveData || liveDomFrameId !== null) return;
+                if (!pendingLiveData) return;
+
+                // Snapshot dau tien co the la cache/last-known cu. Chi cac event Live tiep theo
+                // moi duoc xem la thoi diem du lieu realtime vua den.
+                if (liveListenerPrimed) markLiveDataReceived(Date.now());
+                else liveListenerPrimed = true;
+
+                if (liveDomFrameId !== null) return;
 
                 liveDomFrameId = requestAnimationFrame(() => {
                     const data = pendingLiveData;
@@ -2120,7 +2422,7 @@
                     liveDomFrameId = null;
                     if (!data) return;
 
-                    // Power_Unit = W la schema chuan cua firmware V9.
+                    // Power_Unit = W la schema chuan cua firmware V12.11.
                     // Khong tu dong nhan/doi kW de tranh tai dien loi don vi cu.
 
                     const battVoltage = toSafeNumber(data.Batt_Voltage);
@@ -2128,34 +2430,66 @@
                     const battTemp = toSafeNumber(data.Batt_Temp, NaN);
                     const battTempFresh = data.Battery_Temp_Data_Fresh !== false && Number.isFinite(battTemp);
 
-                    // V9 W-ONLY: TOAN BO cong suat tu Firebase da la W.
+                    // V11 T1 GRID FINE: TOAN BO cong suat tu Firebase da la W.
                     // Khong con nhan *1000 cho PV.
                     const pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power)));
+                    // V11: Grid_Power (signed W) la gia tri chon tu 161/145 trong firmware.
+                    // Dung signed value lam nguon chinh de khong bi field Import/Export cu trong Firebase
+                    // che mat muc 10-20W. Import/Export chi fallback khi Grid_Power = 0.
                     const gridInW = Math.round(toSafeNumber(data.Grid_Power));
                     const gridImportRaw = Number(data.Grid_Import_Power);
                     const gridExportRaw = Number(data.Grid_Export_Power);
-                    const gridImportW = Number.isFinite(gridImportRaw)
-                        ? Math.max(0, Math.round(gridImportRaw))
-                        : Math.max(0, -gridInW);
-                    const gridExportW = Number.isFinite(gridExportRaw)
-                        ? Math.max(0, Math.round(gridExportRaw))
-                        : Math.max(0, gridInW);
+                    let gridImportW = Math.max(0, -gridInW);
+                    let gridExportW = Math.max(0, gridInW);
+                    if (gridInW === 0) {
+                        if (Number.isFinite(gridImportRaw) && gridImportRaw > 0) {
+                            gridImportW = Math.max(0, Math.round(gridImportRaw));
+                        }
+                        if (Number.isFinite(gridExportRaw) && gridExportRaw > 0) {
+                            gridExportW = Math.max(0, Math.round(gridExportRaw));
+                        }
+                    }
                     const gridDataFresh = data.Grid_Data_Fresh !== false;
                     const gridPresentKnown = typeof data.Grid_Present === 'boolean';
-                    const gridPresent = gridPresentKnown ? data.Grid_Present : true;
+                    const gridPresent = gridPresentKnown ? data.Grid_Present : null;
 
-                    // V9: uu tien cong suat pin truc tiep register 293 do ESP32 gui len, don vi W.
-                    // Fallback V*I chi de tuong thich khi field Batt_Power chua xuat hien.
+                    // V12.11: badge GRID ON/OFF nam ngay tren khung dong ho.
+                    // Chi hien ON/OFF khi ESP32 heartbeat dang online va Grid data fresh.
+                    setClockGridStatus(gridPresent, gridDataFresh && gridPresentKnown);
+
+                    // V11: Batt_Power da duoc firmware chon tu reg293/VxI.
+                    // Bao ve them o HTML: neu Batt_Power=0 do register 293 lam tron 10W
+                    // nhung BMS current van cho thay dong nho, dung V*I de khong mat luong pin.
                     const rawBattPower = Number(data.Batt_Power);
-                    const battInW = Number.isFinite(rawBattPower)
-                        ? Math.round(rawBattPower)
-                        : Math.round(battVoltage * battCurrent);
+                    const rawBattPowerVi = Number(data.Batt_Power_VI);
+                    const localBattPowerVi = battVoltage * battCurrent;
+                    let battInW = 0;
+                    if (Number.isFinite(rawBattPower) && Math.abs(rawBattPower) >= 1) {
+                        battInW = Math.round(rawBattPower);
+                    } else if (Number.isFinite(rawBattPowerVi) && Math.abs(rawBattPowerVi) >= 2) {
+                        battInW = Math.round(rawBattPowerVi);
+                    } else if (Number.isFinite(localBattPowerVi) && Math.abs(localBattPowerVi) >= 2) {
+                        battInW = Math.round(localBattPowerVi);
+                    } else if (Number.isFinite(rawBattPower)) {
+                        battInW = Math.round(rawBattPower);
+                    }
 
-                    // Load_Power tu Modbus da la W. Chi fallback can bang neu field chua co.
+                    // Can bang cong suat W: Load = PV + GridImport - GridExport + Batt(+xa/-sac).
+                    // V11 firmware doc 175/194/198 va gui Load_Power da chon.
+                    // Neu direct van =0 (topology khong map vao load register), dashboard dung balance.
+                    const balanceLoadW = Math.max(0, Math.round(
+                        pvInW + gridImportW - gridExportW + battInW
+                    ));
                     const rawLoadPower = Number(data.Load_Power);
-                    const loadInW = Number.isFinite(rawLoadPower)
-                        ? Math.max(0, Math.round(rawLoadPower))
-                        : Math.max(0, Math.round(pvInW - gridInW + battInW));
+                    const loadDataFresh = data.Load_Data_Fresh !== false;
+                    let loadInW = 0;
+                    if (loadDataFresh && Number.isFinite(rawLoadPower) && rawLoadPower >= 1) {
+                        loadInW = Math.round(rawLoadPower);
+                    } else if (balanceLoadW >= 20) {
+                        loadInW = balanceLoadW;
+                    } else if (Number.isFinite(rawLoadPower) && rawLoadPower >= 0) {
+                        loadInW = Math.round(rawLoadPower);
+                    }
                     updateBackgroundByTimeAndPv(pvInW);
 
                     animateValue('lbl-pv', pvInW, v => Math.round(v));
@@ -2178,9 +2512,9 @@
                         elGrid.style.color = '';
                         elGrid.style.textShadow = '';
 
-                        if (gridDataFresh && gridPresent && gridImportW > 0) {
+                        if (gridDataFresh && gridPresent === true && gridImportW > 0) {
                             elGrid.classList.add('val-grid-buy-style');
-                        } else if (gridDataFresh && gridPresent && gridExportW > 0) {
+                        } else if (gridDataFresh && gridPresent === true && gridExportW > 0) {
                             elGrid.classList.add('val-grid-sell-style');
                         } else {
                             elGrid.style.color = '#fff';
@@ -2190,21 +2524,32 @@
 
                     if (elGridMode) {
                         elGridMode.classList.remove('buy', 'sell', 'idle', 'no-grid', 'stale');
+
                         if (!gridDataFresh) {
-                            updateDOMText('lbl-grid-mode', '⚠ MẤT DATA LƯỚI');
+                            // Trang thai data Grid da nam o khung dong ho.
                             elGridMode.classList.add('stale');
-                        } else if (!gridPresent) {
-                            updateDOMText('lbl-grid-mode', '⚠ KHÔNG CÓ LƯỚI');
+                            elGridMode.style.display = 'none';
+                            updateDOMText('lbl-grid-mode', '');
+                        } else if (gridPresent === false) {
+                            // V12.11.1: bo dong "KHONG CO LUOI" gan cot EVN.
                             elGridMode.classList.add('no-grid');
+                            elGridMode.style.display = 'none';
+                            updateDOMText('lbl-grid-mode', '');
                         } else if (gridImportW > 0) {
-                            updateDOMText('lbl-grid-mode', '← MUA EVN ' + gridImportW.toLocaleString('vi-VN') + ' W');
+                            // V12.11.1: bo dong "MUA EVN ..." gan cot EVN.
                             elGridMode.classList.add('buy');
+                            elGridMode.style.display = 'none';
+                            updateDOMText('lbl-grid-mode', '');
                         } else if (gridExportW > 0) {
-                            updateDOMText('lbl-grid-mode', 'ĐẨY EVN ' + gridExportW.toLocaleString('vi-VN') + ' W →');
+                            // Chi giu thong bao DAY EVN khi co export.
                             elGridMode.classList.add('sell');
+                            elGridMode.style.display = '';
+                            updateDOMText('lbl-grid-mode', 'ĐẨY EVN ' + gridExportW.toLocaleString('vi-VN') + ' W →');
                         } else {
-                            updateDOMText('lbl-grid-mode', 'CÂN BẰNG 0 W');
+                            // Can bang 0W khong can them chu.
                             elGridMode.classList.add('idle');
+                            elGridMode.style.display = 'none';
+                            updateDOMText('lbl-grid-mode', '');
                         }
                     }
 
@@ -2235,6 +2580,7 @@
                         const toggle = document.getElementById('inv-switch-toggle');
                         const statusText = document.getElementById('switch-status-text');
                         const modalEl = document.getElementById('confirm-modal');
+
                         if (toggle && (!modalEl || !modalEl.classList.contains('active'))) {
                             toggle.checked = (data.Inv_Switch === 1);
                         }
@@ -2313,7 +2659,7 @@
                     else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW));
                     else setFlow('flow-batt', false);
 
-                    // V9 W-ONLY: dùng trực tiếp Import/Export do firmware gửi lên, don vi W.
+                    // V11 T1 GRID FINE: dùng trực tiếp Import/Export do firmware gửi lên, don vi W.
                     // MUA: EVN (bên phải) -> inverter, màu đỏ.
                     // ĐẨY: inverter -> EVN (bên phải), màu xanh.
                     if (!gridDataFresh || !gridPresent) {
@@ -2360,6 +2706,7 @@
                         statusText.innerText = "...";
                         statusText.style.color = "#ffaa00";
                     }
+
                     if (!database) {
                         if (statusText) {
                             statusText.innerText = "Lỗi!";
@@ -2380,6 +2727,7 @@
                 }
                 closeModal();
             });
+
             btnCancel.addEventListener('click', function() {
                 closeModal();
             });
@@ -2418,4 +2766,4 @@ if (database) setTimeout(autoSyncYesterdayHistory, 4000);
 
     </script>
 </body>
-</html>
+                    </html>
