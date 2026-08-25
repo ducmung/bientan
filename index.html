@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sosen Energy Dashboard V11 T1 GRID FINE</title>
+    <title>Sosen Energy Dashboard V12.11 - Full Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <!-- Thư viện vẽ Biểu đồ Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -50,137 +50,48 @@
             transform: translateZ(0);
         }
 
-        body.night-stars {
-            background: #000;
-        }
-
-        body.night-stars::before {
-            z-index: 0;
-            background: #000;
-        }
-
-        body.night-stars::after {
-            z-index: 0;
-            opacity: 0;
-            animation: none;
-        }
+        body.night-stars { background: #000; }
+        body.night-stars::before { z-index: 0; background: #000; }
+        body.night-stars::after { z-index: 0; opacity: 0; animation: none; }
 
         .app-container { 
-            position: relative; 
-            z-index: 1; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-            max-width: 1000px; 
-            margin: 0 auto; 
-            transform: translateZ(0); 
+            position: relative; z-index: 1; display: flex; flex-direction: column; gap: 20px; max-width: 1000px; margin: 0 auto; transform: translateZ(0); 
         }
 
         .diagram-panel {
-            position: relative; 
-            width: 100%; 
-            max-width: 500px; 
-            margin: 0 auto; 
-            aspect-ratio: 1 / 1.1;
+            position: relative; width: 100%; max-width: 500px; margin: 0 auto; aspect-ratio: 1 / 1.1;
             background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.42), rgba(255,255,255,0.22) 42%, rgba(255,255,255,0.35)), rgba(255, 255, 255, 0.45);
-            border-radius: 20px; 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.65);
-            backdrop-filter: blur(6px); 
-            -webkit-backdrop-filter: blur(6px); 
-            border: 1px solid rgba(255,255,255,0.42);
-            overflow: hidden; 
-            isolation: isolate; 
-            transform: translateZ(0);
+            border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.65);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.42);
+            overflow: hidden; isolation: isolate; transform: translateZ(0);
         }
 
         .diagram-panel::before {
-            content: "";
-            position: absolute;
-            inset: 8%;
-            border-radius: 50%;
-            background:
-                radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 2px),
-                conic-gradient(from 0deg, transparent, rgba(255,215,0,0.18), transparent, rgba(0,229,255,0.16), transparent);
-            animation: softSpin 22s linear infinite;
-            z-index: -1;
-            transform: translateZ(0);
+            content: ""; position: absolute; inset: 8%; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 2px), conic-gradient(from 0deg, transparent, rgba(255,215,0,0.18), transparent, rgba(0,229,255,0.16), transparent);
+            animation: softSpin 22s linear infinite; z-index: -1; transform: translateZ(0);
         }
 
         body.night-stars .diagram-panel {
-            background: #000;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85), inset 0 0 16px rgba(255,255,255,0.06), 0 0 28px rgba(0,229,255,0.16);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
+            background: #000; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85), inset 0 0 16px rgba(255,255,255,0.06), 0 0 28px rgba(0,229,255,0.16);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
         }
 
         body.night-stars .diagram-panel::before {
-            inset: 0;
-            border-radius: inherit;
-            z-index: 0;
-            opacity: 0.62;
-            background:
-                radial-gradient(2px 2px at 12% 11%, rgba(255,255,255,0.94), transparent),
-                radial-gradient(1.8px 1.8px at 43% 8%, rgba(255,247,205,0.9), transparent),
-                radial-gradient(1.8px 1.8px at 76% 18%, rgba(180,226,255,0.88), transparent),
-                radial-gradient(1.5px 1.5px at 20% 43%, rgba(185,230,255,0.86), transparent),
-                radial-gradient(1.6px 1.6px at 68% 34%, rgba(255,255,255,0.88), transparent),
-                radial-gradient(1.5px 1.5px at 82% 63%, rgba(255,255,255,0.82), transparent),
-                radial-gradient(2px 2px at 88% 46%, rgba(255,247,205,0.94), transparent),
-                radial-gradient(1.8px 1.8px at 27% 61%, rgba(170,220,255,0.86), transparent),
-                radial-gradient(1.5px 1.5px at 15% 76%, rgba(255,255,255,0.9), transparent),
-                radial-gradient(1.8px 1.8px at 58% 85%, rgba(180,226,255,0.88), transparent),
-                radial-gradient(2px 2px at 92% 82%, rgba(255,247,205,0.92), transparent),
-                radial-gradient(1.2px 1.2px at 34% 92%, rgba(255,255,255,0.8), transparent),
-                radial-gradient(1.6px 1.6px at 54% 22%, rgba(185,230,255,0.85), transparent),
-                radial-gradient(1.8px 1.8px at 38% 54%, rgba(255,255,255,0.95), transparent),
-                radial-gradient(2px 2px at 70% 70%, rgba(255,247,205,0.88), transparent),
-                radial-gradient(1.4px 1.4px at 8% 28%, rgba(255,255,255,0.82), transparent),
-                radial-gradient(1.5px 1.5px at 85% 25%, rgba(180,226,255,0.8), transparent),
-                radial-gradient(2.2px 2.2px at 45% 75%, rgba(255,255,255,0.9), transparent),
-                radial-gradient(1.8px 1.8px at 62% 12%, rgba(255,247,205,0.85), transparent),
-                radial-gradient(1.5px 1.5px at 95% 55%, rgba(255,255,255,0.88), transparent),
-                radial-gradient(1.6px 1.6px at 25% 88%, rgba(170,220,255,0.9), transparent),
-                radial-gradient(2px 2px at 50% 45%, rgba(255,255,255,0.92), transparent);
-            background-size: 100% 100%;
-            animation: panelStarTwinkle 2.2s ease-in-out infinite alternate;
-            pointer-events: none;
-            transform: translateZ(0);
+            inset: 0; border-radius: inherit; z-index: 0; opacity: 0.62;
+            background: radial-gradient(2px 2px at 12% 11%, rgba(255,255,255,0.94), transparent), radial-gradient(1.8px 1.8px at 43% 8%, rgba(255,247,205,0.9), transparent), radial-gradient(1.8px 1.8px at 76% 18%, rgba(180,226,255,0.88), transparent), radial-gradient(1.5px 1.5px at 20% 43%, rgba(185,230,255,0.86), transparent), radial-gradient(1.6px 1.6px at 68% 34%, rgba(255,255,255,0.88), transparent), radial-gradient(1.5px 1.5px at 82% 63%, rgba(255,255,255,0.82), transparent), radial-gradient(2px 2px at 88% 46%, rgba(255,247,205,0.94), transparent), radial-gradient(1.8px 1.8px at 27% 61%, rgba(170,220,255,0.86), transparent), radial-gradient(1.5px 1.5px at 15% 76%, rgba(255,255,255,0.9), transparent), radial-gradient(1.8px 1.8px at 58% 85%, rgba(180,226,255,0.88), transparent), radial-gradient(2px 2px at 92% 82%, rgba(255,247,205,0.92), transparent), radial-gradient(1.2px 1.2px at 34% 92%, rgba(255,255,255,0.8), transparent), radial-gradient(1.6px 1.6px at 54% 22%, rgba(185,230,255,0.85), transparent), radial-gradient(1.8px 1.8px at 38% 54%, rgba(255,255,255,0.95), transparent), radial-gradient(2px 2px at 70% 70%, rgba(255,247,205,0.88), transparent), radial-gradient(1.4px 1.4px at 8% 28%, rgba(255,255,255,0.82), transparent), radial-gradient(1.5px 1.5px at 85% 25%, rgba(180,226,255,0.8), transparent), radial-gradient(2.2px 2.2px at 45% 75%, rgba(255,255,255,0.9), transparent), radial-gradient(1.8px 1.8px at 62% 12%, rgba(255,247,205,0.85), transparent), radial-gradient(1.5px 1.5px at 95% 55%, rgba(255,255,255,0.88), transparent), radial-gradient(1.6px 1.6px at 25% 88%, rgba(170,220,255,0.9), transparent), radial-gradient(2px 2px at 50% 45%, rgba(255,255,255,0.92), transparent);
+            background-size: 100% 100%; animation: panelStarTwinkle 2.2s ease-in-out infinite alternate; pointer-events: none; transform: translateZ(0);
         }
 
-        @keyframes panelStarTwinkle {
-            from { opacity: 0.52; transform: scale(1) translateZ(0); }
-            55% { opacity: 1; transform: scale(1.006) translateZ(0); }
-            to { opacity: 0.76; transform: scale(1.012) translateZ(0); }
-        }
-
+        @keyframes panelStarTwinkle { from { opacity: 0.52; transform: scale(1) translateZ(0); } 55% { opacity: 1; transform: scale(1.006) translateZ(0); } to { opacity: 0.76; transform: scale(1.012) translateZ(0); } }
         @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
-        .diagram-panel::after,
-        .stat-card::after,
-        .node-center::after,
-        .image-frame::after,
-        #update-clock::after,
-        #lbl-inv-temp::after {
-            content: "";
-            position: absolute;
-            inset: -2px;
-            border-radius: inherit;
-            padding: 2px;
-            background: linear-gradient(90deg, 
-                #ff004c, #ff8c00, #ffd700, #00cc66, 
-                #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00
-            );
-            background-size: 200% 100%;
-            -webkit-mask:
-                linear-gradient(#000 0 0) content-box,
-                linear-gradient(#000 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-            animation:
-                rainbowSlide 3s linear infinite,
-                rainbowBorderGlow 1.5s ease-in-out infinite alternate;
-            transform: translateZ(0);
+        .diagram-panel::after, .stat-card::after, .node-center::after, .image-frame::after, #update-clock::after, #lbl-inv-temp::after {
+            content: ""; position: absolute; inset: -2px; border-radius: inherit; padding: 2px;
+            background: linear-gradient(90deg, #ff004c, #ff8c00, #ffd700, #00cc66, #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00);
+            background-size: 200% 100%; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+            animation: rainbowSlide 3s linear infinite, rainbowBorderGlow 1.5s ease-in-out infinite alternate; transform: translateZ(0);
         }
 
         .diagram-panel::after { z-index: 4; inset: 0; border-radius: 20px; }
@@ -191,10 +102,7 @@
         #lbl-inv-temp::after { z-index: -1; border-radius: 20px; }
 
         @keyframes rainbowSlide { to { background-position: -200% 0; } }
-        @keyframes rainbowBorderGlow {
-            from { opacity: 0.7; }
-            to { opacity: 1; }
-        }
+        @keyframes rainbowBorderGlow { from { opacity: 0.7; } to { opacity: 1; } }
 
         .node { position: absolute; transform: translate(-50%, -50%) translateZ(0); background: transparent; border: none; padding: 10px 4px; text-align: center; width: 90px; z-index: 10; }
         .pos-pv { top: 15%; left: 12%; }
@@ -207,19 +115,12 @@
         .image-frame {
             position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15;
             width: 140px; padding: 4px; border-radius: 15px; overflow: hidden;
-            background: linear-gradient(90deg, 
-                #ff004c, #ff8c00, #ffd700, #00cc66, 
-                #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00
-            );
-            background-size: 200% 100%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 12px rgba(0,229,255,0.32);
-            animation:
-                rainbowSlide 3s linear infinite,
-                rainbowBorderGlow 1.5s ease-in-out infinite alternate;
+            background: linear-gradient(90deg, #ff004c, #ff8c00, #ffd700, #00cc66, #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00);
+            background-size: 200% 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 12px rgba(0,229,255,0.32);
+            animation: rainbowSlide 3s linear infinite, rainbowBorderGlow 1.5s ease-in-out infinite alternate;
         }
         .image-frame img { position: relative; z-index: 1; width: 100%; height: auto; display: block; border-radius: 11px; transform: translateZ(0); }
 
-        /* Node Biến Tần Trung Tâm */
         .node-center {
             position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
             width: 115px; height: 125px; padding: 3px; background: #fff; border-radius: 15px;
@@ -235,43 +136,15 @@
         }
 
         .inv-switch-overlay {
-            position: absolute;
-            top: 3px;
-            right: 4px;
-            z-index: 25;
-            background: transparent;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1px;
-            padding: 0;
-            border: none;
-            box-shadow: none;
+            position: absolute; top: 3px; right: 4px; z-index: 25; background: transparent; display: flex;
+            flex-direction: column; align-items: center; gap: 1px; padding: 0; border: none; box-shadow: none;
         }
-        .switch.mini-switch {
-            width: 26px;
-            height: 13px;
-        }
-        .switch.mini-switch .slider:before {
-            height: 9px;
-            width: 9px;
-            left: 2px;
-            bottom: 2px;
-        }
-        .switch.mini-switch input:checked + .slider:before {
-            transform: translateX(13px) translateZ(0);
-        }
-        .mini-inv-status {
-            font-size: 8px;
-            font-weight: 900;
-            color: #00cc66;
-            white-space: nowrap;
-            line-height: 1;
-            margin-top: 1px;
-        }
-        .bpf-container {
-            position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15; text-align: center; width: 100%; pointer-events: none;
-        }
+        .switch.mini-switch { width: 26px; height: 13px; }
+        .switch.mini-switch .slider:before { height: 9px; width: 9px; left: 2px; bottom: 2px; }
+        .switch.mini-switch input:checked + .slider:before { transform: translateX(13px) translateZ(0); }
+        .mini-inv-status { font-size: 8px; font-weight: 900; color: #00cc66; white-space: nowrap; line-height: 1; margin-top: 1px; }
+        
+        .bpf-container { position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15; text-align: center; width: 100%; pointer-events: none; }
         .bpf-text {
             font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 32px; font-weight: 900; letter-spacing: 14px;
             position: relative; display: inline-block; background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
@@ -289,122 +162,36 @@
         .line-grid { top: 18%; right: 16%; transform-origin: right center; transform: rotate(-38deg) translateZ(0); }
         .line-batt { top: 82%; left: 16%; transform-origin: left center; transform: rotate(-38deg) translateZ(0); }
         .line-load { top: 82%; right: 16%; transform-origin: right center; transform: rotate(38deg) translateZ(0); }
+        
         #lbl-status {
-            position: relative; z-index: 1; display: block; margin: 0 0 5px 0;
-            transform: translateZ(0); font-size: 11px; font-weight: 900;
-            background: transparent; padding: 0; border-radius: 0; box-shadow: none;
-            color: #a8b0ba; text-align: center; white-space: nowrap; transition: color 0.5s;
+            position: relative; z-index: 1; display: block; margin: 0 0 5px 0; transform: translateZ(0); font-size: 11px; font-weight: 900;
+            background: transparent; padding: 0; border-radius: 0; box-shadow: none; color: #a8b0ba; text-align: center; white-space: nowrap; transition: color 0.5s;
         }
 
         .battery-mini-meter {
-            --mini-color: #888;
-            --mini-glow: rgba(255,255,255,0.45);
+            --mini-color: #888; --mini-glow: rgba(255,255,255,0.45);
             position: absolute; top: 50%; left: 18%; transform: translate(-50%, -50%) translateZ(0);
             z-index: 25; min-width: 112px; padding: 6px 9px 9px 9px; border-radius: 16px;
-            background: rgba(12, 18, 30, 0.72); border: 1px solid rgba(255,255,255,0.36);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 14px var(--mini-glow);
+            background: rgba(12, 18, 30, 0.72); border: 1px solid rgba(255,255,255,0.36); box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 14px var(--mini-glow);
             overflow: hidden; pointer-events: none; color: #fff;
         }
         .battery-mini-meter::before {
-            content: ""; position: absolute; inset: 0; opacity: 0.62;
-            background: linear-gradient(90deg, transparent 0%, var(--mini-glow) 48%, transparent 100%);
-            transform: translateX(-120%) translateZ(0);
-            animation: miniEnergySweep 1.7s linear infinite;
-            pointer-events: none;
+            content: ""; position: absolute; inset: 0; opacity: 0.62; background: linear-gradient(90deg, transparent 0%, var(--mini-glow) 48%, transparent 100%);
+            transform: translateX(-120%) translateZ(0); animation: miniEnergySweep 1.7s linear infinite; pointer-events: none;
         }
-        .battery-mini-meter.charge {
-            --mini-color: #00cc66;
-            --mini-glow: rgba(0, 204, 102, 0.48);
-        }
-        .battery-mini-meter.discharge {
-            --mini-color: #ff4444;
-            --mini-glow: rgba(255, 68, 68, 0.48);
-        }
-        .battery-mini-meter.idle {
-            --mini-color: #a8b0ba;
-            --mini-glow: rgba(168, 176, 186, 0.28);
-        }
-        .battery-mini-row {
-            position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between;
-            gap: 8px; font-size: 10px; font-weight: 900; line-height: 1.15;
-        }
+        .battery-mini-meter.charge { --mini-color: #00cc66; --mini-glow: rgba(0, 204, 102, 0.48); }
+        .battery-mini-meter.discharge { --mini-color: #ff4444; --mini-glow: rgba(255, 68, 68, 0.48); }
+        .battery-mini-meter.idle { --mini-color: #a8b0ba; --mini-glow: rgba(168, 176, 186, 0.28); }
+        .battery-mini-row { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10px; font-weight: 900; line-height: 1.15; }
         .battery-mini-row + .battery-mini-row { margin-top: 3px; }
         .battery-mini-label { color: rgba(255,255,255,0.78); }
-        .battery-mini-value {
-            color: #fff; text-shadow: 0 0 6px var(--mini-color), 0 1px 3px rgba(0,0,0,0.85);
-            font-variant-numeric: tabular-nums;
-        }
-        @keyframes miniEnergySweep {
-            to { transform: translateX(120%) translateZ(0); }
-        }
-
-        #device-status {
-            position: absolute;
-            top: 41.5%;
-            right: 18%;
-            transform: translate(50%, -50%) translateZ(0);
-            z-index: 26;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 0.35px;
-            white-space: nowrap;
-            pointer-events: none;
-            color: #ffd166;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 8px rgba(255,209,102,0.32);
-        }
-        #device-status .device-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            flex: 0 0 7px;
-            background: #ffd166;
-            box-shadow: 0 0 7px rgba(255,209,102,0.75);
-        }
-        #device-status.online {
-            color: #45ff91;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(69,255,145,0.48);
-        }
-        #device-status.online .device-dot {
-            background: #20e878;
-            box-shadow: 0 0 8px rgba(32,232,120,0.95), 0 0 14px rgba(32,232,120,0.45);
-        }
-        #device-status.offline {
-            color: #ff5555;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 10px rgba(255,68,68,0.6);
-            animation: deviceOfflineBlink 0.9s ease-in-out infinite alternate;
-        }
-        #device-status.offline .device-dot {
-            background: #ff2f2f;
-            box-shadow: 0 0 9px rgba(255,47,47,1), 0 0 16px rgba(255,47,47,0.55);
-        }
-        #device-status.checking {
-            color: #ffd166;
-        }
-        @keyframes deviceOfflineBlink {
-            from { opacity: 0.48; }
-            to { opacity: 1; }
-        }
-
-        #update-clock {
-            position: absolute; top: 48%; right: 18%; transform: translate(50%, -50%) translateZ(0);
-            font-size: 13px; font-weight: 900; color: #ff0000; font-family: monospace; background: rgba(255, 255, 255, 0.95);
-            padding: 6px 16px; border-radius: 20px; 
-            z-index: 25; letter-spacing: 1px; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1);
-        }
+        .battery-mini-value { color: #fff; text-shadow: 0 0 6px var(--mini-color), 0 1px 3px rgba(0,0,0,0.85); font-variant-numeric: tabular-nums; }
+        @keyframes miniEnergySweep { to { transform: translateX(120%) translateZ(0); } }
 
         .node h3 { font-size: 10px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
         .node .unit { font-size: 10px; color: rgba(255,255,255,0.86); font-weight: 800; }
-        .corner-node {
-            width: 96px; padding: 0 4px; display: flex; flex-direction: column; align-items: center; gap: 2px;
-        }
-        .corner-power {
-            order: 1; transform: translateY(-13px) translateZ(0); line-height: 1; position: relative; z-index: 12;
-            text-align: center; pointer-events: none;
-        }
+        .corner-node { width: 96px; padding: 0 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .corner-power { order: 1; transform: translateY(-13px) translateZ(0); line-height: 1; position: relative; z-index: 12; text-align: center; pointer-events: none; }
         .corner-power h3 { margin: 0 0 3px 0; }
         .corner-power .val { display: block; font-size: 18px; line-height: 1; }
         .corner-power .unit { display: block; line-height: 1.05; margin-top: 2px; }
@@ -414,223 +201,74 @@
         .pos-batt.corner-node .battery-body { width: 92px; height: 40px; border-radius: 5px; }
         .pos-batt.corner-node .battery-cap { width: 7px; height: 19px; border-radius: 0 4px 4px 0; }
         .pos-batt.corner-node #lbl-soc { font-size: 21px; }
+        
         .battery-temp-label {
-            order: 3;
-            position: relative;
-            z-index: 13;
-            margin-top: 1px;
-            transform: translate(4px, -1px) translateZ(0);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            min-width: auto;
-            padding: 0;
-            border-radius: 0;
-            font-size: 11px;
-            font-weight: 900;
-            line-height: 1.1;
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            white-space: nowrap;
-            pointer-events: none;
+            order: 3; position: relative; z-index: 13; margin-top: 1px; transform: translate(4px, -1px) translateZ(0); display: inline-flex;
+            align-items: center; justify-content: center; gap: 4px; min-width: auto; padding: 0; border-radius: 0; font-size: 11px;
+            font-weight: 900; line-height: 1.1; background: transparent; border: none; box-shadow: none; white-space: nowrap; pointer-events: none;
         }
-        .battery-temp-label .temp-icon {
-            color: rgba(255,255,255,0.82);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.75);
-        }
-        .battery-temp-label .temp-value {
-            color: #7dffb2;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,255,178,0.35);
-            transition: color 0.35s ease, text-shadow 0.35s ease;
-            font-variant-numeric: tabular-nums;
-        }
-        /* Trạng thái nhiệt độ pin: <18 mát, 18-29.9 xanh, 30-35.9 vàng, 36-42.9 đỏ, >=43 đỏ cảnh báo */
-        .battery-temp-label.temp-cool .temp-value {
-            color: #7ddfff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,223,255,0.38);
-        }
-        .battery-temp-label.temp-normal .temp-value {
-            color: #38ff7a;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 9px rgba(56,255,122,0.48);
-        }
-        .battery-temp-label.temp-warm .temp-value {
-            color: #ffd600;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 10px rgba(255,214,0,0.52);
-        }
-        .battery-temp-label.temp-hot .temp-value {
-            color: #ff3b30;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.88), 0 0 10px rgba(255,59,48,0.62);
-        }
-        .battery-temp-label.temp-danger .temp-value {
-            color: #ff1f1f;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.92), 0 0 8px #ff0000, 0 0 16px rgba(255,0,0,0.92);
-            animation: batteryTempDangerBlink 0.72s steps(2, end) infinite;
-        }
-        @keyframes batteryTempDangerBlink {
-            0%, 45% { opacity: 1; transform: scale(1) translateZ(0); filter: brightness(1.15); }
-            46%, 100% { opacity: 0.22; transform: scale(1.06) translateZ(0); filter: brightness(1.8); }
-        }
-        .battery-temp-label.temp-stale .temp-value {
-            color: #a8b0ba;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.75);
-            animation: none;
-        }
+        .battery-temp-label .temp-icon { color: rgba(255,255,255,0.82); text-shadow: 0 1px 3px rgba(0,0,0,0.75); }
+        .battery-temp-label .temp-value { color: #7dffb2; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,255,178,0.35); transition: color 0.35s ease, text-shadow 0.35s ease; font-variant-numeric: tabular-nums; }
+        .battery-temp-label.temp-cool .temp-value { color: #7ddfff; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,223,255,0.38); }
+        .battery-temp-label.temp-normal .temp-value { color: #38ff7a; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 9px rgba(56,255,122,0.48); }
+        .battery-temp-label.temp-warm .temp-value { color: #ffd600; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 10px rgba(255,214,0,0.52); }
+        .battery-temp-label.temp-hot .temp-value { color: #ff3b30; text-shadow: 0 1px 3px rgba(0,0,0,0.88), 0 0 10px rgba(255,59,48,0.62); }
+        .battery-temp-label.temp-danger .temp-value { color: #ff1f1f; text-shadow: 0 1px 3px rgba(0,0,0,0.92), 0 0 8px #ff0000, 0 0 16px rgba(255,0,0,0.92); animation: batteryTempDangerBlink 0.72s steps(2, end) infinite; }
+        @keyframes batteryTempDangerBlink { 0%, 45% { opacity: 1; transform: scale(1) translateZ(0); filter: brightness(1.15); } 46%, 100% { opacity: 0.22; transform: scale(1.06) translateZ(0); filter: brightness(1.8); } }
+        .battery-temp-label.temp-stale .temp-value { color: #a8b0ba; text-shadow: 0 1px 3px rgba(0,0,0,0.75); animation: none; }
+        
         .pos-load.corner-node .icon { margin: -10px auto 0 auto; transform: translate(6px, 3px) translateZ(0); }
         .pos-load.corner-node .img-icon { width: 78px; height: 78px; margin: -8px auto 0 auto; }
         
-        .icon { 
-            font-size: 46px; 
-            line-height: 1;
-            margin-bottom: 8px; 
-            display: inline-block;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); 
-        }
+        .icon { font-size: 46px; line-height: 1; margin-bottom: 8px; display: inline-block; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
         .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)); }
-        
-        .img-icon {
-            width: 85px; 
-            height: 85px;
-            object-fit: cover;
-            display: block;
-            margin: -10px auto 5px auto;
-            filter: brightness(1.1) contrast(1.1);
-            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%);
-            mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%);
-            transform: translateZ(0);
-        }
-
+        .img-icon { width: 85px; height: 85px; object-fit: cover; display: block; margin: -10px auto 5px auto; filter: brightness(1.1) contrast(1.1); -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); transform: translateZ(0); }
         .pos-load .icon { filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.8)); }
 
-        .battery-wrapper { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            margin: 10px auto 5px auto; 
-            position: relative; 
-            cursor: pointer; 
-            transition: transform 0.2s ease, filter 0.2s ease;
-            transform: translateZ(0);
-        }
-        .battery-wrapper:hover { 
-            transform: scale(1.05) translateZ(0); 
-            filter: drop-shadow(0 0 8px rgba(0, 204, 102, 0.5)); 
-        }
-        
-        .battery-body {
-            width: 72px; height: 32px;
-            background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%);
-            border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); border-right: 1px solid #111;
-            position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8); transform: translateZ(0);
-        }
+        .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; cursor: pointer; transition: transform 0.2s ease, filter 0.2s ease; transform: translateZ(0); }
+        .battery-wrapper:hover { transform: scale(1.05) translateZ(0); filter: drop-shadow(0 0 8px rgba(0, 204, 102, 0.5)); }
+        .battery-body { width: 72px; height: 32px; background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%); border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); border-right: 1px solid #111; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8); transform: translateZ(0); }
         .battery-body::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.05) 100%); pointer-events: none; z-index: 2; }
         .battery-cap { width: 5px; height: 14px; background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%); border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.3); border-left: none; box-shadow: inset 1px 0 3px rgba(255,255,255,0.6); }
-        .battery-fill {
-            height: 100%; width: 0%; transition: width 0.5s ease-in-out, background 0.5s;
-            position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); transform: translateZ(0);
-        }
+        .battery-fill { height: 100%; width: 0%; transition: width 0.5s ease-in-out, background 0.5s; position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); transform: translateZ(0); }
         .fill-red { background: linear-gradient(to bottom, #ff5555 0%, #ffaaaa 30%, #ff2222 70%, #aa0000 100%); }
         .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
         .fill-green { background: linear-gradient(to bottom, #00ee77 0%, #88ffbb 30%, #00bb55 70%, #007733 100%); }
-
-        #lbl-soc {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
-            z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a; 
-            text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6);
-            letter-spacing: 1px; margin: 0; 
-        }
-        .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
+        #lbl-soc { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a; text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6); letter-spacing: 1px; margin: 0; }
         
-        /* CÁC STYLE MÀU CHỮ NỔI 3D CHO TỪNG LUỒNG NĂNG LƯỢNG (RÕ NÉT TRÊN NỀN SÁNG) */
+        .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
         .val-pv-style { color: #ffffff !important; text-shadow: 0 1px 0 #b45309, 0 2px 0 #92400e, 0 3px 0 #78350f, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(245, 158, 11, 0.9) !important; font-size: 18px; }
         .val-load-style { color: #ffffff !important; text-shadow: 0 1px 0 #1d4ed8, 0 2px 0 #1e40af, 0 3px 0 #1e3a8a, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(59, 130, 246, 0.9) !important; font-size: 18px; }
         .val-grid-buy-style { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
         .val-grid-sell-style { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
-
-        /* V8.1 - Nhãn trực tiếp MUA/ĐẨY điện lưới */
         .pos-grid { width: 118px; }
-        .grid-live-mode {
-            margin-top: 4px;
-            min-height: 15px;
-            font-size: 10px;
-            font-weight: 900;
-            line-height: 1.15;
-            letter-spacing: 0.1px;
-            white-space: nowrap;
-            transition: color 0.25s ease, text-shadow 0.25s ease, opacity 0.25s ease;
-            font-variant-numeric: tabular-nums;
-        }
-        .grid-live-mode.buy {
-            color: #ff5b6e;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(255,68,68,0.55);
-        }
-        .grid-live-mode.sell {
-            color: #22e58a;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(0,204,102,0.55);
-        }
-        .grid-live-mode.idle {
-            color: rgba(255,255,255,0.9);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.75);
-        }
-        .grid-live-mode.no-grid,
-        .grid-live-mode.stale {
-            color: #ffb74d;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 8px rgba(255,183,77,0.4);
-        }
-        
+        .grid-live-mode { margin-top: 4px; min-height: 15px; font-size: 10px; font-weight: 900; line-height: 1.15; letter-spacing: 0.1px; white-space: nowrap; transition: color 0.25s ease, text-shadow 0.25s ease, opacity 0.25s ease; font-variant-numeric: tabular-nums; }
+        .grid-live-mode.buy { color: #ff5b6e; text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(255,68,68,0.55); }
+        .grid-live-mode.sell { color: #22e58a; text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(0,204,102,0.55); }
+        .grid-live-mode.idle { color: rgba(255,255,255,0.9); text-shadow: 0 1px 3px rgba(0,0,0,0.75); }
+        .grid-live-mode.no-grid, .grid-live-mode.stale { color: #ffb74d; text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 8px rgba(255,183,77,0.4); }
         .val-charge { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
         .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
+        
         .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; transform: translateZ(0); }
         .flow-track {
-            position: absolute; top: 50%; left: -4%; width: 108%; height: 8px;
-            transform: translateY(-50%) translateZ(0); border-radius: 999px;
-            background:
-                repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 9px, rgba(255,255,255,0.86) 10px 12px, rgba(255,255,255,0) 13px 22px),
-                linear-gradient(90deg, rgba(255,255,255,0.04) 0%, var(--c) 18%, #ffffff 50%, var(--c) 82%, rgba(255,255,255,0.04) 100%);
-            background-size: 44px 100%, 100% 100%;
-            box-shadow: 0 0 8px var(--c), inset 0 0 5px rgba(255,255,255,0.75);
-            opacity: 0.9;
-            animation: electricWireSlide var(--wire-speed, 1s) linear infinite;
-            z-index: 1;
+            position: absolute; top: 50%; left: -4%; width: 108%; height: 8px; transform: translateY(-50%) translateZ(0); border-radius: 999px;
+            background: repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 9px, rgba(255,255,255,0.86) 10px 12px, rgba(255,255,255,0) 13px 22px), linear-gradient(90deg, rgba(255,255,255,0.04) 0%, var(--c) 18%, #ffffff 50%, var(--c) 82%, rgba(255,255,255,0.04) 100%);
+            background-size: 44px 100%, 100% 100%; box-shadow: 0 0 8px var(--c), inset 0 0 5px rgba(255,255,255,0.75); opacity: 0.9; animation: electricWireSlide var(--wire-speed, 1s) linear infinite; z-index: 1;
         }
-        .flow-track::before {
-            content: ''; position: absolute; left: -10px; right: -10px; top: 50%; height: 20px;
-            transform: translateY(-50%) translateZ(0); border-radius: 999px;
-            background: radial-gradient(ellipse at center, var(--c) 0%, rgba(255,255,255,0.08) 36%, rgba(255,255,255,0) 72%);
-            opacity: 0.38; z-index: -1;
-        }
-        .flow-track::after {
-            content: ''; position: absolute; left: 2%; right: 2%; top: 50%; height: 2px;
-            transform: translateY(-50%) translateZ(0); border-radius: 999px;
-            background: linear-gradient(90deg, rgba(255,255,255,0.15), #ffffff 48%, rgba(255,255,255,0.15));
-            box-shadow: 0 0 7px #fff;
-        }
+        .flow-track::before { content: ''; position: absolute; left: -10px; right: -10px; top: 50%; height: 20px; transform: translateY(-50%) translateZ(0); border-radius: 999px; background: radial-gradient(ellipse at center, var(--c) 0%, rgba(255,255,255,0.08) 36%, rgba(255,255,255,0) 72%); opacity: 0.38; z-index: -1; }
+        .flow-track::after { content: ''; position: absolute; left: 2%; right: 2%; top: 50%; height: 2px; transform: translateY(-50%) translateZ(0); border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,0.15), #ffffff 48%, rgba(255,255,255,0.15)); box-shadow: 0 0 7px #fff; }
         .flow-dash {
             position: absolute; top: 50%; width: 13px; height: 13px; border-radius: 50%; opacity: 0; z-index: 3;
-            background: radial-gradient(circle at 35% 35%, #ffffff 0 18%, rgba(255,255,255,0.95) 19% 30%, var(--c) 46%, rgba(255,255,255,0) 74%);
-            box-shadow: 0 0 8px #fff, 0 0 14px var(--c);
-            transform: translate(-50%, -50%) translateZ(0);
+            background: radial-gradient(circle at 35% 35%, #ffffff 0 18%, rgba(255,255,255,0.95) 19% 30%, var(--c) 46%, rgba(255,255,255,0) 74%); box-shadow: 0 0 8px #fff, 0 0 14px var(--c); transform: translate(-50%, -50%) translateZ(0);
         }
-        .flow-dash::before {
-            content: ''; position: absolute; top: 50%; width: 34px; height: 4px; border-radius: 999px;
-            transform: translateY(-50%) translateZ(0); opacity: 0.82;
-        }
+        .flow-dash::before { content: ''; position: absolute; top: 50%; width: 34px; height: 4px; border-radius: 999px; transform: translateY(-50%) translateZ(0); opacity: 0.82; }
         .dir-right .flow-dash::before { right: 8px; background: linear-gradient(90deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
         .dir-left .flow-dash::before { left: 8px; background: linear-gradient(270deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
-        .flow-dash::after {
-            content: ''; position: absolute; width: 3px; height: 3px; border-radius: 50%;
-            top: -3px; right: 1px; background: #ffffff;
-            box-shadow: -8px 9px 0 rgba(255,255,255,0.74), 6px 11px 0 var(--c);
-        }
-        .flow-spark {
-            position: absolute; top: 50%; width: 4px; height: 4px; border-radius: 50%; opacity: 0; z-index: 4;
-            background: #ffffff; box-shadow: 0 0 6px #fff, 0 0 13px var(--c);
-            transform: translate(-50%, -50%) translateZ(0);
-        }
+        .flow-dash::after { content: ''; position: absolute; width: 3px; height: 3px; border-radius: 50%; top: -3px; right: 1px; background: #ffffff; box-shadow: -8px 9px 0 rgba(255,255,255,0.74), 6px 11px 0 var(--c); }
+        .flow-spark { position: absolute; top: 50%; width: 4px; height: 4px; border-radius: 50%; opacity: 0; z-index: 4; background: #ffffff; box-shadow: 0 0 6px #fff, 0 0 13px var(--c); transform: translate(-50%, -50%) translateZ(0); }
         .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.28s; } .flow-dash:nth-child(4) { animation-delay: 0.56s; } .flow-dash:nth-child(5) { animation-delay: 0.84s; } .flow-dash:nth-child(6) { animation-delay: 1.12s; } .flow-dash:nth-child(7) { animation-delay: 1.40s; } .flow-dash:nth-child(8) { animation-delay: 1.68s; }
         .flow-spark:nth-child(9) { animation-delay: 0.12s; } .flow-spark:nth-child(10) { animation-delay: 0.38s; } .flow-spark:nth-child(11) { animation-delay: 0.72s; } .flow-spark:nth-child(12) { animation-delay: 1.02s; } .flow-spark:nth-child(13) { animation-delay: 1.34s; } .flow-spark:nth-child(14) { animation-delay: 1.66s; }
-        
         @keyframes electricWireSlide { to { background-position: 44px 0, 0 0; } }
         @keyframes flowInL { 0% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
         @keyframes flowOutL { 0% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
@@ -640,181 +278,30 @@
         @keyframes sparkLeft { 0% { left: 105%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.35) translateZ(0); } 12% { opacity: 1; } 36% { top: 62%; } 62% { top: 38%; } 100% { left: -5%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65) translateZ(0); } }
 
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
-        .stat-card {
-            position: relative; overflow: hidden;
-            background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255, 255, 255, 0.78));
-            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-            border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateZ(0); 
-        }
-        .stat-card::before {
-            content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%);
-            transform: translateX(-120%) translateZ(0); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none;
-        }
+        .stat-card { position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255, 255, 255, 0.78)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateZ(0); }
+        .stat-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%); transform: translateX(-120%) translateZ(0); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none; }
         @keyframes cardSheen { 0%, 48% { transform: translateX(-120%) translateZ(0); } 78%, 100% { transform: translateX(120%) translateZ(0); } }
 
-        /* Biểu đồ năng lượng */
-        .energy-chart-card {
-            padding: 14px;
-            background: rgba(255,255,255,0.94);
-        }
-        .energy-chart-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 2;
-        }
-        .chart-btn-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .chart-btn {
-            min-width: 74px;
-            border: 0;
-            background: #e8e8e8;
-            color: #111;
-            padding: 10px 14px;
-            border-radius: 24px;
-            font-size: 13px;
-            font-weight: 900;
-            letter-spacing: 0;
-            cursor: pointer;
-            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.08);
-            transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
-        }
-        .chart-btn:active,
-        .chart-nav-btn:active,
-        .day-nav-btn:active { transform: translateY(1px); }
-        .chart-btn.active {
-            background: #11c878;
-            color: #fff;
-            box-shadow: 0 6px 14px rgba(17,200,120,0.28);
-        }
-        .chart-period-control {
-            display: grid;
-            grid-template-columns: 30px minmax(118px, 1fr) 30px;
-            align-items: center;
-            min-width: 206px;
-            background: #fff;
-            border: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        .chart-nav-btn,
-        .day-nav-btn {
-            height: 38px;
-            border: 0;
-            background: transparent;
-            color: #8b8b8b;
-            font-size: 26px;
-            font-weight: 900;
-            line-height: 1;
-            cursor: pointer;
-        }
-        .chart-period-label {
-            min-width: 118px;
-            height: 38px;
-            display: grid;
-            place-items: center;
-            border-left: 1px solid rgba(0,0,0,0.08);
-            border-right: 1px solid rgba(0,0,0,0.08);
-            color: #111;
-            font-size: 20px;
-            font-weight: 900;
-            letter-spacing: 0;
-            white-space: nowrap;
-        }
-        .chart-stage {
-            position: relative;
-            height: 275px;
-            width: 100%;
-            margin-top: 8px;
-            padding-top: 30px;
-        }
-        .chart-day-corner {
-            position: absolute;
-            top: 0;
-            right: 2px;
-            z-index: 3;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(255,255,255,0.92);
-            border: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-radius: 18px;
-            padding: 1px 7px;
-        }
-        .day-nav-btn {
-            width: 24px;
-            height: 26px;
-            font-size: 19px;
-            color: #777;
-        }
-        .chart-selected-label {
-            min-width: 68px;
-            text-align: center;
-            color: #111;
-            font-size: 12px;
-            font-weight: 900;
-            white-space: nowrap;
-        }
-        .chart-detail-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 8px;
-            margin-top: 12px;
-            position: relative;
-            z-index: 2;
-        }
-        .chart-detail-card {
-            border: 1px solid rgba(0,0,0,0.08);
-            background: #fff;
-            border-radius: 8px;
-            padding: 10px 8px;
-            min-height: 78px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.07);
-            overflow: hidden;
-        }
-        .chart-detail-card .label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #4a4a4a;
-            font-size: 11px;
-            font-weight: 900;
-            line-height: 1.2;
-            white-space: nowrap;
-        }
-        .chart-color-dot {
-            flex: 0 0 10px;
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-        }
-        .chart-detail-card .value {
-            margin-top: 8px;
-            color: #111;
-            font-size: 22px;
-            font-weight: 900;
-            line-height: 1;
-            white-space: nowrap;
-        }
-        .chart-detail-card .sub {
-            margin-top: 6px;
-            color: #777;
-            font-size: 10px;
-            font-weight: 800;
-            white-space: nowrap;
-        }
-        .dot-pv { background: #59ba35; }
-        .dot-batt { background: #45a8de; }
-        .dot-charge { background: #3322c9; }
-        .dot-load { background: #ffa247; }
+        .energy-chart-card { padding: 14px; background: rgba(255,255,255,0.94); }
+        .energy-chart-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 2; }
+        .chart-btn-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .chart-btn { min-width: 74px; border: 0; background: #e8e8e8; color: #111; padding: 10px 14px; border-radius: 24px; font-size: 13px; font-weight: 900; letter-spacing: 0; cursor: pointer; box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease; }
+        .chart-btn:active, .chart-nav-btn:active, .day-nav-btn:active { transform: translateY(1px); }
+        .chart-btn.active { background: #11c878; color: #fff; box-shadow: 0 6px 14px rgba(17,200,120,0.28); }
+        .chart-period-control { display: grid; grid-template-columns: 30px minmax(118px, 1fr) 30px; align-items: center; min-width: 206px; background: #fff; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .chart-nav-btn, .day-nav-btn { height: 38px; border: 0; background: transparent; color: #8b8b8b; font-size: 26px; font-weight: 900; line-height: 1; cursor: pointer; }
+        .chart-period-label { min-width: 118px; height: 38px; display: grid; place-items: center; border-left: 1px solid rgba(0,0,0,0.08); border-right: 1px solid rgba(0,0,0,0.08); color: #111; font-size: 20px; font-weight: 900; letter-spacing: 0; white-space: nowrap; }
+        .chart-stage { position: relative; height: 275px; width: 100%; margin-top: 8px; padding-top: 30px; }
+        .chart-day-corner { position: absolute; top: 0; right: 2px; z-index: 3; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.92); border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 18px; padding: 1px 7px; }
+        .day-nav-btn { width: 24px; height: 26px; font-size: 19px; color: #777; }
+        .chart-selected-label { min-width: 68px; text-align: center; color: #111; font-size: 12px; font-weight: 900; white-space: nowrap; }
+        .chart-detail-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; position: relative; z-index: 2; }
+        .chart-detail-card { border: 1px solid rgba(0,0,0,0.08); background: #fff; border-radius: 8px; padding: 10px 8px; min-height: 78px; box-shadow: 0 3px 10px rgba(0,0,0,0.07); overflow: hidden; }
+        .chart-detail-card .label { display: flex; align-items: center; gap: 5px; color: #4a4a4a; font-size: 11px; font-weight: 900; line-height: 1.2; white-space: nowrap; }
+        .chart-color-dot { flex: 0 0 10px; width: 10px; height: 10px; border-radius: 2px; }
+        .chart-detail-card .value { margin-top: 8px; color: #111; font-size: 22px; font-weight: 900; line-height: 1; white-space: nowrap; }
+        .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
+        .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
 
         @media (max-width: 620px) {
             .energy-chart-toolbar { align-items: stretch; flex-direction: column; }
@@ -839,62 +326,20 @@
         input:checked + .slider { background-color: #00cc66; box-shadow: 0 0 14px rgba(0,204,102,0.35); }
         input:checked + .slider:before { transform: translateX(24px) translateZ(0); }
 
-        /* Modal Xác Nhận Bật/Tắt Biến Tần */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .modal-box {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 22px 24px;
-            max-width: 320px;
-            width: 88%;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            transform: scale(0.85);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .modal-overlay.active .modal-box {
-            transform: scale(1);
-        }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-box { background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 22px 24px; max-width: 320px; width: 88%; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.8); transform: scale(0.85); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-overlay.active .modal-box { transform: scale(1); }
         .modal-icon { font-size: 38px; margin-bottom: 6px; }
         .modal-title { font-size: 16px; font-weight: 900; color: #111; margin-bottom: 6px; }
         .modal-msg { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 18px; line-height: 1.4; }
         .modal-actions { display: flex; gap: 10px; justify-content: center; }
-        .modal-btn {
-            flex: 1;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 13px;
-            border: none;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-        }
+        .modal-btn { flex: 1; padding: 10px 14px; border-radius: 12px; font-weight: 800; font-size: 13px; border: none; cursor: pointer; transition: transform 0.2s, background 0.2s; }
         .modal-btn-confirm { background: #00cc66; color: #fff; box-shadow: 0 4px 12px rgba(0, 204, 102, 0.4); }
         .modal-btn-cancel { background: #eee; color: #444; }
         .modal-btn:active { transform: scale(0.95); }
 
-        /* Responsive */
         @media (max-width: 400px) {
-            #device-status { top: 42%; font-size: 8.5px; gap: 4px; }
-            #device-status .device-dot { width: 6px; height: 6px; flex-basis: 6px; }
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 10px; }
             .bpf-text { font-size: 26px; letter-spacing: 8px; }
@@ -910,300 +355,43 @@
             .stats-panel { flex: 1; justify-content: center; }
         }
 
-        /* Mặt trời Canvas & Các cấp độ hiển thị (Cấp 0 -> Cấp 6) */
         .solar-sun-box{ width: 82px; height: 82px; margin: auto; position: relative; transform: translate(-8px, -6px) translateZ(0); }
         #solar-sun{ width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; transition: all 0.5s ease; transform: translateZ(0); }
-        
-        #sun-canvas {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) translateZ(0);
-            width: 230px;
-            height: 230px;
-            pointer-events: none;
-            z-index: 0;
-            transition: filter 0.5s ease;
-        }
-
-        .sun-core{
-            position: relative;
-            z-index: 2;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background:
-                radial-gradient(circle,
-                #ffffff 0%,
-                #fff8c8 20%,
-                #ffe56a 45%,
-                #ffbf00 75%,
-                #ff9800 100%);
-            box-shadow:
-                0 0 20px #fff7c5,
-                0 0 40px #ffd700,
-                0 0 80px #ffb300,
-                0 0 120px rgba(255,190,0,.7);
-            animation: sunPulse 2s ease-in-out infinite;
-            transform: translateZ(0);
-        }
-
-        #solar-sun::before{
-            content:"";
-            position:absolute;
-            width:112px;
-            height:112px;
-            border-radius:50%;
-            background:
-                radial-gradient(circle,
-                rgba(255,255,255,.55),
-                rgba(255,220,80,.2) 40%,
-                transparent 75%);
-            animation: haloPulse 2.5s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 1;
-            transform: translateZ(0);
-        }
-
+        #sun-canvas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0); width: 230px; height: 230px; pointer-events: none; z-index: 0; transition: filter 0.5s ease; }
+        .sun-core{ position: relative; z-index: 2; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle, #ffffff 0%, #fff8c8 20%, #ffe56a 45%, #ffbf00 75%, #ff9800 100%); box-shadow: 0 0 20px #fff7c5, 0 0 40px #ffd700, 0 0 80px #ffb300, 0 0 120px rgba(255,190,0,.7); animation: sunPulse 2s ease-in-out infinite; transform: translateZ(0); }
+        #solar-sun::before{ content:""; position:absolute; width:112px; height:112px; border-radius:50%; background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,220,80,.2) 40%, transparent 75%); animation: haloPulse 2.5s ease-in-out infinite; pointer-events: none; z-index: 1; transform: translateZ(0); }
         @keyframes sunPulse{ 0%{ transform: scale(1) translateZ(0); opacity: 0.9; } 50%{ transform: scale(1.05) translateZ(0); opacity: 1; } 100%{ transform: scale(1) translateZ(0); opacity: 0.9; } }
-        
-        @keyframes haloPulse{
-            0%{ opacity: 0.7; transform: scale(1) translateZ(0); }
-            50%{ opacity: 1; transform: scale(1.1) translateZ(0); }
-            100%{ opacity: 0.7; transform: scale(1) translateZ(0); }
-        }
+        @keyframes haloPulse{ 0%{ opacity: 0.7; transform: scale(1) translateZ(0); } 50%{ opacity: 1; transform: scale(1.1) translateZ(0); } 100%{ opacity: 0.7; transform: scale(1) translateZ(0); } }
 
-        .sun-lvl-0 { opacity: 0.15; filter: brightness(0.25) grayscale(0.8); }
-        .sun-lvl-1 { opacity: 0.55; filter: brightness(0.68) drop-shadow(0 0 5px rgba(255, 215, 0, 0.28)); }
-        .sun-lvl-2 { opacity: 0.72; filter: brightness(0.90) drop-shadow(0 0 10px rgba(255, 215, 0, 0.50)); }
-        .sun-lvl-3 { opacity: 0.85; filter: brightness(1.10) drop-shadow(0 0 14px rgba(255, 215, 0, 0.65)); }
-        .sun-lvl-4 { opacity: 0.95; filter: brightness(1.30) drop-shadow(0 0 18px rgba(255, 215, 0, 0.78)); }
-        .sun-lvl-5 { opacity: 1.00; filter: brightness(1.48) drop-shadow(0 0 22px rgba(255, 215, 0, 0.88)); }
-        .sun-lvl-6 { opacity: 1.00; filter: brightness(1.68) drop-shadow(0 0 28px rgba(255, 215, 0, 0.98)); }
-    
-        /* =====================================================
-           V12.11 CLOCK STATUS: GRID + ESP32 ngay tren khung dong ho
-           ===================================================== */
-        #update-clock.status-clock {
-            min-width: 172px;
-            padding: 6px 9px 7px 9px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            line-height: 1;
-        }
+        .sun-lvl-0 { opacity: 0.15; filter: brightness(0.25) grayscale(0.8); } .sun-lvl-1 { opacity: 0.55; filter: brightness(0.68) drop-shadow(0 0 5px rgba(255, 215, 0, 0.28)); } .sun-lvl-2 { opacity: 0.72; filter: brightness(0.90) drop-shadow(0 0 10px rgba(255, 215, 0, 0.50)); } .sun-lvl-3 { opacity: 0.85; filter: brightness(1.10) drop-shadow(0 0 14px rgba(255, 215, 0, 0.65)); } .sun-lvl-4 { opacity: 0.95; filter: brightness(1.30) drop-shadow(0 0 18px rgba(255, 215, 0, 0.78)); } .sun-lvl-5 { opacity: 1.00; filter: brightness(1.48) drop-shadow(0 0 22px rgba(255, 215, 0, 0.88)); } .sun-lvl-6 { opacity: 1.00; filter: brightness(1.68) drop-shadow(0 0 28px rgba(255, 215, 0, 0.98)); }
 
-        #clock-time-text {
-            font-size: 13px;
-            font-weight: 900;
-            color: #ff0000;
-            font-family: monospace;
-            letter-spacing: 1px;
-            white-space: nowrap;
-            line-height: 1;
-        }
-
-        .clock-status-row {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            line-height: 1;
-        }
-
-        .clock-grid-status,
-        #update-clock #device-status {
-            position: static;
-            inset: auto;
-            top: auto;
-            right: auto;
-            left: auto;
-            transform: none;
-            z-index: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 2px 5px;
-            border-radius: 8px;
-            font-size: 8px;
-            font-weight: 900;
-            letter-spacing: 0.15px;
-            white-space: nowrap;
-            pointer-events: none;
-            animation: none;
-            background: rgba(10, 16, 28, 0.12);
-            border: 1px solid rgba(0,0,0,0.07);
-            text-shadow: none;
-        }
-
-        .clock-grid-dot,
-        #update-clock #device-status .device-dot {
-            width: 6px;
-            height: 6px;
-            flex: 0 0 6px;
-            border-radius: 50%;
-        }
-
-        .clock-grid-status.on,
-        #update-clock #device-status.online {
-            color: #00a94f;
-            background: rgba(0, 204, 102, 0.10);
-        }
-        .clock-grid-status.on .clock-grid-dot,
-        #update-clock #device-status.online .device-dot {
-            background: #00cc66;
-            box-shadow: 0 0 6px rgba(0, 204, 102, 0.8);
-        }
-
-        .clock-grid-status.off,
-        #update-clock #device-status.offline {
-            color: #e32121;
-            background: rgba(255, 68, 68, 0.10);
-            animation: clockStatusBlink 1s ease-in-out infinite alternate;
-        }
-        .clock-grid-status.off .clock-grid-dot,
-        #update-clock #device-status.offline .device-dot {
-            background: #ff3333;
-            box-shadow: 0 0 6px rgba(255, 51, 51, 0.85);
-        }
-
-        .clock-grid-status.unknown,
-        .clock-grid-status.stale,
-        #update-clock #device-status.checking {
-            color: #b77900;
-            background: rgba(255, 193, 7, 0.10);
-        }
-        .clock-grid-status.unknown .clock-grid-dot,
-        .clock-grid-status.stale .clock-grid-dot,
-        #update-clock #device-status.checking .device-dot {
-            background: #ffb000;
-            box-shadow: 0 0 5px rgba(255, 176, 0, 0.75);
-        }
-        @keyframes clockStatusBlink {
-            from { opacity: 0.62; }
-            to { opacity: 1; }
-        }
-
-        @media (max-width: 600px) {
-            #update-clock.status-clock {
-                min-width: 146px;
-                padding: 5px 7px 6px 7px;
-                gap: 3px;
-            }
-            #clock-time-text { font-size: 11px; }
-            .clock-status-row { gap: 4px; }
-            .clock-grid-status,
-            #update-clock #device-status {
-                font-size: 7px;
-                padding: 2px 4px;
-                gap: 3px;
-            }
-            .clock-grid-dot,
-            #update-clock #device-status .device-dot {
-                width: 5px;
-                height: 5px;
-                flex-basis: 5px;
-            }
-        }
-
-    
-        /* =====================================================
-           V12.11.1 - COMPACT CLOCK FRAME
-           Nam gon giua vien phai inverter va vien phai diagram-panel.
-           ===================================================== */
-        #update-clock.status-clock {
-            top: 48%;
-            left: calc(50% + 66px);
-            right: 12px;
-            width: auto;
-            min-width: 0;
-            max-width: 150px;
-            transform: translateY(-50%) translateZ(0);
-            padding: 5px 6px 6px 6px;
-            border-radius: 9px;
-            gap: 3px;
-            letter-spacing: 0;
-            box-sizing: border-box;
-        }
-
+        #update-clock.status-clock { top: 48%; left: calc(50% + 66px); right: 12px; width: auto; min-width: 0; max-width: 150px; transform: translateY(-50%) translateZ(0); padding: 5px 6px 6px 6px; border-radius: 9px; gap: 3px; letter-spacing: 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; position: absolute; z-index: 25; background: rgba(255, 255, 255, 0.95); box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1); }
         #update-clock.status-clock::after { border-radius: 9px; }
+        #clock-time-text { font-size: 12px; letter-spacing: 1.2px; line-height: 1; color: #ff0000; font-family: monospace; font-weight: 900; }
+        .clock-status-row { gap: 4px; width: 100%; flex-wrap: nowrap; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .clock-grid-status, #update-clock #device-status { flex: 1 1 0; min-width: 0; padding: 2px 3px; border-radius: 5px; font-size: 7px; gap: 3px; letter-spacing: 0; display: inline-flex; align-items: center; justify-content: center; font-weight: 900; background: rgba(10, 16, 28, 0.12); border: 1px solid rgba(0,0,0,0.07); }
+        .clock-grid-dot, #update-clock #device-status .device-dot { width: 5px; height: 5px; flex: 0 0 5px; border-radius: 50%; }
 
-        #clock-time-text {
-            font-size: 12px;
-            letter-spacing: 1.2px;
-            line-height: 1;
-        }
-
-        .clock-status-row {
-            gap: 4px;
-            width: 100%;
-            flex-wrap: nowrap;
-        }
-
-        .clock-grid-status,
-        #update-clock #device-status {
-            flex: 1 1 0;
-            min-width: 0;
-            padding: 2px 3px;
-            border-radius: 5px;
-            font-size: 7px;
-            gap: 3px;
-            letter-spacing: 0;
-        }
-
-        .clock-grid-dot,
-        #update-clock #device-status .device-dot {
-            width: 5px;
-            height: 5px;
-            flex: 0 0 5px;
-        }
+        .clock-grid-status.on, #update-clock #device-status.online { color: #00a94f; background: rgba(0, 204, 102, 0.10); }
+        .clock-grid-status.on .clock-grid-dot, #update-clock #device-status.online .device-dot { background: #00cc66; box-shadow: 0 0 6px rgba(0, 204, 102, 0.8); }
+        .clock-grid-status.off, #update-clock #device-status.offline { color: #e32121; background: rgba(255, 68, 68, 0.10); animation: clockStatusBlink 1s ease-in-out infinite alternate; }
+        .clock-grid-status.off .clock-grid-dot, #update-clock #device-status.offline .device-dot { background: #ff3333; box-shadow: 0 0 6px rgba(255, 51, 51, 0.85); }
+        .clock-grid-status.unknown, .clock-grid-status.stale, #update-clock #device-status.checking { color: #b77900; background: rgba(255, 193, 7, 0.10); }
+        .clock-grid-status.unknown .clock-grid-dot, .clock-grid-status.stale .clock-grid-dot, #update-clock #device-status.checking .device-dot { background: #ffb000; box-shadow: 0 0 5px rgba(255, 176, 0, 0.75); }
+        
+        @keyframes clockStatusBlink { from { opacity: 0.62; } to { opacity: 1; } }
 
         @media (max-width: 600px) {
-            #update-clock.status-clock {
-                top: 48%;
-                left: calc(50% + 58px);
-                right: 8px;
-                width: auto;
-                min-width: 0;
-                max-width: none;
-                transform: translateY(-50%) translateZ(0);
-                padding: 4px 5px 5px 5px;
-                border-radius: 8px;
-                gap: 3px;
-            }
-
+            #update-clock.status-clock { top: 48%; left: calc(50% + 58px); right: 8px; width: auto; min-width: 0; max-width: none; transform: translateY(-50%) translateZ(0); padding: 4px 5px 5px 5px; border-radius: 8px; gap: 3px; }
             #update-clock.status-clock::after { border-radius: 8px; }
-
-            #clock-time-text {
-                font-size: 11px;
-                letter-spacing: 1px;
-            }
-
+            #clock-time-text { font-size: 11px; letter-spacing: 1px; }
             .clock-status-row { gap: 3px; }
-
-            .clock-grid-status,
-            #update-clock #device-status {
-                font-size: 6.8px;
-                padding: 2px;
-                border-radius: 4px;
-                gap: 2px;
-            }
-
-            .clock-grid-dot,
-            #update-clock #device-status .device-dot {
-                width: 4px;
-                height: 4px;
-                flex-basis: 4px;
-            }
+            .clock-grid-status, #update-clock #device-status { font-size: 6.8px; padding: 2px; border-radius: 4px; gap: 2px; }
+            .clock-grid-dot, #update-clock #device-status .device-dot { width: 4px; height: 4px; flex-basis: 4px; }
         }
-
     </style>
 </head>
-<body data-dashboard-version="V12.11.1">
+<body data-dashboard-version="V12.11 - Full Sync">
     <div class="app-container">
         <div class="diagram-panel">
             <div id="battery-mini-meter" class="battery-mini-meter idle">
@@ -1211,6 +399,7 @@
                 <div class="battery-mini-row"><span class="battery-mini-label">Áp</span><span class="battery-mini-value" id="mini-stat-v">-- V</span></div>
                 <div class="battery-mini-row"><span class="battery-mini-label">Dòng</span><span class="battery-mini-value" id="mini-stat-a">-- A</span></div>
             </div>
+            
             <div id="update-clock" class="status-clock" title="Trạng thái lưới, ESP32 và thời điểm nhận dữ liệu gần nhất">
                 <div class="clock-status-row">
                     <span id="clock-grid-status" class="clock-grid-status unknown">
@@ -1272,7 +461,10 @@
                     <div class="battery-body"><div class="battery-fill" id="batt-fill"></div><div id="lbl-soc">0%</div></div>
                     <div class="battery-cap"></div>
                 </div>
-                <div id="lbl-batt-temp" class="battery-temp-label temp-stale"><span class="temp-icon">🌡️</span><span id="lbl-batt-temp-value" class="temp-value">--°C</span></div>
+                <!-- Vị trí hiển thị nhiệt độ pin -->
+                <div id="lbl-batt-temp" class="battery-temp-label temp-stale">
+                    <span class="temp-icon">🌡️</span><span id="lbl-batt-temp-value" class="temp-value">--°C</span>
+                </div>
             </div>
 
             <div class="node pos-load corner-node">
@@ -1374,62 +566,37 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ================= HÀM ĐẾM SỐ MƯỢT TỰ ĐỘNG =================
         const numberAnimState = {};
         function animateValue(id, targetVal, formatFn, duration = 650) {
             const el = document.getElementById(id);
             if (!el) return;
-
             targetVal = Number(targetVal) || 0;
-
             if (!numberAnimState[id]) {
                 numberAnimState[id] = { currentVal: targetVal, frameId: null };
                 el.innerText = formatFn(targetVal);
                 return;
             }
-
             const state = numberAnimState[id];
             const startVal = state.currentVal;
-
-            if (Math.abs(startVal - targetVal) < 0.001) {
-                el.innerText = formatFn(targetVal);
-                return;
-            }
-
+            if (Math.abs(startVal - targetVal) < 0.001) { el.innerText = formatFn(targetVal); return; }
             if (state.frameId) cancelAnimationFrame(state.frameId);
-
             const startTime = performance.now();
-
             function step(now) {
                 const elapsed = now - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 const ease = 1 - Math.pow(1 - progress, 3);
-
                 const current = startVal + (targetVal - startVal) * ease;
                 state.currentVal = current;
                 el.innerText = formatFn(current);
-
-                if (progress < 1) {
-                    state.frameId = requestAnimationFrame(step);
-                } else {
-                    state.currentVal = targetVal;
-                    el.innerText = formatFn(targetVal);
-                    state.frameId = null;
-                }
+                if (progress < 1) { state.frameId = requestAnimationFrame(step); } 
+                else { state.currentVal = targetVal; el.innerText = formatFn(targetVal); state.frameId = null; }
             }
             state.frameId = requestAnimationFrame(step);
         }
 
-        function toSafeNumber(value, fallback = 0) {
-            const number = Number(value);
-            return Number.isFinite(number) ? number : fallback;
-        }
+        function toSafeNumber(value, fallback = 0) { const number = Number(value); return Number.isFinite(number) ? number : fallback; }
+        function clampNumber(value, min, max) { return Math.min(max, Math.max(min, toSafeNumber(value, min))); }
 
-        function clampNumber(value, min, max) {
-            return Math.min(max, Math.max(min, toSafeNumber(value, min)));
-        }
-
-        // ================= KỊCH BẢN VẼ MẶT TRỜI CHIA 6 CẤP ĐỘ DỰA TRÊN CÔNG SUẤT PV =================
         let currentSunLevel = 0; 
         const sunRayCounts = [0, 12, 24, 36, 48, 60, 72];
         let latestPvPowerW = 0;
@@ -1439,116 +606,66 @@
         function updateBackgroundByTimeAndPv(pvW = latestPvPowerW) {
             const pvPower = toSafeNumber(pvW);
             latestPvPowerW = pvPower;
-
             const hour = new Date().getHours();
             const isNightTime = hour >= 18 || hour < 6;
             const shouldShowStars = isNightTime && pvPower < 1;
-
-            if (document.body) {
-                document.body.classList.toggle('night-stars', shouldShowStars);
-            }
+            if (document.body) { document.body.classList.toggle('night-stars', shouldShowStars); }
         }
 
         function initCanvasSun() {
             const canvas = document.getElementById('sun-canvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
-            
             const size = 260; 
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
             canvas.width = size * dpr;
             canvas.height = size * dpr;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-            const cx = size / 2;
-            const cy = size / 2;
-
+            const cx = size / 2, cy = size / 2;
             const rays = [];
             const maxRays = 72;
-
             for (let i = 0; i < maxRays; i++) {
-                rays.push({
-                    angle: Math.random() * Math.PI * 2,
-                    baseLength: 30 + Math.random() * 80,
-                    width: 0.3 + Math.random() * 1.5,
-                    speed: 0.02 + Math.random() * 0.08,
-                    phase: Math.random() * Math.PI * 2,
-                    baseAlpha: 0.2 + Math.random() * 0.8
-                });
+                rays.push({ angle: Math.random() * Math.PI * 2, baseLength: 30 + Math.random() * 80, width: 0.3 + Math.random() * 1.5, speed: 0.02 + Math.random() * 0.08, phase: Math.random() * Math.PI * 2, baseAlpha: 0.2 + Math.random() * 0.8 });
             }
-
             function animateCanvasSun(now) {
                 sunAnimationFrameId = null;
                 ctx.clearRect(0, 0, size, size);
-
                 const activeRaysCount = sunRayCounts[currentSunLevel] || 0;
                 if (document.hidden || activeRaysCount <= 0) return;
-
                 const time = now * 0.001;
-
                 for (let i = 0; i < activeRaysCount; i++) {
                     const ray = rays[i];
                     const currentLength = ray.baseLength + Math.sin(ray.phase + time * (ray.speed * 80)) * 15;
                     const currentAlpha = ray.baseAlpha * (0.5 + Math.sin(ray.phase * 3 + time * 30) * 0.5);
                     const angle = ray.angle + time * 0.05; 
-
                     const x = cx + Math.cos(angle) * currentLength;
                     const y = cy + Math.sin(angle) * currentLength;
-
                     const grad = ctx.createLinearGradient(cx, cy, x, y);
                     grad.addColorStop(0, `rgba(255, 255, 255, ${currentAlpha})`);
                     grad.addColorStop(0.3, `rgba(255, 245, 150, ${currentAlpha * 0.8})`);
                     grad.addColorStop(1, `rgba(255, 200, 0, 0)`);
-
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy);
-                    ctx.lineTo(x, y);
-                    ctx.lineWidth = ray.width;
-                    ctx.strokeStyle = grad;
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.lineWidth = ray.width; ctx.strokeStyle = grad; ctx.stroke();
                 }
-
                 sunAnimationFrameId = requestAnimationFrame(animateCanvasSun);
             }
-
-            sunCanvasRender = () => {
-                if (sunAnimationFrameId === null && !document.hidden) {
-                    sunAnimationFrameId = requestAnimationFrame(animateCanvasSun);
-                }
-            };
-
+            sunCanvasRender = () => { if (sunAnimationFrameId === null && !document.hidden) { sunAnimationFrameId = requestAnimationFrame(animateCanvasSun); } };
             document.addEventListener('visibilitychange', () => {
-                if (document.hidden && sunAnimationFrameId !== null) {
-                    cancelAnimationFrame(sunAnimationFrameId);
-                    sunAnimationFrameId = null;
-                    return;
-                }
+                if (document.hidden && sunAnimationFrameId !== null) { cancelAnimationFrame(sunAnimationFrameId); sunAnimationFrameId = null; return; }
                 sunCanvasRender();
             });
-
             sunCanvasRender();
         }
 
         function updateSunLevelByPower(pvW) {
             const pvPower = toSafeNumber(pvW);
             let lvl = 0;
-            if (pvPower >= 7001) { lvl = 6; }        
-            else if (pvPower >= 5001) { lvl = 5; }   
-            else if (pvPower >= 3001) { lvl = 4; }   
-            else if (pvPower >= 2001) { lvl = 3; }   
-            else if (pvPower >= 1001) { lvl = 2; }   
-            else if (pvPower >= 11) { lvl = 1; }     
-            else { lvl = 0; }                    
-
+            if (pvPower >= 7001) { lvl = 6; } else if (pvPower >= 5001) { lvl = 5; } else if (pvPower >= 3001) { lvl = 4; } else if (pvPower >= 2001) { lvl = 3; } else if (pvPower >= 1001) { lvl = 2; } else if (pvPower >= 11) { lvl = 1; }
             const levelChanged = currentSunLevel !== lvl;
             if (levelChanged) {
                 currentSunLevel = lvl;
                 const solarSun = document.getElementById('solar-sun');
-                if (solarSun) {
-                    solarSun.className = 'sun-lvl-' + lvl;
-                }
+                if (solarSun) { solarSun.className = 'sun-lvl-' + lvl; }
             }
-
             if (sunCanvasRender && (lvl > 0 || levelChanged)) sunCanvasRender();
         }
         
@@ -1563,27 +680,15 @@
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
         let database = null;
         if (typeof firebase !== 'undefined' && firebase.database) {
-            if (!firebase.apps || firebase.apps.length === 0) {
-                firebase.initializeApp(firebaseConfig);
-            }
+            if (!firebase.apps || firebase.apps.length === 0) { firebase.initializeApp(firebaseConfig); }
             database = firebase.database();
         } else {
             console.error('Firebase SDK chưa tải được.');
             updateDOMText('lbl-status', 'Mất kết nối');
         }
         const lblStatus = document.getElementById('lbl-status');
-        const battFill = document.getElementById('batt-fill');
 
-        let energyChart = null;
-        let currentChartMode = 'month';
-        let chartCursorDate = new Date();
-        let chartSelectedIndex = 0;
-        let chartRows = [];
-        let chartAllRows = [];
-        let chartSelectedSourceIndex = 0;
-        let chartResizeTimer = null;
-        let chartLoadRequestId = 0;
-        let chartRefreshTimer = null;
+        let energyChart = null; let currentChartMode = 'month'; let chartCursorDate = new Date(); let chartSelectedIndex = 0; let chartRows = []; let chartAllRows = []; let chartSelectedSourceIndex = 0; let chartResizeTimer = null; let chartLoadRequestId = 0; let chartRefreshTimer = null;
         const chartSeries = [
             { label: 'Sản lượng PV', key: 'pv', color: '#59ba35', border: '#48a927' },
             { label: 'Xả pin', key: 'batt', color: '#45a8de', border: '#278fc9' },
@@ -1594,40 +699,21 @@
         const energySelectedBandPlugin = {
             id: 'energySelectedBand',
             beforeDatasetsDraw(chart) {
-                const area = chart.chartArea;
-                const meta = chart.getDatasetMeta(0);
-                const bar = meta && meta.data ? meta.data[chartSelectedIndex] : null;
+                const area = chart.chartArea; const meta = chart.getDatasetMeta(0); const bar = meta && meta.data ? meta.data[chartSelectedIndex] : null;
                 if (!area || !bar || chart.data.labels.length === 0) return;
-
                 const step = (area.right - area.left) / chart.data.labels.length;
-                const x = bar.x - step / 2 + 3;
-                const width = Math.max(16, step - 6);
-                const ctx = chart.ctx;
-
-                ctx.save();
-                ctx.fillStyle = 'rgba(0,0,0,0.04)';
-                ctx.strokeStyle = 'rgba(0,0,0,0.22)';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
+                const x = bar.x - step / 2 + 3; const width = Math.max(16, step - 6); const ctx = chart.ctx;
+                ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.strokeStyle = 'rgba(0,0,0,0.22)'; ctx.lineWidth = 1; ctx.beginPath();
                 drawChartRoundRect(ctx, x, area.top + 2, width, area.bottom - area.top - 4, 8);
-                ctx.fill();
-                ctx.stroke();
-                ctx.restore();
+                ctx.fill(); ctx.stroke(); ctx.restore();
             }
         };
 
         const energyValueLabelPlugin = {
             id: 'energyValueLabels',
             afterDatasetsDraw(chart) {
-                const ctx = chart.ctx;
-                const area = chart.chartArea;
-
-                ctx.save();
-                ctx.fillStyle = '#111';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                ctx.font = '900 10px Nunito, sans-serif';
-
+                const ctx = chart.ctx; const area = chart.chartArea;
+                ctx.save(); ctx.fillStyle = '#111'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.font = '900 10px Nunito, sans-serif';
                 chart.data.datasets.forEach((dataset, datasetIndex) => {
                     const meta = chart.getDatasetMeta(datasetIndex);
                     meta.data.forEach((bar, index) => {
@@ -1643,94 +729,38 @@
 
         function initChart() {
             const chartCanvas = document.getElementById('energyChart');
-            if (!chartCanvas || typeof Chart === 'undefined') {
-                console.warn('Chart.js chưa tải được, bỏ qua phần biểu đồ.');
-                return;
-            }
-
+            if (!chartCanvas || typeof Chart === 'undefined') return;
             const ctx = chartCanvas.getContext('2d');
             energyChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: [],
-                    datasets: chartSeries.map(series => ({
-                        label: series.label,
-                        dataKey: series.key,
-                        data: [],
-                        backgroundColor: series.color,
-                        borderColor: series.border,
-                        borderWidth: 1,
-                        borderRadius: 2,
-                        categoryPercentage: 0.88,
-                        barPercentage: 0.92,
-                        maxBarThickness: 38
-                    }))
+                    datasets: chartSeries.map(series => ({ label: series.label, dataKey: series.key, data: [], backgroundColor: series.color, borderColor: series.border, borderWidth: 1, borderRadius: 2, categoryPercentage: 0.88, barPercentage: 0.92, maxBarThickness: 38 }))
                 },
                 plugins: [energySelectedBandPlugin, energyValueLabelPlugin],
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     onClick(event, elements) {
                         if (elements.length > 0) {
                             const clickedRow = chartRows[elements[0].index];
-                            if (clickedRow && Number.isInteger(clickedRow.sourceIndex)) {
-                                chartSelectedSourceIndex = clickedRow.sourceIndex;
-                                updateVisibleChartRows();
-                            }
+                            if (clickedRow && Number.isInteger(clickedRow.sourceIndex)) { chartSelectedSourceIndex = clickedRow.sourceIndex; updateVisibleChartRows(); }
                         }
                     },
                     plugins: {
-                        legend: {
-                            align: 'start',
-                            labels: {
-                                boxWidth: 12,
-                                boxHeight: 12,
-                                padding: 10,
-                                font: { family: 'Nunito', weight: '900', size: 12 },
-                                color: '#222'
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                title(items) {
-                                    const row = chartRows[items[0].dataIndex];
-                                    return row ? row.detailLabel : '';
-                                },
-                                label(item) {
-                                    return `${item.dataset.label}: ${formatChartNumber(item.parsed.y)} kWh`;
-                                }
-                            }
-                        }
+                        legend: { align: 'start', labels: { boxWidth: 12, boxHeight: 12, padding: 10, font: { family: 'Nunito', weight: '900', size: 12 }, color: '#222' } },
+                        tooltip: { callbacks: { title(items) { const row = chartRows[items[0].dataIndex]; return row ? row.detailLabel : ''; }, label(item) { return `${item.dataset.label}: ${formatChartNumber(item.parsed.y)} kWh`; } } }
                     },
                     scales: {
-                        x: {
-                            grid: { display: true, color: 'rgba(0,0,0,0.18)', borderDash: [8, 8] },
-                            ticks: { font: { family: 'Nunito', weight: '900', size: 13 }, color: '#222' }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grace: '18%',
-                            ticks: { font: { family: 'Nunito', weight: '900', size: 12 }, color: '#333' },
-                            grid: { color: 'rgba(0,0,0,0.16)' }
-                        }
+                        x: { grid: { display: true, color: 'rgba(0,0,0,0.18)', borderDash: [8, 8] }, ticks: { font: { family: 'Nunito', weight: '900', size: 13 }, color: '#222' } },
+                        y: { beginAtZero: true, grace: '18%', ticks: { font: { family: 'Nunito', weight: '900', size: 12 }, color: '#333' }, grid: { color: 'rgba(0,0,0,0.16)' } }
                     }
                 }
             });
-            window.addEventListener('resize', () => {
-                clearTimeout(chartResizeTimer);
-                chartResizeTimer = setTimeout(() => {
-                    if (energyChart && chartAllRows.length > 0) updateVisibleChartRows();
-                }, 120);
-            });
+            window.addEventListener('resize', () => { clearTimeout(chartResizeTimer); chartResizeTimer = setTimeout(() => { if (energyChart && chartAllRows.length > 0) updateVisibleChartRows(); }, 120); });
             loadChartData();
         }
 
-        function scheduleChartDataRefresh(delay = 800) {
-            clearTimeout(chartRefreshTimer);
-            chartRefreshTimer = setTimeout(() => {
-                if (database && energyChart) loadChartData();
-            }, delay);
-        }
+        function scheduleChartDataRefresh(delay = 800) { clearTimeout(chartRefreshTimer); chartRefreshTimer = setTimeout(() => { if (database && energyChart) loadChartData(); }, delay); }
 
         function setChartMode(mode) {
             if (!['month', 'year', 'total'].includes(mode)) return;
@@ -1742,11 +772,7 @@
         }
 
         function shiftChartPeriod(step) {
-            if (currentChartMode === 'month') {
-                chartCursorDate.setMonth(chartCursorDate.getMonth() + step);
-            } else if (currentChartMode === 'year') {
-                chartCursorDate.setFullYear(chartCursorDate.getFullYear() + step);
-            }
+            if (currentChartMode === 'month') { chartCursorDate.setMonth(chartCursorDate.getMonth() + step); } else if (currentChartMode === 'year') { chartCursorDate.setFullYear(chartCursorDate.getFullYear() + step); }
             loadChartData();
         }
 
@@ -1767,33 +793,20 @@
                 const monthKey = `${yyyy}_${mm}`;
                 database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value', (snap) => {
                     if (requestId !== chartLoadRequestId) return;
-                    const daysData = snap.val() || {};
-                    const rows = [];
-                    const daysInMonth = new Date(yyyy, chartCursorDate.getMonth() + 1, 0).getDate();
-
+                    const daysData = snap.val() || {}; const rows = []; const daysInMonth = new Date(yyyy, chartCursorDate.getMonth() + 1, 0).getDate();
                     for (let d = 1; d <= daysInMonth; d++) {
                         const dayStr = String(d).padStart(2, '0');
-                        rows.push({
-                            label: String(d),
-                            detailLabel: `Ngày ${dayStr}/${mm}/${yyyy}`,
-                            ...normalizeChartItem(daysData[`day_${dayStr}`])
-                        });
+                        rows.push({ label: String(d), detailLabel: `Ngày ${dayStr}/${mm}/${yyyy}`, ...normalizeChartItem(daysData[`day_${dayStr}`]) });
                     }
                     renderChartRows(rows);
                 });
             } else if (currentChartMode === 'year') {
                 database.ref(`/SosenSystem/History/Monthly/${yyyy}`).once('value', (snap) => {
                     if (requestId !== chartLoadRequestId) return;
-                    const monthsData = snap.val() || {};
-                    const rows = [];
-
+                    const monthsData = snap.val() || {}; const rows = [];
                     for (let m = 1; m <= 12; m++) {
                         const monthStr = String(m).padStart(2, '0');
-                        rows.push({
-                            label: `T${m}`,
-                            detailLabel: `Tháng ${monthStr}/${yyyy}`,
-                            ...normalizeChartItem(monthsData[`month_${monthStr}`])
-                        });
+                        rows.push({ label: `T${m}`, detailLabel: `Tháng ${monthStr}/${yyyy}`, ...normalizeChartItem(monthsData[`month_${monthStr}`]) });
                     }
                     renderChartRows(rows);
                 });
@@ -1803,137 +816,67 @@
                     const yearsData = snap.val() || {};
                     let rows = Object.keys(yearsData).sort().map(yKey => {
                         const yearLabel = yKey.replace('year_', '');
-                        return {
-                            label: yearLabel,
-                            detailLabel: `Năm ${yearLabel}`,
-                            ...normalizeChartItem(yearsData[yKey])
-                        };
+                        return { label: yearLabel, detailLabel: `Năm ${yearLabel}`, ...normalizeChartItem(yearsData[yKey]) };
                     });
-
-                    if (rows.length === 0) {
-                        rows = [{
-                            label: String(yyyy),
-                            detailLabel: `Năm ${yyyy}`,
-                            pv: 0,
-                            batt: 0,
-                            charge: 0,
-                            load: 0
-                        }];
-                    }
+                    if (rows.length === 0) { rows = [{ label: String(yyyy), detailLabel: `Năm ${yyyy}`, pv: 0, batt: 0, charge: 0, load: 0 }]; }
                     renderChartRows(rows);
                 });
             }
         }
 
-        function renderChartRows(rows) {
-            chartAllRows = rows;
-            chartSelectedSourceIndex = getDefaultChartIndex(rows);
-            updateVisibleChartRows();
-        }
+        function renderChartRows(rows) { chartAllRows = rows; chartSelectedSourceIndex = getDefaultChartIndex(rows); updateVisibleChartRows(); }
 
         function updateVisibleChartRows() {
             const rows = chartAllRows;
             if (!energyChart) return;
-
             if (rows.length === 0) {
-                chartRows = [];
-                chartSelectedIndex = 0;
-                energyChart.data.labels = [];
-                energyChart.data.datasets.forEach(dataset => { dataset.data = []; });
-                updateChartDetail();
-                energyChart.update('none');
-                return;
+                chartRows = []; chartSelectedIndex = 0; energyChart.data.labels = []; energyChart.data.datasets.forEach(dataset => { dataset.data = []; });
+                updateChartDetail(); energyChart.update('none'); return;
             }
-
-            const limit = currentChartMode === 'month' ? Math.min(getMonthVisibleCount(), rows.length) : rows.length;
+            const limit = currentChartMode === 'month' ? (window.innerWidth <= 430 ? 3 : 4) : rows.length;
             let start = 0;
-
             if (currentChartMode === 'month' && rows.length > limit) {
                 start = chartSelectedSourceIndex - Math.floor(limit / 2);
                 start = Math.max(0, Math.min(start, rows.length - limit));
             }
-
-            chartRows = rows.slice(start, start + limit).map((row, index) => ({
-                ...row,
-                sourceIndex: start + index
-            }));
+            chartRows = rows.slice(start, start + limit).map((row, index) => ({ ...row, sourceIndex: start + index }));
             chartSelectedIndex = chartRows.findIndex(row => row.sourceIndex === chartSelectedSourceIndex);
             if (chartSelectedIndex < 0) chartSelectedIndex = 0;
 
             energyChart.data.labels = chartRows.map(row => row.label);
-            energyChart.data.datasets.forEach(dataset => {
-                dataset.data = chartRows.map(row => row[dataset.dataKey] || 0);
-            });
-            updateChartDetail();
-            energyChart.update('none');
-        }
-
-        function getMonthVisibleCount() {
-            return window.innerWidth <= 430 ? 3 : 4;
+            energyChart.data.datasets.forEach(dataset => { dataset.data = chartRows.map(row => row[dataset.dataKey] || 0); });
+            updateChartDetail(); energyChart.update('none');
         }
 
         function getDefaultChartIndex(rows) {
             if (rows.length === 0) return 0;
-
             const now = new Date();
-            if (
-                currentChartMode === 'month' &&
-                chartCursorDate.getFullYear() === now.getFullYear() &&
-                chartCursorDate.getMonth() === now.getMonth()
-            ) {
+            if (currentChartMode === 'month' && chartCursorDate.getFullYear() === now.getFullYear() && chartCursorDate.getMonth() === now.getMonth()) {
                 return Math.min(rows.length - 1, Math.max(0, now.getDate() - 1));
             }
-
-            for (let i = rows.length - 1; i >= 0; i--) {
-                const row = rows[i];
-                if ((row.pv + row.batt + row.charge + row.load) > 0) return i;
-            }
+            for (let i = rows.length - 1; i >= 0; i--) { const row = rows[i]; if ((row.pv + row.batt + row.charge + row.load) > 0) return i; }
             return 0;
         }
 
         function normalizeChartItem(item = {}) {
-            return {
-                pv: toChartNumber(item.pv),
-                batt: toChartNumber(item.batt ?? item.bat ?? item.battery ?? item.discharge ?? item.batDischarge),
-                charge: toChartNumber(item.charge ?? item.battCharge ?? item.batCharge ?? item.chargeBattery),
-                load: toChartNumber(item.load)
-            };
+            return { pv: toChartNumber(item.pv), batt: toChartNumber(item.batt ?? item.bat ?? item.battery ?? item.discharge ?? item.batDischarge), charge: toChartNumber(item.charge ?? item.battCharge ?? item.batCharge ?? item.chargeBattery), load: toChartNumber(item.load) };
         }
 
         function drawChartRoundRect(ctx, x, y, width, height, radius) {
-            if (typeof ctx.roundRect === 'function') {
-                ctx.roundRect(x, y, width, height, radius);
-                return;
-            }
-
+            if (typeof ctx.roundRect === 'function') { ctx.roundRect(x, y, width, height, radius); return; }
             const r = Math.min(radius, width / 2, height / 2);
-            ctx.moveTo(x + r, y);
-            ctx.lineTo(x + width - r, y);
-            ctx.quadraticCurveTo(x + width, y, x + width, y + r);
-            ctx.lineTo(x + width, y + height - r);
-            ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-            ctx.lineTo(x + r, y + height);
-            ctx.quadraticCurveTo(x, y + height, x, y + height - r);
-            ctx.lineTo(x, y + r);
-            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.moveTo(x + r, y); ctx.lineTo(x + width - r, y); ctx.quadraticCurveTo(x + width, y, x + width, y + r); ctx.lineTo(x + width, y + height - r);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height); ctx.lineTo(x + r, y + height); ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+            ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
         }
 
-        function toChartNumber(value) {
-            const number = Number(value);
-            return Number.isFinite(number) ? number : 0;
-        }
-
-        function formatChartNumber(value) {
-            const number = Number(value) || 0;
-            return number >= 100 ? number.toFixed(0) : number.toFixed(1);
-        }
+        function toChartNumber(value) { const number = Number(value); return Number.isFinite(number) ? number : 0; }
+        function formatChartNumber(value) { const number = Number(value) || 0; return number >= 100 ? number.toFixed(0) : number.toFixed(1); }
 
         function updateChartPeriodLabel() {
             const el = document.getElementById('chart-period-label');
             if (!el) return;
-
-            const yyyy = chartCursorDate.getFullYear();
-            const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
+            const yyyy = chartCursorDate.getFullYear(); const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
             el.textContent = currentChartMode === 'month' ? `${yyyy}-${mm}` : (currentChartMode === 'year' ? String(yyyy) : 'TỔNG');
         }
 
@@ -1946,9 +889,7 @@
             updateDOMText('chart-detail-load', formatChartNumber(row.load));
         }
 
-        let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
-        let lastHistorySaveSignature = "";
-        let historySaveTimer = null;
+        let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null; let lastHistorySaveSignature = ""; let historySaveTimer = null;
 
         function checkAndSwitchMonth() {
             if (!database) return;
@@ -1971,15 +912,9 @@
 
         function queueEnergyHistorySave(pvToday, loadToday, gridBuyToday, battDischargeToday = 0, battChargeToday = 0) {
             if (!database) return;
-
             const now = new Date();
-            const dateKey = [
-                now.getFullYear(),
-                String(now.getMonth() + 1).padStart(2, '0'),
-                String(now.getDate()).padStart(2, '0')
-            ].join('_');
-            const values = [pvToday, loadToday, gridBuyToday, battDischargeToday, battChargeToday]
-                .map(value => Number(toSafeNumber(value).toFixed(1)));
+            const dateKey = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('_');
+            const values = [pvToday, loadToday, gridBuyToday, battDischargeToday, battChargeToday].map(value => Number(toSafeNumber(value).toFixed(1)));
             const signature = `${dateKey}|${values.join('|')}`;
 
             if (signature === lastHistorySaveSignature) return;
@@ -1993,85 +928,33 @@
 
         function saveEnergyHistoryToFirebase(pvToday, loadToday, gridBuyToday, battDischargeToday = 0, battChargeToday = 0) {
             if (!database) return;
-
-            pvToday = toSafeNumber(pvToday);
-            loadToday = toSafeNumber(loadToday);
-            gridBuyToday = toSafeNumber(gridBuyToday);
-            battDischargeToday = toSafeNumber(battDischargeToday);
-            battChargeToday = toSafeNumber(battChargeToday);
-
+            pvToday = toSafeNumber(pvToday); loadToday = toSafeNumber(loadToday); gridBuyToday = toSafeNumber(gridBuyToday); battDischargeToday = toSafeNumber(battDischargeToday); battChargeToday = toSafeNumber(battChargeToday);
             const now = new Date();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const dd = String(now.getDate()).padStart(2, '0');
-
-            const monthKey = `${yyyy}_${mm}`;
-            const dayKey = `day_${dd}`;
-            const monthItemKey = `month_${mm}`;
-            const yearKey = `year_${yyyy}`;
-
+            const yyyy = now.getFullYear(); const mm = String(now.getMonth() + 1).padStart(2, '0'); const dd = String(now.getDate()).padStart(2, '0');
+            const monthKey = `${yyyy}_${mm}`; const dayKey = `day_${dd}`; const monthItemKey = `month_${mm}`; const yearKey = `year_${yyyy}`;
             const dailyRef = database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`);
-            const dailyPayload = {
-                pv: Number(pvToday.toFixed(1)),
-                load: Number(loadToday.toFixed(1)),
-                grid: Number(gridBuyToday.toFixed(1)),
-                batt: Number(battDischargeToday.toFixed(1)),
-                charge: Number(battChargeToday.toFixed(1))
-            };
+            const dailyPayload = { pv: Number(pvToday.toFixed(1)), load: Number(loadToday.toFixed(1)), grid: Number(gridBuyToday.toFixed(1)), batt: Number(battDischargeToday.toFixed(1)), charge: Number(battChargeToday.toFixed(1)) };
 
             dailyRef.update(dailyPayload)
                 .then(() => database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value'))
                 .then((snap) => {
-                    const daysData = snap.val() || {};
-                    let monthPv = 0, monthLoad = 0, monthGrid = 0, monthBatt = 0, monthCharge = 0;
-                    for (let d in daysData) {
-                        monthPv += toSafeNumber(daysData[d].pv);
-                        monthLoad += toSafeNumber(daysData[d].load);
-                        monthGrid += toSafeNumber(daysData[d].grid);
-                        monthBatt += toSafeNumber(daysData[d].batt);
-                        monthCharge += toSafeNumber(daysData[d].charge);
-                    }
-
-                    return database.ref(`/SosenSystem/History/Monthly/${yyyy}/${monthItemKey}`).update({
-                        pv: Number(monthPv.toFixed(1)),
-                        load: Number(monthLoad.toFixed(1)),
-                        grid: Number(monthGrid.toFixed(1)),
-                        batt: Number(monthBatt.toFixed(1)),
-                        charge: Number(monthCharge.toFixed(1))
-                    });
+                    const daysData = snap.val() || {}; let monthPv = 0, monthLoad = 0, monthGrid = 0, monthBatt = 0, monthCharge = 0;
+                    for (let d in daysData) { monthPv += toSafeNumber(daysData[d].pv); monthLoad += toSafeNumber(daysData[d].load); monthGrid += toSafeNumber(daysData[d].grid); monthBatt += toSafeNumber(daysData[d].batt); monthCharge += toSafeNumber(daysData[d].charge); }
+                    return database.ref(`/SosenSystem/History/Monthly/${yyyy}/${monthItemKey}`).update({ pv: Number(monthPv.toFixed(1)), load: Number(monthLoad.toFixed(1)), grid: Number(monthGrid.toFixed(1)), batt: Number(monthBatt.toFixed(1)), charge: Number(monthCharge.toFixed(1)) });
                 })
                 .then(() => database.ref(`/SosenSystem/History/Monthly/${yyyy}`).once('value'))
                 .then((mSnap) => {
-                    const monthsData = mSnap.val() || {};
-                    let yearPv = 0, yearLoad = 0, yearGrid = 0, yearBatt = 0, yearCharge = 0;
-                    for (let m in monthsData) {
-                        yearPv += toSafeNumber(monthsData[m].pv);
-                        yearLoad += toSafeNumber(monthsData[m].load);
-                        yearGrid += toSafeNumber(monthsData[m].grid);
-                        yearBatt += toSafeNumber(monthsData[m].batt);
-                        yearCharge += toSafeNumber(monthsData[m].charge);
-                    }
-
-                    return database.ref(`/SosenSystem/History/Yearly/${yearKey}`).update({
-                        pv: Number(yearPv.toFixed(1)),
-                        load: Number(yearLoad.toFixed(1)),
-                        grid: Number(yearGrid.toFixed(1)),
-                        batt: Number(yearBatt.toFixed(1)),
-                        charge: Number(yearCharge.toFixed(1))
-                    });
+                    const monthsData = mSnap.val() || {}; let yearPv = 0, yearLoad = 0, yearGrid = 0, yearBatt = 0, yearCharge = 0;
+                    for (let m in monthsData) { yearPv += toSafeNumber(monthsData[m].pv); yearLoad += toSafeNumber(monthsData[m].load); yearGrid += toSafeNumber(monthsData[m].grid); yearBatt += toSafeNumber(monthsData[m].batt); yearCharge += toSafeNumber(monthsData[m].charge); }
+                    return database.ref(`/SosenSystem/History/Yearly/${yearKey}`).update({ pv: Number(yearPv.toFixed(1)), load: Number(yearLoad.toFixed(1)), grid: Number(yearGrid.toFixed(1)), batt: Number(yearBatt.toFixed(1)), charge: Number(yearCharge.toFixed(1)) });
                 })
-                .then(() => {
-                    scheduleChartDataRefresh();
-                })
-                .catch((error) => {
-                    console.error('Lỗi khi lưu lịch sử năng lượng:', error);
-                });
+                .then(() => { scheduleChartDataRefresh(); })
+                .catch((error) => { console.error('Lỗi khi lưu lịch sử năng lượng:', error); });
         }
 
         function recalculateEnergy() {
             if (!latestDailyData) return; 
             const data = latestDailyData;
-            
             let pvToday = toSafeNumber(data.PV_Today); 
             let currentETotal = toSafeNumber(data.PV_Total_Lifetime);
             let loadToday = toSafeNumber(data.Load_Today);
@@ -2084,10 +967,8 @@
             animateValue('stat-grid-buy', gridBuyToday, v => v.toFixed(1) + ' kWh');
             animateValue('stat-bat-dis', battDisToday, v => v.toFixed(1) + ' kWh');
             animateValue('stat-bat-chg', battChgToday, v => v.toFixed(1) + ' kWh');
-            
             animateValue('stat-bat-dis-total', toSafeNumber(data.Bat_Discharge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
             animateValue('stat-bat-chg-total', toSafeNumber(data.Bat_Charge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
-            
             animateValue('stat-pv-total', currentETotal, v => v.toFixed(1) + ' kWh');
 
             if (pvToday > 0 || loadToday > 0 || gridBuyToday > 0 || battDisToday > 0 || battChgToday > 0) {
@@ -2108,14 +989,11 @@
 
             let pvMonthTotal = 0; 
             for (let key in currentMonthHistory) { 
-                if (key !== curDayKey) {
-                    pvMonthTotal += Number(currentMonthHistory[key]) || 0; 
-                }
+                if (key !== curDayKey) { pvMonthTotal += Number(currentMonthHistory[key]) || 0; }
             }
             
             let activePvForMoney = Math.max(pvToday, savedPv);
             pvMonthTotal += activePvForMoney;
-
             let monthMoney = calcEVN(pvMonthTotal); 
             let todayMoney = 0;
 
@@ -2130,22 +1008,15 @@
             animateValue('money-pv-today', activePvForMoney, v => v.toFixed(1));
             animateValue('money-pv-month', pvMonthTotal, v => v.toFixed(1)); 
             animateValue('money-pv-total', currentETotal, v => v.toFixed(1));
-            
             animateValue('money-today', Math.round(todayMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
             animateValue('money-month', Math.round(monthMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
             animateValue('money-total', Math.round(totalMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ');
         }
 
-        function updateDOMText(id, newValue) {
-            const el = document.getElementById(id);
-            if (el && el.innerText !== String(newValue)) { el.innerText = newValue; }
-        }
+        function updateDOMText(id, newValue) { const el = document.getElementById(id); if (el && el.innerText !== String(newValue)) { el.innerText = newValue; } }
 
         function getFlowIntensity(powerW) {
-            if (powerW === undefined || powerW === null) {
-                return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
-            }
-
+            if (powerW === undefined || powerW === null) { return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 }; }
             const watts = Math.abs(toSafeNumber(powerW));
             if (watts < 1) return { particles: 0, sparks: 0, dashDuration: 7.8, sparkDuration: 5.4, wireSpeed: 4.2 };
             if (watts <= 1000) return { particles: 3, sparks: 2, dashDuration: 7.0, sparkDuration: 4.8, wireSpeed: 3.6 };
@@ -2158,7 +1029,6 @@
         function setFlow(groupId, isActive, animName, color, powerW) {
             const group = document.getElementById(groupId); 
             if (!group) return;
-            
             const currentAnim = group.getAttribute('data-anim') || '';
             const currentActive = group.style.display === 'block';
             const intensity = getFlowIntensity(powerW);
@@ -2176,61 +1046,38 @@
                     group.setAttribute('data-particles', String(intensity.particles));
                     group.setAttribute('data-dash-duration', String(intensity.dashDuration));
                     
-                    if (movesRight) { 
-                        group.classList.add('dir-right'); 
-                        group.classList.remove('dir-left'); 
-                    } else { 
-                        group.classList.add('dir-left'); 
-                        group.classList.remove('dir-right'); 
-                    }
+                    if (movesRight) { group.classList.add('dir-right'); group.classList.remove('dir-left'); } 
+                    else { group.classList.add('dir-left'); group.classList.remove('dir-right'); }
                     
                     const dashes = group.querySelectorAll('.flow-dash');
                     dashes.forEach((d, index) => { 
-                        d.style.animationName = 'none';
-                        d.style.opacity = '0';
-                        if (index >= intensity.particles) {
-                            d.style.display = 'none';
-                            return;
-                        }
-                        d.style.display = 'block';
-                        void d.offsetWidth;
+                        d.style.animationName = 'none'; d.style.opacity = '0';
+                        if (index >= intensity.particles) { d.style.display = 'none'; return; }
+                        d.style.display = 'block'; void d.offsetWidth;
                         d.style.animationName = animName;
                         d.style.animationDelay = '-' + ((index * intensity.dashDuration) / intensity.particles).toFixed(2) + 's';
-                        d.style.animationDuration = intensity.dashDuration + 's'; 
-                        d.style.animationIterationCount = 'infinite'; 
-                        d.style.animationTimingFunction = 'linear'; 
+                        d.style.animationDuration = intensity.dashDuration + 's'; d.style.animationIterationCount = 'infinite'; d.style.animationTimingFunction = 'linear'; 
                     });
 
                     const sparks = group.querySelectorAll('.flow-spark');
                     sparks.forEach((s, index) => {
-                        s.style.animationName = 'none';
-                        s.style.opacity = '0';
-                        if (index >= intensity.sparks) {
-                            s.style.display = 'none';
-                            return;
-                        }
-                        s.style.display = 'block';
-                        void s.offsetWidth;
+                        s.style.animationName = 'none'; s.style.opacity = '0';
+                        if (index >= intensity.sparks) { s.style.display = 'none'; return; }
+                        s.style.display = 'block'; void s.offsetWidth;
                         s.style.animationName = movesRight ? 'sparkRight' : 'sparkLeft';
                         s.style.animationDelay = '-' + ((index * intensity.sparkDuration) / Math.max(intensity.sparks, 1)).toFixed(2) + 's';
-                        s.style.animationDuration = intensity.sparkDuration + 's';
-                        s.style.animationIterationCount = 'infinite';
-                        s.style.animationTimingFunction = 'linear';
+                        s.style.animationDuration = intensity.sparkDuration + 's'; s.style.animationIterationCount = 'infinite'; s.style.animationTimingFunction = 'linear';
                     });
                 }
             } else { 
                 if (currentActive) {
                     group.style.display = 'none'; 
-                    group.setAttribute('data-anim', '');
-                    group.setAttribute('data-particles', '');
-                    group.setAttribute('data-dash-duration', '');
+                    group.setAttribute('data-anim', ''); group.setAttribute('data-particles', ''); group.setAttribute('data-dash-duration', '');
                 }
             }
         }
 
-        // ================= TRẠNG THÁI ONLINE / OFFLINE CỦA ESP32 =================
-        // Firmware V12 gửi Device_Heartbeat độc lập mỗi ~5 giây qua client Firebase riêng.
-        // Quá 20 giây không thấy heartbeat mới => OFFLINE (4 nhịp heartbeat dự phòng).
+        // ================= TRẠNG THÁI ONLINE / OFFLINE CỦA ESP32 VÀ LƯỚI =================
         const DEVICE_OFFLINE_TIMEOUT_MS = 20000;
         const DEVICE_FIRST_CHECK_TIMEOUT_MS = 20000;
         const DEVICE_HB_STORAGE_KEY = 'sosen_device_hb_value';
@@ -2245,27 +1092,26 @@
         let liveListenerPrimed = false;
         let currentDeviceState = 'checking';
 
+        // Biến toàn cục để đồng bộ Lưới
+        let globalGridOnline = false;
+        let globalGridFresh = false;
+
         function setClockGridStatus(gridPresent, gridFresh = true) {
             const box = document.getElementById('clock-grid-status');
             const label = document.getElementById('clock-grid-status-text');
             if (!box || !label) return;
-
             box.classList.remove('on', 'off', 'unknown', 'stale');
 
-            // Neu ESP32/Firebase khong duoc xac nhan online, khong duoc dung data Grid cu
-            // de ket luan luoi hien tai ON/OFF.
             if (currentDeviceState !== 'online') {
                 box.classList.add('unknown');
                 updateDOMText('clock-grid-status-text', 'GRID --');
                 return;
             }
-
             if (!gridFresh) {
                 box.classList.add('stale');
                 updateDOMText('clock-grid-status-text', 'GRID ?');
                 return;
             }
-
             if (gridPresent === true) {
                 box.classList.add('on');
                 updateDOMText('clock-grid-status-text', 'GRID ON');
@@ -2291,32 +1137,18 @@
             const box = document.getElementById('device-status');
             const text = document.getElementById('device-status-text');
             if (!box || !text) return;
-
             currentDeviceState = state;
             box.classList.remove('online', 'offline', 'checking', 'firebase-offline');
             box.classList.add(state === 'firebase-offline' ? 'checking' : state);
 
-            if (state === 'online') {
-                updateDOMText('device-status-text', 'ESP32 ON');
-            } else if (state === 'offline') {
-                updateDOMText('device-status-text', 'ESP32 OFF');
-                setClockGridStatus(null, false);
-            } else if (state === 'firebase-offline') {
-                updateDOMText('device-status-text', 'ESP32 ?');
-                setClockGridStatus(null, false);
-            } else {
-                updateDOMText('device-status-text', 'ESP32 ...');
-                setClockGridStatus(null, false);
-            }
+            if (state === 'online') { updateDOMText('device-status-text', 'ESP32 ON'); }
+            else if (state === 'offline') { updateDOMText('device-status-text', 'ESP32 OFF'); setClockGridStatus(null, false); }
+            else if (state === 'firebase-offline') { updateDOMText('device-status-text', 'ESP32 ?'); setClockGridStatus(null, false); }
+            else { updateDOMText('device-status-text', 'ESP32 ...'); setClockGridStatus(null, false); }
         }
 
-        // Đây KHÔNG phải đồng hồ chạy liên tục. Nó là thời điểm nhận gói Live mới nhất.
-        // Chỉ đổi khi heartbeat của ESP32 đổi; khi ESP32 OFFLINE thì giá trị đứng yên.
         function renderLastLiveReceivedTime() {
-            if (!(lastLiveReceivedAt > 0)) {
-                updateDOMText('clock-time-text', '--:--:--');
-                return;
-            }
+            if (!(lastLiveReceivedAt > 0)) { updateDOMText('clock-time-text', '--:--:--'); return; }
             const t = new Date(lastLiveReceivedAt);
             updateDOMText('clock-time-text', t.toLocaleTimeString('vi-VN', { hour12: false }));
         }
@@ -2330,54 +1162,29 @@
         function processDeviceHeartbeat(data) {
             const hb = Number(data && data.Device_Heartbeat);
             if (!Number.isFinite(hb)) return;
-
             const nowMs = Date.now();
-
-            // Lần đầu tiên trình duyệt này nhìn thấy heartbeat: chỉ lấy làm mốc.
-            // Không vội báo ONLINE vì Firebase có thể đang giữ heartbeat cũ từ lúc ESP32 đã bị rút.
             if (lastDeviceHeartbeat === null) {
                 lastDeviceHeartbeat = hb;
                 try { localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb)); } catch (e) {}
-                setDeviceStatus('checking');
-                return;
+                setDeviceStatus('checking'); return;
             }
-
-            // Chỉ khi heartbeat THỰC SỰ đổi mới xác nhận ESP32 vừa gửi dữ liệu mới.
             if (hb !== lastDeviceHeartbeat) {
-                lastDeviceHeartbeat = hb;
-                lastDeviceHeartbeatAt = nowMs;
-                try {
-                    localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb));
-                    localStorage.setItem(DEVICE_HB_TIME_STORAGE_KEY, String(nowMs));
-                } catch (e) {}
+                lastDeviceHeartbeat = hb; lastDeviceHeartbeatAt = nowMs;
+                try { localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb)); localStorage.setItem(DEVICE_HB_TIME_STORAGE_KEY, String(nowMs)); } catch (e) {}
                 markLiveDataReceived(nowMs);
-                setDeviceStatus('online');
-                return;
+                setDeviceStatus('online'); return;
             }
-
-            // Cùng heartbeat: chỉ ONLINE nếu trình duyệt đã xác nhận heartbeat này gần đây.
-            if (lastDeviceHeartbeatAt > 0 && (nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS) {
-                setDeviceStatus('online');
-            }
+            if (lastDeviceHeartbeatAt > 0 && (nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS) { setDeviceStatus('online'); }
         }
 
         function updateDeviceStatusByTimeout() {
             const nowMs = Date.now();
-            // Neu chinh trinh duyet mat ket noi Firebase thi KHONG ket luan ESP32 offline.
-            if (firebaseBrowserConnected === false) {
-                setDeviceStatus('firebase-offline');
-                return;
-            }
-            if (lastDeviceHeartbeatAt > 0) {
-                setDeviceStatus((nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS ? 'online' : 'offline');
-            } else if ((nowMs - deviceStatusStartAt) >= DEVICE_FIRST_CHECK_TIMEOUT_MS) {
-                setDeviceStatus('offline');
-            } else {
-                setDeviceStatus('checking');
-            }
+            if (firebaseBrowserConnected === false) { setDeviceStatus('firebase-offline'); return; }
+            if (lastDeviceHeartbeatAt > 0) { setDeviceStatus((nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS ? 'online' : 'offline'); }
+            else if ((nowMs - deviceStatusStartAt) >= DEVICE_FIRST_CHECK_TIMEOUT_MS) { setDeviceStatus('offline'); }
+            else { setDeviceStatus('checking'); }
         }
 
-        // Hiển thị lại lần cập nhật cuối đã lưu; không tự chạy theo từng giây.
         renderLastLiveReceivedTime();
         setInterval(updateDeviceStatusByTimeout, 1000);
         updateDeviceStatusByTimeout();
@@ -2386,16 +1193,20 @@
         let liveDomFrameId = null;
 
         if (database) {
-            // Tach 3 trang thai: ESP32 offline / trinh duyet mat Firebase / online.
             database.ref('.info/connected').on('value', (snapshot) => {
                 firebaseBrowserConnected = snapshot.val() === true;
                 updateDeviceStatusByTimeout();
             });
 
-            // V12.11 heartbeat nam o node /DeviceStatus rieng, khong kich hoat render ca /Live moi 5 giay.
+            // Lắng nghe Heartbeat và trạng thái lưới
             database.ref('/SosenSystem/DeviceStatus').on('value', (snapshot) => {
                 const statusData = snapshot.val();
-                if (statusData) processDeviceHeartbeat(statusData);
+                if (statusData) {
+                    processDeviceHeartbeat(statusData);
+                    globalGridOnline = statusData.Grid_Online === true;
+                    globalGridFresh = statusData.Grid_Data_Fresh !== false;
+                    setClockGridStatus(typeof statusData.Grid_Online === 'boolean' ? statusData.Grid_Online : null, statusData.Grid_Data_Fresh);
+                }
             });
 
             database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
@@ -2405,97 +1216,53 @@
             });
             setInterval(() => { checkAndSwitchMonth(); }, 60000);
 
+            // Lắng nghe dữ liệu Live
             database.ref('/SosenSystem/Live').on('value', (snapshot) => {
                 pendingLiveData = snapshot.val();
                 if (!pendingLiveData) return;
-
-                // Snapshot dau tien co the la cache/last-known cu. Chi cac event Live tiep theo
-                // moi duoc xem la thoi diem du lieu realtime vua den.
+                
                 if (liveListenerPrimed) markLiveDataReceived(Date.now());
                 else liveListenerPrimed = true;
 
                 if (liveDomFrameId !== null) return;
-
                 liveDomFrameId = requestAnimationFrame(() => {
                     const data = pendingLiveData;
                     pendingLiveData = null;
                     liveDomFrameId = null;
                     if (!data) return;
 
-                    // Power_Unit = W la schema chuan cua firmware V12.11.
-                    // Khong tu dong nhan/doi kW de tranh tai dien loi don vi cu.
-
                     const battVoltage = toSafeNumber(data.Batt_Voltage);
                     const battCurrent = toSafeNumber(data.Batt_Current);
                     const battTemp = toSafeNumber(data.Batt_Temp, NaN);
-                    const battTempFresh = data.Battery_Temp_Data_Fresh !== false && Number.isFinite(battTemp);
+                    const battTempFresh = Number.isFinite(battTemp);
 
-                    // V11 T1 GRID FINE: TOAN BO cong suat tu Firebase da la W.
-                    // Khong con nhan *1000 cho PV.
                     const pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power)));
-                    // V11: Grid_Power (signed W) la gia tri chon tu 161/145 trong firmware.
-                    // Dung signed value lam nguon chinh de khong bi field Import/Export cu trong Firebase
-                    // che mat muc 10-20W. Import/Export chi fallback khi Grid_Power = 0.
                     const gridInW = Math.round(toSafeNumber(data.Grid_Power));
-                    const gridImportRaw = Number(data.Grid_Import_Power);
-                    const gridExportRaw = Number(data.Grid_Export_Power);
+                    
                     let gridImportW = Math.max(0, -gridInW);
                     let gridExportW = Math.max(0, gridInW);
                     if (gridInW === 0) {
-                        if (Number.isFinite(gridImportRaw) && gridImportRaw > 0) {
-                            gridImportW = Math.max(0, Math.round(gridImportRaw));
-                        }
-                        if (Number.isFinite(gridExportRaw) && gridExportRaw > 0) {
-                            gridExportW = Math.max(0, Math.round(gridExportRaw));
-                        }
+                        gridImportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Import_Power)));
+                        gridExportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Export_Power)));
                     }
-                    const gridDataFresh = data.Grid_Data_Fresh !== false;
-                    const gridPresentKnown = typeof data.Grid_Present === 'boolean';
-                    const gridPresent = gridPresentKnown ? data.Grid_Present : null;
 
-                    // V12.11: badge GRID ON/OFF nam ngay tren khung dong ho.
-                    // Chi hien ON/OFF khi ESP32 heartbeat dang online va Grid data fresh.
-                    setClockGridStatus(gridPresent, gridDataFresh && gridPresentKnown);
+                    const gridDataFresh = globalGridFresh;
+                    const gridPresent = globalGridOnline;
 
-                    // V11: Batt_Power da duoc firmware chon tu reg293/VxI.
-                    // Bao ve them o HTML: neu Batt_Power=0 do register 293 lam tron 10W
-                    // nhung BMS current van cho thay dong nho, dung V*I de khong mat luong pin.
-                    const rawBattPower = Number(data.Batt_Power);
-                    const rawBattPowerVi = Number(data.Batt_Power_VI);
                     const localBattPowerVi = battVoltage * battCurrent;
                     let battInW = 0;
-                    if (Number.isFinite(rawBattPower) && Math.abs(rawBattPower) >= 1) {
-                        battInW = Math.round(rawBattPower);
-                    } else if (Number.isFinite(rawBattPowerVi) && Math.abs(rawBattPowerVi) >= 2) {
-                        battInW = Math.round(rawBattPowerVi);
-                    } else if (Number.isFinite(localBattPowerVi) && Math.abs(localBattPowerVi) >= 2) {
+                    if (Number.isFinite(localBattPowerVi) && Math.abs(localBattPowerVi) >= 2) {
                         battInW = Math.round(localBattPowerVi);
-                    } else if (Number.isFinite(rawBattPower)) {
-                        battInW = Math.round(rawBattPower);
                     }
 
-                    // Can bang cong suat W: Load = PV + GridImport - GridExport + Batt(+xa/-sac).
-                    // V11 firmware doc 175/194/198 va gui Load_Power da chon.
-                    // Neu direct van =0 (topology khong map vao load register), dashboard dung balance.
-                    const balanceLoadW = Math.max(0, Math.round(
-                        pvInW + gridImportW - gridExportW + battInW
-                    ));
+                    const balanceLoadW = Math.max(0, Math.round(pvInW + gridImportW - gridExportW + battInW));
                     const rawLoadPower = Number(data.Load_Power);
-                    const loadDataFresh = data.Load_Data_Fresh !== false;
-                    let loadInW = 0;
-                    if (loadDataFresh && Number.isFinite(rawLoadPower) && rawLoadPower >= 1) {
-                        loadInW = Math.round(rawLoadPower);
-                    } else if (balanceLoadW >= 20) {
-                        loadInW = balanceLoadW;
-                    } else if (Number.isFinite(rawLoadPower) && rawLoadPower >= 0) {
-                        loadInW = Math.round(rawLoadPower);
-                    }
-                    updateBackgroundByTimeAndPv(pvInW);
+                    let loadInW = (Number.isFinite(rawLoadPower) && rawLoadPower >= 1) ? Math.round(rawLoadPower) : balanceLoadW;
 
+                    updateBackgroundByTimeAndPv(pvInW);
                     animateValue('lbl-pv', pvInW, v => Math.round(v));
                     const elPv = document.getElementById('lbl-pv');
                     if (elPv) elPv.classList.add('val-pv-style');
-
                     updateSunLevelByPower(pvInW);
 
                     animateValue('lbl-load', loadInW, v => Math.round(v));
@@ -2509,60 +1276,25 @@
                     const elGridMode = document.getElementById('lbl-grid-mode');
                     if (elGrid) {
                         elGrid.classList.remove('val-grid-buy-style', 'val-grid-sell-style');
-                        elGrid.style.color = '';
-                        elGrid.style.textShadow = '';
-
-                        if (gridDataFresh && gridPresent === true && gridImportW > 0) {
-                            elGrid.classList.add('val-grid-buy-style');
-                        } else if (gridDataFresh && gridPresent === true && gridExportW > 0) {
-                            elGrid.classList.add('val-grid-sell-style');
-                        } else {
-                            elGrid.style.color = '#fff';
-                            elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
-                        }
+                        if (gridDataFresh && gridPresent === true && gridImportW > 0) { elGrid.classList.add('val-grid-buy-style'); }
+                        else if (gridDataFresh && gridPresent === true && gridExportW > 0) { elGrid.classList.add('val-grid-sell-style'); }
+                        else { elGrid.style.color = '#fff'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)'; }
                     }
-
                     if (elGridMode) {
                         elGridMode.classList.remove('buy', 'sell', 'idle', 'no-grid', 'stale');
-
-                        if (!gridDataFresh) {
-                            // Trang thai data Grid da nam o khung dong ho.
-                            elGridMode.classList.add('stale');
-                            elGridMode.style.display = 'none';
-                            updateDOMText('lbl-grid-mode', '');
-                        } else if (gridPresent === false) {
-                            // V12.11.1: bo dong "KHONG CO LUOI" gan cot EVN.
-                            elGridMode.classList.add('no-grid');
-                            elGridMode.style.display = 'none';
-                            updateDOMText('lbl-grid-mode', '');
-                        } else if (gridImportW > 0) {
-                            // V12.11.1: bo dong "MUA EVN ..." gan cot EVN.
-                            elGridMode.classList.add('buy');
-                            elGridMode.style.display = 'none';
-                            updateDOMText('lbl-grid-mode', '');
-                        } else if (gridExportW > 0) {
-                            // Chi giu thong bao DAY EVN khi co export.
-                            elGridMode.classList.add('sell');
-                            elGridMode.style.display = '';
-                            updateDOMText('lbl-grid-mode', 'ĐẨY EVN ' + gridExportW.toLocaleString('vi-VN') + ' W →');
-                        } else {
-                            // Can bang 0W khong can them chu.
-                            elGridMode.classList.add('idle');
-                            elGridMode.style.display = 'none';
-                            updateDOMText('lbl-grid-mode', '');
-                        }
+                        if (!gridDataFresh) { elGridMode.classList.add('stale'); elGridMode.style.display = 'none'; }
+                        else if (gridPresent === false) { elGridMode.classList.add('no-grid'); elGridMode.style.display = 'none'; }
+                        else if (gridImportW > 0) { elGridMode.classList.add('buy'); elGridMode.style.display = 'none'; }
+                        else if (gridExportW > 0) { elGridMode.classList.add('sell'); elGridMode.style.display = ''; updateDOMText('lbl-grid-mode', 'ĐẨY EVN ' + gridExportW.toLocaleString('vi-VN') + ' W →'); }
+                        else { elGridMode.classList.add('idle'); elGridMode.style.display = 'none'; }
                     }
 
                     animateValue('lbl-batt', Math.abs(battInW), v => Math.round(v));
                     const elBatt = document.getElementById('lbl-batt');
                     if (elBatt) {
                         elBatt.classList.remove('val-charge', 'val-discharge');
-                        if (battInW < 0) { elBatt.classList.add('val-charge'); }
-                        else if (battInW > 0) { elBatt.classList.add('val-discharge'); }
-                        else {
-                            elBatt.style.color = '#fff';
-                            elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)';
-                        }
+                        if (battInW < -1) { elBatt.classList.add('val-charge'); } else if (battInW > 1) { elBatt.classList.add('val-discharge'); }
+                        else { elBatt.style.color = '#fff'; elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)'; }
                     }
 
                     if (data.Inv_Temp !== undefined) {
@@ -2570,52 +1302,32 @@
                         const t = toSafeNumber(data.Inv_Temp);
                         if (tempLabel) {
                             animateValue('lbl-inv-temp', t, v => '🌡️ ' + v.toFixed(0) + '°C');
-                            if (t < 40 && tempLabel.style.backgroundColor !== 'rgb(0, 204, 102)') { tempLabel.style.backgroundColor = '#00cc66'; }
-                            else if (t >= 40 && t < 48 && tempLabel.style.backgroundColor !== 'rgb(255, 170, 0)') { tempLabel.style.backgroundColor = '#ffaa00'; }
-                            else if (t >= 48 && tempLabel.style.backgroundColor !== 'rgb(255, 68, 68)') { tempLabel.style.backgroundColor = '#ff4444'; }
+                            if (t < 40) tempLabel.style.backgroundColor = '#00cc66'; else if (t >= 40 && t < 48) tempLabel.style.backgroundColor = '#ffaa00'; else tempLabel.style.backgroundColor = '#ff4444';
                         }
                     }
 
                     if (data.Inv_Switch !== undefined) {
                         const toggle = document.getElementById('inv-switch-toggle');
                         const statusText = document.getElementById('switch-status-text');
-                        const modalEl = document.getElementById('confirm-modal');
-
-                        if (toggle && (!modalEl || !modalEl.classList.contains('active'))) {
-                            toggle.checked = (data.Inv_Switch === 1);
-                        }
-                        if (statusText) {
-                            updateDOMText('switch-status-text', (data.Inv_Switch === 1) ? "BẬT" : "TẮT");
-                            statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444";
-                        }
+                        if (toggle && document.getElementById('confirm-modal').className.indexOf('active') === -1) { toggle.checked = (data.Inv_Switch === 1); }
+                        if (statusText) { updateDOMText('switch-status-text', (data.Inv_Switch === 1) ? "BẬT" : "TẮT"); statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444"; }
                     }
 
                     let soc = clampNumber(data.Batt_SOC, 0, 100);
                     animateValue('lbl-soc', soc, v => Math.round(v) + '%');
 
+                    // ================= CẬP NHẬT NHIỆT ĐỘ PIN =================
                     const battTempLabel = document.getElementById('lbl-batt-temp');
                     if (battTempLabel) {
                         battTempLabel.classList.remove('temp-cool', 'temp-normal', 'temp-warm', 'temp-hot', 'temp-danger', 'temp-stale');
                         if (battTempFresh) {
                             animateValue('lbl-batt-temp-value', battTemp, v => v.toFixed(1) + '°C');
-
-                            // Phân mức nhiệt độ pin theo giá trị thực (có phần thập phân).
-                            if (battTemp >= 43.0) {
-                                battTempLabel.classList.add('temp-danger');   // >=43°C: đỏ nhấp nháy cảnh báo nguy hiểm
-                            } else if (battTemp >= 36.0) {
-                                battTempLabel.classList.add('temp-hot');      // 36.0-42.9°C: đỏ
-                            } else if (battTemp >= 30.0) {
-                                battTempLabel.classList.add('temp-warm');     // 30.0-35.9°C: vàng
-                            } else if (battTemp >= 18.0) {
-                                battTempLabel.classList.add('temp-normal');   // 18.0-29.9°C: xanh
-                            } else {
-                                battTempLabel.classList.add('temp-cool');     // <18°C: xanh nhạt/mát
-                            }
+                            if (battTemp >= 43.0) battTempLabel.classList.add('temp-danger');
+                            else if (battTemp >= 36.0) battTempLabel.classList.add('temp-hot');
+                            else if (battTemp >= 30.0) battTempLabel.classList.add('temp-warm');
+                            else if (battTemp >= 18.0) battTempLabel.classList.add('temp-normal');
+                            else battTempLabel.classList.add('temp-cool');
                         } else {
-                            if (numberAnimState['lbl-batt-temp-value']?.frameId) {
-                                cancelAnimationFrame(numberAnimState['lbl-batt-temp-value'].frameId);
-                                numberAnimState['lbl-batt-temp-value'].frameId = null;
-                            }
                             updateDOMText('lbl-batt-temp-value', '--°C');
                             battTempLabel.classList.add('temp-stale');
                         }
@@ -2623,6 +1335,7 @@
 
                     animateValue('mini-stat-v', battVoltage, v => v.toFixed(1) + ' V');
                     animateValue('mini-stat-a', battCurrent, v => v.toFixed(1) + ' A');
+                    
                     const miniMeter = document.getElementById('battery-mini-meter');
                     if (miniMeter) {
                         miniMeter.classList.remove('charge', 'discharge', 'idle');
@@ -2633,52 +1346,31 @@
                     let statusLower = rawStatus.toLowerCase();
                     let displayStatus = rawStatus;
                     let statusColor = '#888';
-
-                    if (statusLower.includes("sac") || statusLower.includes("sạc") || statusLower.includes("charge")) {
-                        displayStatus = "Đang Sạc"; statusColor = '#00cc66';
-                    } else if (statusLower.includes("xa") || statusLower.includes("xả") || statusLower.includes("discharge")) {
-                        displayStatus = "Đang Xả"; statusColor = '#ff4444';
-                    } else {
-                        displayStatus = "Chờ"; statusColor = '#888';
-                    }
-
+                    if (statusLower.includes("sac") || statusLower.includes("charge")) { displayStatus = "Đang Sạc"; statusColor = '#00cc66'; }
+                    else if (statusLower.includes("xa") || statusLower.includes("discharge")) { displayStatus = "Đang Xả"; statusColor = '#ff4444'; }
+                    else { displayStatus = "Chờ"; statusColor = '#888'; }
+                    
                     updateDOMText('lbl-status', displayStatus);
-                    if (lblStatus && lblStatus.style.color !== statusColor) { lblStatus.style.color = statusColor; }
+                    if (document.getElementById('lbl-status')) document.getElementById('lbl-status').style.color = statusColor;
 
-                    let colorTheme = 'fill-green';
-                    if (soc <= 20) colorTheme = 'fill-red'; else if (soc <= 40) colorTheme = 'fill-yellow';
-                    if (battFill) {
-                        if (battFill.style.width !== soc + '%') battFill.style.width = soc + '%';
-                        if (!battFill.className.includes(colorTheme)) battFill.className = 'battery-fill ' + colorTheme;
-                    }
+                    let colorTheme = soc <= 20 ? 'fill-red' : (soc <= 40 ? 'fill-yellow' : 'fill-green');
+                    const battFill = document.getElementById('batt-fill');
+                    if (battFill) { battFill.style.width = soc + '%'; battFill.className = 'battery-fill ' + colorTheme; }
 
                     if(pvInW >= 1) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
                     if(loadInW >= 1) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
+                    if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW)); else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); else setFlow('flow-batt', false);
 
-                    if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW));
-                    else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW));
-                    else setFlow('flow-batt', false);
-
-                    // V11 T1 GRID FINE: dùng trực tiếp Import/Export do firmware gửi lên, don vi W.
-                    // MUA: EVN (bên phải) -> inverter, màu đỏ.
-                    // ĐẨY: inverter -> EVN (bên phải), màu xanh.
-                    if (!gridDataFresh || !gridPresent) {
-                        setFlow('flow-grid', false);
-                    } else if (gridImportW > 0) {
-                        setFlow('flow-grid', true, 'flowInR', '#ff4444', gridImportW);
-                    } else if (gridExportW > 0) {
-                        setFlow('flow-grid', true, 'flowOutR', '#00cc66', gridExportW);
-                    } else {
-                        setFlow('flow-grid', false);
-                    }
+                    if (!gridDataFresh || !gridPresent) { setFlow('flow-grid', false); }
+                    else if (gridImportW > 0) { setFlow('flow-grid', true, 'flowInR', '#ff4444', gridImportW); }
+                    else if (gridExportW > 0) { setFlow('flow-grid', true, 'flowOutR', '#00cc66', gridExportW); }
+                    else { setFlow('flow-grid', false); }
                 });
             });
         }
         setInterval(() => { updateBackgroundByTimeAndPv(); }, 60000);
 
-        // ================= XỬ LÝ SỰ KIỆN XÁC NHẬN BẬT/TẮT BIẾN TẦN =================
         let pendingState = null;
-
         function initModalEvents() {
             const toggleEl = document.getElementById('inv-switch-toggle');
             const modalEl = document.getElementById('confirm-modal');
@@ -2689,11 +1381,9 @@
 
             toggleEl.addEventListener('click', function(e) {
                 e.preventDefault();
-                
                 pendingState = !this.checked;
                 const actionText = pendingState ? "BẬT" : "TẮT";
                 modalMsg.innerText = `Bạn có chắc chắn muốn ${actionText} Biến Tần không?`;
-                
                 modalEl.classList.add('active');
             });
 
@@ -2702,68 +1392,38 @@
                     toggleEl.checked = pendingState;
                     const newState = pendingState ? 1 : 0;
                     const statusText = document.getElementById('switch-status-text');
-                    if (statusText) {
-                        statusText.innerText = "...";
-                        statusText.style.color = "#ffaa00";
-                    }
+                    if (statusText) { statusText.innerText = "..."; statusText.style.color = "#ffaa00"; }
 
-                    if (!database) {
-                        if (statusText) {
-                            statusText.innerText = "Lỗi!";
-                            statusText.style.color = "#ff4444";
-                        }
-                        closeModal();
-                        return;
-                    }
-                    
-                    database.ref('/SosenSystem/Control').update({ Inv_Switch: newState })
-                        .catch((error) => {
-                            console.error("Lỗi khi gửi lệnh:", error);
-                            if (statusText) {
-                                statusText.innerText = "Lỗi!";
-                                statusText.style.color = "#ff4444";
-                            }
-                        });
+                    if (!database) { if (statusText) { statusText.innerText = "Lỗi!"; statusText.style.color = "#ff4444"; } closeModal(); return; }
+                    database.ref('/SosenSystem/Control').update({ Inv_Switch: newState }).catch((error) => {
+                        console.error("Lỗi khi gửi lệnh:", error);
+                        if (statusText) { statusText.innerText = "Lỗi!"; statusText.style.color = "#ff4444"; }
+                    });
                 }
                 closeModal();
             });
-
-            btnCancel.addEventListener('click', function() {
-                closeModal();
-            });
+            btnCancel.addEventListener('click', function() { closeModal(); });
         }
-
         function closeModal() {
             const modalEl = document.getElementById('confirm-modal');
             if (modalEl) modalEl.classList.remove('active');
             pendingState = null;
         }
-        // Tự động kiểm tra và bù dữ liệu ngày hôm qua nếu bị thiếu
-function autoSyncYesterdayHistory() {
-    if (!database) return;
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    const yyyy = yesterday.getFullYear();
-    const mm = String(yesterday.getMonth() + 1).padStart(2, '0');
-    const dd = String(yesterday.getDate()).padStart(2, '0');
-    
-    const monthKey = `${yyyy}_${mm}`;
-    const dayKey = `day_${dd}`;
-    
-    database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).once('value', (snap) => {
-        const data = snap.val();
-        // Nếu ngày hôm qua chưa có bản ghi hoặc sản lượng PV = 0
-        if (!data || (data.pv === 0 && data.load === 0)) {
-            console.warn(`Phát hiện ngày ${dd}/${mm}/${yyyy} thiếu dữ liệu. Tiến hành kiểm tra dữ liệu bù...`);
-            // Bạn có thể nhập tay bù trên Firebase Console hoặc lấy từ biến lưu E_Total
+
+        function autoSyncYesterdayHistory() {
+            if (!database) return;
+            const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+            const yyyy = yesterday.getFullYear(); const mm = String(yesterday.getMonth() + 1).padStart(2, '0'); const dd = String(yesterday.getDate()).padStart(2, '0');
+            const monthKey = `${yyyy}_${mm}`; const dayKey = `day_${dd}`;
+            
+            database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).once('value', (snap) => {
+                const data = snap.val();
+                if (!data || (data.pv === 0 && data.load === 0)) {
+                    console.warn(`Phát hiện ngày ${dd}/${mm}/${yyyy} thiếu dữ liệu. Tiến hành kiểm tra dữ liệu bù...`);
+                }
+            });
         }
-    });
-}
-
-// Kích hoạt sau khi tải xong Firebase
-if (database) setTimeout(autoSyncYesterdayHistory, 4000);
-
+        if (database) setTimeout(autoSyncYesterdayHistory, 4000);
     </script>
 </body>
-                    </html>
+</html>
