@@ -1092,7 +1092,6 @@
         let liveListenerPrimed = false;
         let currentDeviceState = 'checking';
 
-        // Biến toàn cục để đồng bộ Lưới
         let globalGridOnline = false;
         let globalGridFresh = false;
 
@@ -1198,7 +1197,6 @@
                 updateDeviceStatusByTimeout();
             });
 
-            // Lắng nghe Heartbeat và trạng thái lưới
             database.ref('/SosenSystem/DeviceStatus').on('value', (snapshot) => {
                 const statusData = snapshot.val();
                 if (statusData) {
@@ -1249,15 +1247,15 @@
                     const gridDataFresh = globalGridFresh;
                     const gridPresent = globalGridOnline;
 
-                    const localBattPowerVi = battVoltage * battCurrent;
-                    let battInW = 0;
-                    if (Number.isFinite(localBattPowerVi) && Math.abs(localBattPowerVi) >= 2) {
-                        battInW = Math.round(localBattPowerVi);
-                    }
+                    // 1. Tính công suất Pin bằng phép nhân Áp với Dòng:
+                    let battInW = Math.round(data.Batt_Voltage * data.Batt_Current);
 
-                    const balanceLoadW = Math.max(0, Math.round(pvInW + gridImportW - gridExportW + battInW));
-                    const rawLoadPower = Number(data.Load_Power);
-                    let loadInW = (Number.isFinite(rawLoadPower) && rawLoadPower >= 1) ? Math.round(rawLoadPower) : balanceLoadW;
+                    // 2. Tự động tính Tải tiêu thụ bằng tổng các nguồn cấp cộng lại:
+                    let loadInW = Math.round(pvInW + gridImportW - gridExportW + battInW);
+                    if (loadInW < 0) loadInW = 0;
+
+                    // 3. Gán con số vừa cộng ép buộc đó lên màn hình hiển thị Tải:
+                    document.getElementById('lbl-load').innerText = loadInW;
 
                     updateBackgroundByTimeAndPv(pvInW);
                     animateValue('lbl-pv', pvInW, v => Math.round(v));
@@ -1265,7 +1263,7 @@
                     if (elPv) elPv.classList.add('val-pv-style');
                     updateSunLevelByPower(pvInW);
 
-                    animateValue('lbl-load', loadInW, v => Math.round(v));
+                    // animateValue('lbl-load', loadInW, v => Math.round(v)); // Đã ẩn để tránh ghi đè hiệu ứng
                     const elLoad = document.getElementById('lbl-load');
                     if (elLoad) elLoad.classList.add('val-load-style');
 
