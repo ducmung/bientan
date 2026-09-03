@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sosen Energy Dashboard V12.11 - Full Sync</title>
+    <title>Sosen Energy Dashboard V2.6 - Full Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
-    <!-- Thư viện vẽ Biểu đồ Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
@@ -18,7 +17,6 @@
             overflow-x: hidden;
             position: relative;
         }
-        /* Lớp nền cố định tối ưu chống giật lag & mất hình */
         body::before {
             content: "";
             position: fixed;
@@ -391,7 +389,7 @@
         }
     </style>
 </head>
-<body data-dashboard-version="V12.11 - Full Sync">
+<body data-dashboard-version="V2.6 - Full Sync">
     <div class="app-container">
         <div class="diagram-panel">
             <div id="battery-mini-meter" class="battery-mini-meter idle">
@@ -461,7 +459,6 @@
                     <div class="battery-body"><div class="battery-fill" id="batt-fill"></div><div id="lbl-soc">0%</div></div>
                     <div class="battery-cap"></div>
                 </div>
-                <!-- Vị trí hiển thị nhiệt độ pin -->
                 <div id="lbl-batt-temp" class="battery-temp-label temp-stale">
                     <span class="temp-icon">🌡️</span><span id="lbl-batt-temp-value" class="temp-value">--°C</span>
                 </div>
@@ -676,7 +673,7 @@
             initModalEvents();
         });
 
-        // ================= FIREBASE & BIỂU ĐỒ NĂNG LƯỢNG (CHART.JS) =================
+        // ================= FIREBASE REALTIME DATABASE =================
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
         let database = null;
         if (typeof firebase !== 'undefined' && firebase.database) {
@@ -686,7 +683,6 @@
             console.error('Firebase SDK chưa tải được.');
             updateDOMText('lbl-status', 'Mất kết nối');
         }
-        const lblStatus = document.getElementById('lbl-status');
 
         let energyChart = null; let currentChartMode = 'month'; let chartCursorDate = new Date(); let chartSelectedIndex = 0; let chartRows = []; let chartAllRows = []; let chartSelectedSourceIndex = 0; let chartResizeTimer = null; let chartLoadRequestId = 0; let chartRefreshTimer = null;
         const chartSeries = [
@@ -1077,7 +1073,7 @@
             }
         }
 
-        // ================= TRẠNG THÁI ONLINE / OFFLINE CỦA ESP32 VÀ LƯỚI =================
+        // ================= TRẠNG THÁI ONLINE/OFFLINE & BỘ LỌC ĐỒNG BỘ =================
         const DEVICE_OFFLINE_TIMEOUT_MS = 20000;
         const DEVICE_FIRST_CHECK_TIMEOUT_MS = 20000;
         const DEVICE_HB_STORAGE_KEY = 'sosen_device_hb_value';
@@ -1095,7 +1091,7 @@
         let globalGridOnline = false;
         let globalGridFresh = false;
 
-        function setClockGridStatus(gridPresent, gridFresh = true) {
+        function setClockGridStatus(gridOnline, gridFresh = true, rawStatusText = null) {
             const box = document.getElementById('clock-grid-status');
             const label = document.getElementById('clock-grid-status-text');
             if (!box || !label) return;
@@ -1111,15 +1107,16 @@
                 updateDOMText('clock-grid-status-text', 'GRID ?');
                 return;
             }
-            if (gridPresent === true) {
+
+            if (gridOnline === true) {
                 box.classList.add('on');
                 updateDOMText('clock-grid-status-text', 'GRID ON');
-            } else if (gridPresent === false) {
+            } else if (gridOnline === false) {
                 box.classList.add('off');
                 updateDOMText('clock-grid-status-text', 'GRID OFF');
             } else {
                 box.classList.add('unknown');
-                updateDOMText('clock-grid-status-text', 'GRID --');
+                updateDOMText('clock-grid-status-text', rawStatusText ? 'GRID ' + rawStatusText : 'GRID --');
             }
         }
 
@@ -1164,8 +1161,11 @@
             const nowMs = Date.now();
             if (lastDeviceHeartbeat === null) {
                 lastDeviceHeartbeat = hb;
-                try { localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb)); } catch (e) {}
-                setDeviceStatus('checking'); return;
+                lastDeviceHeartbeatAt = nowMs;
+                try { localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb)); localStorage.setItem(DEVICE_HB_TIME_STORAGE_KEY, String(nowMs)); } catch (e) {}
+                setDeviceStatus('online');
+                markLiveDataReceived(nowMs);
+                return;
             }
             if (hb !== lastDeviceHeartbeat) {
                 lastDeviceHeartbeat = hb; lastDeviceHeartbeatAt = nowMs;
@@ -1197,16 +1197,19 @@
                 updateDeviceStatusByTimeout();
             });
 
+            // 1. Lắng nghe trạng thái thiết bị & Lưới (Heartbeat)
             database.ref('/SosenSystem/DeviceStatus').on('value', (snapshot) => {
                 const statusData = snapshot.val();
                 if (statusData) {
                     processDeviceHeartbeat(statusData);
-                    globalGridOnline = statusData.Grid_Online === true;
-                    globalGridFresh = statusData.Grid_Data_Fresh !== false;
-                    setClockGridStatus(typeof statusData.Grid_Online === 'boolean' ? statusData.Grid_Online : null, statusData.Grid_Data_Fresh);
+                    const gridKnown = statusData.Grid_State_Known === true;
+                    globalGridOnline = gridKnown ? (statusData.Grid_Online === true) : false;
+                    globalGridFresh = statusData.Grid_Data_Fresh === true;
+                    setClockGridStatus(gridKnown ? statusData.Grid_Online : null, globalGridFresh, statusData.Grid_Status || statusData.Grid_Raw_State);
                 }
             });
 
+            // 2. Lắng nghe dữ liệu Năng lượng tích lũy
             database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
                 latestDailyData = snapshot.val();
                 checkAndSwitchMonth();
@@ -1214,7 +1217,7 @@
             });
             setInterval(() => { checkAndSwitchMonth(); }, 60000);
 
-            // Lắng nghe dữ liệu Live
+            // 3. Lắng nghe Dữ liệu Live chính
             database.ref('/SosenSystem/Live').on('value', (snapshot) => {
                 pendingLiveData = snapshot.val();
                 if (!pendingLiveData) return;
@@ -1232,41 +1235,48 @@
                     const battVoltage = toSafeNumber(data.Batt_Voltage);
                     const battCurrent = toSafeNumber(data.Batt_Current);
                     const battTemp = toSafeNumber(data.Batt_Temp, NaN);
-                    const battTempFresh = Number.isFinite(battTemp);
+                    
+                    // Đồng bộ cờ tươi của Pin từ Firmware
+                    const battTempFresh = (data.Battery_Data_Fresh === true) && Number.isFinite(battTemp);
 
                     const pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power)));
-                    const gridInW = Math.round(toSafeNumber(data.Grid_Power));
                     
-                    let gridImportW = Math.max(0, -gridInW);
-                    let gridExportW = Math.max(0, gridInW);
-                    if (gridInW === 0) {
-                        gridImportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Import_Power)));
-                        gridExportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Export_Power)));
+                    // Đồng bộ công suất lưới trực tiếp
+                    const gridImportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Import_Power)));
+                    const gridExportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Export_Power)));
+
+                    // Đồng bộ trạng thái lưới
+                    const gridStateKnown = (data.Grid_State_Known !== undefined) ? (data.Grid_State_Known === true) : true;
+                    const gridDataFresh = (data.Grid_Data_Fresh !== undefined) ? (data.Grid_Data_Fresh === true) : globalGridFresh;
+                    const gridPresent = gridStateKnown ? (data.Grid_Online === true) : globalGridOnline;
+
+                    // Cập nhật trạng thái đồng hồ Lưới
+                    if (gridStateKnown) {
+                        setClockGridStatus(data.Grid_Online, gridDataFresh, data.Grid_State);
                     }
 
-                    const gridDataFresh = globalGridFresh;
-                    const gridPresent = globalGridOnline;
-
-                    // 1. Tính công suất Pin bằng phép nhân Áp với Dòng:
-                    let battInW = Math.round(data.Batt_Voltage * data.Batt_Current);
-
-                    // 2. Tự động tính Tải tiêu thụ bằng tổng các nguồn cấp cộng lại:
-                    let loadInW = Math.round(pvInW + gridImportW - gridExportW + battInW);
-                    if (loadInW < 0) loadInW = 0;
-
-                    // 3. Gán con số vừa cộng ép buộc đó lên màn hình hiển thị Tải:
-                    document.getElementById('lbl-load').innerText = loadInW;
+                    // Công suất Pin & Công suất Tải chính xác từ Firmware
+                    const battInW = data.Batt_Power !== undefined ? Math.round(toSafeNumber(data.Batt_Power)) : Math.round(battVoltage * battCurrent);
+                    const loadInW = Math.max(0, Math.round(toSafeNumber(data.Load_Power)));
+                    const loadValid = data.Load_Calculation_Valid === true;
 
                     updateBackgroundByTimeAndPv(pvInW);
+                    
+                    // Hiển thị Sản lượng Mặt trời
                     animateValue('lbl-pv', pvInW, v => Math.round(v));
                     const elPv = document.getElementById('lbl-pv');
                     if (elPv) elPv.classList.add('val-pv-style');
                     updateSunLevelByPower(pvInW);
 
-                    // animateValue('lbl-load', loadInW, v => Math.round(v)); // Đã ẩn để tránh ghi đè hiệu ứng
+                    // Hiển thị Công suất Tải
+                    animateValue('lbl-load', loadInW, v => Math.round(v));
                     const elLoad = document.getElementById('lbl-load');
-                    if (elLoad) elLoad.classList.add('val-load-style');
+                    if (elLoad) {
+                        elLoad.classList.add('val-load-style');
+                        elLoad.style.opacity = loadValid ? '1' : '0.5';
+                    }
 
+                    // Hiển thị Công suất Lưới
                     const gridActiveW = gridImportW > 0 ? gridImportW : gridExportW;
                     animateValue('lbl-grid', gridActiveW, v => Math.round(v));
 
@@ -1274,19 +1284,20 @@
                     const elGridMode = document.getElementById('lbl-grid-mode');
                     if (elGrid) {
                         elGrid.classList.remove('val-grid-buy-style', 'val-grid-sell-style');
-                        if (gridDataFresh && gridPresent === true && gridImportW > 0) { elGrid.classList.add('val-grid-buy-style'); }
-                        else if (gridDataFresh && gridPresent === true && gridExportW > 0) { elGrid.classList.add('val-grid-sell-style'); }
+                        if (gridDataFresh && gridPresent && gridImportW > 0) { elGrid.classList.add('val-grid-buy-style'); }
+                        else if (gridDataFresh && gridPresent && gridExportW > 0) { elGrid.classList.add('val-grid-sell-style'); }
                         else { elGrid.style.color = '#fff'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)'; }
                     }
                     if (elGridMode) {
                         elGridMode.classList.remove('buy', 'sell', 'idle', 'no-grid', 'stale');
                         if (!gridDataFresh) { elGridMode.classList.add('stale'); elGridMode.style.display = 'none'; }
-                        else if (gridPresent === false) { elGridMode.classList.add('no-grid'); elGridMode.style.display = 'none'; }
+                        else if (!gridPresent) { elGridMode.classList.add('no-grid'); elGridMode.style.display = 'none'; }
                         else if (gridImportW > 0) { elGridMode.classList.add('buy'); elGridMode.style.display = 'none'; }
                         else if (gridExportW > 0) { elGridMode.classList.add('sell'); elGridMode.style.display = ''; updateDOMText('lbl-grid-mode', 'ĐẨY EVN ' + gridExportW.toLocaleString('vi-VN') + ' W →'); }
                         else { elGridMode.classList.add('idle'); elGridMode.style.display = 'none'; }
                     }
 
+                    // Hiển thị Công suất Pin
                     animateValue('lbl-batt', Math.abs(battInW), v => Math.round(v));
                     const elBatt = document.getElementById('lbl-batt');
                     if (elBatt) {
@@ -1295,6 +1306,7 @@
                         else { elBatt.style.color = '#fff'; elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)'; }
                     }
 
+                    // Nhiệt độ Biến tần
                     if (data.Inv_Temp !== undefined) {
                         const tempLabel = document.getElementById('lbl-inv-temp');
                         const t = toSafeNumber(data.Inv_Temp);
@@ -1304,6 +1316,7 @@
                         }
                     }
 
+                    // Công tắc Biến tần (Inv_Switch)
                     if (data.Inv_Switch !== undefined) {
                         const toggle = document.getElementById('inv-switch-toggle');
                         const statusText = document.getElementById('switch-status-text');
@@ -1311,10 +1324,11 @@
                         if (statusText) { updateDOMText('switch-status-text', (data.Inv_Switch === 1) ? "BẬT" : "TẮT"); statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444"; }
                     }
 
+                    // SOC Pin
                     let soc = clampNumber(data.Batt_SOC, 0, 100);
                     animateValue('lbl-soc', soc, v => Math.round(v) + '%');
 
-                    // ================= CẬP NHẬT NHIỆT ĐỘ PIN =================
+                    // Nhiệt độ Pin (Batt_Temp)
                     const battTempLabel = document.getElementById('lbl-batt-temp');
                     if (battTempLabel) {
                         battTempLabel.classList.remove('temp-cool', 'temp-normal', 'temp-warm', 'temp-hot', 'temp-danger', 'temp-stale');
@@ -1355,8 +1369,9 @@
                     const battFill = document.getElementById('batt-fill');
                     if (battFill) { battFill.style.width = soc + '%'; battFill.className = 'battery-fill ' + colorTheme; }
 
-                    if(pvInW >= 1) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
-                    if(loadInW >= 1) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
+                    // Luồng chảy Năng lượng (Flow Animation)
+                    if (pvInW >= 1) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
+                    if (loadInW >= 1 && loadValid) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
                     if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW)); else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); else setFlow('flow-batt', false);
 
                     if (!gridDataFresh || !gridPresent) { setFlow('flow-grid', false); }
@@ -1417,7 +1432,7 @@
             database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).once('value', (snap) => {
                 const data = snap.val();
                 if (!data || (data.pv === 0 && data.load === 0)) {
-                    console.warn(`Phát hiện ngày ${dd}/${mm}/${yyyy} thiếu dữ liệu. Tiến hành kiểm tra dữ liệu bù...`);
+                    console.warn(`Phát hiện ngày ${dd}/${mm}/${yyyy} thiếu dữ liệu. Đang cập nhật...`);
                 }
             });
         }
