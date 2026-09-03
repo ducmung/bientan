@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sosen Energy Dashboard V2.6 - Full Sync</title>
+    <title>Sosen Energy Dashboard V2.6 - Full Sync (Read-Only)</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -389,7 +389,7 @@
         }
     </style>
 </head>
-<body data-dashboard-version="V2.6 - Full Sync">
+<body data-dashboard-version="V2.6 - Full Sync (Read-Only)">
     <div class="app-container">
         <div class="diagram-panel">
             <div id="battery-mini-meter" class="battery-mini-meter idle">
@@ -496,7 +496,7 @@
                     <div>Tháng này (<span id="money-pv-month">0</span> kWh): <span id="money-month" style="font-size: 15px; color: #ff4444; font-weight: 900;">0 đ</span></div>
                     <div>Năm nay/Trọn đời (<span id="money-pv-total">0</span> kWh): <span id="money-total" style="font-size: 16px; color: #00cc66; font-weight: 900;">0 đ</span></div>
                 </div>
-                <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic; position: relative; z-index: 1;">*Hệ thống tự động cộng dồn theo ngày dương lịch</div>
+                <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic; position: relative; z-index: 1;">*Hệ thống tự động đồng bộ định kỳ từ ESP32</div>
             </div>
 
             <div class="stat-card energy-chart-card">
@@ -508,7 +508,7 @@
                     </div>
                     <div class="chart-period-control">
                         <button class="chart-nav-btn" type="button" onclick="shiftChartPeriod(-1)" aria-label="Kỳ trước">‹</button>
-                        <div class="chart-period-label" id="chart-period-label">2026-07</div>
+                        <div class="chart-period-label" id="chart-period-label">2026-09</div>
                         <button class="chart-nav-btn" type="button" onclick="shiftChartPeriod(1)" aria-label="Kỳ sau">›</button>
                     </div>
                 </div>
@@ -684,7 +684,7 @@
             updateDOMText('lbl-status', 'Mất kết nối');
         }
 
-        let energyChart = null; let currentChartMode = 'month'; let chartCursorDate = new Date(); let chartSelectedIndex = 0; let chartRows = []; let chartAllRows = []; let chartSelectedSourceIndex = 0; let chartResizeTimer = null; let chartLoadRequestId = 0; let chartRefreshTimer = null;
+        let energyChart = null; let currentChartMode = 'month'; let chartCursorDate = new Date(); let chartSelectedIndex = 0; let chartRows = []; let chartAllRows = []; let chartSelectedSourceIndex = 0; let chartResizeTimer = null; let chartLoadRequestId = 0;
         const chartSeries = [
             { label: 'Sản lượng PV', key: 'pv', color: '#59ba35', border: '#48a927' },
             { label: 'Xả pin', key: 'batt', color: '#45a8de', border: '#278fc9' },
@@ -756,8 +756,6 @@
             loadChartData();
         }
 
-        function scheduleChartDataRefresh(delay = 800) { clearTimeout(chartRefreshTimer); chartRefreshTimer = setTimeout(() => { if (database && energyChart) loadChartData(); }, delay); }
-
         function setChartMode(mode) {
             if (!['month', 'year', 'total'].includes(mode)) return;
             currentChartMode = mode;
@@ -778,6 +776,7 @@
             updateVisibleChartRows();
         }
 
+        // Đọc dữ liệu lịch sử do ESP32 tự động chốt mỗi 30 phút
         function loadChartData() {
             if (!database) return;
             const requestId = ++chartLoadRequestId;
@@ -885,14 +884,18 @@
             updateDOMText('chart-detail-load', formatChartNumber(row.load));
         }
 
-        let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null; let lastHistorySaveSignature = ""; let historySaveTimer = null;
+        let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
 
         function checkAndSwitchMonth() {
             if (!database) return;
             let d = new Date(); let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
             if (mk !== currentMonthKey) {
                 if (currentMonthKey !== "") { database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).off(); }
-                currentMonthKey = mk; database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).on('value', (snap) => { currentMonthHistory = snap.val() || {}; recalculateEnergy(); });
+                currentMonthKey = mk; 
+                database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).on('value', (snap) => { 
+                    currentMonthHistory = snap.val() || {}; 
+                    recalculateEnergy(); 
+                });
             }
         }
 
@@ -906,46 +909,15 @@
             if(r > 0) { cost += r * 3736.80; } return cost;
         }
 
-        function queueEnergyHistorySave(pvToday, loadToday, gridBuyToday, battDischargeToday = 0, battChargeToday = 0) {
-            if (!database) return;
-            const now = new Date();
-            const dateKey = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('_');
-            const values = [pvToday, loadToday, gridBuyToday, battDischargeToday, battChargeToday].map(value => Number(toSafeNumber(value).toFixed(1)));
-            const signature = `${dateKey}|${values.join('|')}`;
-
-            if (signature === lastHistorySaveSignature) return;
-            clearTimeout(historySaveTimer);
-            historySaveTimer = setTimeout(() => {
-                if (signature === lastHistorySaveSignature) return;
-                lastHistorySaveSignature = signature;
-                saveEnergyHistoryToFirebase(...values);
-            }, 1200);
+        // ================= ĐÃ CẮT BỎ CÁC HÀM GHI ĐÈ LÊN FIREBASE =================
+        function queueEnergyHistorySave() {
+            // Đã chuyển cho ESP32 tự động chốt định kỳ 30 phút/lần
+            return;
         }
 
-        function saveEnergyHistoryToFirebase(pvToday, loadToday, gridBuyToday, battDischargeToday = 0, battChargeToday = 0) {
-            if (!database) return;
-            pvToday = toSafeNumber(pvToday); loadToday = toSafeNumber(loadToday); gridBuyToday = toSafeNumber(gridBuyToday); battDischargeToday = toSafeNumber(battDischargeToday); battChargeToday = toSafeNumber(battChargeToday);
-            const now = new Date();
-            const yyyy = now.getFullYear(); const mm = String(now.getMonth() + 1).padStart(2, '0'); const dd = String(now.getDate()).padStart(2, '0');
-            const monthKey = `${yyyy}_${mm}`; const dayKey = `day_${dd}`; const monthItemKey = `month_${mm}`; const yearKey = `year_${yyyy}`;
-            const dailyRef = database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`);
-            const dailyPayload = { pv: Number(pvToday.toFixed(1)), load: Number(loadToday.toFixed(1)), grid: Number(gridBuyToday.toFixed(1)), batt: Number(battDischargeToday.toFixed(1)), charge: Number(battChargeToday.toFixed(1)) };
-
-            dailyRef.update(dailyPayload)
-                .then(() => database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value'))
-                .then((snap) => {
-                    const daysData = snap.val() || {}; let monthPv = 0, monthLoad = 0, monthGrid = 0, monthBatt = 0, monthCharge = 0;
-                    for (let d in daysData) { monthPv += toSafeNumber(daysData[d].pv); monthLoad += toSafeNumber(daysData[d].load); monthGrid += toSafeNumber(daysData[d].grid); monthBatt += toSafeNumber(daysData[d].batt); monthCharge += toSafeNumber(daysData[d].charge); }
-                    return database.ref(`/SosenSystem/History/Monthly/${yyyy}/${monthItemKey}`).update({ pv: Number(monthPv.toFixed(1)), load: Number(monthLoad.toFixed(1)), grid: Number(monthGrid.toFixed(1)), batt: Number(monthBatt.toFixed(1)), charge: Number(monthCharge.toFixed(1)) });
-                })
-                .then(() => database.ref(`/SosenSystem/History/Monthly/${yyyy}`).once('value'))
-                .then((mSnap) => {
-                    const monthsData = mSnap.val() || {}; let yearPv = 0, yearLoad = 0, yearGrid = 0, yearBatt = 0, yearCharge = 0;
-                    for (let m in monthsData) { yearPv += toSafeNumber(monthsData[m].pv); yearLoad += toSafeNumber(monthsData[m].load); yearGrid += toSafeNumber(monthsData[m].grid); yearBatt += toSafeNumber(monthsData[m].batt); yearCharge += toSafeNumber(monthsData[m].charge); }
-                    return database.ref(`/SosenSystem/History/Yearly/${yearKey}`).update({ pv: Number(yearPv.toFixed(1)), load: Number(yearLoad.toFixed(1)), grid: Number(yearGrid.toFixed(1)), batt: Number(yearBatt.toFixed(1)), charge: Number(yearCharge.toFixed(1)) });
-                })
-                .then(() => { scheduleChartDataRefresh(); })
-                .catch((error) => { console.error('Lỗi khi lưu lịch sử năng lượng:', error); });
+        function saveEnergyHistoryToFirebase() {
+            // Đã chuyển cho ESP32 tự động chốt định kỳ 30 phút/lần
+            return;
         }
 
         function recalculateEnergy() {
@@ -967,21 +939,12 @@
             animateValue('stat-bat-chg-total', toSafeNumber(data.Bat_Charge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
             animateValue('stat-pv-total', currentETotal, v => v.toFixed(1) + ' kWh');
 
-            if (pvToday > 0 || loadToday > 0 || gridBuyToday > 0 || battDisToday > 0 || battChgToday > 0) {
-                queueEnergyHistorySave(pvToday, loadToday, gridBuyToday, battDisToday, battChgToday);
-            }
-
             let todayDate = new Date(); 
-            let curMonthKey = todayDate.getFullYear() + "_" + (todayDate.getMonth() + 1).toString().padStart(2, '0');
             let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
             let savedPv = toSafeNumber(currentMonthHistory[curDayKey]);
-            const roundedPvToday = Number(pvToday.toFixed(1));
 
-            if (database && roundedPvToday > savedPv && roundedPvToday > 0) { 
-                database.ref(`/SosenSystem/Monthly_History/${curMonthKey}/${curDayKey}`).set(roundedPvToday); 
-                currentMonthHistory[curDayKey] = roundedPvToday; 
-                savedPv = roundedPvToday; 
-            }
+            // ĐÃ XÓA ĐOẠN GHI ĐÈ LÊN FIREBASE:
+            // ESP32 đã đảm nhiệm chốt và lưu tự động vào Database
 
             let pvMonthTotal = 0; 
             for (let key in currentMonthHistory) { 
@@ -1073,9 +1036,9 @@
             }
         }
 
-        // ================= TRẠNG THÁI ONLINE/OFFLINE & BỘ LỌC ĐỒNG BỘ =================
-        const DEVICE_OFFLINE_TIMEOUT_MS = 20000;
-        const DEVICE_FIRST_CHECK_TIMEOUT_MS = 20000;
+        // ================= TRẠNG THÁI THIẾT BỊ =================
+        const DEVICE_OFFLINE_TIMEOUT_MS = 30000; // Tăng lên 30s tránh báo nhầm
+        const DEVICE_FIRST_CHECK_TIMEOUT_MS = 25000;
         const DEVICE_HB_STORAGE_KEY = 'sosen_device_hb_value';
         const DEVICE_HB_TIME_STORAGE_KEY = 'sosen_device_hb_seen_at';
         const DEVICE_LAST_DATA_TIME_STORAGE_KEY = 'sosen_last_live_received_at';
@@ -1209,7 +1172,7 @@
                 }
             });
 
-            // 2. Lắng nghe dữ liệu Năng lượng tích lũy
+            // 2. Lắng nghe dữ liệu Năng lượng tích lũy (Thuần đọc)
             database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
                 latestDailyData = snapshot.val();
                 checkAndSwitchMonth();
@@ -1235,27 +1198,20 @@
                     const battVoltage = toSafeNumber(data.Batt_Voltage);
                     const battCurrent = toSafeNumber(data.Batt_Current);
                     const battTemp = toSafeNumber(data.Batt_Temp, NaN);
-                    
-                    // Đồng bộ cờ tươi của Pin từ Firmware
                     const battTempFresh = (data.Battery_Data_Fresh === true) && Number.isFinite(battTemp);
 
                     const pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power)));
-                    
-                    // Đồng bộ công suất lưới trực tiếp
                     const gridImportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Import_Power)));
                     const gridExportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Export_Power)));
 
-                    // Đồng bộ trạng thái lưới
                     const gridStateKnown = (data.Grid_State_Known !== undefined) ? (data.Grid_State_Known === true) : true;
                     const gridDataFresh = (data.Grid_Data_Fresh !== undefined) ? (data.Grid_Data_Fresh === true) : globalGridFresh;
                     const gridPresent = gridStateKnown ? (data.Grid_Online === true) : globalGridOnline;
 
-                    // Cập nhật trạng thái đồng hồ Lưới
                     if (gridStateKnown) {
                         setClockGridStatus(data.Grid_Online, gridDataFresh, data.Grid_State);
                     }
 
-                    // Công suất Pin & Công suất Tải chính xác từ Firmware
                     const battInW = data.Batt_Power !== undefined ? Math.round(toSafeNumber(data.Batt_Power)) : Math.round(battVoltage * battCurrent);
                     const loadInW = Math.max(0, Math.round(toSafeNumber(data.Load_Power)));
                     const loadValid = data.Load_Calculation_Valid === true;
@@ -1422,21 +1378,6 @@
             if (modalEl) modalEl.classList.remove('active');
             pendingState = null;
         }
-
-        function autoSyncYesterdayHistory() {
-            if (!database) return;
-            const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-            const yyyy = yesterday.getFullYear(); const mm = String(yesterday.getMonth() + 1).padStart(2, '0'); const dd = String(yesterday.getDate()).padStart(2, '0');
-            const monthKey = `${yyyy}_${mm}`; const dayKey = `day_${dd}`;
-            
-            database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).once('value', (snap) => {
-                const data = snap.val();
-                if (!data || (data.pv === 0 && data.load === 0)) {
-                    console.warn(`Phát hiện ngày ${dd}/${mm}/${yyyy} thiếu dữ liệu. Đang cập nhật...`);
-                }
-            });
-        }
-        if (database) setTimeout(autoSyncYesterdayHistory, 4000);
     </script>
 </body>
 </html>
