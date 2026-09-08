@@ -747,7 +747,7 @@
                         tooltip: { callbacks: { title(items) { const row = chartRows[items[0].dataIndex]; return row ? row.detailLabel : ''; }, label(item) { return `${item.dataset.label}: ${formatChartNumber(item.parsed.y)} kWh`; } } }
                     },
                     scales: {
-                        x: { grid: { display: true, color: 'rgba(0,0,0,0.18)', borderDash: [8, 8] }, ticks: { font: { family: 'Nunito', weight: '900', size: 13 }, color: '#222' } },
+                        x: { grid: { display: true, color: 'rgba(0,0,0,0.18)', borderDash: }, ticks: { font: { family: 'Nunito', weight: '900', size: 13 }, color: '#222' } },
                         y: { beginAtZero: true, grace: '18%', ticks: { font: { family: 'Nunito', weight: '900', size: 12 }, color: '#333' }, grid: { color: 'rgba(0,0,0,0.16)' } }
                     }
                 }
@@ -776,7 +776,6 @@
             updateVisibleChartRows();
         }
 
-        // Đọc dữ liệu lịch sử do ESP32 tự động chốt mỗi 30 phút
         function loadChartData() {
             if (!database) return;
             const requestId = ++chartLoadRequestId;
@@ -909,16 +908,8 @@
             if(r > 0) { cost += r * 3736.80; } return cost;
         }
 
-        // ================= ĐÃ CẮT BỎ CÁC HÀM GHI ĐÈ LÊN FIREBASE =================
-        function queueEnergyHistorySave() {
-            // Đã chuyển cho ESP32 tự động chốt định kỳ 30 phút/lần
-            return;
-        }
-
-        function saveEnergyHistoryToFirebase() {
-            // Đã chuyển cho ESP32 tự động chốt định kỳ 30 phút/lần
-            return;
-        }
+        function queueEnergyHistorySave() { return; }
+        function saveEnergyHistoryToFirebase() { return; }
 
         function recalculateEnergy() {
             if (!latestDailyData) return; 
@@ -942,9 +933,6 @@
             let todayDate = new Date(); 
             let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
             let savedPv = toSafeNumber(currentMonthHistory[curDayKey]);
-
-            // ĐÃ XÓA ĐOẠN GHI ĐÈ LÊN FIREBASE:
-            // ESP32 đã đảm nhiệm chốt và lưu tự động vào Database
 
             let pvMonthTotal = 0; 
             for (let key in currentMonthHistory) { 
@@ -1036,9 +1024,9 @@
             }
         }
 
-        // ================= TRẠNG THÁI THIẾT BỊ =================
-        const DEVICE_OFFLINE_TIMEOUT_MS = 30000; // Tăng lên 30s tránh báo nhầm
-        const DEVICE_FIRST_CHECK_TIMEOUT_MS = 25000;
+        // ================= TRẠNG THÁI THIẾT BỊ: ĐỘ TRỄ 40S & NHẬN BIẾT THÔNG MINH =================
+        const DEVICE_OFFLINE_TIMEOUT_MS = 40000; // ⚠️ ĐÃ ĐẶT 40 GIÂY CHỐNG BÁO OFF ẢO
+        const DEVICE_FIRST_CHECK_TIMEOUT_MS = 35000;
         const DEVICE_HB_STORAGE_KEY = 'sosen_device_hb_value';
         const DEVICE_HB_TIME_STORAGE_KEY = 'sosen_device_hb_seen_at';
         const DEVICE_LAST_DATA_TIME_STORAGE_KEY = 'sosen_last_live_received_at';
@@ -1118,38 +1106,58 @@
             renderLastLiveReceivedTime();
         }
 
+        // ⚠️ CƠ CHẾ NHẬN BIẾT THÔNG MINH: Bất kỳ khi nào nhận dữ liệu là lập tức BÁO ONLINE!
+        function markDeviceActive(nowMs = Date.now()) {
+            lastDeviceHeartbeatAt = nowMs;
+            setDeviceStatus('online');
+            markLiveDataReceived(nowMs);
+        }
+
         function processDeviceHeartbeat(data) {
             const hb = Number(data && data.Device_Heartbeat);
             if (!Number.isFinite(hb)) return;
             const nowMs = Date.now();
-            if (lastDeviceHeartbeat === null) {
+            if (lastDeviceHeartbeat === null || hb !== lastDeviceHeartbeat) {
                 lastDeviceHeartbeat = hb;
-                lastDeviceHeartbeatAt = nowMs;
                 try { localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb)); localStorage.setItem(DEVICE_HB_TIME_STORAGE_KEY, String(nowMs)); } catch (e) {}
-                setDeviceStatus('online');
-                markLiveDataReceived(nowMs);
+                markDeviceActive(nowMs);
                 return;
             }
-            if (hb !== lastDeviceHeartbeat) {
-                lastDeviceHeartbeat = hb; lastDeviceHeartbeatAt = nowMs;
-                try { localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb)); localStorage.setItem(DEVICE_HB_TIME_STORAGE_KEY, String(nowMs)); } catch (e) {}
-                markLiveDataReceived(nowMs);
-                setDeviceStatus('online'); return;
+            if (lastDeviceHeartbeatAt > 0 && (nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS) { 
+                setDeviceStatus('online'); 
             }
-            if (lastDeviceHeartbeatAt > 0 && (nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS) { setDeviceStatus('online'); }
         }
 
+        // ⚠️ KIỂM TRA THỜI GIAN THEO MỐC MỚI NHẤT CỦA CẢ LIVE DATA VÀ HEARTBEAT (40 GIÂY)
         function updateDeviceStatusByTimeout() {
             const nowMs = Date.now();
             if (firebaseBrowserConnected === false) { setDeviceStatus('firebase-offline'); return; }
-            if (lastDeviceHeartbeatAt > 0) { setDeviceStatus((nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS ? 'online' : 'offline'); }
-            else if ((nowMs - deviceStatusStartAt) >= DEVICE_FIRST_CHECK_TIMEOUT_MS) { setDeviceStatus('offline'); }
-            else { setDeviceStatus('checking'); }
+            
+            // Lấy thời điểm hoạt động gần nhất giữa Heartbeat và Live Data:
+            const mostRecentActivity = Math.max(lastDeviceHeartbeatAt, lastLiveReceivedAt);
+            
+            if (mostRecentActivity > 0) { 
+                setDeviceStatus((nowMs - mostRecentActivity) <= DEVICE_OFFLINE_TIMEOUT_MS ? 'online' : 'offline'); 
+            }
+            else if ((nowMs - deviceStatusStartAt) >= DEVICE_FIRST_CHECK_TIMEOUT_MS) { 
+                setDeviceStatus('offline'); 
+            }
+            else { 
+                setDeviceStatus('checking'); 
+            }
         }
 
         renderLastLiveReceivedTime();
         setInterval(updateDeviceStatusByTimeout, 1000);
         updateDeviceStatusByTimeout();
+
+        // Tự động kết nối lại và kiểm tra ngay khi mở màn hình điện thoại
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && database) {
+                database.goOnline();
+                updateDeviceStatusByTimeout();
+            }
+        });
 
         let pendingLiveData = null;
         let liveDomFrameId = null;
@@ -1175,18 +1183,20 @@
             // 2. Lắng nghe dữ liệu Năng lượng tích lũy (Thuần đọc)
             database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
                 latestDailyData = snapshot.val();
+                markDeviceActive(Date.now()); // Có dữ liệu về là ESP32 sống
                 checkAndSwitchMonth();
                 recalculateEnergy();
             });
             setInterval(() => { checkAndSwitchMonth(); }, 60000);
 
-            // 3. Lắng nghe Dữ liệu Live chính
+            // 3. Lắng nghe Dữ liệu Live chính (NHẬN DIỆN THÔNG MINH)
             database.ref('/SosenSystem/Live').on('value', (snapshot) => {
                 pendingLiveData = snapshot.val();
                 if (!pendingLiveData) return;
                 
-                if (liveListenerPrimed) markLiveDataReceived(Date.now());
-                else liveListenerPrimed = true;
+                // ⚠️ BỔ SUNG: Hễ có Live Data về là ESP32 100% ONLINE, BẬT ĐÈN XANH NGAY LẬP TỨC!
+                markDeviceActive(Date.now());
+                if (!liveListenerPrimed) liveListenerPrimed = true;
 
                 if (liveDomFrameId !== null) return;
                 liveDomFrameId = requestAnimationFrame(() => {
@@ -1208,6 +1218,7 @@
                     const gridDataFresh = (data.Grid_Data_Fresh !== undefined) ? (data.Grid_Data_Fresh === true) : globalGridFresh;
                     const gridPresent = gridStateKnown ? (data.Grid_Online === true) : globalGridOnline;
 
+                    // Hiển thị chuẩn xác trạng thái lưới từ Live Data
                     if (gridStateKnown) {
                         setClockGridStatus(data.Grid_Online, gridDataFresh, data.Grid_State);
                     }
@@ -1375,6 +1386,7 @@
         }
         function closeModal() {
             const modalEl = document.getElementById('confirm-modal');
+            if (modalEl) modalEl.classList.remove('active'); modalEl = document.getElementById('confirm-modal');
             if (modalEl) modalEl.classList.remove('active');
             pendingState = null;
         }
