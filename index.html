@@ -1037,8 +1037,8 @@
         }
 
         // ================= TRẠNG THÁI THIẾT BỊ =================
-        const DEVICE_OFFLINE_TIMEOUT_MS = 35000; // Tăng lên 30s tránh báo nhầm
-        const DEVICE_FIRST_CHECK_TIMEOUT_MS = 30000;
+        const DEVICE_OFFLINE_TIMEOUT_MS = 30000; // Tăng lên 30s tránh báo nhầm
+        const DEVICE_FIRST_CHECK_TIMEOUT_MS = 25000;
         const DEVICE_HB_STORAGE_KEY = 'sosen_device_hb_value';
         const DEVICE_HB_TIME_STORAGE_KEY = 'sosen_device_hb_seen_at';
         const DEVICE_LAST_DATA_TIME_STORAGE_KEY = 'sosen_last_live_received_at';
@@ -1194,11 +1194,6 @@
                     pendingLiveData = null;
                     liveDomFrameId = null;
                     if (!data) return;
-                    lastDeviceHeartbeatAt = Date.now(); // Xác nhận nhịp tim còn sống
-    setDeviceStatus('online');          // BẬT ĐÈN XANH ESP32 ON NGAY LẬP TỨC!
-
-    if (liveListenerPrimed) markLiveDataReceived(Date.now());
-    else liveListenerPrimed = true;
 
                     const battVoltage = toSafeNumber(data.Batt_Voltage);
                     const battCurrent = toSafeNumber(data.Batt_Current);
