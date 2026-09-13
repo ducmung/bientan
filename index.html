@@ -1181,6 +1181,45 @@
             setInterval(() => { checkAndSwitchMonth(); }, 60000);
 
             // 3. Lắng nghe Dữ liệu Live chính
+            let lastLiveTime = 0;
+
+// Khi có dữ liệu Live đổ về từ Firebase (mỗi 4 giây):
+database.ref('/SosenSystem/Live').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        lastLiveTime = Date.now(); // Cập nhật thời điểm nhận gói tin
+        
+        // 1. CẬP NHẬT TRẠNG THÁI LƯỚI ĐIỆN TỪ V_GRID
+        const elGridStatus = document.getElementById('lbl-grid-status'); // Hoặc id của thẻ hiển thị GRID
+        if (elGridStatus) {
+            if (data.V_Grid && data.V_Grid > 50) {
+                elGridStatus.innerHTML = "🟢 GRID ON";
+                elGridStatus.style.color = "#00cc66";
+            } else {
+                elGridStatus.innerHTML = "⚪ GRID OFF";
+                elGridStatus.style.color = "#888";
+            }
+        }
+        
+        // 2. CẬP NHẬT TRẠNG THÁI ESP32 ONLINE
+        const elEspStatus = document.getElementById('lbl-esp-status'); // Hoặc id của thẻ hiển thị ESP32
+        if (elEspStatus) {
+            elEspStatus.innerHTML = "🟢 ESP32 ONLINE";
+            elEspStatus.style.color = "#00cc66";
+        }
+    }
+});
+
+// Kiểm tra định kỳ mỗi 2 giây: Nếu quá 15s không có Live data thì mới báo OFFLINE
+setInterval(() => {
+    if (lastLiveTime > 0 && (Date.now() - lastLiveTime > 30000)) {
+        const elEspStatus = document.getElementById('lbl-esp-status');
+        if (elEspStatus) {
+            elEspStatus.innerHTML = "🔴 ESP32 OFF";
+            elEspStatus.style.color = "#ff4444";
+        }
+    }
+}, 4000);
             database.ref('/SosenSystem/Live').on('value', (snapshot) => {
                 pendingLiveData = snapshot.val();
                 if (!pendingLiveData) return;
