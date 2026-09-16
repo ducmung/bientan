@@ -909,17 +909,6 @@
             if(r > 0) { cost += r * 3736.80; } return cost;
         }
 
-        // ================= ĐÃ CẮT BỎ CÁC HÀM GHI ĐÈ LÊN FIREBASE =================
-        function queueEnergyHistorySave() {
-            // Đã chuyển cho ESP32 tự động chốt định kỳ 30 phút/lần
-            return;
-        }
-
-        function saveEnergyHistoryToFirebase() {
-            // Đã chuyển cho ESP32 tự động chốt định kỳ 30 phút/lần
-            return;
-        }
-
         function recalculateEnergy() {
             if (!latestDailyData) return; 
             const data = latestDailyData;
@@ -942,9 +931,6 @@
             let todayDate = new Date(); 
             let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
             let savedPv = toSafeNumber(currentMonthHistory[curDayKey]);
-
-            // ĐÃ XÓA ĐOẠN GHI ĐÈ LÊN FIREBASE:
-            // ESP32 đã đảm nhiệm chốt và lưu tự động vào Database
 
             let pvMonthTotal = 0; 
             for (let key in currentMonthHistory) { 
@@ -1036,23 +1022,24 @@
             }
         }
 
-        // ================= TRẠNG THÁI THIẾT BỊ =================
-        const DEVICE_OFFLINE_TIMEOUT_MS = 35000; // Tăng lên 35s tránh báo nhầm
-        const DEVICE_FIRST_CHECK_TIMEOUT_MS = 30000;
-        const DEVICE_HB_STORAGE_KEY = 'sosen_device_hb_value';
-        const DEVICE_HB_TIME_STORAGE_KEY = 'sosen_device_hb_seen_at';
+        // ================= TRẠNG THÁI THIẾT BỊ & LƯỚI =================
+        const DEVICE_FIRST_CHECK_TIMEOUT_MS = 15000;
         const DEVICE_LAST_DATA_TIME_STORAGE_KEY = 'sosen_last_live_received_at';
 
         let deviceStatusStartAt = Date.now();
-        let lastDeviceHeartbeat = null;
-        let lastDeviceHeartbeatAt = 0;
+        let lastLiveTime = 0;
         let lastLiveReceivedAt = 0;
         let firebaseBrowserConnected = null;
         let liveListenerPrimed = false;
         let currentDeviceState = 'checking';
 
-        let globalGridOnline = false;
-        let globalGridFresh = false;
+        try {
+            const storedLiveAt = Number(localStorage.getItem(DEVICE_LAST_DATA_TIME_STORAGE_KEY) || 0);
+            if (Number.isFinite(storedLiveAt) && storedLiveAt > 0) {
+                lastLiveReceivedAt = storedLiveAt;
+                lastLiveTime = storedLiveAt;
+            }
+        } catch (e) {}
 
         function setClockGridStatus(gridOnline, gridFresh = true, rawStatusText = null) {
             const box = document.getElementById('clock-grid-status');
@@ -1083,15 +1070,6 @@
             }
         }
 
-        try {
-            const storedHb = localStorage.getItem(DEVICE_HB_STORAGE_KEY);
-            const storedAt = Number(localStorage.getItem(DEVICE_HB_TIME_STORAGE_KEY) || 0);
-            const storedLiveAt = Number(localStorage.getItem(DEVICE_LAST_DATA_TIME_STORAGE_KEY) || 0);
-            if (storedHb !== null && storedHb !== '') lastDeviceHeartbeat = Number(storedHb);
-            if (Number.isFinite(storedAt) && storedAt > 0) lastDeviceHeartbeatAt = storedAt;
-            if (Number.isFinite(storedLiveAt) && storedLiveAt > 0) lastLiveReceivedAt = storedLiveAt;
-        } catch (e) {}
-
         function setDeviceStatus(state) {
             const box = document.getElementById('device-status');
             const text = document.getElementById('device-status-text');
@@ -1100,10 +1078,18 @@
             box.classList.remove('online', 'offline', 'checking', 'firebase-offline');
             box.classList.add(state === 'firebase-offline' ? 'checking' : state);
 
-            if (state === 'online') { updateDOMText('device-status-text', 'ESP32 ON'); }
-            else if (state === 'offline') { updateDOMText('device-status-text', 'ESP32 OFF'); setClockGridStatus(null, false); }
-            else if (state === 'firebase-offline') { updateDOMText('device-status-text', 'ESP32 ?'); setClockGridStatus(null, false); }
-            else { updateDOMText('device-status-text', 'ESP32 ...'); setClockGridStatus(null, false); }
+            if (state === 'online') { 
+                updateDOMText('device-status-text', 'ESP32 ON'); 
+            } else if (state === 'offline') { 
+                updateDOMText('device-status-text', 'ESP32 OFF'); 
+                setClockGridStatus(null, false); 
+            } else if (state === 'firebase-offline') { 
+                updateDOMText('device-status-text', 'ESP32 ?'); 
+                setClockGridStatus(null, false); 
+            } else { 
+                updateDOMText('device-status-text', 'ESP32 ...'); 
+                setClockGridStatus(null, false); 
+            }
         }
 
         function renderLastLiveReceivedTime() {
@@ -1114,41 +1100,33 @@
 
         function markLiveDataReceived(nowMs = Date.now()) {
             lastLiveReceivedAt = nowMs;
+            lastLiveTime = nowMs;
             try { localStorage.setItem(DEVICE_LAST_DATA_TIME_STORAGE_KEY, String(nowMs)); } catch (e) {}
             renderLastLiveReceivedTime();
         }
 
-        function processDeviceHeartbeat(data) {
-            const hb = Number(data && data.Device_Heartbeat);
-            if (!Number.isFinite(hb)) return;
-            const nowMs = Date.now();
-            if (lastDeviceHeartbeat === null) {
-                lastDeviceHeartbeat = hb;
-                lastDeviceHeartbeatAt = nowMs;
-                try { localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb)); localStorage.setItem(DEVICE_HB_TIME_STORAGE_KEY, String(nowMs)); } catch (e) {}
-                setDeviceStatus('online');
-                markLiveDataReceived(nowMs);
-                return;
-            }
-            if (hb !== lastDeviceHeartbeat) {
-                lastDeviceHeartbeat = hb; lastDeviceHeartbeatAt = nowMs;
-                try { localStorage.setItem(DEVICE_HB_STORAGE_KEY, String(hb)); localStorage.setItem(DEVICE_HB_TIME_STORAGE_KEY, String(nowMs)); } catch (e) {}
-                markLiveDataReceived(nowMs);
-                setDeviceStatus('online'); return;
-            }
-            if (lastDeviceHeartbeatAt > 0 && (nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS) { setDeviceStatus('online'); }
-        }
-
+        // Tự động kiểm tra: Nếu quá 15 giây không có gói tin Live -> Báo ESP32 OFF
         function updateDeviceStatusByTimeout() {
             const nowMs = Date.now();
-            if (firebaseBrowserConnected === false) { setDeviceStatus('firebase-offline'); return; }
-            if (lastDeviceHeartbeatAt > 0) { setDeviceStatus((nowMs - lastDeviceHeartbeatAt) <= DEVICE_OFFLINE_TIMEOUT_MS ? 'online' : 'offline'); }
-            else if ((nowMs - deviceStatusStartAt) >= DEVICE_FIRST_CHECK_TIMEOUT_MS) { setDeviceStatus('offline'); }
-            else { setDeviceStatus('checking'); }
+            if (firebaseBrowserConnected === false) { 
+                setDeviceStatus('firebase-offline'); 
+                return; 
+            }
+            if (lastLiveTime > 0) {
+                if (nowMs - lastLiveTime > 15000) {
+                    setDeviceStatus('offline');
+                } else {
+                    setDeviceStatus('online');
+                }
+            } else if ((nowMs - deviceStatusStartAt) >= DEVICE_FIRST_CHECK_TIMEOUT_MS) {
+                setDeviceStatus('offline');
+            } else {
+                setDeviceStatus('checking');
+            }
         }
 
         renderLastLiveReceivedTime();
-        setInterval(updateDeviceStatusByTimeout, 1000);
+        setInterval(updateDeviceStatusByTimeout, 2000);
         updateDeviceStatusByTimeout();
 
         let pendingLiveData = null;
@@ -1160,19 +1138,7 @@
                 updateDeviceStatusByTimeout();
             });
 
-            // 1. Lắng nghe trạng thái thiết bị & Lưới (Heartbeat)
-            database.ref('/SosenSystem/DeviceStatus').on('value', (snapshot) => {
-                const statusData = snapshot.val();
-                if (statusData) {
-                    processDeviceHeartbeat(statusData);
-                    const gridKnown = statusData.Grid_State_Known === true;
-                    globalGridOnline = gridKnown ? (statusData.Grid_Online === true) : false;
-                    globalGridFresh = statusData.Grid_Data_Fresh === true;
-                    setClockGridStatus(gridKnown ? statusData.Grid_Online : null, globalGridFresh, statusData.Grid_Status || statusData.Grid_Raw_State);
-                }
-            });
-
-            // 2. Lắng nghe dữ liệu Năng lượng tích lũy (Thuần đọc)
+            // 1. Lắng nghe dữ liệu Năng lượng tích lũy (Thuần đọc)
             database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
                 latestDailyData = snapshot.val();
                 checkAndSwitchMonth();
@@ -1180,52 +1146,14 @@
             });
             setInterval(() => { checkAndSwitchMonth(); }, 60000);
 
-            // 3. Lắng nghe Dữ liệu Live chính
-            let lastLiveTime = 0;
-
-// Khi có dữ liệu Live đổ về từ Firebase (mỗi 4 giây):
-database.ref('/SosenSystem/Live').on('value', (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-        lastLiveTime = Date.now(); // Cập nhật thời điểm nhận gói tin
-        
-        // 1. CẬP NHẬT TRẠNG THÁI LƯỚI ĐIỆN TỪ V_GRID
-        const elGridStatus = document.getElementById('lbl-grid-status'); // Hoặc id của thẻ hiển thị GRID
-        if (elGridStatus) {
-            if (data.V_Grid && data.V_Grid > 50) {
-                elGridStatus.innerHTML = "🟢 GRID ON";
-                elGridStatus.style.color = "#00cc66";
-            } else {
-                elGridStatus.innerHTML = "⚪ GRID OFF";
-                elGridStatus.style.color = "#888";
-            }
-        }
-        
-        // 2. CẬP NHẬT TRẠNG THÁI ESP32 ONLINE
-        const elEspStatus = document.getElementById('lbl-esp-status'); // Hoặc id của thẻ hiển thị ESP32
-        if (elEspStatus) {
-            elEspStatus.innerHTML = "🟢 ESP32 ONLINE";
-            elEspStatus.style.color = "#00cc66";
-        }
-    }
-});
-
-// Kiểm tra định kỳ mỗi 2 giây: Nếu quá 15s không có Live data thì mới báo OFFLINE
-setInterval(() => {
-    if (lastLiveTime > 0 && (Date.now() - lastLiveTime > 30000)) {
-        const elEspStatus = document.getElementById('lbl-esp-status');
-        if (elEspStatus) {
-            elEspStatus.innerHTML = "🔴 ESP32 OFF";
-            elEspStatus.style.color = "#ff4444";
-        }
-    }
-}, 4000);
+            // 2. Lắng nghe Dữ liệu Live chính (Mỗi 4 giây gửi lên 1 lần)
             database.ref('/SosenSystem/Live').on('value', (snapshot) => {
                 pendingLiveData = snapshot.val();
                 if (!pendingLiveData) return;
                 
-                if (liveListenerPrimed) markLiveDataReceived(Date.now());
-                else liveListenerPrimed = true;
+                // Cập nhật thời điểm nhận gói tin Live và kích hoạt ESP32 ONLINE ngay lập tức
+                markLiveDataReceived(Date.now());
+                setDeviceStatus('online');
 
                 if (liveDomFrameId !== null) return;
                 liveDomFrameId = requestAnimationFrame(() => {
@@ -1233,6 +1161,11 @@ setInterval(() => {
                     pendingLiveData = null;
                     liveDomFrameId = null;
                     if (!data) return;
+
+                    // TỰ ĐỘNG XÁC ĐỊNH TRẠNG THÁI LƯỚI TỪ V_Grid
+                    const vGrid = toSafeNumber(data.V_Grid !== undefined ? data.V_Grid : data.Grid_Voltage);
+                    const isGridOn = (vGrid > 50) || (data.Grid_Online === true);
+                    setClockGridStatus(isGridOn, true);
 
                     const battVoltage = toSafeNumber(data.Batt_Voltage);
                     const battCurrent = toSafeNumber(data.Batt_Current);
@@ -1242,14 +1175,6 @@ setInterval(() => {
                     const pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power)));
                     const gridImportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Import_Power)));
                     const gridExportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Export_Power)));
-
-                    const gridStateKnown = (data.Grid_State_Known !== undefined) ? (data.Grid_State_Known === true) : true;
-                    const gridDataFresh = (data.Grid_Data_Fresh !== undefined) ? (data.Grid_Data_Fresh === true) : globalGridFresh;
-                    const gridPresent = gridStateKnown ? (data.Grid_Online === true) : globalGridOnline;
-
-                    if (gridStateKnown) {
-                        setClockGridStatus(data.Grid_Online, gridDataFresh, data.Grid_State);
-                    }
 
                     const battInW = data.Batt_Power !== undefined ? Math.round(toSafeNumber(data.Batt_Power)) : Math.round(battVoltage * battCurrent);
                     const loadInW = Math.max(0, Math.round(toSafeNumber(data.Load_Power)));
@@ -1279,14 +1204,13 @@ setInterval(() => {
                     const elGridMode = document.getElementById('lbl-grid-mode');
                     if (elGrid) {
                         elGrid.classList.remove('val-grid-buy-style', 'val-grid-sell-style');
-                        if (gridDataFresh && gridPresent && gridImportW > 0) { elGrid.classList.add('val-grid-buy-style'); }
-                        else if (gridDataFresh && gridPresent && gridExportW > 0) { elGrid.classList.add('val-grid-sell-style'); }
+                        if (isGridOn && gridImportW > 0) { elGrid.classList.add('val-grid-buy-style'); }
+                        else if (isGridOn && gridExportW > 0) { elGrid.classList.add('val-grid-sell-style'); }
                         else { elGrid.style.color = '#fff'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)'; }
                     }
                     if (elGridMode) {
                         elGridMode.classList.remove('buy', 'sell', 'idle', 'no-grid', 'stale');
-                        if (!gridDataFresh) { elGridMode.classList.add('stale'); elGridMode.style.display = 'none'; }
-                        else if (!gridPresent) { elGridMode.classList.add('no-grid'); elGridMode.style.display = 'none'; }
+                        if (!isGridOn) { elGridMode.classList.add('no-grid'); elGridMode.style.display = 'none'; }
                         else if (gridImportW > 0) { elGridMode.classList.add('buy'); elGridMode.style.display = 'none'; }
                         else if (gridExportW > 0) { elGridMode.classList.add('sell'); elGridMode.style.display = ''; updateDOMText('lbl-grid-mode', 'ĐẨY EVN ' + gridExportW.toLocaleString('vi-VN') + ' W →'); }
                         else { elGridMode.classList.add('idle'); elGridMode.style.display = 'none'; }
@@ -1369,7 +1293,7 @@ setInterval(() => {
                     if (loadInW >= 1 && loadValid) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
                     if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW)); else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); else setFlow('flow-batt', false);
 
-                    if (!gridDataFresh || !gridPresent) { setFlow('flow-grid', false); }
+                    if (!isGridOn) { setFlow('flow-grid', false); }
                     else if (gridImportW > 0) { setFlow('flow-grid', true, 'flowInR', '#ff4444', gridImportW); }
                     else if (gridExportW > 0) { setFlow('flow-grid', true, 'flowOutR', '#00cc66', gridExportW); }
                     else { setFlow('flow-grid', false); }
