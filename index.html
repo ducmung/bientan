@@ -886,13 +886,17 @@
 
         let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
 
+        // ĐỒNG BỘ ĐÚNG VÀO NHÁNH /SosenSystem/History/Daily CỦA ESP32
         function checkAndSwitchMonth() {
             if (!database) return;
-            let d = new Date(); let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
+            let d = new Date(); 
+            let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
             if (mk !== currentMonthKey) {
-                if (currentMonthKey !== "") { database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).off(); }
+                if (currentMonthKey !== "") { 
+                    database.ref(`/SosenSystem/History/Daily/${currentMonthKey}`).off(); 
+                }
                 currentMonthKey = mk; 
-                database.ref(`/SosenSystem/Monthly_History/${currentMonthKey}`).on('value', (snap) => { 
+                database.ref(`/SosenSystem/History/Daily/${currentMonthKey}`).on('value', (snap) => { 
                     currentMonthHistory = snap.val() || {}; 
                     recalculateEnergy(); 
                 });
@@ -909,6 +913,7 @@
             if(r > 0) { cost += r * 3736.80; } return cost;
         }
 
+        // TÍNH TOÁN NĂNG LƯỢNG & TIỀN ĐIỆN CHUẨN XÁC THEO TỪNG OBJECT NGÀY
         function recalculateEnergy() {
             if (!latestDailyData) return; 
             const data = latestDailyData;
@@ -930,15 +935,24 @@
 
             let todayDate = new Date(); 
             let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
-            let savedPv = toSafeNumber(currentMonthHistory[curDayKey]);
 
+            // Tính tổng sản lượng tháng từ nhánh History/Daily
             let pvMonthTotal = 0; 
             for (let key in currentMonthHistory) { 
-                if (key !== curDayKey) { pvMonthTotal += Number(currentMonthHistory[key]) || 0; }
+                if (key !== curDayKey) { 
+                    let dayItem = currentMonthHistory[key];
+                    let dayVal = (dayItem && typeof dayItem === 'object') ? Number(dayItem.pv || 0) : Number(dayItem || 0);
+                    pvMonthTotal += isNaN(dayVal) ? 0 : dayVal; 
+                }
             }
             
-            let activePvForMoney = Math.max(pvToday, savedPv);
+            // Lấy sản lượng ngày hôm nay (so sánh giữa Daily_Energy và giá trị chốt tạm thời trong History)
+            let curDayObj = currentMonthHistory[curDayKey];
+            let savedPvToday = (curDayObj && typeof curDayObj === 'object') ? Number(curDayObj.pv || 0) : Number(curDayObj || 0);
+            let activePvForMoney = Math.max(pvToday, savedPvToday);
+            
             pvMonthTotal += activePvForMoney;
+            
             let monthMoney = calcEVN(pvMonthTotal); 
             let todayMoney = 0;
 
