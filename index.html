@@ -251,7 +251,7 @@
         .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; transform: translateZ(0); }
         .flow-track {
             position: absolute; top: 50%; left: -4%; width: 108%; height: 8px; transform: translateY(-50%) translateZ(0); border-radius: 999px;
-            background: repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 9px, rgba(255,255,255,0.86) 10px 12px, rgba(255,255,255,0) 13px 22px), linear-gradient(90deg, rgba(255,255,255,0.04) 0%, var(--c) 18%, #ffffff 50%, var(--c) 82%, rgba(255,255,255,0.04) 100%);
+            background: repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 9px, rgba(255,255,255,0.86) 10px 12px, rgba(255,255,255,0.04) 0%, var(--c) 18%, #ffffff 50%, var(--c) 82%, rgba(255,255,255,0.04) 100%);
             background-size: 44px 100%, 100% 100%; box-shadow: 0 0 8px var(--c), inset 0 0 5px rgba(255,255,255,0.75); opacity: 0.9; animation: electricWireSlide var(--wire-speed, 1s) linear infinite; z-index: 1;
         }
         .flow-track::before { content: ''; position: absolute; left: -10px; right: -10px; top: 50%; height: 20px; transform: translateY(-50%) translateZ(0); border-radius: 999px; background: radial-gradient(ellipse at center, var(--c) 0%, rgba(255,255,255,0.08) 36%, rgba(255,255,255,0) 72%); opacity: 0.38; z-index: -1; }
@@ -473,6 +473,7 @@
         </div>
 
         <div class="stats-panel">
+            <!-- GIỮ NGUYÊN HOÀN TOÀN CẤU HÌNH THỐNG KÊ GỐC -->
             <div class="stat-card">
                 <div class="stat-header"><h2>📊 THỐNG KÊ NĂNG LƯỢNG</h2></div>
                 <div class="list-detail">
@@ -489,6 +490,7 @@
                 </div>
             </div>
 
+            <!-- GIỮ NGUYÊN THẺ QUY ĐỔI TIỀN ĐIỆN GỐC -->
             <div class="stat-card money-card">
                 <div class="stat-header"><h2 style="color: #b8860b;">💰 QUY ĐỔI TIỀN ĐIỆN (EVN)</h2></div>
                 <div class="list-detail">
@@ -499,6 +501,7 @@
                 <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic; position: relative; z-index: 1;">*Hệ thống tự động đồng bộ định kỳ từ ESP32</div>
             </div>
 
+            <!-- BIỂU ĐỒ NĂNG LƯỢNG: NƠI TÍCH HỢP TÍNH TOÁN CỘNG DỒN -->
             <div class="stat-card energy-chart-card">
                 <div class="energy-chart-toolbar">
                     <div class="chart-btn-group">
@@ -515,7 +518,8 @@
                 <div class="chart-stage">
                     <div class="chart-day-corner">
                         <button class="day-nav-btn" type="button" onclick="moveChartDay(-1)" aria-label="Mốc trước">‹</button>
-                        <span class="chart-selected-label" id="chart-selected-label">Ngày --</span>
+                        <!-- Có thể bấm trực tiếp vào chữ bên dưới để chuyển qua lại xem Từng Ngày / Cả Tháng -->
+                        <span class="chart-selected-label" id="chart-selected-label" onclick="toggleMonthTotalInChart()" title="Nhấn để xem Tổng Cả Tháng / Từng Ngày" style="cursor: pointer;">Ngày --</span>
                         <button class="day-nav-btn" type="button" onclick="moveChartDay(1)" aria-label="Mốc sau">›</button>
                     </div>
                     <canvas id="energyChart"></canvas>
@@ -684,7 +688,18 @@
             updateDOMText('lbl-status', 'Mất kết nối');
         }
 
-        let energyChart = null; let currentChartMode = 'month'; let chartCursorDate = new Date(); let chartSelectedIndex = 0; let chartRows = []; let chartAllRows = []; let chartSelectedSourceIndex = 0; let chartResizeTimer = null; let chartLoadRequestId = 0;
+        let energyChart = null; 
+        let currentChartMode = 'month'; 
+        let chartCursorDate = new Date(); 
+        let chartSelectedIndex = 0; 
+        let chartRows = []; 
+        let chartAllRows = []; 
+        let chartSelectedSourceIndex = 0; 
+        let chartResizeTimer = null; 
+        let chartLoadRequestId = 0;
+        let chartMonthTotals = { pv: 0, batt: 0, charge: 0, load: 0 };
+        let isShowingMonthTotalInMonthMode = false;
+
         const chartSeries = [
             { label: 'Sản lượng PV', key: 'pv', color: '#59ba35', border: '#48a927' },
             { label: 'Xả pin', key: 'batt', color: '#45a8de', border: '#278fc9' },
@@ -695,6 +710,7 @@
         const energySelectedBandPlugin = {
             id: 'energySelectedBand',
             beforeDatasetsDraw(chart) {
+                if (isShowingMonthTotalInMonthMode && currentChartMode === 'month') return;
                 const area = chart.chartArea; const meta = chart.getDatasetMeta(0); const bar = meta && meta.data ? meta.data[chartSelectedIndex] : null;
                 if (!area || !bar || chart.data.labels.length === 0) return;
                 const step = (area.right - area.left) / chart.data.labels.length;
@@ -738,6 +754,7 @@
                     responsive: true, maintainAspectRatio: false,
                     onClick(event, elements) {
                         if (elements.length > 0) {
+                            isShowingMonthTotalInMonthMode = false;
                             const clickedRow = chartRows[elements[0].index];
                             if (clickedRow && Number.isInteger(clickedRow.sourceIndex)) { chartSelectedSourceIndex = clickedRow.sourceIndex; updateVisibleChartRows(); }
                         }
@@ -759,6 +776,7 @@
         function setChartMode(mode) {
             if (!['month', 'year', 'total'].includes(mode)) return;
             currentChartMode = mode;
+            isShowingMonthTotalInMonthMode = false;
             document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
             const activeBtn = document.getElementById(`btn-chart-${mode}`);
             if (activeBtn) activeBtn.classList.add('active');
@@ -766,54 +784,174 @@
         }
 
         function shiftChartPeriod(step) {
-            if (currentChartMode === 'month') { chartCursorDate.setMonth(chartCursorDate.getMonth() + step); } else if (currentChartMode === 'year') { chartCursorDate.setFullYear(chartCursorDate.getFullYear() + step); }
+            if (currentChartMode === 'month') { chartCursorDate.setMonth(chartCursorDate.getMonth() + step); } 
+            else if (currentChartMode === 'year') { chartCursorDate.setFullYear(chartCursorDate.getFullYear() + step); }
+            isShowingMonthTotalInMonthMode = false;
             loadChartData();
         }
 
         function moveChartDay(step) {
             if (chartAllRows.length === 0) return;
+            isShowingMonthTotalInMonthMode = false;
             chartSelectedSourceIndex = Math.max(0, Math.min(chartAllRows.length - 1, chartSelectedSourceIndex + step));
             updateVisibleChartRows();
         }
 
-        // Đọc dữ liệu lịch sử do ESP32 tự động chốt mỗi 30 phút
+        function toggleMonthTotalInChart() {
+            if (currentChartMode !== 'month') return;
+            isShowingMonthTotalInMonthMode = !isShowingMonthTotalInMonthMode;
+            updateChartDetail();
+            if (energyChart) energyChart.draw();
+        }
+
+        // ================= TÍCH HỢP TÍNH TOÁN CỘNG DỒN CHO BIỂU ĐỒ =================
         function loadChartData() {
             if (!database) return;
             const requestId = ++chartLoadRequestId;
             updateChartPeriodLabel();
             const yyyy = chartCursorDate.getFullYear();
             const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
+            const now = new Date();
+            const isCurrentYear = (yyyy === now.getFullYear());
+            const isViewingCurrentMonth = (isCurrentYear && chartCursorDate.getMonth() === now.getMonth());
 
+            // 1. BIỂU ĐỒ CHẾ ĐỘ THÁNG: Duyệt từng ngày và tích lũy sẵn tổng tháng
             if (currentChartMode === 'month') {
                 const monthKey = `${yyyy}_${mm}`;
                 database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value', (snap) => {
                     if (requestId !== chartLoadRequestId) return;
-                    const daysData = snap.val() || {}; const rows = []; const daysInMonth = new Date(yyyy, chartCursorDate.getMonth() + 1, 0).getDate();
+                    const daysData = snap.val() || {}; 
+                    const rows = []; 
+                    const daysInMonth = new Date(yyyy, chartCursorDate.getMonth() + 1, 0).getDate();
+                    let mSum = { pv: 0, batt: 0, charge: 0, load: 0 };
+
                     for (let d = 1; d <= daysInMonth; d++) {
                         const dayStr = String(d).padStart(2, '0');
-                        rows.push({ label: String(d), detailLabel: `Ngày ${dayStr}/${mm}/${yyyy}`, ...normalizeChartItem(daysData[`day_${dayStr}`]) });
+                        let itemData = daysData[`day_${dayStr}`] || {};
+
+                        // Nếu là ngày hôm nay: Lấy số liệu lớn nhất giữa Live và History để cập nhật tức thời
+                        if (isViewingCurrentMonth && d === now.getDate() && latestDailyData) {
+                            itemData = {
+                                pv: Math.max(toSafeNumber(itemData.pv), toSafeNumber(latestDailyData.PV_Today)),
+                                batt: Math.max(toSafeNumber(itemData.batt ?? itemData.bat ?? itemData.discharge), toSafeNumber(latestDailyData.Bat_Discharge_Today)),
+                                charge: Math.max(toSafeNumber(itemData.charge ?? itemData.battCharge ?? itemData.batCharge), toSafeNumber(latestDailyData.Bat_Charge_Today)),
+                                load: Math.max(toSafeNumber(itemData.load), toSafeNumber(latestDailyData.Load_Today))
+                            };
+                        }
+
+                        const norm = normalizeChartItem(itemData);
+                        mSum.pv += norm.pv;
+                        mSum.batt += norm.batt;
+                        mSum.charge += norm.charge;
+                        mSum.load += norm.load;
+
+                        rows.push({ label: String(d), detailLabel: `Ngày ${dayStr}/${mm}/${yyyy}`, ...norm });
                     }
+                    chartMonthTotals = mSum;
                     renderChartRows(rows);
                 });
+
+            // 2. BIỂU ĐỒ CHẾ ĐỘ NĂM: TỰ ĐỘNG CỘNG DỒN CÁC NGÀY ĐỂ TẠO RA 12 THÁNG (T1..T12)
             } else if (currentChartMode === 'year') {
-                database.ref(`/SosenSystem/History/Monthly/${yyyy}`).once('value', (snap) => {
-                    if (requestId !== chartLoadRequestId) return;
-                    const monthsData = snap.val() || {}; const rows = [];
-                    for (let m = 1; m <= 12; m++) {
-                        const monthStr = String(m).padStart(2, '0');
-                        rows.push({ label: `T${m}`, detailLabel: `Tháng ${monthStr}/${yyyy}`, ...normalizeChartItem(monthsData[`month_${monthStr}`]) });
-                    }
-                    renderChartRows(rows);
-                });
-            } else if (currentChartMode === 'total') {
-                database.ref(`/SosenSystem/History/Yearly`).once('value', (snap) => {
-                    if (requestId !== chartLoadRequestId) return;
-                    const yearsData = snap.val() || {};
-                    let rows = Object.keys(yearsData).sort().map(yKey => {
-                        const yearLabel = yKey.replace('year_', '');
-                        return { label: yearLabel, detailLabel: `Năm ${yearLabel}`, ...normalizeChartItem(yearsData[yKey]) };
+                database.ref('/SosenSystem/History/Daily')
+                    .orderByKey()
+                    .startAt(`${yyyy}_01`)
+                    .endAt(`${yyyy}_12\uf8ff`)
+                    .once('value', (snap) => {
+                        if (requestId !== chartLoadRequestId) return;
+                        const yearDailyData = snap.val() || {};
+                        const rows = [];
+                        const curMonthNum = now.getMonth() + 1;
+                        const curDayNum = now.getDate();
+
+                        for (let m = 1; m <= 12; m++) {
+                            const monthStr = String(m).padStart(2, '0');
+                            const mKey = `${yyyy}_${monthStr}`;
+                            const daysData = yearDailyData[mKey] || {};
+
+                            let mPv = 0, mBatt = 0, mCharge = 0, mLoad = 0;
+
+                            for (let dKey in daysData) {
+                                if (isCurrentYear && m === curMonthNum && dKey === `day_${String(curDayNum).padStart(2, '0')}`) {
+                                    continue; // Xử lý riêng ngày hôm nay
+                                }
+                                const dayObj = daysData[dKey];
+                                if (dayObj && typeof dayObj === 'object') {
+                                    mPv += toChartNumber(dayObj.pv);
+                                    mBatt += toChartNumber(dayObj.batt ?? dayObj.bat ?? dayObj.discharge);
+                                    mCharge += toChartNumber(dayObj.charge ?? dayObj.battCharge ?? dayObj.batCharge);
+                                    mLoad += toChartNumber(dayObj.load);
+                                }
+                            }
+
+                            // Cộng thêm Live hôm nay vào tháng hiện tại
+                            if (isCurrentYear && m === curMonthNum && latestDailyData) {
+                                const curDayObj = daysData[`day_${String(curDayNum).padStart(2, '0')}`] || {};
+                                mPv += Math.max(toSafeNumber(latestDailyData.PV_Today), toSafeNumber(curDayObj.pv));
+                                mBatt += Math.max(toSafeNumber(latestDailyData.Bat_Discharge_Today), toSafeNumber(curDayObj.batt ?? curDayObj.bat));
+                                mCharge += Math.max(toSafeNumber(latestDailyData.Bat_Charge_Today), toSafeNumber(curDayObj.charge));
+                                mLoad += Math.max(toSafeNumber(latestDailyData.Load_Today), toSafeNumber(curDayObj.load));
+                            }
+
+                            rows.push({
+                                label: `T${m}`,
+                                detailLabel: `Tháng ${monthStr}/${yyyy}`,
+                                pv: mPv,
+                                batt: mBatt,
+                                charge: mCharge,
+                                load: mLoad
+                            });
+                        }
+                        renderChartRows(rows);
                     });
-                    if (rows.length === 0) { rows = [{ label: String(yyyy), detailLabel: `Năm ${yyyy}`, pv: 0, batt: 0, charge: 0, load: 0 }]; }
+
+            // 3. BIỂU ĐỒ CHẾ ĐỘ TỔNG: TỰ ĐỘNG CỘNG DỒN TẤT CẢ CÁC NĂM TỪ HISTORY
+            } else if (currentChartMode === 'total') {
+                database.ref('/SosenSystem/History/Daily').once('value', (snap) => {
+                    if (requestId !== chartLoadRequestId) return;
+                    const allDailyData = snap.val() || {};
+                    const yearMap = {};
+                    const curYear = now.getFullYear();
+                    const curMonthKey = `${curYear}_${String(now.getMonth() + 1).padStart(2, '0')}`;
+                    const curDayKey = `day_${String(now.getDate()).padStart(2, '0')}`;
+
+                    for (let mKey in allDailyData) {
+                        const yr = mKey.split('_')[0];
+                        if (!yearMap[yr]) yearMap[yr] = { pv: 0, batt: 0, charge: 0, load: 0 };
+                        const monthObj = allDailyData[mKey];
+                        for (let dKey in monthObj) {
+                            if (mKey === curMonthKey && dKey === curDayKey) continue;
+                            const d = monthObj[dKey];
+                            if (d && typeof d === 'object') {
+                                yearMap[yr].pv += toChartNumber(d.pv);
+                                yearMap[yr].batt += toChartNumber(d.batt ?? d.bat ?? d.discharge);
+                                yearMap[yr].charge += toChartNumber(d.charge ?? d.battCharge ?? d.batCharge);
+                                yearMap[yr].load += toChartNumber(d.load);
+                            }
+                        }
+                    }
+
+                    if (latestDailyData) {
+                        if (!yearMap[curYear]) yearMap[curYear] = { pv: 0, batt: 0, charge: 0, load: 0 };
+                        const todayObj = (allDailyData[curMonthKey] && allDailyData[curMonthKey][curDayKey]) || {};
+                        yearMap[curYear].pv += Math.max(toSafeNumber(latestDailyData.PV_Today), toSafeNumber(todayObj.pv));
+                        yearMap[curYear].batt += Math.max(toSafeNumber(latestDailyData.Bat_Discharge_Today), toSafeNumber(todayObj.batt ?? todayObj.bat));
+                        yearMap[curYear].charge += Math.max(toSafeNumber(latestDailyData.Bat_Charge_Today), toSafeNumber(todayObj.charge));
+                        yearMap[curYear].load += Math.max(toSafeNumber(latestDailyData.Load_Today), toSafeNumber(todayObj.load));
+                    }
+
+                    let rows = Object.keys(yearMap).sort().map(yr => ({
+                        label: yr,
+                        detailLabel: `Năm ${yr}`,
+                        pv: yearMap[yr].pv,
+                        batt: yearMap[yr].batt,
+                        charge: yearMap[yr].charge,
+                        load: yearMap[yr].load
+                    }));
+
+                    if (rows.length === 0) {
+                        rows = [{ label: String(yyyy), detailLabel: `Năm ${yyyy}`, pv: 0, batt: 0, charge: 0, load: 0 }];
+                    }
                     renderChartRows(rows);
                 });
             }
@@ -849,6 +987,9 @@
             if (currentChartMode === 'month' && chartCursorDate.getFullYear() === now.getFullYear() && chartCursorDate.getMonth() === now.getMonth()) {
                 return Math.min(rows.length - 1, Math.max(0, now.getDate() - 1));
             }
+            if (currentChartMode === 'year' && chartCursorDate.getFullYear() === now.getFullYear()) {
+                return Math.min(rows.length - 1, now.getMonth());
+            }
             for (let i = rows.length - 1; i >= 0; i--) { const row = rows[i]; if ((row.pv + row.batt + row.charge + row.load) > 0) return i; }
             return 0;
         }
@@ -876,6 +1017,18 @@
         }
 
         function updateChartDetail() {
+            // Khi người dùng bấm vào tiêu đề ngày ở chế độ Tháng để xem Tổng Cả Tháng
+            if (currentChartMode === 'month' && isShowingMonthTotalInMonthMode && chartMonthTotals) {
+                const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
+                const yyyy = chartCursorDate.getFullYear();
+                updateDOMText('chart-selected-label', `Tổng T${mm}/${yyyy}`);
+                updateDOMText('chart-detail-pv', formatChartNumber(chartMonthTotals.pv));
+                updateDOMText('chart-detail-batt', formatChartNumber(chartMonthTotals.batt));
+                updateDOMText('chart-detail-charge', formatChartNumber(chartMonthTotals.charge));
+                updateDOMText('chart-detail-load', formatChartNumber(chartMonthTotals.load));
+                return;
+            }
+
             const row = chartRows[chartSelectedIndex] || { detailLabel: '--', pv: 0, batt: 0, charge: 0, load: 0 };
             updateDOMText('chart-selected-label', row.detailLabel);
             updateDOMText('chart-detail-pv', formatChartNumber(row.pv));
@@ -886,7 +1039,6 @@
 
         let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
 
-        // ĐỒNG BỘ ĐÚNG VÀO NHÁNH /SosenSystem/History/Daily CỦA ESP32
         function checkAndSwitchMonth() {
             if (!database) return;
             let d = new Date(); 
@@ -913,7 +1065,6 @@
             if(r > 0) { cost += r * 3736.80; } return cost;
         }
 
-        // TÍNH TOÁN NĂNG LƯỢNG & TIỀN ĐIỆN CHUẨN XÁC THEO TỪNG OBJECT NGÀY
         function recalculateEnergy() {
             if (!latestDailyData) return; 
             const data = latestDailyData;
@@ -936,7 +1087,7 @@
             let todayDate = new Date(); 
             let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
 
-            // Tính tổng sản lượng tháng từ nhánh History/Daily
+            // Tính tổng sản lượng tháng phục vụ tính tiền điện
             let pvMonthTotal = 0; 
             for (let key in currentMonthHistory) { 
                 if (key !== curDayKey) { 
@@ -946,7 +1097,6 @@
                 }
             }
             
-            // Lấy sản lượng ngày hôm nay (so sánh giữa Daily_Energy và giá trị chốt tạm thời trong History)
             let curDayObj = currentMonthHistory[curDayKey];
             let savedPvToday = (curDayObj && typeof curDayObj === 'object') ? Number(curDayObj.pv || 0) : Number(curDayObj || 0);
             let activePvForMoney = Math.max(pvToday, savedPvToday);
@@ -1044,7 +1194,6 @@
         let lastLiveTime = 0;
         let lastLiveReceivedAt = 0;
         let firebaseBrowserConnected = null;
-        let liveListenerPrimed = false;
         let currentDeviceState = 'checking';
 
         try {
@@ -1119,7 +1268,6 @@
             renderLastLiveReceivedTime();
         }
 
-        // Tự động kiểm tra: Nếu quá 15 giây không có gói tin Live -> Báo ESP32 OFF
         function updateDeviceStatusByTimeout() {
             const nowMs = Date.now();
             if (firebaseBrowserConnected === false) { 
@@ -1152,20 +1300,22 @@
                 updateDeviceStatusByTimeout();
             });
 
-            // 1. Lắng nghe dữ liệu Năng lượng tích lũy (Thuần đọc)
+            // 1. Lắng nghe dữ liệu Daily_Energy và tự động cập nhật biểu đồ nếu cần
             database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
                 latestDailyData = snapshot.val();
                 checkAndSwitchMonth();
                 recalculateEnergy();
+                if (energyChart && (currentChartMode === 'month' || currentChartMode === 'year')) {
+                    loadChartData();
+                }
             });
             setInterval(() => { checkAndSwitchMonth(); }, 60000);
 
-            // 2. Lắng nghe Dữ liệu Live chính (Mỗi 4 giây gửi lên 1 lần)
+            // 2. Lắng nghe Dữ liệu Live chính
             database.ref('/SosenSystem/Live').on('value', (snapshot) => {
                 pendingLiveData = snapshot.val();
                 if (!pendingLiveData) return;
                 
-                // Cập nhật thời điểm nhận gói tin Live và kích hoạt ESP32 ONLINE ngay lập tức
                 markLiveDataReceived(Date.now());
                 setDeviceStatus('online');
 
@@ -1176,7 +1326,6 @@
                     liveDomFrameId = null;
                     if (!data) return;
 
-                    // TỰ ĐỘNG XÁC ĐỊNH TRẠNG THÁI LƯỚI TỪ V_Grid
                     const vGrid = toSafeNumber(data.V_Grid !== undefined ? data.V_Grid : data.Grid_Voltage);
                     const isGridOn = (vGrid > 50) || (data.Grid_Online === true);
                     setClockGridStatus(isGridOn, true);
@@ -1196,13 +1345,11 @@
 
                     updateBackgroundByTimeAndPv(pvInW);
                     
-                    // Hiển thị Sản lượng Mặt trời
                     animateValue('lbl-pv', pvInW, v => Math.round(v));
                     const elPv = document.getElementById('lbl-pv');
                     if (elPv) elPv.classList.add('val-pv-style');
                     updateSunLevelByPower(pvInW);
 
-                    // Hiển thị Công suất Tải
                     animateValue('lbl-load', loadInW, v => Math.round(v));
                     const elLoad = document.getElementById('lbl-load');
                     if (elLoad) {
@@ -1210,7 +1357,6 @@
                         elLoad.style.opacity = loadValid ? '1' : '0.5';
                     }
 
-                    // Hiển thị Công suất Lưới
                     const gridActiveW = gridImportW > 0 ? gridImportW : gridExportW;
                     animateValue('lbl-grid', gridActiveW, v => Math.round(v));
 
@@ -1230,7 +1376,6 @@
                         else { elGridMode.classList.add('idle'); elGridMode.style.display = 'none'; }
                     }
 
-                    // Hiển thị Công suất Pin
                     animateValue('lbl-batt', Math.abs(battInW), v => Math.round(v));
                     const elBatt = document.getElementById('lbl-batt');
                     if (elBatt) {
@@ -1239,7 +1384,6 @@
                         else { elBatt.style.color = '#fff'; elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)'; }
                     }
 
-                    // Nhiệt độ Biến tần
                     if (data.Inv_Temp !== undefined) {
                         const tempLabel = document.getElementById('lbl-inv-temp');
                         const t = toSafeNumber(data.Inv_Temp);
@@ -1249,7 +1393,6 @@
                         }
                     }
 
-                    // Công tắc Biến tần (Inv_Switch)
                     if (data.Inv_Switch !== undefined) {
                         const toggle = document.getElementById('inv-switch-toggle');
                         const statusText = document.getElementById('switch-status-text');
@@ -1257,11 +1400,9 @@
                         if (statusText) { updateDOMText('switch-status-text', (data.Inv_Switch === 1) ? "BẬT" : "TẮT"); statusText.style.color = (data.Inv_Switch === 1) ? "#00cc66" : "#ff4444"; }
                     }
 
-                    // SOC Pin
                     let soc = clampNumber(data.Batt_SOC, 0, 100);
                     animateValue('lbl-soc', soc, v => Math.round(v) + '%');
 
-                    // Nhiệt độ Pin (Batt_Temp)
                     const battTempLabel = document.getElementById('lbl-batt-temp');
                     if (battTempLabel) {
                         battTempLabel.classList.remove('temp-cool', 'temp-normal', 'temp-warm', 'temp-hot', 'temp-danger', 'temp-stale');
@@ -1302,7 +1443,6 @@
                     const battFill = document.getElementById('batt-fill');
                     if (battFill) { battFill.style.width = soc + '%'; battFill.className = 'battery-fill ' + colorTheme; }
 
-                    // Luồng chảy Năng lượng (Flow Animation)
                     if (pvInW >= 1) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
                     if (loadInW >= 1 && loadValid) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
                     if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW)); else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); else setFlow('flow-batt', false);
