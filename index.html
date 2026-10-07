@@ -363,7 +363,7 @@
         }
     </style>
 </head>
-<body data-dashboard-version="V3.1 - Sosen Hybrid Gateway Synchronized">
+<body data-dashboard-version="V3.0 - Ultra Fast MQTT Live & Firebase Storage">
     <div class="app-container">
         <div class="diagram-panel">
             <div id="battery-mini-meter" class="battery-mini-meter idle">
@@ -372,7 +372,7 @@
                 <div class="battery-mini-row"><span class="battery-mini-label">Dòng</span><span class="battery-mini-value" id="mini-stat-a">-- A</span></div>
             </div>
             
-            <div id="update-clock" class="status-clock" title="Trạng thái lưới, Gateway và thời điểm nhận dữ liệu Live gần nhất qua MQTT">
+            <div id="update-clock" class="status-clock" title="Trạng thái lưới, ESP32 và thời điểm nhận dữ liệu Live gần nhất qua MQTT">
                 <div class="clock-status-row">
                     <span id="clock-grid-status" class="clock-grid-status unknown">
                         <span class="clock-grid-dot"></span>
@@ -417,8 +417,6 @@
                 <h3>LƯỚI EVN</h3>
                 <div class="val" id="lbl-grid">0</div>
                 <div class="unit">W</div>
-                <!-- HIỂN THỊ ĐIỆN ÁP & TẦN SỐ LƯỚI ĐỒNG BỘ TỪ MODBUS 40141 -->
-                <div id="lbl-grid-vf" style="font-size: 10px; font-weight: 900; color: #a0c4ff; margin-top: 2px;">-- V | -- Hz</div>
                 <div id="lbl-grid-mode" class="grid-live-mode idle" style="display:none"></div>
             </div>
 
@@ -448,13 +446,11 @@
                     <div>☀️ Sản lượng PV: <span id="stat-pv-today">0 kWh</span></div>
                     <div style="color: #0088ff;">🏠 Tiêu thụ hôm nay: <span id="stat-load-today">0 kWh</span></div>
                     <div>🗼 Lấy lưới hôm nay: <span id="stat-grid-buy">0 kWh</span></div>
-                    <div style="color: #00cc66;">📤 Đẩy lưới hôm nay: <span id="stat-grid-sell">0.0 kWh</span></div>
                     <div>🔋 Pin đã xả (Nay): <span id="stat-bat-dis">0 kWh</span></div>
                     <div>⚡ Pin đã sạc (Nay): <span id="stat-bat-chg">0 kWh</span></div>
                     
                     <div style="color: #b000ff;">🔋 Tổng Pin đã xả: <span id="stat-bat-dis-total">0 kWh</span></div>
                     <div style="color: #ff8c00;">⚡ Tổng Pin đã sạc: <span id="stat-bat-chg-total">0 kWh</span></div>
-                    <div style="color: #0099ff;">🏠 Tổng điện tiêu thụ: <span id="stat-load-total">0.0 kWh</span></div>
                     
                     <div style="color: #d35400;">🌐 E_Total (PV Trọn đời): <span id="stat-pv-total">0 kWh</span></div>
                 </div>
@@ -998,20 +994,16 @@
             let currentETotal = toSafeNumber(data.PV_Total_Lifetime);
             let loadToday = toSafeNumber(data.Load_Today);
             let gridBuyToday = toSafeNumber(data.Grid_Buy_Today);
-            let gridSellToday = toSafeNumber(data.Grid_Sell_Today);
             let battDisToday = toSafeNumber(data.Bat_Discharge_Today);
             let battChgToday = toSafeNumber(data.Bat_Charge_Today);
-            let loadTotal = toSafeNumber(data.Load_Total_Lifetime);
 
             animateValue('stat-pv-today', pvToday, v => v.toFixed(1) + ' kWh');
             animateValue('stat-load-today', loadToday, v => v.toFixed(1) + ' kWh'); 
             animateValue('stat-grid-buy', gridBuyToday, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-grid-sell', gridSellToday, v => v.toFixed(1) + ' kWh');
             animateValue('stat-bat-dis', battDisToday, v => v.toFixed(1) + ' kWh');
             animateValue('stat-bat-chg', battChgToday, v => v.toFixed(1) + ' kWh');
             animateValue('stat-bat-dis-total', toSafeNumber(data.Bat_Discharge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
             animateValue('stat-bat-chg-total', toSafeNumber(data.Bat_Charge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
-            animateValue('stat-load-total', loadTotal, v => v.toFixed(1) + ' kWh');
             animateValue('stat-pv-total', currentETotal, v => v.toFixed(1) + ' kWh');
 
             let todayDate = new Date(); 
@@ -1150,9 +1142,9 @@
             box.classList.remove('online', 'offline', 'checking');
             box.classList.add(state);
 
-            if (state === 'online') { updateDOMText('device-status-text', 'ONLINE'); } 
-            else if (state === 'offline') { updateDOMText('device-status-text', 'OFFLINE'); setClockGridStatus(null); } 
-            else { updateDOMText('device-status-text', 'CONNECTING...'); setClockGridStatus(null); }
+            if (state === 'online') { updateDOMText('device-status-text', 'ESP32 ON'); } 
+            else if (state === 'offline') { updateDOMText('device-status-text', 'ESP32 OFF'); setClockGridStatus(null); } 
+            else { updateDOMText('device-status-text', 'ESP32 ...'); setClockGridStatus(null); }
         }
 
         function renderLastLiveReceivedTime() {
@@ -1193,21 +1185,8 @@
             } catch (e) {}
 
             const vGrid = toSafeNumber(data.V_Grid);
-            const fGrid = toSafeNumber(data.F_Grid);
             const isGridOn = (vGrid > 50) || (data.Grid_Online === true);
             setClockGridStatus(isGridOn);
-
-            // Cập nhật thông số Điện áp (V) và Tần số (Hz) Lưới EVN
-            const elGridVF = document.getElementById('lbl-grid-vf');
-            if (elGridVF) {
-                if (isGridOn && vGrid > 0) {
-                    elGridVF.innerText = vGrid.toFixed(1) + ' V | ' + fGrid.toFixed(2) + ' Hz';
-                    elGridVF.style.color = '#a0c4ff';
-                } else {
-                    elGridVF.innerText = 'Mất Lưới EVN';
-                    elGridVF.style.color = '#ff6b6b';
-                }
-            }
 
             const battVoltage = toSafeNumber(data.Batt_Voltage);
             const battCurrent = toSafeNumber(data.Batt_Current);
@@ -1320,6 +1299,86 @@
             else if (gridImportW > 0) { setFlow('flow-grid', true, 'flowInR', '#ff4444', gridImportW); }
             else if (gridExportW > 0) { setFlow('flow-grid', true, 'flowOutR', '#00cc66', gridExportW); }
             else { setFlow('flow-grid', false); }
+
+            // ================= ĐỒNG BỘ NĂNG LƯỢNG NGÀY & TRỌN ĐỜI TRỰC TIẾP TỪ MQTT PC NHÚNG =================
+            let hasEnergyUpdate = false;
+            if (!latestDailyData) latestDailyData = {};
+
+            const pvTodayVal = data.PV_Today !== undefined ? data.PV_Today : data.pv_today;
+            if (pvTodayVal !== undefined && pvTodayVal !== null && !isNaN(Number(pvTodayVal))) {
+                latestDailyData.PV_Today = Number(pvTodayVal);
+                hasEnergyUpdate = true;
+            }
+
+            const batChgTodayVal = data.Bat_Charge_Today !== undefined ? data.Bat_Charge_Today : data.bat_charge_today;
+            if (batChgTodayVal !== undefined && batChgTodayVal !== null && !isNaN(Number(batChgTodayVal))) {
+                latestDailyData.Bat_Charge_Today = Number(batChgTodayVal);
+                hasEnergyUpdate = true;
+            }
+
+            const batDisTodayVal = data.Bat_Discharge_Today !== undefined ? data.Bat_Discharge_Today : data.bat_discharge_today;
+            if (batDisTodayVal !== undefined && batDisTodayVal !== null && !isNaN(Number(batDisTodayVal))) {
+                latestDailyData.Bat_Discharge_Today = Number(batDisTodayVal);
+                hasEnergyUpdate = true;
+            }
+
+            const loadTodayVal = data.Load_Today !== undefined ? data.Load_Today : data.load_today;
+            if (loadTodayVal !== undefined && loadTodayVal !== null && !isNaN(Number(loadTodayVal))) {
+                latestDailyData.Load_Today = Number(loadTodayVal);
+                hasEnergyUpdate = true;
+            }
+
+            const gridBuyTodayVal = data.Grid_Buy_Today !== undefined ? data.Grid_Buy_Today : data.grid_buy_today;
+            if (gridBuyTodayVal !== undefined && gridBuyTodayVal !== null && !isNaN(Number(gridBuyTodayVal))) {
+                latestDailyData.Grid_Buy_Today = Number(gridBuyTodayVal);
+                hasEnergyUpdate = true;
+            }
+
+            const pvTotalVal = data.PV_Total_Lifetime !== undefined ? data.PV_Total_Lifetime : (data.PV_Total !== undefined ? data.PV_Total : data.pv_total);
+            if (pvTotalVal !== undefined && pvTotalVal !== null && !isNaN(Number(pvTotalVal))) {
+                latestDailyData.PV_Total_Lifetime = Number(pvTotalVal);
+                hasEnergyUpdate = true;
+            }
+
+            const batDisTotalVal = data.Bat_Discharge_Total_Lifetime !== undefined ? data.Bat_Discharge_Total_Lifetime : (data.Bat_Discharge_Total !== undefined ? data.Bat_Discharge_Total : data.bat_discharge_total);
+            if (batDisTotalVal !== undefined && batDisTotalVal !== null && !isNaN(Number(batDisTotalVal))) {
+                latestDailyData.Bat_Discharge_Total_Lifetime = Number(batDisTotalVal);
+                hasEnergyUpdate = true;
+            }
+
+            const batChgTotalVal = data.Bat_Charge_Total_Lifetime !== undefined ? data.Bat_Charge_Total_Lifetime : (data.Bat_Charge_Total !== undefined ? data.Bat_Charge_Total : data.bat_charge_total);
+            if (batChgTotalVal !== undefined && batChgTotalVal !== null && !isNaN(Number(batChgTotalVal))) {
+                latestDailyData.Bat_Charge_Total_Lifetime = Number(batChgTotalVal);
+                hasEnergyUpdate = true;
+            }
+
+            if (hasEnergyUpdate) {
+                try {
+                    localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
+                } catch(e) {}
+                recalculateEnergy();
+                updateChartTodayRealtime(latestDailyData);
+            }
+        }
+
+        // Cập nhật cột ngày hiện tại trên biểu đồ Chart.js mà không cần tải lại Firebase
+        function updateChartTodayRealtime(eData) {
+            if (!energyChart || currentChartMode !== 'month') return;
+            const now = new Date();
+            const yyyy = chartCursorDate.getFullYear();
+            const isCurrentYear = (yyyy === now.getFullYear());
+            const isViewingCurrentMonth = (isCurrentYear && chartCursorDate.getMonth() === now.getMonth());
+            if (!isViewingCurrentMonth || !chartAllRows || chartAllRows.length === 0) return;
+
+            const todayNum = now.getDate();
+            const rowIdx = todayNum - 1;
+            if (chartAllRows[rowIdx]) {
+                if (eData.PV_Today !== undefined) chartAllRows[rowIdx].pv = toSafeNumber(eData.PV_Today);
+                if (eData.Bat_Discharge_Today !== undefined) chartAllRows[rowIdx].batt = toSafeNumber(eData.Bat_Discharge_Today);
+                if (eData.Bat_Charge_Today !== undefined) chartAllRows[rowIdx].charge = toSafeNumber(eData.Bat_Charge_Today);
+                if (eData.Load_Today !== undefined) chartAllRows[rowIdx].load = toSafeNumber(eData.Load_Today);
+                updateVisibleChartRows();
+            }
         }
 
         // ================= KHỞI TẠO KẾT NỐI MQTT WEBSOCKET =================
@@ -1343,6 +1402,7 @@
 
             mqttClient.on('connect', () => {
                 console.log("[MQTT] Da ket noi WSS thanh cong!");
+                // Nhận ngay gói tin retained mới nhất
                 mqttClient.subscribe(MQTT_TOPIC_DATA, { qos: 0 }, (err) => {
                     if (!err) console.log("[MQTT] Subscribed:", MQTT_TOPIC_DATA);
                 });
@@ -1370,6 +1430,7 @@
 
         // ================= KHỞI ĐỘNG HỆ THỐNG VÀ LẮNG NGHE FIREBASE =================
         document.addEventListener('DOMContentLoaded', () => {
+            // NẠP NGAY LẬP TỨC TỪ CACHE (0.05 giây để không bị trắng số liệu)
             const cachedData = localStorage.getItem("last_sosen_snapshot");
             if (cachedData) {
                 try {
