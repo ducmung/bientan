@@ -1,492 +1,1556 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sosen Hybrid Solar Dashboard</title>
-  
-  <!-- Font & Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  
-  <!-- Chart.js & Paho MQTT & Firebase App/Database SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sosen Energy Dashboard V3.0 - Ultra Fast MQTT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- THƯ VIỆN MQTT WEBSOCKET TRÌNH DUYỆT -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
 
-  <style>
-    :root {
-      --primary: #2196F3;
-      --pv-color: #ff9800;
-      --grid-color: #f44336;
-      --bat-color: #4caf50;
-      --load-color: #9c27b0;
-      --bg: #f0f4f8;
-      --card-bg: rgba(255, 255, 255, 0.95);
-      --text: #2c3e50;
-    }
+        body {
+            background: linear-gradient(135deg, rgba(6, 12, 24, 0.85), rgba(18, 32, 58, 0.75));
+            color: #333;
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background: url('1279_High_Defination_(HDTV).jpg') no-repeat center center / cover;
+            transform: translateZ(0);
+            pointer-events: none;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #e2ebf0 0%, #eef1f5 100%);
-      color: var(--text);
-      padding: 12px;
-      min-height: 100vh;
-    }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            opacity: 0;
+            pointer-events: none;
+            background-repeat: repeat;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.95), transparent),
+                radial-gradient(1.6px 1.6px at 74px 112px, rgba(190,230,255,0.82), transparent),
+                radial-gradient(2px 2px at 138px 62px, rgba(255,247,205,0.92), transparent),
+                radial-gradient(1.4px 1.4px at 168px 164px, rgba(255,255,255,0.86), transparent),
+                radial-gradient(1.8px 1.8px at 44px 178px, rgba(185,230,255,0.88), transparent),
+                radial-gradient(1.4px 1.4px at 190px 22px, rgba(255,255,255,0.8), transparent);
+            background-size: 220px 220px;
+            transition: opacity 0.8s ease;
+            will-change: opacity, transform;
+            transform: translateZ(0);
+        }
 
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+        body.night-stars { background: #000; }
+        body.night-stars::before { z-index: 0; background: #000; }
+        body.night-stars::after { z-index: 0; opacity: 0; animation: none; }
 
-    .card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 14px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-    }
+        .app-container { 
+            position: relative; z-index: 1; display: flex; flex-direction: column; gap: 20px; max-width: 1000px; margin: 0 auto; transform: translateZ(0); 
+        }
 
-    /* Header & Status Bar */
-    .header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #eee;
-    }
-    .status-badge {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .badge-online { background: #e8f5e9; color: #2e7d32; }
-    .badge-offline { background: #ffebee; color: #c62828; }
-    .badge-sync { background: #e3f2fd; color: #1565c0; }
+        .diagram-panel {
+            position: relative; width: 100%; max-width: 500px; margin: 0 auto; aspect-ratio: 1 / 1.1;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.42), rgba(255,255,255,0.22) 42%, rgba(255,255,255,0.35)), rgba(255, 255, 255, 0.45);
+            border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.65);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.42);
+            overflow: hidden; isolation: isolate; transform: translateZ(0);
+        }
 
-    /* Energy Flow Grid */
-    .flow-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .flow-node {
-      border-radius: 12px;
-      padding: 12px;
-      text-align: center;
-      background: #fafafa;
-      position: relative;
-    }
-    .node-pv { border-left: 4px solid var(--pv-color); }
-    .node-grid { border-left: 4px solid var(--grid-color); }
-    .node-bat { border-left: 4px solid var(--bat-color); }
-    .node-load { border-left: 4px solid var(--load-color); }
+        .diagram-panel::before {
+            content: ""; position: absolute; inset: 8%; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 2px), conic-gradient(from 0deg, transparent, rgba(255,215,0,0.18), transparent, rgba(0,229,255,0.16), transparent);
+            animation: softSpin 22s linear infinite; z-index: -1; transform: translateZ(0);
+        }
 
-    .node-title { font-size: 12px; color: #666; font-weight: 500; }
-    .node-val { font-size: 20px; font-weight: 700; margin: 4px 0; }
-    .node-sub { font-size: 11px; color: #888; }
+        body.night-stars .diagram-panel {
+            background: #000; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85), inset 0 0 16px rgba(255,255,255,0.06), 0 0 28px rgba(0,229,255,0.16);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+        }
 
-    /* Battery Graphic */
-    .bat-visual-box {
-      margin-top: 8px;
-      padding: 10px;
-      background: #f9fbfd;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .soc-bar-bg {
-      flex: 1;
-      height: 14px;
-      background: #e0e0e0;
-      border-radius: 7px;
-      margin: 0 10px;
-      overflow: hidden;
-    }
-    .soc-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #81c784, #4caf50);
-      width: 0%;
-      transition: width 0.5s ease;
-    }
+        body.night-stars .diagram-panel::before {
+            inset: 0; border-radius: inherit; z-index: 0; opacity: 0.62;
+            background: radial-gradient(2px 2px at 12% 11%, rgba(255,255,255,0.94), transparent), radial-gradient(1.8px 1.8px at 43% 8%, rgba(255,247,205,0.9), transparent), radial-gradient(1.8px 1.8px at 76% 18%, rgba(180,226,255,0.88), transparent), radial-gradient(1.5px 1.5px at 20% 43%, rgba(185,230,255,0.86), transparent), radial-gradient(1.6px 1.6px at 68% 34%, rgba(255,255,255,0.88), transparent), radial-gradient(1.5px 1.5px at 82% 63%, rgba(255,255,255,0.82), transparent), radial-gradient(2px 2px at 88% 46%, rgba(255,247,205,0.94), transparent), radial-gradient(1.8px 1.8px at 27% 61%, rgba(170,220,255,0.86), transparent), radial-gradient(1.5px 1.5px at 15% 76%, rgba(255,255,255,0.9), transparent), radial-gradient(1.8px 1.8px at 58% 85%, rgba(180,226,255,0.88), transparent), radial-gradient(2px 2px at 92% 82%, rgba(255,247,205,0.92), transparent), radial-gradient(1.2px 1.2px at 34% 92%, rgba(255,255,255,0.8), transparent), radial-gradient(1.6px 1.6px at 54% 22%, rgba(185,230,255,0.85), transparent), radial-gradient(1.8px 1.8px at 38% 54%, rgba(255,255,255,0.95), transparent), radial-gradient(2px 2px at 70% 70%, rgba(255,247,205,0.88), transparent), radial-gradient(1.4px 1.4px at 8% 28%, rgba(255,255,255,0.82), transparent), radial-gradient(1.5px 1.5px at 85% 25%, rgba(180,226,255,0.8), transparent), radial-gradient(2.2px 2.2px at 45% 75%, rgba(255,255,255,0.9), transparent), radial-gradient(1.8px 1.8px at 62% 12%, rgba(255,247,205,0.85), transparent), radial-gradient(1.5px 1.5px at 95% 55%, rgba(255,255,255,0.88), transparent), radial-gradient(1.6px 1.6px at 25% 88%, rgba(170,220,255,0.9), transparent), radial-gradient(2px 2px at 50% 45%, rgba(255,255,255,0.92), transparent);
+            background-size: 100% 100%; animation: panelStarTwinkle 2.2s ease-in-out infinite alternate; pointer-events: none; transform: translateZ(0);
+        }
 
-    /* History & Daily Section */
-    .stats-table {
-      width: 100%;
-      margin-top: 6px;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .stats-table tr {
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .stats-table td {
-      padding: 7px 4px;
-    }
-    .stats-table td:last-child {
-      text-align: right;
-      font-weight: 600;
-    }
+        @keyframes panelStarTwinkle { from { opacity: 0.52; transform: scale(1) translateZ(0); } 55% { opacity: 1; transform: scale(1.006) translateZ(0); } to { opacity: 0.76; transform: scale(1.012) translateZ(0); } }
+        @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
-    .chart-container {
-      position: relative;
-      height: 210px;
-      width: 100%;
-      margin-top: 10px;
-    }
-    .sync-indicator {
-      font-size: 11px;
-      color: #666;
-      text-align: right;
-      margin-top: 4px;
-    }
-  </style>
+        .diagram-panel::after, .stat-card::after, .node-center::after, .image-frame::after, #update-clock::after, #lbl-inv-temp::after {
+            content: ""; position: absolute; inset: -2px; border-radius: inherit; padding: 2px;
+            background: linear-gradient(90deg, #ff004c, #ff8c00, #ffd700, #00cc66, #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00);
+            background-size: 200% 100%; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+            animation: rainbowSlide 3s linear infinite, rainbowBorderGlow 1.5s ease-in-out infinite alternate; transform: translateZ(0);
+        }
+
+        .diagram-panel::after { z-index: 4; inset: 0; border-radius: 20px; }
+        .stat-card::after { z-index: 2; inset: 0; border-radius: 20px; }
+        .image-frame::after { z-index: 2; inset: 0; border-radius: 15px; padding: 4px; }
+        .node-center::after { z-index: -1; border-radius: 15px; }
+        #update-clock::after { z-index: -1; border-radius: 20px; }
+        #lbl-inv-temp::after { z-index: -1; border-radius: 20px; }
+
+        @keyframes rainbowSlide { to { background-position: -200% 0; } }
+        @keyframes rainbowBorderGlow { from { opacity: 0.7; } to { opacity: 1; } }
+
+        .node { position: absolute; transform: translate(-50%, -50%) translateZ(0); background: transparent; border: none; padding: 10px 4px; text-align: center; width: 90px; z-index: 10; }
+        .pos-pv { top: 15%; left: 12%; }
+        .pos-grid { top: 18%; left: 84%; }
+        .pos-batt { top: 82%; left: 16%; }
+        .pos-load { top: 82%; left: 84%; }
+        .pos-batt.corner-node { top: 84%; left: 15%; width: 118px; }
+        .pos-load.corner-node { top: 86%; left: 88%; }
+
+        .image-frame {
+            position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15;
+            width: 140px; padding: 4px; border-radius: 15px; overflow: hidden;
+            background: linear-gradient(90deg, #ff004c, #ff8c00, #ffd700, #00cc66, #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00);
+            background-size: 200% 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 12px rgba(0,229,255,0.32);
+            animation: rainbowSlide 3s linear infinite, rainbowBorderGlow 1.5s ease-in-out infinite alternate;
+        }
+        .image-frame img { position: relative; z-index: 1; width: 100%; height: auto; display: block; border-radius: 11px; transform: translateZ(0); }
+
+        .node-center {
+            position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
+            width: 115px; height: 125px; padding: 3px; background: #fff; border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.16), 0 0 22px rgba(0,204,102,0.3); z-index: 15;
+        }
+        .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; transform: translateZ(0); }
+
+        #lbl-inv-temp {
+            position: absolute; top: 69%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
+            font-size: 14px; font-weight: 900; background: #00cc66; color: #fff;
+            padding: 4px 16px; border-radius: 20px; z-index: 20; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
+        }
+        
+        .bpf-container { position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15; text-align: center; width: 100%; pointer-events: none; }
+        .bpf-text {
+            font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 32px; font-weight: 900; letter-spacing: 14px;
+            position: relative; display: inline-block; background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.55));
+            animation: goldPulse 2.6s ease-in-out infinite alternate; margin-left: 14px;
+        }
+        @keyframes goldPulse { from { opacity: 0.88; transform: translateZ(0); } to { opacity: 1; transform: translateY(-1px) translateZ(0); } }
+        .bpf-text::after {
+            content: attr(data-text); position: absolute; left: 0; top: 0; z-index: -1; -webkit-text-fill-color: transparent; background: none;
+            text-shadow: 1px 1px 0 #ff0000, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 0 #660000, 5px 5px 0 #330000, 6px 6px 12px rgba(255, 0, 0, 0.8);
+        }
+
+        .line { position: absolute; height: 26px; margin-top: -13px; background: transparent; width: 44%; z-index: 1; transform: translateZ(0); pointer-events: none; }
+        .line-pv { top: 18%; left: 16%; transform-origin: left center; transform: rotate(38deg) translateZ(0); }
+        .line-grid { top: 18%; right: 16%; transform-origin: right center; transform: rotate(-38deg) translateZ(0); }
+        .line-batt { top: 82%; left: 16%; transform-origin: left center; transform: rotate(-38deg) translateZ(0); }
+        .line-load { top: 82%; right: 16%; transform-origin: right center; transform: rotate(38deg) translateZ(0); }
+        
+        #lbl-status {
+            position: relative; z-index: 1; display: block; margin: 0 0 5px 0; transform: translateZ(0); font-size: 11px; font-weight: 900;
+            background: transparent; padding: 0; border-radius: 0; box-shadow: none; color: #a8b0ba; text-align: center; white-space: nowrap; transition: color 0.5s;
+        }
+
+        .battery-mini-meter {
+            --mini-color: #888; --mini-glow: rgba(255,255,255,0.45);
+            position: absolute; top: 50%; left: 18%; transform: translate(-50%, -50%) translateZ(0);
+            z-index: 25; min-width: 112px; padding: 6px 9px 9px 9px; border-radius: 16px;
+            background: rgba(12, 18, 30, 0.72); border: 1px solid rgba(255,255,255,0.36); box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 14px var(--mini-glow);
+            overflow: hidden; pointer-events: none; color: #fff;
+        }
+        .battery-mini-meter::before {
+            content: ""; position: absolute; inset: 0; opacity: 0.62; background: linear-gradient(90deg, transparent 0%, var(--mini-glow) 48%, transparent 100%);
+            transform: translateX(-120%) translateZ(0); animation: miniEnergySweep 1.7s linear infinite; pointer-events: none;
+        }
+        .battery-mini-meter.charge { --mini-color: #00cc66; --mini-glow: rgba(0, 204, 102, 0.48); }
+        .battery-mini-meter.discharge { --mini-color: #ff4444; --mini-glow: rgba(255, 68, 68, 0.48); }
+        .battery-mini-meter.idle { --mini-color: #a8b0ba; --mini-glow: rgba(168, 176, 186, 0.28); }
+        .battery-mini-row { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10px; font-weight: 900; line-height: 1.15; }
+        .battery-mini-row + .battery-mini-row { margin-top: 3px; }
+        .battery-mini-label { color: rgba(255,255,255,0.78); }
+        .battery-mini-value { color: #fff; text-shadow: 0 0 6px var(--mini-color), 0 1px 3px rgba(0,0,0,0.85); font-variant-numeric: tabular-nums; }
+        @keyframes miniEnergySweep { to { transform: translateX(120%) translateZ(0); } }
+
+        .node h3 { font-size: 10px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
+        .node .unit { font-size: 10px; color: rgba(255,255,255,0.86); font-weight: 800; }
+        .corner-node { width: 96px; padding: 0 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .corner-power { order: 1; transform: translateY(-13px) translateZ(0); line-height: 1; position: relative; z-index: 12; text-align: center; pointer-events: none; }
+        .corner-power h3 { margin: 0 0 3px 0; }
+        .corner-power .val { display: block; font-size: 18px; line-height: 1; }
+        .corner-power .unit { display: block; line-height: 1.05; margin-top: 2px; }
+        .corner-node .battery-wrapper, .corner-node .icon { order: 2; position: relative; z-index: 11; }
+        .pos-batt.corner-node .battery-wrapper { margin: -2px auto 0 auto; transform: translate(4px, -2px) translateZ(0); }
+        .pos-batt.corner-node .battery-wrapper:hover { transform: translate(4px, -2px) scale(1.05) translateZ(0); }
+        .pos-batt.corner-node .battery-body { width: 92px; height: 40px; border-radius: 5px; }
+        .pos-batt.corner-node .battery-cap { width: 7px; height: 19px; border-radius: 0 4px 4px 0; }
+        .pos-batt.corner-node #lbl-soc { font-size: 21px; }
+        
+        .battery-temp-label {
+            order: 3; position: relative; z-index: 13; margin-top: 1px; transform: translate(4px, -1px) translateZ(0); display: inline-flex;
+            align-items: center; justify-content: center; gap: 4px; min-width: auto; padding: 0; border-radius: 0; font-size: 11px;
+            font-weight: 900; line-height: 1.1; background: transparent; border: none; box-shadow: none; white-space: nowrap; pointer-events: none;
+        }
+        .battery-temp-label .temp-icon { color: rgba(255,255,255,0.82); text-shadow: 0 1px 3px rgba(0,0,0,0.75); }
+        .battery-temp-label .temp-value { color: #7dffb2; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,255,178,0.35); transition: color 0.35s ease, text-shadow 0.35s ease; font-variant-numeric: tabular-nums; }
+        .battery-temp-label.temp-cool .temp-value { color: #7ddfff; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,223,255,0.38); }
+        .battery-temp-label.temp-normal .temp-value { color: #38ff7a; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 9px rgba(56,255,122,0.48); }
+        .battery-temp-label.temp-warm .temp-value { color: #ffd600; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 10px rgba(255,214,0,0.52); }
+        .battery-temp-label.temp-hot .temp-value { color: #ff3b30; text-shadow: 0 1px 3px rgba(0,0,0,0.88), 0 0 10px rgba(255,59,48,0.62); }
+        .battery-temp-label.temp-danger .temp-value { color: #ff1f1f; text-shadow: 0 1px 3px rgba(0,0,0,0.92), 0 0 8px #ff0000, 0 0 16px rgba(255,0,0,0.92); animation: batteryTempDangerBlink 0.72s steps(2, end) infinite; }
+        @keyframes batteryTempDangerBlink { 0%, 45% { opacity: 1; transform: scale(1) translateZ(0); filter: brightness(1.15); } 46%, 100% { opacity: 0.22; transform: scale(1.06) translateZ(0); filter: brightness(1.8); } }
+        .battery-temp-label.temp-stale .temp-value { color: #a8b0ba; text-shadow: 0 1px 3px rgba(0,0,0,0.75); animation: none; }
+        
+        .pos-load.corner-node .icon { margin: -10px auto 0 auto; transform: translate(6px, 3px) translateZ(0); }
+        .pos-load.corner-node .img-icon { width: 78px; height: 78px; margin: -8px auto 0 auto; }
+        
+        .icon { font-size: 46px; line-height: 1; margin-bottom: 8px; display: inline-block; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
+        .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)); }
+        .img-icon { width: 85px; height: 85px; object-fit: cover; display: block; margin: -10px auto 5px auto; filter: brightness(1.1) contrast(1.1); -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); transform: translateZ(0); }
+        .pos-load .icon { filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.8)); }
+
+        .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; cursor: pointer; transition: transform 0.2s ease, filter 0.2s ease; transform: translateZ(0); }
+        .battery-wrapper:hover { transform: scale(1.05) translateZ(0); filter: drop-shadow(0 0 8px rgba(0, 204, 102, 0.5)); }
+        .battery-body { width: 72px; height: 32px; background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%); border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); border-right: 1px solid #111; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8); transform: translateZ(0); }
+        .battery-body::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.05) 100%); pointer-events: none; z-index: 2; }
+        .battery-cap { width: 5px; height: 14px; background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%); border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.3); border-left: none; box-shadow: inset 1px 0 3px rgba(255,255,255,0.6); }
+        .battery-fill { height: 100%; width: 0%; transition: width 0.5s ease-in-out, background 0.5s; position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); transform: translateZ(0); }
+        .fill-red { background: linear-gradient(to bottom, #ff5555 0%, #ffaaaa 30%, #ff2222 70%, #aa0000 100%); }
+        .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
+        .fill-green { background: linear-gradient(to bottom, #00ee77 0%, #88ffbb 30%, #00bb55 70%, #007733 100%); }
+        #lbl-soc { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a; text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6); letter-spacing: 1px; margin: 0; }
+        
+        .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
+        .val-pv-style { color: #ffffff !important; text-shadow: 0 1px 0 #b45309, 0 2px 0 #92400e, 0 3px 0 #78350f, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(245, 158, 11, 0.9) !important; font-size: 18px; }
+        .val-load-style { color: #ffffff !important; text-shadow: 0 1px 0 #1d4ed8, 0 2px 0 #1e40af, 0 3px 0 #1e3a8a, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(59, 130, 246, 0.9) !important; font-size: 18px; }
+        .val-grid-buy-style { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
+        .val-grid-sell-style { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
+        .pos-grid { width: 118px; }
+        .grid-live-mode { margin-top: 4px; min-height: 15px; font-size: 10px; font-weight: 900; line-height: 1.15; letter-spacing: 0.1px; white-space: nowrap; transition: color 0.25s ease, text-shadow 0.25s ease, opacity 0.25s ease; font-variant-numeric: tabular-nums; }
+        .grid-live-mode.buy { color: #ff5b6e; text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(255,68,68,0.55); }
+        .grid-live-mode.sell { color: #22e58a; text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(0,204,102,0.55); }
+        .grid-live-mode.idle { color: rgba(255,255,255,0.9); text-shadow: 0 1px 3px rgba(0,0,0,0.75); }
+        .grid-live-mode.no-grid, .grid-live-mode.stale { color: #ffb74d; text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 8px rgba(255,183,77,0.4); }
+        .val-charge { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
+        .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
+        
+        .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; transform: translateZ(0); }
+        .flow-track {
+            position: absolute; top: 50%; left: -4%; width: 108%; height: 8px; transform: translateY(-50%) translateZ(0); border-radius: 999px;
+            background: repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 9px, rgba(255,255,255,0.86) 10px 12px, rgba(255,255,255,0.04) 0%, var(--c) 18%, #ffffff 50%, var(--c) 82%, rgba(255,255,255,0.04) 100%);
+            background-size: 44px 100%, 100% 100%; box-shadow: 0 0 8px var(--c), inset 0 0 5px rgba(255,255,255,0.75); opacity: 0.9; animation: electricWireSlide var(--wire-speed, 1s) linear infinite; z-index: 1;
+        }
+        .flow-track::before { content: ''; position: absolute; left: -10px; right: -10px; top: 50%; height: 20px; transform: translateY(-50%) translateZ(0); border-radius: 999px; background: radial-gradient(ellipse at center, var(--c) 0%, rgba(255,255,255,0.08) 36%, rgba(255,255,255,0) 72%); opacity: 0.38; z-index: -1; }
+        .flow-track::after { content: ''; position: absolute; left: 2%; right: 2%; top: 50%; height: 2px; transform: translateY(-50%) translateZ(0); border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,0.15), #ffffff 48%, rgba(255,255,255,0.15)); box-shadow: 0 0 7px #fff; }
+        .flow-dash {
+            position: absolute; top: 50%; width: 13px; height: 13px; border-radius: 50%; opacity: 0; z-index: 3;
+            background: radial-gradient(circle at 35% 35%, #ffffff 0 18%, rgba(255,255,255,0.95) 19% 30%, var(--c) 46%, rgba(255,255,255,0) 74%); box-shadow: 0 0 8px #fff, 0 0 14px var(--c); transform: translate(-50%, -50%) translateZ(0);
+        }
+        .flow-dash::before { content: ''; position: absolute; top: 50%; width: 34px; height: 4px; border-radius: 999px; transform: translateY(-50%) translateZ(0); opacity: 0.82; }
+        .dir-right .flow-dash::before { right: 8px; background: linear-gradient(90deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
+        .dir-left .flow-dash::before { left: 8px; background: linear-gradient(270deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
+        .flow-dash::after { content: ''; position: absolute; width: 3px; height: 3px; border-radius: 50%; top: -3px; right: 1px; background: #ffffff; box-shadow: -8px 9px 0 rgba(255,255,255,0.74), 6px 11px 0 var(--c); }
+        .flow-spark { position: absolute; top: 50%; width: 4px; height: 4px; border-radius: 50%; opacity: 0; z-index: 4; background: #ffffff; box-shadow: 0 0 6px #fff, 0 0 13px var(--c); transform: translate(-50%, -50%) translateZ(0); }
+        .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.28s; } .flow-dash:nth-child(4) { animation-delay: 0.56s; } .flow-dash:nth-child(5) { animation-delay: 0.84s; } .flow-dash:nth-child(6) { animation-delay: 1.12s; } .flow-dash:nth-child(7) { animation-delay: 1.40s; } .flow-dash:nth-child(8) { animation-delay: 1.68s; }
+        .flow-spark:nth-child(9) { animation-delay: 0.12s; } .flow-spark:nth-child(10) { animation-delay: 0.38s; } .flow-spark:nth-child(11) { animation-delay: 0.72s; } .flow-spark:nth-child(12) { animation-delay: 1.02s; } .flow-spark:nth-child(13) { animation-delay: 1.34s; } .flow-spark:nth-child(14) { animation-delay: 1.66s; }
+        @keyframes electricWireSlide { to { background-position: 44px 0, 0 0; } }
+        @keyframes flowInL { 0% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
+        @keyframes flowOutL { 0% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
+        @keyframes flowInR { 0% { right: -8%; opacity: 0; transform: translate(50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(50%, -50%) scale(1.06) translateZ(0); } 100% { right: 108%; opacity: 0; transform: translate(50%, -50%) scale(0.55) translateZ(0); } }
+        @keyframes flowOutR { 0% { right: 108%; opacity: 0; transform: translate(50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(50%, -50%) scale(1.06) translateZ(0); } 100% { right: -8%; opacity: 0; transform: translate(50%, -50%) scale(0.55) translateZ(0); } }
+        @keyframes sparkRight { 0% { left: -5%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.35) translateZ(0); } 12% { opacity: 1; } 36% { top: 38%; } 62% { top: 62%; } 100% { left: 105%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65) translateZ(0); } }
+        @keyframes sparkLeft { 0% { left: 105%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.35) translateZ(0); } 12% { opacity: 1; } 36% { top: 62%; } 62% { top: 38%; } 100% { left: -5%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65) translateZ(0); } }
+
+        .stats-panel { display: flex; flex-direction: column; gap: 15px; }
+        .stat-card { position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255, 255, 255, 0.78)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateZ(0); }
+        .stat-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%); transform: translateX(-120%) translateZ(0); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none; }
+        @keyframes cardSheen { 0%, 48% { transform: translateX(-120%) translateZ(0); } 78%, 100% { transform: translateX(120%) translateZ(0); } }
+
+        .energy-chart-card { padding: 14px; background: rgba(255,255,255,0.94); }
+        .energy-chart-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 2; }
+        .chart-btn-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .chart-btn { min-width: 74px; border: 0; background: #e8e8e8; color: #111; padding: 10px 14px; border-radius: 24px; font-size: 13px; font-weight: 900; letter-spacing: 0; cursor: pointer; box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease; }
+        .chart-btn:active, .chart-nav-btn:active, .day-nav-btn:active { transform: translateY(1px); }
+        .chart-btn.active { background: #11c878; color: #fff; box-shadow: 0 6px 14px rgba(17,200,120,0.28); }
+        .chart-period-control { display: grid; grid-template-columns: 30px minmax(118px, 1fr) 30px; align-items: center; min-width: 206px; background: #fff; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .chart-nav-btn, .day-nav-btn { height: 38px; border: 0; background: transparent; color: #8b8b8b; font-size: 26px; font-weight: 900; line-height: 1; cursor: pointer; }
+        .chart-period-label { min-width: 118px; height: 38px; display: grid; place-items: center; border-left: 1px solid rgba(0,0,0,0.08); border-right: 1px solid rgba(0,0,0,0.08); color: #111; font-size: 20px; font-weight: 900; letter-spacing: 0; white-space: nowrap; }
+        .chart-stage { position: relative; height: 275px; width: 100%; margin-top: 8px; padding-top: 30px; }
+        .chart-day-corner { position: absolute; top: 0; right: 2px; z-index: 3; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.92); border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 18px; padding: 1px 7px; }
+        .day-nav-btn { width: 24px; height: 26px; font-size: 19px; color: #777; }
+        .chart-selected-label { min-width: 68px; text-align: center; color: #111; font-size: 12px; font-weight: 900; white-space: nowrap; }
+        .chart-detail-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; position: relative; z-index: 2; }
+        .chart-detail-card { border: 1px solid rgba(0,0,0,0.08); background: #fff; border-radius: 8px; padding: 10px 8px; min-height: 78px; box-shadow: 0 3px 10px rgba(0,0,0,0.07); overflow: hidden; }
+        .chart-detail-card .label { display: flex; align-items: center; gap: 5px; color: #4a4a4a; font-size: 11px; font-weight: 900; line-height: 1.2; white-space: nowrap; }
+        .chart-color-dot { flex: 0 0 10px; width: 10px; height: 10px; border-radius: 2px; }
+        .chart-detail-card .value { margin-top: 8px; color: #111; font-size: 22px; font-weight: 900; line-height: 1; white-space: nowrap; }
+        .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
+        .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
+
+        @media (max-width: 620px) {
+            .energy-chart-toolbar { align-items: stretch; flex-direction: column; }
+            .chart-btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .chart-btn { min-width: 0; padding: 9px 8px; font-size: 12px; }
+            .chart-period-control { width: 100%; grid-template-columns: 38px 1fr 38px; }
+            .chart-stage { height: 245px; padding-top: 32px; }
+            .chart-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        .money-card { background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95)); border: 1px solid rgba(218, 165, 32, 0.65); }
+        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 1; }
+        .stat-header h2 { font-size: 16px; color: #444; }
+        .list-detail { font-size: 13px; color: #555; position: relative; z-index: 1; }
+        .list-detail div { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px; }
+        .list-detail div:last-child { border: none; }
+        .list-detail span { font-weight: 800; color: #111; white-space: nowrap; }
+
+        @media (max-width: 400px) {
+            #update-clock { font-size: 11px; padding: 4px 8px; }
+            #lbl-status { font-size: 10px; }
+            .bpf-text { font-size: 26px; letter-spacing: 8px; }
+            .image-frame { width: 120px; top: 14%; } 
+            .node-center { width: 105px; height: 115px; } 
+            #lbl-inv-temp { top: 70%; }
+            .battery-mini-meter { top: 50%; min-width: 96px; padding: 5px 7px 8px 7px; }
+            .battery-mini-row { font-size: 9px; }
+        }
+        @media (min-width: 768px) {
+            .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
+            .diagram-panel { flex: 1; max-width: none; }
+            .stats-panel { flex: 1; justify-content: center; }
+        }
+
+        .solar-sun-box{ width: 82px; height: 82px; margin: auto; position: relative; transform: translate(-8px, -6px) translateZ(0); }
+        #solar-sun{ width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; transition: all 0.5s ease; transform: translateZ(0); }
+        #sun-canvas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0); width: 230px; height: 230px; pointer-events: none; z-index: 0; transition: filter 0.5s ease; }
+        .sun-core{ position: relative; z-index: 2; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle, #ffffff 0%, #fff8c8 20%, #ffe56a 45%, #ffbf00 75%, #ff9800 100%); box-shadow: 0 0 20px #fff7c5, 0 0 40px #ffd700, 0 0 80px #ffb300, 0 0 120px rgba(255,190,0,.7); animation: sunPulse 2s ease-in-out infinite; transform: translateZ(0); }
+        #solar-sun::before{ content:""; position:absolute; width:112px; height:112px; border-radius:50%; background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,220,80,.2) 40%, transparent 75%); animation: haloPulse 2.5s ease-in-out infinite; pointer-events: none; z-index: 1; transform: translateZ(0); }
+        @keyframes sunPulse{ 0%{ transform: scale(1) translateZ(0); opacity: 0.9; } 50%{ transform: scale(1.05) translateZ(0); opacity: 1; } 100%{ transform: scale(1) translateZ(0); opacity: 0.9; } }
+        @keyframes haloPulse{ 0%{ opacity: 0.7; transform: scale(1) translateZ(0); } 50%{ opacity: 1; transform: scale(1.1) translateZ(0); } 100%{ opacity: 0.7; transform: scale(1) translateZ(0); } }
+
+        .sun-lvl-0 { opacity: 0.15; filter: brightness(0.25) grayscale(0.8); } .sun-lvl-1 { opacity: 0.55; filter: brightness(0.68) drop-shadow(0 0 5px rgba(255, 215, 0, 0.28)); } .sun-lvl-2 { opacity: 0.72; filter: brightness(0.90) drop-shadow(0 0 10px rgba(255, 215, 0, 0.50)); } .sun-lvl-3 { opacity: 0.85; filter: brightness(1.10) drop-shadow(0 0 14px rgba(255, 215, 0, 0.65)); } .sun-lvl-4 { opacity: 0.95; filter: brightness(1.30) drop-shadow(0 0 18px rgba(255, 215, 0, 0.78)); } .sun-lvl-5 { opacity: 1.00; filter: brightness(1.48) drop-shadow(0 0 22px rgba(255, 215, 0, 0.88)); } .sun-lvl-6 { opacity: 1.00; filter: brightness(1.68) drop-shadow(0 0 28px rgba(255, 215, 0, 0.98)); }
+
+        #update-clock.status-clock { top: 48%; left: calc(50% + 66px); right: 12px; width: auto; min-width: 0; max-width: 150px; transform: translateY(-50%) translateZ(0); padding: 5px 6px 6px 6px; border-radius: 9px; gap: 3px; letter-spacing: 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; position: absolute; z-index: 25; background: rgba(255, 255, 255, 0.95); box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1); }
+        #update-clock.status-clock::after { border-radius: 9px; }
+        #clock-time-text { font-size: 12px; letter-spacing: 1.2px; line-height: 1; color: #ff0000; font-family: monospace; font-weight: 900; }
+        .clock-status-row { gap: 4px; width: 100%; flex-wrap: nowrap; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .clock-grid-status, #update-clock #device-status { flex: 1 1 0; min-width: 0; padding: 2px 3px; border-radius: 5px; font-size: 7px; gap: 3px; letter-spacing: 0; display: inline-flex; align-items: center; justify-content: center; font-weight: 900; background: rgba(10, 16, 28, 0.12); border: 1px solid rgba(0,0,0,0.07); }
+        .clock-grid-dot, #update-clock #device-status .device-dot { width: 5px; height: 5px; flex: 0 0 5px; border-radius: 50%; }
+
+        .clock-grid-status.on, #update-clock #device-status.online { color: #00a94f; background: rgba(0, 204, 102, 0.10); }
+        .clock-grid-status.on .clock-grid-dot, #update-clock #device-status.online .device-dot { background: #00cc66; box-shadow: 0 0 6px rgba(0, 204, 102, 0.8); }
+        .clock-grid-status.off, #update-clock #device-status.offline { color: #e32121; background: rgba(255, 68, 68, 0.10); animation: clockStatusBlink 1s ease-in-out infinite alternate; }
+        .clock-grid-status.off .clock-grid-dot, #update-clock #device-status.offline .device-dot { background: #ff3333; box-shadow: 0 0 6px rgba(255, 51, 51, 0.85); }
+        .clock-grid-status.unknown, .clock-grid-status.stale, #update-clock #device-status.checking { color: #b77900; background: rgba(255, 193, 7, 0.10); }
+        .clock-grid-status.unknown .clock-grid-dot, .clock-grid-status.stale .clock-grid-dot, #update-clock #device-status.checking .device-dot { background: #ffb000; box-shadow: 0 0 5px rgba(255, 176, 0, 0.75); }
+        
+        @keyframes clockStatusBlink { from { opacity: 0.62; } to { opacity: 1; } }
+
+        @media (max-width: 600px) {
+            #update-clock.status-clock { top: 48%; left: calc(50% + 58px); right: 8px; width: auto; min-width: 0; max-width: none; transform: translateY(-50%) translateZ(0); padding: 4px 5px 5px 5px; border-radius: 8px; gap: 3px; }
+            #update-clock.status-clock::after { border-radius: 8px; }
+            #clock-time-text { font-size: 11px; letter-spacing: 1px; }
+            .clock-status-row { gap: 3px; }
+            .clock-grid-status, #update-clock #device-status { font-size: 6.8px; padding: 2px; border-radius: 4px; gap: 2px; }
+            .clock-grid-dot, #update-clock #device-status .device-dot { width: 4px; height: 4px; flex-basis: 4px; }
+        }
+    </style>
 </head>
-<body>
+<body data-dashboard-version="V3.0 - Ultra Fast MQTT Live & Firebase Storage">
+    <div class="app-container">
+        <div class="diagram-panel">
+            <div id="battery-mini-meter" class="battery-mini-meter idle">
+                <div id="lbl-status">Đang tải...</div>
+                <div class="battery-mini-row"><span class="battery-mini-label">Áp</span><span class="battery-mini-value" id="mini-stat-v">-- V</span></div>
+                <div class="battery-mini-row"><span class="battery-mini-label">Dòng</span><span class="battery-mini-value" id="mini-stat-a">-- A</span></div>
+            </div>
+            
+            <div id="update-clock" class="status-clock" title="Trạng thái lưới, ESP32 và thời điểm nhận dữ liệu Live gần nhất qua MQTT">
+                <div class="clock-status-row">
+                    <span id="clock-grid-status" class="clock-grid-status unknown">
+                        <span class="clock-grid-dot"></span>
+                        <span id="clock-grid-status-text">GRID --</span>
+                    </span>
+                    <span id="device-status" class="checking">
+                        <span class="device-dot"></span>
+                        <span id="device-status-text">ESP32 ...</span>
+                    </span>
+                </div>
+                <div id="clock-time-text">--:--:--</div>
+            </div>
 
-<div class="container">
-  <!-- THẺ TRẠNG THÁI & LIVE FLOW -->
-  <div class="card">
-    <div class="header-bar">
-      <div>
-        <span id="mqttStatusBadge" class="status-badge badge-offline"><i class="fas fa-circle"></i> MQTT OFF</span>
-        <span id="gridStatusBadge" class="status-badge badge-offline"><i class="fas fa-plug"></i> LƯỚI OFF</span>
-      </div>
-      <div id="liveClock" style="font-size: 12px; font-weight: 600; color: #555;">--:--:--</div>
+            <div class="image-frame">
+                <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image" onerror="this.style.opacity='0'">
+            </div>
+
+            <!-- NODE BIẾN TẦN TRUNG TÂM -->
+            <div class="node-center pos-inv">
+                <img src="68.jpg" alt="Inverter" onerror="this.style.opacity='0'">
+            </div>
+
+            <div id="lbl-inv-temp">🌡️ --°C</div>
+
+            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+
+            <div class="node pos-pv">
+                <div class="solar-sun-box">
+                    <div id="solar-sun" class="sun-lvl-0">
+                        <canvas id="sun-canvas"></canvas>
+                        <div class="sun-core"></div>
+                    </div>
+                </div>
+                <h3>MẶT TRỜI</h3><div class="val val-pv-style" id="lbl-pv">0</div><div class="unit">W</div>
+            </div>
+
+            <div class="node pos-grid">
+                <div class="icon">🗼</div>
+                <h3>LƯỚI EVN</h3>
+                <div class="val" id="lbl-grid">0</div>
+                <div class="unit">W</div>
+                <div id="lbl-grid-mode" class="grid-live-mode idle" style="display:none"></div>
+            </div>
+
+            <div class="node pos-batt corner-node">
+                <div class="corner-power"><h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div></div>
+                <div class="battery-wrapper" onclick="window.open('https://mikasolar.com/14058648', '_blank')" title="Nhấn để xem chi tiết Pin">
+                    <div class="battery-body"><div class="battery-fill" id="batt-fill"></div><div id="lbl-soc">0%</div></div>
+                    <div class="battery-cap"></div>
+                </div>
+                <div id="lbl-batt-temp" class="battery-temp-label temp-stale">
+                    <span class="temp-icon">🌡️</span><span id="lbl-batt-temp-value" class="temp-value">--°C</span>
+                </div>
+            </div>
+
+            <div class="node pos-load corner-node">
+                <div class="corner-power"><h3>TIÊU THỤ</h3><div class="val val-load-style" id="lbl-load">0</div><div class="unit">W</div></div>
+                <div class="icon"><img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon" onerror="this.style.opacity='0'"></div>
+            </div>
+
+            <div class="bpf-container"><div class="bpf-text" data-text="八方來財">八方來財</div></div>
+        </div>
+
+        <div class="stats-panel">
+            <div class="stat-card">
+                <div class="stat-header"><h2>📊 THỐNG KÊ NĂNG LƯỢNG</h2></div>
+                <div class="list-detail">
+                    <div>☀️ Sản lượng PV: <span id="stat-pv-today">0 kWh</span></div>
+                    <div style="color: #0088ff;">🏠 Tiêu thụ hôm nay: <span id="stat-load-today">0 kWh</span></div>
+                    <div>🗼 Lấy lưới hôm nay: <span id="stat-grid-buy">0 kWh</span></div>
+                    <div>🔋 Pin đã xả (Nay): <span id="stat-bat-dis">0 kWh</span></div>
+                    <div>⚡ Pin đã sạc (Nay): <span id="stat-bat-chg">0 kWh</span></div>
+                    
+                    <div style="color: #b000ff;">🔋 Tổng Pin đã xả: <span id="stat-bat-dis-total">0 kWh</span></div>
+                    <div style="color: #ff8c00;">⚡ Tổng Pin đã sạc: <span id="stat-bat-chg-total">0 kWh</span></div>
+                    
+                    <div style="color: #d35400;">🌐 E_Total (PV Trọn đời): <span id="stat-pv-total">0 kWh</span></div>
+                </div>
+            </div>
+
+            <div class="stat-card money-card">
+                <div class="stat-header"><h2 style="color: #b8860b;">💰 QUY ĐỔI TIỀN ĐIỆN (EVN)</h2></div>
+                <div class="list-detail">
+                    <div>Hôm nay (<span id="money-pv-today">0</span> kWh): <span id="money-today" style="font-size: 15px; color: #ffaa00; font-weight: 900;">0 đ</span></div>
+                    <div>Tháng này (<span id="money-pv-month">0</span> kWh): <span id="money-month" style="font-size: 15px; color: #ff4444; font-weight: 900;">0 đ</span></div>
+                    <div>Năm nay/Trọn đời (<span id="money-pv-total">0</span> kWh): <span id="money-total" style="font-size: 16px; color: #00cc66; font-weight: 900;">0 đ</span></div>
+                </div>
+                <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic; position: relative; z-index: 1;">*Hệ thống tự động đồng bộ Live qua MQTT & Biểu đồ từ Firebase</div>
+            </div>
+
+            <div class="stat-card energy-chart-card">
+                <div class="energy-chart-toolbar">
+                    <div class="chart-btn-group">
+                        <button class="chart-btn active" id="btn-chart-month" onclick="setChartMode('month')">THÁNG</button>
+                        <button class="chart-btn" id="btn-chart-year" onclick="setChartMode('year')">NĂM</button>
+                        <button class="chart-btn" id="btn-chart-total" onclick="setChartMode('total')">TỔNG</button>
+                    </div>
+                    <div class="chart-period-control">
+                        <button class="chart-nav-btn" type="button" onclick="shiftChartPeriod(-1)" aria-label="Kỳ trước">‹</button>
+                        <div class="chart-period-label" id="chart-period-label">2026-10</div>
+                        <button class="chart-nav-btn" type="button" onclick="shiftChartPeriod(1)" aria-label="Kỳ sau">›</button>
+                    </div>
+                </div>
+                <div class="chart-stage">
+                    <div class="chart-day-corner">
+                        <button class="day-nav-btn" type="button" onclick="moveChartDay(-1)" aria-label="Mốc trước">‹</button>
+                        <span class="chart-selected-label" id="chart-selected-label" onclick="toggleMonthTotalInChart()" title="Nhấn để xem Tổng Cả Tháng / Từng Ngày" style="cursor: pointer;">Ngày --</span>
+                        <button class="day-nav-btn" type="button" onclick="moveChartDay(1)" aria-label="Mốc sau">›</button>
+                    </div>
+                    <canvas id="energyChart"></canvas>
+                </div>
+                <div class="chart-detail-grid">
+                    <div class="chart-detail-card">
+                        <div class="label"><span class="chart-color-dot dot-pv"></span>Sản lượng PV</div>
+                        <div class="value" id="chart-detail-pv">0.0</div>
+                        <div class="sub">kWh</div>
+                    </div>
+                    <div class="chart-detail-card">
+                        <div class="label"><span class="chart-color-dot dot-batt"></span>Xả pin</div>
+                        <div class="value" id="chart-detail-batt">0.0</div>
+                        <div class="sub">kWh</div>
+                    </div>
+                    <div class="chart-detail-card">
+                        <div class="label"><span class="chart-color-dot dot-charge"></span>Sạc pin</div>
+                        <div class="value" id="chart-detail-charge">0.0</div>
+                        <div class="sub">kWh</div>
+                    </div>
+                    <div class="chart-detail-card">
+                        <div class="label"><span class="chart-color-dot dot-load"></span>Tiêu thụ</div>
+                        <div class="value" id="chart-detail-load">0.0</div>
+                        <div class="sub">kWh</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- 4 Khối Luồng Năng Lượng -->
-    <div class="flow-grid">
-      <div class="flow-node node-pv">
-        <div class="node-title"><i class="fas fa-sun" style="color: var(--pv-color);"></i> MẶT TRỜI</div>
-        <div class="node-val" id="valPvPower">0 <small style="font-size: 12px;">W</small></div>
-        <div class="node-sub">Hôm nay: <span id="valPvToday">0.0</span> kWh</div>
-      </div>
-      <div class="flow-node node-grid">
-        <div class="node-title"><i class="fas fa-tower-broadcast" style="color: var(--grid-color);"></i> LƯỚI EVN</div>
-        <div class="node-val" id="valGridPower">0 <small style="font-size: 12px;">W</small></div>
-        <div class="node-sub"><span id="valGridVolt">0</span> V | <span id="valGridFreq">0.0</span> Hz</div>
-      </div>
-      <div class="flow-node node-bat">
-        <div class="node-title"><i class="fas fa-car-battery" style="color: var(--bat-color);"></i> PIN LƯU TRỮ</div>
-        <div class="node-val" id="valBatPower">0 <small style="font-size: 12px;">W</small></div>
-        <div class="node-sub"><span id="valBatVolt">0.0</span> V | <span id="valBatStatus">Chờ</span></div>
-      </div>
-      <div class="flow-node node-load">
-        <div class="node-title"><i class="fas fa-house-chimney" style="color: var(--load-color);"></i> TIÊU THỤ</div>
-        <div class="node-val" id="valLoadPower">0 <small style="font-size: 12px;">W</small></div>
-        <div class="node-sub">Hôm nay: <span id="valLoadToday">0.0</span> kWh</div>
-      </div>
-    </div>
+    <!-- FIREBASE SDK V8 ĐỂ ĐỒNG BỘ CHART & DAILY ENERGY -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-    <!-- Thanh SOC Pin -->
-    <div class="bat-visual-box">
-      <span style="font-size: 12px; font-weight: 600;">SOC: <span id="valSocNum">0</span>%</span>
-      <div class="soc-bar-bg">
-        <div class="soc-bar-fill" id="socBarFill"></div>
-      </div>
-      <span style="font-size: 11px; color: #666;"><i class="fas fa-temperature-half"></i> <span id="valInvTemp">0</span>°C</span>
-    </div>
-  </div>
+    <script>
+        // ================= CẤU HÌNH MQTT WEBSOCKET RIÊNG =================
+        const MQTT_WSS_URL     = "wss://ra12bb13.ala.asia-southeast1.emqxsl.com:8084/mqtt";
+        const MQTT_USER        = "ducmung";
+        const MQTT_PASSWORD    = "mungha8586";
+        const MQTT_TOPIC_DATA  = "sosen/data";
+        
+        // Client ID ngẫu nhiên: Tránh bị Broker giữ kết nối cũ khi reload trang
+        const MQTT_CLIENT_ID   = "WebUser_" + Math.random().toString(16).substring(2, 10);
 
-  <!-- THẺ THỐNG KÊ NĂNG LƯỢNG HÔM NAY -->
-  <div class="card">
-    <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px; display: flex; justify-content: space-between;">
-      <span><i class="fas fa-chart-pie" style="color: var(--primary);"></i> NĂNG LƯỢNG TRONG NGÀY</span>
-      <span id="syncBadge" class="status-badge badge-sync" style="display: none;"><i class="fas fa-cloud-arrow-up"></i> Auto Synced</span>
-    </div>
-    <table class="stats-table">
-      <tr><td><i class="fas fa-sun" style="color: var(--pv-color);"></i> Sản lượng PV hôm nay:</td><td id="rowPvToday">0.0 kWh</td></tr>
-      <tr><td><i class="fas fa-house" style="color: var(--load-color);"></i> Tiêu thụ hôm nay:</td><td id="rowLoadToday">0.0 kWh</td></tr>
-      <tr><td><i class="fas fa-arrow-down" style="color: var(--grid-color);"></i> Mua lưới hôm nay:</td><td id="rowGridBuyToday">0.0 kWh</td></tr>
-      <tr><td><i class="fas fa-battery-half" style="color: var(--bat-color);"></i> Pin đã xả (Nay):</td><td id="rowBatDischargeToday">0.0 kWh</td></tr>
-      <tr><td><i class="fas fa-bolt" style="color: #2e7d32;"></i> Pin đã sạc (Nay):</td><td id="rowBatChargeToday">0.0 kWh</td></tr>
-      <tr><td><i class="fas fa-infinity" style="color: #607d8b;"></i> PV Trọn đời:</td><td id="rowPvTotal">0.0 kWh</td></tr>
-    </table>
-    <div class="sync-indicator" id="syncTimeText">Chốt sổ Firebase: Chưa đồng bộ</div>
-  </div>
-
-  <!-- THẺ BIỂU ĐỒ LỊCH SỬ THÁNG -->
-  <div class="card">
-    <div style="font-size: 14px; font-weight: 700;">
-      <i class="fas fa-chart-column" style="color: var(--primary);"></i> LỊCH SỬ THÁNG NÀY (kWh)
-    </div>
-    <div class="chart-container">
-      <canvas id="monthlyHistoryChart"></canvas>
-    </div>
-  </div>
-</div>
-
-<script>
-  // ================= 1. CẤU HÌNH THÔNG SỐ =================
-  const FIREBASE_CONFIG = {
-    databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app"
-  };
-
-  const MQTT_CONFIG = {
-    host: "ra12bb13.ala.asia-southeast1.emqxsl.com",
-    port: 8084, // Cổng WSS Bảo mật
-    path: "/mqtt",
-    user: "ducmung",
-    pass: "mungha8586",
-    topic: "sosen/data",
-    clientId: "WebDashboard_" + Math.random().toString(16).substr(2, 8)
-  };
-
-  // ================= 2. KHỞI TẠO FIREBASE SDK =================
-  if (!firebase.apps.length) {
-    firebase.initializeApp(FIREBASE_CONFIG);
-  }
-  const database = firebase.database();
-
-  // ================= 3. BIẾN TOÀN CỤC & TIỆN ÍCH =================
-  let latestDailyData = null;
-  let lastFirebaseAutoSyncTime = 0;
-  let historyChart = null;
-
-  function toSafeNumber(val) {
-    let n = parseFloat(val);
-    return isNaN(n) ? 0 : n;
-  }
-
-  // ================= 4. HÀM TỰ ĐỘNG CHỐT SỔ VÀ LƯU CLOUD =================
-  function autoSyncTodayToFirebase() {
-    if (!database || !latestDailyData) return;
-    const now = Date.now();
-    if (now - lastFirebaseAutoSyncTime < 30000) return; // Giãn cách tối thiểu 30s giữa các lần ghi
-
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    const monthKey = `${yyyy}_${mm}`;
-    const dayKey = `day_${dd}`;
-
-    const pv = toSafeNumber(latestDailyData.PV_Today);
-    const load = toSafeNumber(latestDailyData.Load_Today);
-    const batt = toSafeNumber(latestDailyData.Bat_Discharge_Today);
-    const charge = toSafeNumber(latestDailyData.Bat_Charge_Today);
-    const grid = toSafeNumber(latestDailyData.Grid_Buy_Today);
-
-    if (pv > 0 || load > 0 || batt > 0 || charge > 0) {
-      lastFirebaseAutoSyncTime = now;
-      const record = {
-        pv: Math.round(pv * 10) / 10,
-        load: Math.round(load * 10) / 10,
-        batt: Math.round(batt * 10) / 10,
-        charge: Math.round(charge * 10) / 10,
-        grid: Math.round(grid * 10) / 10
-      };
-
-      // Ghi thẳng vào cây lịch sử ngày để biểu đồ lưu vĩnh viễn
-      database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(record);
-
-      // Đồng bộ cây Daily_Energy
-      database.ref("/SosenSystem/Daily_Energy").update({
-        PV_Today: record.pv,
-        Load_Today: record.load,
-        Bat_Discharge_Today: record.batt,
-        Bat_Charge_Today: record.charge,
-        Grid_Buy_Today: record.grid
-      });
-
-      // Hiệu ứng giao diện chốt sổ thành công
-      const syncBadge = document.getElementById("syncBadge");
-      syncBadge.style.display = "inline-flex";
-      document.getElementById("syncTimeText").innerText = 
-        `Chốt sổ Firebase: ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')} (OK)`;
-      
-      setTimeout(() => {
-        syncBadge.style.display = "none";
-      }, 4000);
-    }
-  }
-
-  // ================= 5. KHỞI TẠO BIỂU ĐỒ LỊCH SỬ THÁNG =================
-  function initHistoryChart() {
-    const ctx = document.getElementById('monthlyHistoryChart').getContext('2d');
-    const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-    const labels = Array.from({length: daysInMonth}, (_, i) => `${i + 1}`);
-
-    historyChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'PV (kWh)',
-            data: Array(daysInMonth).fill(0),
-            backgroundColor: 'rgba(255, 152, 0, 0.85)',
-            borderRadius: 4
-          },
-          {
-            label: 'Sạc Pin (kWh)',
-            data: Array(daysInMonth).fill(0),
-            backgroundColor: 'rgba(76, 175, 80, 0.85)',
-            borderRadius: 4
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-          y: { beginAtZero: true, ticks: { font: { size: 10 } } }
-        },
-        plugins: {
-          legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+        // ================= CẤU HÌNH FIREBASE LƯU TRỮ =================
+        const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        let database = null;
+        if (typeof firebase !== 'undefined' && firebase.database) {
+            if (!firebase.apps || firebase.apps.length === 0) { firebase.initializeApp(firebaseConfig); }
+            database = firebase.database();
         }
-      }
-    });
-  }
 
-  // Lắng nghe dữ liệu lịch sử tháng từ Firebase
-  function listenMonthlyHistory() {
-    const d = new Date();
-    const monthKey = `${d.getFullYear()}_${String(d.getMonth() + 1).padStart(2, "0")}`;
-    
-    database.ref(`/SosenSystem/History/Daily/${monthKey}`).on('value', (snapshot) => {
-      const data = snapshot.val();
-      if (!data || !historyChart) return;
-
-      const pvSeries = [...historyChart.data.datasets[0].data];
-      const chargeSeries = [...historyChart.data.datasets[1].data];
-
-      Object.keys(data).forEach(dayKey => {
-        const dayNum = parseInt(dayKey.replace("day_", ""));
-        if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= pvSeries.length) {
-          pvSeries[dayNum - 1] = toSafeNumber(data[dayKey].pv);
-          chargeSeries[dayNum - 1] = toSafeNumber(data[dayKey].charge);
+        const numberAnimState = {};
+        function animateValue(id, targetVal, formatFn, duration = 650) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            targetVal = Number(targetVal) || 0;
+            if (!numberAnimState[id]) {
+                numberAnimState[id] = { currentVal: targetVal, frameId: null };
+                el.innerText = formatFn(targetVal);
+                return;
+            }
+            const state = numberAnimState[id];
+            const startVal = state.currentVal;
+            if (Math.abs(startVal - targetVal) < 0.001) { el.innerText = formatFn(targetVal); return; }
+            if (state.frameId) cancelAnimationFrame(state.frameId);
+            const startTime = performance.now();
+            function step(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3);
+                const current = startVal + (targetVal - startVal) * ease;
+                state.currentVal = current;
+                el.innerText = formatFn(current);
+                if (progress < 1) { state.frameId = requestAnimationFrame(step); } 
+                else { state.currentVal = targetVal; el.innerText = formatFn(targetVal); state.frameId = null; }
+            }
+            state.frameId = requestAnimationFrame(step);
         }
-      });
 
-      historyChart.data.datasets[0].data = pvSeries;
-      historyChart.data.datasets[1].data = chargeSeries;
-      historyChart.update();
-    });
-  }
+        function toSafeNumber(value, fallback = 0) { const number = Number(value); return Number.isFinite(number) ? number : fallback; }
+        function clampNumber(value, min, max) { return Math.min(max, Math.max(min, toSafeNumber(value, min))); }
 
-  // ================= 6. LẮNG NGHE FIREBASE DAILY_ENERGY =================
-  database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
-    const d = snapshot.val();
-    if (!d) return;
-    
-    // Lưu cache để bộ đồng bộ hoạt động
-    latestDailyData = Object.assign(latestDailyData || {}, d);
+        let currentSunLevel = 0; 
+        const sunRayCounts = [0, 12, 24, 36, 48, 60, 72];
+        let latestPvPowerW = 0;
+        let sunAnimationFrameId = null;
+        let sunCanvasRender = null;
 
-    document.getElementById("valPvToday").innerText = toSafeNumber(d.PV_Today).toFixed(1);
-    document.getElementById("valLoadToday").innerText = toSafeNumber(d.Load_Today).toFixed(1);
-    document.getElementById("rowPvToday").innerText = `${toSafeNumber(d.PV_Today).toFixed(1)} kWh`;
-    document.getElementById("rowLoadToday").innerText = `${toSafeNumber(d.Load_Today).toFixed(1)} kWh`;
-    document.getElementById("rowGridBuyToday").innerText = `${toSafeNumber(d.Grid_Buy_Today).toFixed(1)} kWh`;
-    document.getElementById("rowBatDischargeToday").innerText = `${toSafeNumber(d.Bat_Discharge_Today).toFixed(1)} kWh`;
-    document.getElementById("rowBatChargeToday").innerText = `${toSafeNumber(d.Bat_Charge_Today).toFixed(1)} kWh`;
-    document.getElementById("rowPvTotal").innerText = `${toSafeNumber(d.PV_Total_Lifetime).toFixed(1)} kWh`;
-  });
+        function updateBackgroundByTimeAndPv(pvW = latestPvPowerW) {
+            const pvPower = toSafeNumber(pvW);
+            latestPvPowerW = pvPower;
+            const hour = new Date().getHours();
+            const isNightTime = hour >= 18 || hour < 6;
+            const shouldShowStars = isNightTime && pvPower < 1;
+            if (document.body) { document.body.classList.toggle('night-stars', shouldShowStars); }
+        }
 
-  // ================= 7. KẾT NỐI VÀ LẮNG NGHE MQTT WSS =================
-  const mqttClient = new Paho.MQTT.Client(MQTT_CONFIG.host, MQTT_CONFIG.port, MQTT_CONFIG.path, MQTT_CONFIG.clientId);
+        function initCanvasSun() {
+            const canvas = document.getElementById('sun-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const size = 260; 
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = size * dpr;
+            canvas.height = size * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            const cx = size / 2, cy = size / 2;
+            const rays = [];
+            const maxRays = 72;
+            for (let i = 0; i < maxRays; i++) {
+                rays.push({ angle: Math.random() * Math.PI * 2, baseLength: 30 + Math.random() * 80, width: 0.3 + Math.random() * 1.5, speed: 0.02 + Math.random() * 0.08, phase: Math.random() * Math.PI * 2, baseAlpha: 0.2 + Math.random() * 0.8 });
+            }
+            function animateCanvasSun(now) {
+                sunAnimationFrameId = null;
+                ctx.clearRect(size, size);
+                const activeRaysCount = sunRayCounts[currentSunLevel] || 0;
+                if (document.hidden || activeRaysCount <= 0) return;
+                const time = now * 0.001;
+                for (let i = 0; i < activeRaysCount; i++) {
+                    const ray = rays[i];
+                    const currentLength = ray.baseLength + Math.sin(ray.phase + time * (ray.speed * 80)) * 15;
+                    const currentAlpha = ray.baseAlpha * (0.5 + Math.sin(ray.phase * 3 + time * 30) * 0.5);
+                    const angle = ray.angle + time * 0.05; 
+                    const x = cx + Math.cos(angle) * currentLength;
+                    const y = cy + Math.sin(angle) * currentLength;
+                    const grad = ctx.createLinearGradient(cx, cy, x, y);
+                    grad.addColorStop(0, `rgba(255, 255, 255, ${currentAlpha})`);
+                    grad.addColorStop(0.3, `rgba(255, 245, 150, ${currentAlpha * 0.8})`);
+                    grad.addColorStop(1, `rgba(255, 200, 0, 0)`);
+                    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.lineWidth = ray.width; ctx.strokeStyle = grad; ctx.stroke();
+                }
+                sunAnimationFrameId = requestAnimationFrame(animateCanvasSun);
+            }
+            sunCanvasRender = () => { if (sunAnimationFrameId === null && !document.hidden) { sunAnimationFrameId = requestAnimationFrame(animateCanvasSun); } };
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && sunAnimationFrameId !== null) { cancelAnimationFrame(sunAnimationFrameId); sunAnimationFrameId = null; return; }
+                sunCanvasRender();
+            });
+            sunCanvasRender();
+        }
 
-  mqttClient.onConnectionLost = (responseObject) => {
-    document.getElementById("mqttStatusBadge").className = "status-badge badge-offline";
-    document.getElementById("mqttStatusBadge").innerHTML = '<i class="fas fa-circle"></i> MQTT OFF';
-    setTimeout(connectMqtt, 3000);
-  };
+        function updateSunLevelByPower(pvW) {
+            const pvPower = toSafeNumber(pvW);
+            let lvl = 0;
+            if (pvPower >= 7001) { lvl = 6; } else if (pvPower >= 5001) { lvl = 5; } else if (pvPower >= 3001) { lvl = 4; } else if (pvPower >= 2001) { lvl = 3; } else if (pvPower >= 1001) { lvl = 2; } else if (pvPower >= 11) { lvl = 1; }
+            const levelChanged = currentSunLevel !== lvl;
+            if (levelChanged) {
+                currentSunLevel = lvl;
+                const solarSun = document.getElementById('solar-sun');
+                if (solarSun) { solarSun.className = 'sun-lvl-' + lvl; }
+            }
+            if (sunCanvasRender && (lvl > 0 || levelChanged)) sunCanvasRender();
+        }
 
-  mqttClient.onMessageArrived = (message) => {
-    try {
-      const payload = JSON.parse(message.payloadString);
-      
-      // Cập nhật Live Power & Status
-      document.getElementById("valPvPower").innerHTML = `${Math.round(payload.PV_Power || 0)} <small style="font-size: 12px;">W</small>`;
-      document.getElementById("valGridPower").innerHTML = `${Math.round(payload.Grid_Power || 0)} <small style="font-size: 12px;">W</small>`;
-      document.getElementById("valBatPower").innerHTML = `${Math.round(payload.Batt_Power || 0)} <small style="font-size: 12px;">W</small>`;
-      document.getElementById("valLoadPower").innerHTML = `${Math.round(payload.Load_Power || 0)} <small style="font-size: 12px;">W</small>`;
+        // ================= BIỂU ĐỒ NĂNG LƯỢNG (CHART.JS) =================
+        let energyChart = null; 
+        let currentChartMode = 'month'; 
+        let chartCursorDate = new Date(); 
+        let chartSelectedIndex = 0; 
+        let chartRows = []; 
+        let chartAllRows = []; 
+        let chartSelectedSourceIndex = 0; 
+        let chartResizeTimer = null; 
+        let chartLoadRequestId = 0;
+        let chartMonthTotals = { pv: 0, batt: 0, charge: 0, load: 0 };
+        let isShowingMonthTotalInMonthMode = false;
 
-      document.getElementById("valGridVolt").innerText = Math.round(payload.V_Grid || 0);
-      document.getElementById("valGridFreq").innerText = toSafeNumber(payload.F_Grid).toFixed(1);
-      document.getElementById("valBatVolt").innerText = toSafeNumber(payload.Batt_Voltage).toFixed(1);
-      document.getElementById("valBatStatus").innerText = payload.Batt_Status || "Chờ";
-      
-      const soc = Math.min(100, Math.max(0, parseInt(payload.Batt_SOC || 0)));
-      document.getElementById("valSocNum").innerText = soc;
-      document.getElementById("socBarFill").style.width = soc + "%";
-      document.getElementById("valInvTemp").innerText = Math.round(payload.Inv_Temp || 0);
+        const chartSeries = [
+            { label: 'Sản lượng PV', key: 'pv', color: '#59ba35', border: '#48a927' },
+            { label: 'Xả pin', key: 'batt', color: '#45a8de', border: '#278fc9' },
+            { label: 'Sạc pin', key: 'charge', color: '#3322c9', border: '#2416a8' },
+            { label: 'Tiêu thụ', key: 'load', color: '#ffa247', border: '#f08324' }
+        ];
 
-      // Cập nhật trạng thái Lưới EVN
-      const isGridOnline = (payload.V_Grid >= 50);
-      const gridBadge = document.getElementById("gridStatusBadge");
-      gridBadge.className = isGridOnline ? "status-badge badge-online" : "status-badge badge-offline";
-      gridBadge.innerHTML = isGridOnline ? '<i class="fas fa-plug"></i> LƯỚI ON' : '<i class="fas fa-plug"></i> LƯỚI OFF';
+        const energySelectedBandPlugin = {
+            id: 'energySelectedBand',
+            beforeDatasetsDraw(chart) {
+                if (isShowingMonthTotalInMonthMode && currentChartMode === 'month') return;
+                const area = chart.chartArea; const meta = chart.getDatasetMeta(0); const bar = meta && meta.data ? meta.data[chartSelectedIndex] : null;
+                if (!area || !bar || chart.data.labels.length === 0) return;
+                const step = (area.right - area.left) / chart.data.labels.length;
+                const x = bar.x - step / 2 + 3; const width = Math.max(16, step - 6); const ctx = chart.ctx;
+                ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.strokeStyle = 'rgba(0,0,0,0.22)'; ctx.lineWidth = 1; ctx.beginPath();
+                drawChartRoundRect(ctx, x, area.top + 2, width, area.bottom - area.top - 4, 8);
+                ctx.fill(); ctx.stroke(); ctx.restore();
+            }
+        };
 
-      // Nếu trong gói MQTT có tích hợp kèm dữ liệu Energy ngày -> gom vào cache và kích hoạt Auto Sync
-      if (payload.PV_Today !== undefined || payload.Load_Today !== undefined) {
-        latestDailyData = Object.assign(latestDailyData || {}, {
-          PV_Today: payload.PV_Today,
-          Load_Today: payload.Load_Today,
-          Bat_Discharge_Today: payload.Bat_Discharge_Today,
-          Bat_Charge_Today: payload.Bat_Charge_Today,
-          Grid_Buy_Today: payload.Grid_Buy_Today
+        const energyValueLabelPlugin = {
+            id: 'energyValueLabels',
+            afterDatasetsDraw(chart) {
+                const ctx = chart.ctx; const area = chart.chartArea;
+                ctx.save(); ctx.fillStyle = '#111'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.font = '900 10px Nunito, sans-serif';
+                chart.data.datasets.forEach((dataset, datasetIndex) => {
+                    const meta = chart.getDatasetMeta(datasetIndex);
+                    meta.data.forEach((bar, index) => {
+                        const value = Number(dataset.data[index]) || 0;
+                        if (value <= 0.04) return;
+                        const y = Math.max(bar.y - 5, area.top + 10);
+                        ctx.fillText(formatChartNumber(value), bar.x, y);
+                    });
+                });
+                ctx.restore();
+            }
+        };
+
+        function initChart() {
+            const chartCanvas = document.getElementById('energyChart');
+            if (!chartCanvas || typeof Chart === 'undefined') return;
+            const ctx = chartCanvas.getContext('2d');
+            energyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: chartSeries.map(series => ({ label: series.label, dataKey: series.key, data: [], backgroundColor: series.color, borderColor: series.border, borderWidth: 1, borderRadius: 2, categoryPercentage: 0.88, barPercentage: 0.92, maxBarThickness: 38 }))
+                },
+                plugins: [energySelectedBandPlugin, energyValueLabelPlugin],
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    onClick(event, elements) {
+                        if (elements.length > 0) {
+                            isShowingMonthTotalInMonthMode = false;
+                            const clickedRow = chartRows[elements[0].index];
+                            if (clickedRow && Number.isInteger(clickedRow.sourceIndex)) { chartSelectedSourceIndex = clickedRow.sourceIndex; updateVisibleChartRows(); }
+                        }
+                    },
+                    plugins: {
+                        legend: { align: 'start', labels: { boxWidth: 12, boxHeight: 12, padding: 10, font: { family: 'Nunito', weight: '900', size: 12 }, color: '#222' } },
+                        tooltip: { callbacks: { title(items) { const row = chartRows[items[0].dataIndex]; return row ? row.detailLabel : ''; }, label(item) { return `${item.dataset.label}: ${formatChartNumber(item.parsed.y)} kWh`; } } }
+                    },
+                    scales: {
+                        x: { grid: { display: true, color: 'rgba(0,0,0,0.18)', borderDash: [8, 8] }, ticks: { font: { family: 'Nunito', weight: '900', size: 13 }, color: '#222' } },
+                        y: { beginAtZero: true, grace: '18%', ticks: { font: { family: 'Nunito', weight: '900', size: 12 }, color: '#333' }, grid: { color: 'rgba(0,0,0,0.16)' } }
+                    }
+                }
+            });
+            window.addEventListener('resize', () => { clearTimeout(chartResizeTimer); chartResizeTimer = setTimeout(() => { if (energyChart && chartAllRows.length > 0) updateVisibleChartRows(); }, 120); });
+            loadChartData();
+        }
+
+        function setChartMode(mode) {
+            if (!['month', 'year', 'total'].includes(mode)) return;
+            currentChartMode = mode;
+            isShowingMonthTotalInMonthMode = false;
+            document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`btn-chart-${mode}`);
+            if (activeBtn) activeBtn.classList.add('active');
+            loadChartData();
+        }
+
+        function shiftChartPeriod(step) {
+            if (currentChartMode === 'month') { chartCursorDate.setMonth(chartCursorDate.getMonth() + step); } 
+            else if (currentChartMode === 'year') { chartCursorDate.setFullYear(chartCursorDate.getFullYear() + step); }
+            isShowingMonthTotalInMonthMode = false;
+            loadChartData();
+        }
+
+        function moveChartDay(step) {
+            if (chartAllRows.length === 0) return;
+            isShowingMonthTotalInMonthMode = false;
+            chartSelectedSourceIndex = Math.max(0, Math.min(chartAllRows.length - 1, chartSelectedSourceIndex + step));
+            updateVisibleChartRows();
+        }
+
+        function toggleMonthTotalInChart() {
+            if (currentChartMode !== 'month') return;
+            isShowingMonthTotalInMonthMode = !isShowingMonthTotalInMonthMode;
+            updateChartDetail();
+            if (energyChart) energyChart.draw();
+        }
+
+        function loadChartData() {
+            if (!database) return;
+            const requestId = ++chartLoadRequestId;
+            updateChartPeriodLabel();
+            const yyyy = chartCursorDate.getFullYear();
+            const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
+            const now = new Date();
+            const isCurrentYear = (yyyy === now.getFullYear());
+            const isViewingCurrentMonth = (isCurrentYear && chartCursorDate.getMonth() === now.getMonth());
+
+            if (currentChartMode === 'month') {
+                const monthKey = `${yyyy}_${mm}`;
+                database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value', (snap) => {
+                    if (requestId !== chartLoadRequestId) return;
+                    const daysData = snap.val() || {}; 
+                    const rows = []; 
+                    const daysInMonth = new Date(yyyy, chartCursorDate.getMonth() + 1, 0).getDate();
+                    let mSum = { pv: 0, batt: 0, charge: 0, load: 0 };
+
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const dayStr = String(d).padStart(2, '0');
+                        let itemData = daysData[`day_${dayStr}`] || {};
+
+                        if (isViewingCurrentMonth && d === now.getDate() && latestDailyData) {
+                            itemData = {
+                                pv: Math.max(toSafeNumber(itemData.pv), toSafeNumber(latestDailyData.PV_Today)),
+                                batt: Math.max(toSafeNumber(itemData.batt ?? itemData.bat ?? itemData.discharge), toSafeNumber(latestDailyData.Bat_Discharge_Today)),
+                                charge: Math.max(toSafeNumber(itemData.charge ?? itemData.battCharge ?? itemData.batCharge), toSafeNumber(latestDailyData.Bat_Charge_Today)),
+                                load: Math.max(toSafeNumber(itemData.load), toSafeNumber(latestDailyData.Load_Today))
+                            };
+                        }
+
+                        const norm = normalizeChartItem(itemData);
+                        mSum.pv += norm.pv;
+                        mSum.batt += norm.batt;
+                        mSum.charge += norm.charge;
+                        mSum.load += norm.load;
+
+                        rows.push({ label: String(d), detailLabel: `Ngày ${dayStr}/${mm}/${yyyy}`, ...norm });
+                    }
+                    chartMonthTotals = mSum;
+                    renderChartRows(rows);
+                });
+            } else if (currentChartMode === 'year') {
+                database.ref('/SosenSystem/History/Daily')
+                    .orderByKey()
+                    .startAt(`${yyyy}_01`)
+                    .endAt(`${yyyy}_12\uf8ff`)
+                    .once('value', (snap) => {
+                        if (requestId !== chartLoadRequestId) return;
+                        const yearDailyData = snap.val() || {};
+                        const rows = [];
+                        const curMonthNum = now.getMonth() + 1;
+                        const curDayNum = now.getDate();
+
+                        for (let m = 1; m <= 12; m++) {
+                            const monthStr = String(m).padStart(2, '0');
+                            const mKey = `${yyyy}_${monthStr}`;
+                            const daysData = yearDailyData[mKey] || {};
+
+                            let mPv = 0, mBatt = 0, mCharge = 0, mLoad = 0;
+
+                            for (let dKey in daysData) {
+                                if (isCurrentYear && m === curMonthNum && dKey === `day_${String(curDayNum).padStart(2, '0')}`) continue;
+                                const dayObj = daysData[dKey];
+                                if (dayObj && typeof dayObj === 'object') {
+                                    mPv += toChartNumber(dayObj.pv);
+                                    mBatt += toChartNumber(dayObj.batt ?? dayObj.bat ?? dayObj.discharge);
+                                    mCharge += toChartNumber(dayObj.charge ?? dayObj.battCharge ?? dayObj.batCharge);
+                                    mLoad += toChartNumber(dayObj.load);
+                                }
+                            }
+
+                            if (isCurrentYear && m === curMonthNum && latestDailyData) {
+                                const curDayObj = daysData[`day_${String(curDayNum).padStart(2, '0')}`] || {};
+                                mPv += Math.max(toSafeNumber(latestDailyData.PV_Today), toSafeNumber(curDayObj.pv));
+                                mBatt += Math.max(toSafeNumber(latestDailyData.Bat_Discharge_Today), toSafeNumber(curDayObj.batt ?? curDayObj.bat));
+                                mCharge += Math.max(toSafeNumber(latestDailyData.Bat_Charge_Today), toSafeNumber(curDayObj.charge));
+                                mLoad += Math.max(toSafeNumber(latestDailyData.Load_Today), toSafeNumber(curDayObj.load));
+                            }
+
+                            rows.push({ label: `T${m}`, detailLabel: `Tháng ${monthStr}/${yyyy}`, pv: mPv, batt: mBatt, charge: mCharge, load: mLoad });
+                        }
+                        renderChartRows(rows);
+                    });
+            } else if (currentChartMode === 'total') {
+                database.ref('/SosenSystem/History/Daily').once('value', (snap) => {
+                    if (requestId !== chartLoadRequestId) return;
+                    const allDailyData = snap.val() || {};
+                    const yearMap = {};
+                    const curYear = now.getFullYear();
+                    const curMonthKey = `${curYear}_${String(now.getMonth() + 1).padStart(2, '0')}`;
+                    const curDayKey = `day_${String(now.getDate()).padStart(2, '0')}`;
+
+                    for (let mKey in allDailyData) {
+                        const yr = mKey.split('_')[0];
+                        if (!yearMap[yr]) yearMap[yr] = { pv: 0, batt: 0, charge: 0, load: 0 };
+                        const monthObj = allDailyData[mKey];
+                        for (let dKey in monthObj) {
+                            if (mKey === curMonthKey && dKey === curDayKey) continue;
+                            const d = monthObj[dKey];
+                            if (d && typeof d === 'object') {
+                                yearMap[yr].pv += toChartNumber(d.pv);
+                                yearMap[yr].batt += toChartNumber(d.batt ?? d.bat ?? d.discharge);
+                                yearMap[yr].charge += toChartNumber(d.charge ?? d.battCharge ?? d.batCharge);
+                                yearMap[yr].load += toChartNumber(d.load);
+                            }
+                        }
+                    }
+
+                    if (latestDailyData) {
+                        if (!yearMap[curYear]) yearMap[curYear] = { pv: 0, batt: 0, charge: 0, load: 0 };
+                        const todayObj = (allDailyData[curMonthKey] && allDailyData[curMonthKey][curDayKey]) || {};
+                        yearMap[curYear].pv += Math.max(toSafeNumber(latestDailyData.PV_Today), toSafeNumber(todayObj.pv));
+                        yearMap[curYear].batt += Math.max(toSafeNumber(latestDailyData.Bat_Discharge_Today), toSafeNumber(todayObj.batt ?? todayObj.bat));
+                        yearMap[curYear].charge += Math.max(toSafeNumber(latestDailyData.Bat_Charge_Today), toSafeNumber(todayObj.charge));
+                        yearMap[curYear].load += Math.max(toSafeNumber(latestDailyData.Load_Today), toSafeNumber(todayObj.load));
+                    }
+
+                    let rows = Object.keys(yearMap).sort().map(yr => ({ label: yr, detailLabel: `Năm ${yr}`, pv: yearMap[yr].pv, batt: yearMap[yr].batt, charge: yearMap[yr].charge, load: yearMap[yr].load }));
+                    if (rows.length === 0) { rows = [{ label: String(yyyy), detailLabel: `Năm ${yyyy}`, pv: 0, batt: 0, charge: 0, load: 0 }]; }
+                    renderChartRows(rows);
+                });
+            }
+        }
+
+        function renderChartRows(rows) { chartAllRows = rows; chartSelectedSourceIndex = getDefaultChartIndex(rows); updateVisibleChartRows(); }
+
+        function updateVisibleChartRows() {
+            const rows = chartAllRows;
+            if (!energyChart) return;
+            if (rows.length === 0) {
+                chartRows = []; chartSelectedIndex = 0; energyChart.data.labels = []; energyChart.data.datasets.forEach(dataset => { dataset.data = []; });
+                updateChartDetail(); energyChart.update('none'); return;
+            }
+            const limit = currentChartMode === 'month' ? (window.innerWidth <= 430 ? 3 : 4) : rows.length;
+            let start = 0;
+            if (currentChartMode === 'month' && rows.length > limit) {
+                start = chartSelectedSourceIndex - Math.floor(limit / 2);
+                start = Math.max(0, Math.min(start, rows.length - limit));
+            }
+            chartRows = rows.slice(start, start + limit).map((row, index) => ({ ...row, sourceIndex: start + index }));
+            chartSelectedIndex = chartRows.findIndex(row => row.sourceIndex === chartSelectedSourceIndex);
+            if (chartSelectedIndex < 0) chartSelectedIndex = 0;
+
+            energyChart.data.labels = chartRows.map(row => row.label);
+            energyChart.data.datasets.forEach(dataset => { dataset.data = chartRows.map(row => row[dataset.dataKey] || 0); });
+            updateChartDetail(); energyChart.update('none');
+        }
+
+        function getDefaultChartIndex(rows) {
+            if (rows.length === 0) return 0;
+            const now = new Date();
+            if (currentChartMode === 'month' && chartCursorDate.getFullYear() === now.getFullYear() && chartCursorDate.getMonth() === now.getMonth()) {
+                return Math.min(rows.length - 1, Math.max(0, now.getDate() - 1));
+            }
+            if (currentChartMode === 'year' && chartCursorDate.getFullYear() === now.getFullYear()) {
+                return Math.min(rows.length - 1, now.getMonth());
+            }
+            for (let i = rows.length - 1; i >= 0; i--) { const row = rows[i]; if ((row.pv + row.batt + row.charge + row.load) > 0) return i; }
+            return 0;
+        }
+
+        function normalizeChartItem(item = {}) {
+            return { pv: toChartNumber(item.pv), batt: toChartNumber(item.batt ?? item.bat ?? item.battery ?? item.discharge ?? item.batDischarge), charge: toChartNumber(item.charge ?? item.battCharge ?? item.batCharge ?? item.chargeBattery), load: toChartNumber(item.load) };
+        }
+
+        function drawChartRoundRect(ctx, x, y, width, height, radius) {
+            if (typeof ctx.roundRect === 'function') { ctx.roundRect(x, y, width, height, radius); return; }
+            const r = Math.min(radius, width / 2, height / 2);
+            ctx.moveTo(x + r, y); ctx.lineTo(x + width - r, y); ctx.quadraticCurveTo(x + width, y, x + width, y + r); ctx.lineTo(x + width, y + height - r);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height); ctx.lineTo(x + r, y + height); ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+            ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+        }
+
+        function toChartNumber(value) { const number = Number(value); return Number.isFinite(number) ? number : 0; }
+        function formatChartNumber(value) { const number = Number(value) || 0; return number >= 100 ? number.toFixed(0) : number.toFixed(1); }
+
+        function updateChartPeriodLabel() {
+            const el = document.getElementById('chart-period-label');
+            if (!el) return;
+            const yyyy = chartCursorDate.getFullYear(); const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
+            el.textContent = currentChartMode === 'month' ? `${yyyy}-${mm}` : (currentChartMode === 'year' ? String(yyyy) : 'TỔNG');
+        }
+
+        function updateChartDetail() {
+            if (currentChartMode === 'month' && isShowingMonthTotalInMonthMode && chartMonthTotals) {
+                const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
+                const yyyy = chartCursorDate.getFullYear();
+                updateDOMText('chart-selected-label', `Tổng T${mm}/${yyyy}`);
+                updateDOMText('chart-detail-pv', formatChartNumber(chartMonthTotals.pv));
+                updateDOMText('chart-detail-batt', formatChartNumber(chartMonthTotals.batt));
+                updateDOMText('chart-detail-charge', formatChartNumber(chartMonthTotals.charge));
+                updateDOMText('chart-detail-load', formatChartNumber(chartMonthTotals.load));
+                return;
+            }
+
+            const row = chartRows[chartSelectedIndex] || { detailLabel: '--', pv: 0, batt: 0, charge: 0, load: 0 };
+            updateDOMText('chart-selected-label', row.detailLabel);
+            updateDOMText('chart-detail-pv', formatChartNumber(row.pv));
+            updateDOMText('chart-detail-batt', formatChartNumber(row.batt));
+            updateDOMText('chart-detail-charge', formatChartNumber(row.charge));
+            updateDOMText('chart-detail-load', formatChartNumber(row.load));
+        }
+
+        // ================= TÍNH TOÁN NĂNG LƯỢNG & TIỀN ĐIỆN TỪ FIREBASE =================
+        let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
+
+        function checkAndSwitchMonth() {
+            if (!database) return;
+            let d = new Date(); 
+            let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
+            if (mk !== currentMonthKey) {
+                if (currentMonthKey !== "") { database.ref(`/SosenSystem/History/Daily/${currentMonthKey}`).off(); }
+                currentMonthKey = mk; 
+                database.ref(`/SosenSystem/History/Daily/${currentMonthKey}`).on('value', (snap) => { 
+                    currentMonthHistory = snap.val() || {}; 
+                    recalculateEnergy(); 
+                });
+            }
+        }
+
+        function calcEVN(kWh) {
+            let cost = 0; let r = kWh;
+            if(r > 0) { let q = Math.min(r, 50); cost += q * 2142.72; r -= q; }
+            if(r > 0) { let q = Math.min(r, 50); cost += q * 2214.00; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 2570.40; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 3237.84; r -= q; }
+            if(r > 0) { let q = Math.min(r, 100); cost += q * 3618.00; r -= q; }
+            if(r > 0) { cost += r * 3736.80; } return cost;
+        }
+
+        function recalculateEnergy() {
+            if (!latestDailyData) return; 
+            const data = latestDailyData;
+            let pvToday = toSafeNumber(data.PV_Today); 
+            let currentETotal = toSafeNumber(data.PV_Total_Lifetime);
+            let loadToday = toSafeNumber(data.Load_Today);
+            let gridBuyToday = toSafeNumber(data.Grid_Buy_Today);
+            let battDisToday = toSafeNumber(data.Bat_Discharge_Today);
+            let battChgToday = toSafeNumber(data.Bat_Charge_Today);
+
+            animateValue('stat-pv-today', pvToday, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-load-today', loadToday, v => v.toFixed(1) + ' kWh'); 
+            animateValue('stat-grid-buy', gridBuyToday, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-dis', battDisToday, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-chg', battChgToday, v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-dis-total', toSafeNumber(data.Bat_Discharge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
+            animateValue('stat-bat-chg-total', toSafeNumber(data.Bat_Charge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
+            animateValue('stat-pv-total', currentETotal, v => v.toFixed(1) + ' kWh');
+
+            let todayDate = new Date(); 
+            let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
+
+            let pvMonthTotal = 0; 
+            for (let key in currentMonthHistory) { 
+                if (key !== curDayKey) { 
+                    let dayItem = currentMonthHistory[key];
+                    let dayVal = (dayItem && typeof dayItem === 'object') ? Number(dayItem.pv || 0) : Number(dayItem || 0);
+                    pvMonthTotal += isNaN(dayVal) ? 0 : dayVal; 
+                }
+            }
+            
+            let curDayObj = currentMonthHistory[curDayKey];
+            let savedPvToday = (curDayObj && typeof curDayObj === 'object') ? Number(curDayObj.pv || 0) : Number(curDayObj || 0);
+            let activePvForMoney = Math.max(pvToday, savedPvToday);
+            pvMonthTotal += activePvForMoney;
+            
+            let monthMoney = calcEVN(pvMonthTotal); 
+            let todayMoney = 0;
+
+            if (pvMonthTotal >= activePvForMoney && activePvForMoney > 0) { 
+                todayMoney = monthMoney - calcEVN(pvMonthTotal - activePvForMoney); 
+            } else { 
+                todayMoney = calcEVN(activePvForMoney); 
+            }
+
+            let totalMoney = currentETotal * 3000;
+
+            animateValue('money-pv-today', activePvForMoney, v => v.toFixed(1));
+            animateValue('money-pv-month', pvMonthTotal, v => v.toFixed(1)); 
+            animateValue('money-pv-total', currentETotal, v => v.toFixed(1));
+            animateValue('money-today', Math.round(todayMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
+            animateValue('money-month', Math.round(monthMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
+            animateValue('money-total', Math.round(totalMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ');
+            autoSaveDailyHistoryToFirebase();
+        }
+
+        
+        // ================= TỰ ĐỘNG CHỐT SỔ VÀ LƯU LỊCH SỬ CUỐI NGÀY LÊN FIREBASE =================
+        let lastFirebaseHistorySyncTime = 0;
+        let lastMidnightSnapshotSavedDay = -1;
+
+        function autoSaveDailyHistoryToFirebase(force = false) {
+            if (!database || !latestDailyData) return;
+
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, "0");
+            const dd = String(now.getDate()).padStart(2, "0");
+            const monthKey = `${yyyy}_${mm}`;
+            const dayKey = `day_${dd}`;
+
+            const curMs = Date.now();
+            // Throttling: giãn cách tối thiểu 30 giây giữa các lần ghi trừ khi force = true
+            if (!force && (curMs - lastFirebaseHistorySyncTime < 30000)) return;
+
+            const pv = toSafeNumber(latestDailyData.PV_Today);
+            const load = toSafeNumber(latestDailyData.Load_Today);
+            const batt = toSafeNumber(latestDailyData.Bat_Discharge_Today);
+            const charge = toSafeNumber(latestDailyData.Bat_Charge_Today);
+            const grid = toSafeNumber(latestDailyData.Grid_Buy_Today);
+
+            // Chỉ lưu khi có dữ liệu năng lượng thực tế
+            if (pv > 0 || load > 0 || batt > 0 || charge > 0) {
+                lastFirebaseHistorySyncTime = curMs;
+                const record = {
+                    pv: Math.round(pv * 10) / 10,
+                    load: Math.round(load * 10) / 10,
+                    batt: Math.round(batt * 10) / 10,
+                    charge: Math.round(charge * 10) / 10,
+                    grid: Math.round(grid * 10) / 10
+                };
+
+                // 1. Lưu vào cây Lịch sử ngày: /SosenSystem/History/Daily/YYYY_MM/day_DD
+                database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(record, (err) => {
+                    if (!err) {
+                        console.log(`[FIREBASE AUTO-SYNC] Đã lưu lịch sử ngày ${dd}/${mm}/${yyyy}:`, record);
+                    }
+                });
+
+                // 2. Đồng bộ cây /SosenSystem/Daily_Energy
+                database.ref("/SosenSystem/Daily_Energy").update({
+                    Energy_Unit: "kWh",
+                    PV_Today: record.pv,
+                    Load_Today: record.load,
+                    Bat_Discharge_Today: record.batt,
+                    Bat_Charge_Today: record.charge,
+                    Grid_Buy_Today: record.grid,
+                    PV_Total_Lifetime: toSafeNumber(latestDailyData.PV_Total_Lifetime),
+                    Bat_Discharge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Discharge_Total_Lifetime),
+                    Bat_Charge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Charge_Total_Lifetime)
+                });
+
+                // Lưu bản sao dự phòng vào localStorage
+                try {
+                    localStorage.setItem("sosen_history_backup_" + `${yyyy}_${mm}_${dd}`, JSON.stringify(record));
+                } catch(e) {}
+            }
+        }
+
+        // Kiểm tra và thực hiện chốt sổ cuối ngày lúc 23h58
+        function checkMidnightSnapshotSchedule() {
+            const now = new Date();
+            const curDay = now.getDate();
+            const curHour = now.getHours();
+            const curMin = now.getMinutes();
+
+            // Nếu trong khung giờ 23:58 - 23:59 và chưa chốt sổ ngày hôm nay
+            if (curHour === 23 && curMin >= 58 && lastMidnightSnapshotSavedDay !== curDay) {
+                console.log("[CHỐT SỔ 23:58] Đang thực hiện lưu dữ liệu cuối ngày lên Firebase...");
+                autoSaveDailyHistoryToFirebase(true);
+                lastMidnightSnapshotSavedDay = curDay;
+            }
+        }
+
+        function updateDOMText(id, newValue) { const el = document.getElementById(id); if (el && el.innerText !== String(newValue)) { el.innerText = newValue; } }
+
+        function getFlowIntensity(powerW) {
+            if (powerW === undefined || powerW === null) { return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 }; }
+            const watts = Math.abs(toSafeNumber(powerW));
+            if (watts < 1) return { particles: 0, sparks: 0, dashDuration: 7.8, sparkDuration: 5.4, wireSpeed: 4.2 };
+            if (watts <= 1000) return { particles: 3, sparks: 2, dashDuration: 7.0, sparkDuration: 4.8, wireSpeed: 3.6 };
+            if (watts <= 2000) return { particles: 4, sparks: 3, dashDuration: 5.0, sparkDuration: 3.4, wireSpeed: 2.5 };
+            if (watts <= 4000) return { particles: 5, sparks: 4, dashDuration: 3.4, sparkDuration: 2.35, wireSpeed: 1.7 };
+            if (watts <= 5500) return { particles: 6, sparks: 5, dashDuration: 2.65, sparkDuration: 1.85, wireSpeed: 1.25 };
+            return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
+        }
+
+        function setFlow(groupId, isActive, animName, color, powerW) {
+            const group = document.getElementById(groupId); 
+            if (!group) return;
+            const currentAnim = group.getAttribute('data-anim') || '';
+            const currentActive = group.style.display === 'block';
+            const intensity = getFlowIntensity(powerW);
+
+            if (isActive && intensity.particles > 0) {
+                group.style.display = 'block';
+                group.style.setProperty('--c', color || '#00e5ff');
+                group.style.setProperty('--wire-speed', intensity.wireSpeed + 's');
+                const movesRight = animName === 'flowInL' || animName === 'flowOutR';
+                const currentParticles = group.getAttribute('data-particles') || '';
+                const currentDashDuration = group.getAttribute('data-dash-duration') || '';
+                const needsRefresh = !currentActive || currentAnim !== animName || currentParticles !== String(intensity.particles) || currentDashDuration !== String(intensity.dashDuration);
+                if (needsRefresh) {
+                    group.setAttribute('data-anim', animName);
+                    group.setAttribute('data-particles', String(intensity.particles));
+                    group.setAttribute('data-dash-duration', String(intensity.dashDuration));
+                    
+                    if (movesRight) { group.classList.add('dir-right'); group.classList.remove('dir-left'); } 
+                    else { group.classList.add('dir-left'); group.classList.remove('dir-right'); }
+                    
+                    const dashes = group.querySelectorAll('.flow-dash');
+                    dashes.forEach((d, index) => { 
+                        d.style.animationName = 'none'; d.style.opacity = '0';
+                        if (index >= intensity.particles) { d.style.display = 'none'; return; }
+                        d.style.display = 'block'; void d.offsetWidth;
+                        d.style.animationName = animName;
+                        d.style.animationDelay = '-' + ((index * intensity.dashDuration) / intensity.particles).toFixed(2) + 's';
+                        d.style.animationDuration = intensity.dashDuration + 's'; d.style.animationIterationCount = 'infinite'; d.style.animationTimingFunction = 'linear'; 
+                    });
+
+                    const sparks = group.querySelectorAll('.flow-spark');
+                    sparks.forEach((s, index) => {
+                        s.style.animationName = 'none'; s.style.opacity = '0';
+                        if (index >= intensity.sparks) { s.style.display = 'none'; return; }
+                        s.style.display = 'block'; void s.offsetWidth;
+                        s.style.animationName = movesRight ? 'sparkRight' : 'sparkLeft';
+                        s.style.animationDelay = '-' + ((index * intensity.sparkDuration) / Math.max(intensity.sparks, 1)).toFixed(2) + 's';
+                        s.style.animationDuration = intensity.sparkDuration + 's'; s.style.animationIterationCount = 'infinite'; s.style.animationTimingFunction = 'linear';
+                    });
+                }
+            } else { 
+                if (currentActive) {
+                    group.style.display = 'none'; 
+                    group.setAttribute('data-anim', ''); group.setAttribute('data-particles', ''); group.setAttribute('data-dash-duration', '');
+                }
+            }
+        }
+
+        // ================= TRẠNG THÁI THIẾT BỊ VÀ ĐỒNG HỒ =================
+        let lastLiveTime = 0;
+        let lastLiveReceivedAt = 0;
+        let currentDeviceState = 'checking';
+
+        function setClockGridStatus(gridOnline) {
+            const box = document.getElementById('clock-grid-status');
+            const label = document.getElementById('clock-grid-status-text');
+            if (!box || !label) return;
+            box.classList.remove('on', 'off', 'unknown', 'stale');
+
+            if (currentDeviceState !== 'online') {
+                box.classList.add('unknown');
+                updateDOMText('clock-grid-status-text', 'GRID --');
+                return;
+            }
+            if (gridOnline === true) {
+                box.classList.add('on');
+                updateDOMText('clock-grid-status-text', 'GRID ON');
+            } else if (gridOnline === false) {
+                box.classList.add('off');
+                updateDOMText('clock-grid-status-text', 'GRID OFF');
+            } else {
+                box.classList.add('unknown');
+                updateDOMText('clock-grid-status-text', 'GRID --');
+            }
+        }
+
+        function setDeviceStatus(state) {
+            const box = document.getElementById('device-status');
+            const text = document.getElementById('device-status-text');
+            if (!box || !text) return;
+            currentDeviceState = state;
+            box.classList.remove('online', 'offline', 'checking');
+            box.classList.add(state);
+
+            if (state === 'online') { updateDOMText('device-status-text', 'ESP32 ON'); } 
+            else if (state === 'offline') { updateDOMText('device-status-text', 'ESP32 OFF'); setClockGridStatus(null); } 
+            else { updateDOMText('device-status-text', 'ESP32 ...'); setClockGridStatus(null); }
+        }
+
+        function renderLastLiveReceivedTime() {
+            if (!(lastLiveReceivedAt > 0)) { updateDOMText('clock-time-text', '--:--:--'); return; }
+            const t = new Date(lastLiveReceivedAt);
+            updateDOMText('clock-time-text', t.toLocaleTimeString('vi-VN', { hour12: false }));
+        }
+
+        function markLiveDataReceived(nowMs = Date.now()) {
+            lastLiveReceivedAt = nowMs;
+            lastLiveTime = nowMs;
+            renderLastLiveReceivedTime();
+        }
+
+        function updateDeviceStatusByTimeout() {
+            const nowMs = Date.now();
+            if (lastLiveTime > 0) {
+                if (nowMs - lastLiveTime > 12000) {
+                    setDeviceStatus('offline');
+                } else {
+                    setDeviceStatus('online');
+                }
+            } else {
+                setDeviceStatus('checking');
+            }
+        }
+        setInterval(updateDeviceStatusByTimeout, 2000);
+
+        // ================= XỬ LÝ GÓI TIN LIVE (NHẬN TỪ MQTT 3S) =================
+        function processIncomingLiveData(data) {
+            if (!data) return;
+            markLiveDataReceived(Date.now());
+            setDeviceStatus('online');
+
+            // Lưu dữ liệu vào cache bộ nhớ máy
+            try {
+                localStorage.setItem("last_sosen_snapshot", JSON.stringify(data));
+            } catch (e) {}
+
+            const vGrid = toSafeNumber(data.V_Grid);
+            const isGridOn = (vGrid > 50) || (data.Grid_Online === true);
+            setClockGridStatus(isGridOn);
+
+            const battVoltage = toSafeNumber(data.Batt_Voltage);
+            const battCurrent = toSafeNumber(data.Batt_Current);
+            const battTemp = toSafeNumber(data.Batt_Temp, NaN);
+
+            const pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power)));
+            const gridImportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Import_Power)));
+            const gridExportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Export_Power)));
+            const battInW = data.Batt_Power !== undefined ? Math.round(toSafeNumber(data.Batt_Power)) : Math.round(battVoltage * battCurrent);
+            const loadInW = Math.max(0, Math.round(toSafeNumber(data.Load_Power)));
+
+            updateBackgroundByTimeAndPv(pvInW);
+            
+            animateValue('lbl-pv', pvInW, v => Math.round(v));
+            const elPv = document.getElementById('lbl-pv');
+            if (elPv) elPv.classList.add('val-pv-style');
+            updateSunLevelByPower(pvInW);
+
+            animateValue('lbl-load', loadInW, v => Math.round(v));
+            const elLoad = document.getElementById('lbl-load');
+            if (elLoad) elLoad.classList.add('val-load-style');
+
+            const gridActiveW = gridImportW > 0 ? gridImportW : gridExportW;
+            animateValue('lbl-grid', gridActiveW, v => Math.round(v));
+
+            const elGrid = document.getElementById('lbl-grid');
+            const elGridMode = document.getElementById('lbl-grid-mode');
+            if (elGrid) {
+                elGrid.classList.remove('val-grid-buy-style', 'val-grid-sell-style');
+                if (isGridOn && gridImportW > 0) { elGrid.classList.add('val-grid-buy-style'); }
+                else if (isGridOn && gridExportW > 0) { elGrid.classList.add('val-grid-sell-style'); }
+                else { elGrid.style.color = '#fff'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)'; }
+            }
+            if (elGridMode) {
+                elGridMode.classList.remove('buy', 'sell', 'idle', 'no-grid');
+                if (!isGridOn) { elGridMode.style.display = 'none'; }
+                else if (gridImportW > 0) { elGridMode.style.display = 'none'; }
+                else if (gridExportW > 0) { elGridMode.classList.add('sell'); elGridMode.style.display = ''; updateDOMText('lbl-grid-mode', 'ĐẨY EVN ' + gridExportW.toLocaleString('vi-VN') + ' W →'); }
+                else { elGridMode.style.display = 'none'; }
+            }
+
+            animateValue('lbl-batt', Math.abs(battInW), v => Math.round(v));
+            const elBatt = document.getElementById('lbl-batt');
+            if (elBatt) {
+                elBatt.classList.remove('val-charge', 'val-discharge');
+                if (battInW < -1) { elBatt.classList.add('val-charge'); } 
+                else if (battInW > 1) { elBatt.classList.add('val-discharge'); }
+                else { elBatt.style.color = '#fff'; elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)'; }
+            }
+
+            if (data.Inv_Temp !== undefined) {
+                const tempLabel = document.getElementById('lbl-inv-temp');
+                const t = toSafeNumber(data.Inv_Temp);
+                if (tempLabel) {
+                    animateValue('lbl-inv-temp', t, v => '🌡️ ' + v.toFixed(0) + '°C');
+                    if (t < 40) tempLabel.style.backgroundColor = '#00cc66'; 
+                    else if (t >= 40 && t < 48) tempLabel.style.backgroundColor = '#ffaa00'; 
+                    else tempLabel.style.backgroundColor = '#ff4444';
+                }
+            }
+
+            let soc = clampNumber(data.Batt_SOC, 0, 100);
+            animateValue('lbl-soc', soc, v => Math.round(v) + '%');
+
+            const battTempLabel = document.getElementById('lbl-batt-temp');
+            if (battTempLabel) {
+                battTempLabel.classList.remove('temp-cool', 'temp-normal', 'temp-warm', 'temp-hot', 'temp-danger', 'temp-stale');
+                if (Number.isFinite(battTemp)) {
+                    animateValue('lbl-batt-temp-value', battTemp, v => v.toFixed(1) + '°C');
+                    if (battTemp >= 43.0) battTempLabel.classList.add('temp-danger');
+                    else if (battTemp >= 36.0) battTempLabel.classList.add('temp-hot');
+                    else if (battTemp >= 30.0) battTempLabel.classList.add('temp-warm');
+                    else if (battTemp >= 18.0) battTempLabel.classList.add('temp-normal');
+                    else battTempLabel.classList.add('temp-cool');
+                } else {
+                    updateDOMText('lbl-batt-temp-value', '--°C');
+                    battTempLabel.classList.add('temp-stale');
+                }
+            }
+
+            animateValue('mini-stat-v', battVoltage, v => v.toFixed(1) + ' V');
+            animateValue('mini-stat-a', battCurrent, v => v.toFixed(1) + ' A');
+            
+            const miniMeter = document.getElementById('battery-mini-meter');
+            if (miniMeter) {
+                miniMeter.classList.remove('charge', 'discharge', 'idle');
+                miniMeter.classList.add(battInW < -1 ? 'charge' : (battInW > 1 ? 'discharge' : 'idle'));
+            }
+
+            let rawStatus = String(data.Batt_Status || "");
+            let statusLower = rawStatus.toLowerCase();
+            let displayStatus = rawStatus;
+            let statusColor = '#888';
+            if (statusLower.includes("sac") || statusLower.includes("charge")) { displayStatus = "Đang Sạc"; statusColor = '#00cc66'; }
+            else if (statusLower.includes("xa") || statusLower.includes("discharge")) { displayStatus = "Đang Xả"; statusColor = '#ff4444'; }
+            else { displayStatus = "Chờ"; statusColor = '#888'; }
+            
+            updateDOMText('lbl-status', displayStatus);
+            if (document.getElementById('lbl-status')) document.getElementById('lbl-status').style.color = statusColor;
+
+            let colorTheme = soc <= 20 ? 'fill-red' : (soc <= 40 ? 'fill-yellow' : 'fill-green');
+            const battFill = document.getElementById('batt-fill');
+            if (battFill) { battFill.style.width = soc + '%'; battFill.className = 'battery-fill ' + colorTheme; }
+
+            if (pvInW >= 1) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
+            if (loadInW >= 1) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
+            if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW)); else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); else setFlow('flow-batt', false);
+
+            if (!isGridOn) { setFlow('flow-grid', false); }
+            else if (gridImportW > 0) { setFlow('flow-grid', true, 'flowInR', '#ff4444', gridImportW); }
+            else if (gridExportW > 0) { setFlow('flow-grid', true, 'flowOutR', '#00cc66', gridExportW); }
+            else { setFlow('flow-grid', false); }
+
+            // ================= ĐỒNG BỘ CHỈ SỐ NĂNG LƯỢNG NGÀY & TRỌN ĐỜI TỪ MQTT =================
+            let hasEnergyUpdate = false;
+            if (!latestDailyData) latestDailyData = {};
+
+            const pvTodayVal = data.PV_Today !== undefined ? data.PV_Today : data.pv_today;
+            const batChgTodayVal = data.Bat_Charge_Today !== undefined ? data.Bat_Charge_Today : data.bat_charge_today;
+            const batDisTodayVal = data.Bat_Discharge_Today !== undefined ? data.Bat_Discharge_Today : data.bat_discharge_today;
+            const loadTodayVal = data.Load_Today !== undefined ? data.Load_Today : data.load_today;
+            const gridBuyTodayVal = data.Grid_Buy_Today !== undefined ? data.Grid_Buy_Today : data.grid_buy_today;
+
+            if (pvTodayVal !== undefined && pvTodayVal !== null && !isNaN(Number(pvTodayVal))) {
+                latestDailyData.PV_Today = Number(pvTodayVal);
+                hasEnergyUpdate = true;
+            }
+            if (batChgTodayVal !== undefined && batChgTodayVal !== null && !isNaN(Number(batChgTodayVal))) {
+                latestDailyData.Bat_Charge_Today = Number(batChgTodayVal);
+                hasEnergyUpdate = true;
+            }
+            if (batDisTodayVal !== undefined && batDisTodayVal !== null && !isNaN(Number(batDisTodayVal))) {
+                latestDailyData.Bat_Discharge_Today = Number(batDisTodayVal);
+                hasEnergyUpdate = true;
+            }
+            if (loadTodayVal !== undefined && loadTodayVal !== null && !isNaN(Number(loadTodayVal))) {
+                latestDailyData.Load_Today = Number(loadTodayVal);
+                hasEnergyUpdate = true;
+            }
+            if (gridBuyTodayVal !== undefined && gridBuyTodayVal !== null && !isNaN(Number(gridBuyTodayVal))) {
+                latestDailyData.Grid_Buy_Today = Number(gridBuyTodayVal);
+                hasEnergyUpdate = true;
+            }
+
+            const pvTotalVal = data.PV_Total_Lifetime !== undefined ? data.PV_Total_Lifetime : (data.PV_Total !== undefined ? data.PV_Total : data.pv_total);
+            if (pvTotalVal !== undefined && pvTotalVal !== null && !isNaN(Number(pvTotalVal))) {
+                latestDailyData.PV_Total_Lifetime = Number(pvTotalVal);
+                hasEnergyUpdate = true;
+            }
+            const batDisTotalVal = data.Bat_Discharge_Total_Lifetime !== undefined ? data.Bat_Discharge_Total_Lifetime : (data.Bat_Discharge_Total !== undefined ? data.Bat_Discharge_Total : data.bat_discharge_total);
+            if (batDisTotalVal !== undefined && batDisTotalVal !== null && !isNaN(Number(batDisTotalVal))) {
+                latestDailyData.Bat_Discharge_Total_Lifetime = Number(batDisTotalVal);
+                hasEnergyUpdate = true;
+            }
+            const batChgTotalVal = data.Bat_Charge_Total_Lifetime !== undefined ? data.Bat_Charge_Total_Lifetime : (data.Bat_Charge_Total !== undefined ? data.Bat_Charge_Total : data.bat_charge_total);
+            if (batChgTotalVal !== undefined && batChgTotalVal !== null && !isNaN(Number(batChgTotalVal))) {
+                latestDailyData.Bat_Charge_Total_Lifetime = Number(batChgTotalVal);
+                hasEnergyUpdate = true;
+            }
+
+            if (hasEnergyUpdate) {
+                try {
+                    localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
+                } catch(e) {}
+                recalculateEnergy();
+                updateChartTodayRealtime(latestDailyData);
+            }
+        }
+
+        // Cập nhật cột ngày hôm nay trên biểu đồ theo thời gian thực
+        function updateChartTodayRealtime(eData) {
+            if (!energyChart || currentChartMode !== 'month') return;
+            const now = new Date();
+            const yyyy = chartCursorDate.getFullYear();
+            const isCurrentYear = (yyyy === now.getFullYear());
+            const isViewingCurrentMonth = (isCurrentYear && chartCursorDate.getMonth() === now.getMonth());
+            if (!isViewingCurrentMonth || !chartAllRows || chartAllRows.length === 0) return;
+
+            const todayNum = now.getDate();
+            const rowIdx = todayNum - 1;
+            if (chartAllRows[rowIdx]) {
+                if (eData.PV_Today !== undefined) chartAllRows[rowIdx].pv = toSafeNumber(eData.PV_Today);
+                if (eData.Bat_Discharge_Today !== undefined) chartAllRows[rowIdx].batt = toSafeNumber(eData.Bat_Discharge_Today);
+                if (eData.Bat_Charge_Today !== undefined) chartAllRows[rowIdx].charge = toSafeNumber(eData.Bat_Charge_Today);
+                if (eData.Load_Today !== undefined) chartAllRows[rowIdx].load = toSafeNumber(eData.Load_Today);
+                updateVisibleChartRows();
+            }
+        }
+
+        // ================= KHỞI TẠO KẾT NỐI MQTT WEBSOCKET =================
+        let mqttClient = null;
+        function initMQTT() {
+            if (typeof mqtt === 'undefined') {
+                console.error("MQTT Library chua tai duoc.");
+                return;
+            }
+
+            console.log("[MQTT] Dang ket noi WSS toi EMQX:", MQTT_WSS_URL);
+            mqttClient = mqtt.connect(MQTT_WSS_URL, {
+                clientId: MQTT_CLIENT_ID,
+                username: MQTT_USER,
+                password: MQTT_PASSWORD,
+                clean: true,
+                reconnectPeriod: 2000,
+                connectTimeout: 5000,
+                keepalive: 15
+            });
+
+            mqttClient.on('connect', () => {
+                console.log("[MQTT] Da ket noi WSS thanh cong!");
+                // Nhận ngay gói tin retained mới nhất
+                mqttClient.subscribe(MQTT_TOPIC_DATA, { qos: 0 }, (err) => {
+                    if (!err) console.log("[MQTT] Subscribed:", MQTT_TOPIC_DATA);
+                });
+            });
+
+            mqttClient.on('message', (topic, message) => {
+                if (topic === MQTT_TOPIC_DATA) {
+                    try {
+                        const parsed = JSON.parse(message.toString());
+                        processIncomingLiveData(parsed);
+                    } catch (e) {
+                        console.error("[MQTT] Loi parse JSON:", e);
+                    }
+                }
+            });
+
+            mqttClient.on('error', (err) => {
+                console.error("[MQTT Error]:", err);
+            });
+
+            mqttClient.on('offline', () => {
+                console.warn("[MQTT] Mat ket noi toi Broker");
+            });
+        }
+
+        // ================= KHỞI ĐỘNG HỆ THỐNG VÀ LẮNG NGHE FIREBASE =================
+        document.addEventListener('DOMContentLoaded', () => {
+            // NẠP NGAY LẬP TỨC TỪ CACHE (0.05 giây để không bị trắng số liệu)
+            const cachedData = localStorage.getItem("last_sosen_snapshot");
+            if (cachedData) {
+                try {
+                    const parsed = JSON.parse(cachedData);
+                    processIncomingLiveData(parsed);
+                    console.log("[CACHE] Da nap du lieu tu cache trinh duyet!");
+                } catch (e) {}
+            }
+
+            const cachedDaily = localStorage.getItem("last_sosen_daily_snapshot");
+            if (cachedDaily) {
+                try {
+                    latestDailyData = JSON.parse(cachedDaily);
+                    recalculateEnergy();
+                } catch (e) {}
+            }
+
+            updateBackgroundByTimeAndPv();
+            initCanvasSun();
+            initChart();
+            initMQTT();
+
+            // Firebase: Lắng nghe Daily_Energy (Chỉ số tích lũy & vẽ lại biểu đồ)
+            if (database) {
+                database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
+                    latestDailyData = snapshot.val();
+                    if (latestDailyData) {
+                        try {
+                            localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
+                        } catch(e) {}
+                    }
+                    checkAndSwitchMonth();
+                    recalculateEnergy();
+                    if (energyChart && (currentChartMode === 'month' || currentChartMode === 'year')) {
+                        loadChartData();
+                    }
+                });
+                setInterval(() => { checkAndSwitchMonth(); }, 60000);
+                setInterval(() => { checkMidnightSnapshotSchedule(); }, 30000);
+                window.addEventListener(beforeunload, () => { autoSaveDailyHistoryToFirebase(true); });
+                document.addEventListener(visibilitychange, () => {
+                    if (document.visibilityState === hidden) autoSaveDailyHistoryToFirebase(true);
+                });
+            }
         });
-      }
-
-      // Kích hoạt cơ chế chốt sổ tự động
-      autoSyncTodayToFirebase();
-
-    } catch (e) {
-      console.error("Lỗi giải mã gói MQTT:", e);
-    }
-  };
-
-  function connectMqtt() {
-    mqttClient.connect({
-      useSSL: true,
-      userName: MQTT_CONFIG.user,
-      password: MQTT_CONFIG.pass,
-      timeout: 5,
-      keepAliveInterval: 30,
-      cleanSession: true,
-      onSuccess: () => {
-        document.getElementById("mqttStatusBadge").className = "status-badge badge-online";
-        document.getElementById("mqttStatusBadge").innerHTML = '<i class="fas fa-circle"></i> MQTT ON';
-        mqttClient.subscribe(MQTT_CONFIG.topic);
-      },
-      onFailure: () => {
-        setTimeout(connectMqtt, 5000);
-      }
-    });
-  }
-
-  // ================= 8. ĐỒNG HỒ & VÒNG LẶP HỆ THỐNG =================
-  setInterval(() => {
-    const now = new Date();
-    document.getElementById("liveClock").innerText = 
-      `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-    
-    // Định kỳ quét chốt sổ dữ liệu (30s một lần ngay cả khi không có bản tin mới)
-    autoSyncTodayToFirebase();
-  }, 1000);
-
-  // Khởi động khi tải xong trang
-  window.addEventListener("DOMContentLoaded", () => {
-    initHistoryChart();
-    listenMonthlyHistory();
-    connectMqtt();
-  });
-</script>
-
+        setInterval(() => { updateBackgroundByTimeAndPv(); }, 60000);
+    </script>
 </body>
 </html>
