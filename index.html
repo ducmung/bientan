@@ -472,6 +472,7 @@
                         <button class="chart-btn active" id="btn-chart-month" onclick="setChartMode('month')">THÁNG</button>
                         <button class="chart-btn" id="btn-chart-year" onclick="setChartMode('year')">NĂM</button>
                         <button class="chart-btn" id="btn-chart-total" onclick="setChartMode('total')">TỔNG</button>
+                        <button class="chart-btn" style="background: rgba(255, 170, 0, 0.15); color: #d35400; border: 1px dashed #d35400; font-size: 11px; padding: 4px 8px; margin-left: 6px;" onclick="promptFixYesterday()" title="Bù đắp dữ liệu ngày 07/10 bị thiếu">🔧 Bù Ngày 07</button>
                     </div>
                     <div class="chart-period-control">
                         <button class="chart-nav-btn" type="button" onclick="shiftChartPeriod(-1)" aria-label="Kỳ trước">‹</button>
@@ -1040,6 +1041,102 @@
             animateValue('money-today', Math.round(todayMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
             animateValue('money-month', Math.round(monthMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
             animateValue('money-total', Math.round(totalMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ');
+            autoSyncTodayToFirebase();
+        }
+
+        
+        // ================= TỰ ĐỘNG CHỐT SỔ VÀ LƯU LỊCH SỬ LÊN FIREBASE =================
+        let lastFirebaseAutoSyncTime = 0;
+        function autoSyncTodayToFirebase() {
+            if (!database || !latestDailyData) return;
+            const now = Date.now();
+            if (now - lastFirebaseAutoSyncTime < 30000) return; // Tối thiểu cách nhau 30s
+
+            const d = new Date();
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            const monthKey = `${yyyy}_${mm}`;
+            const dayKey = `day_${dd}`;
+
+            const pv = toSafeNumber(latestDailyData.PV_Today);
+            const load = toSafeNumber(latestDailyData.Load_Today);
+            const batt = toSafeNumber(latestDailyData.Bat_Discharge_Today);
+            const charge = toSafeNumber(latestDailyData.Bat_Charge_Today);
+            const grid = toSafeNumber(latestDailyData.Grid_Buy_Today);
+
+            if (pv > 0 || load > 0 || batt > 0 || charge > 0) {
+                lastFirebaseAutoSyncTime = now;
+                const record = {
+                    pv: Math.round(pv * 10) / 10,
+                    load: Math.round(load * 10) / 10,
+                    batt: Math.round(batt * 10) / 10,
+                    charge: Math.round(charge * 10) / 10,
+                    grid: Math.round(grid * 10) / 10
+                };
+                database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(record, (err) => {
+                    if (!err) {
+                        console.log(`[FIREBASE AUTO-SYNC] Đã tự động lưu lịch sử ngày ${dd}/${mm}/${yyyy}:`, record);
+                    }
+                });
+                database.ref("/SosenSystem/Daily_Energy").update({
+                    PV_Today: record.pv,
+                    Load_Today: record.load,
+                    Bat_Discharge_Today: record.batt,
+                    Bat_Charge_Today: record.charge,
+                    Grid_Buy_Today: record.grid,
+                    PV_Total_Lifetime: toSafeNumber(latestDailyData.PV_Total_Lifetime),
+                    Bat_Discharge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Discharge_Total_Lifetime),
+                    Bat_Charge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Charge_Total_Lifetime)
+                });
+            }
+        }
+
+        // Hàm sửa hoặc bù đắp dữ liệu lịch sử vào Firebase
+        function repairDayData(dayNum, pvVal, battVal, chargeVal, loadVal, gridVal = 0) {
+            if (!database) {
+                alert("Chưa kết nối được Firebase Database!");
+                return;
+            }
+            const yyyy = chartCursorDate.getFullYear();
+            const mm = String(chartCursorDate.getMonth() + 1).padStart(2, "0");
+            const dayStr = String(dayNum).padStart(2, "0");
+            const path = `/SosenSystem/History/Daily/${yyyy}_${mm}/day_${dayStr}`;
+            
+            const payload = {
+                pv: parseFloat(pvVal) || 0,
+                batt: parseFloat(battVal) || 0,
+                charge: parseFloat(chargeVal) || 0,
+                load: parseFloat(loadVal) || 0,
+                grid: parseFloat(gridVal) || 0
+            };
+
+            database.ref(path).update(payload, (err) => {
+                if (!err) {
+                    alert(`Đã cập nhật thành công dữ liệu ngày ${dayStr}/${mm}/${yyyy} lên Firebase! Biểu đồ sẽ cập nhật ngay.`);
+                    loadChartData();
+                } else {
+                    alert("Lỗi khi ghi Firebase: " + err.message);
+                }
+            });
+        }
+
+        function promptFixYesterday() {
+            const defPv = "31.5";
+            const defBatDis = "12.0";
+            const defBatChg = "21.5";
+            const defLoad = "25.0";
+            
+            const val = prompt("Nhập số liệu cho Ngày 07/10 theo định dạng:
+Sản lượng PV, Xả pin, Sạc pin, Tiêu thụ (kWh)", `${defPv}, ${defBatDis}, ${defBatChg}, ${defLoad}`);
+            if (val) {
+                const parts = val.split(",").map(s => s.trim());
+                if (parts.length >= 4) {
+                    repairDayData(7, parts[0], parts[1], parts[2], parts[3]);
+                } else {
+                    alert("Định dạng không hợp lệ, vui lòng nhập đủ 4 thông số phân cách bằng dấu phẩy.");
+                }
+            }
         }
 
         function updateDOMText(id, newValue) { const el = document.getElementById(id); if (el && el.innerText !== String(newValue)) { el.innerText = newValue; } }
