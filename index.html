@@ -1040,27 +1040,16 @@
             animateValue('money-today', Math.round(todayMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
             animateValue('money-month', Math.round(monthMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
             animateValue('money-total', Math.round(totalMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ');
-            autoSaveDailyHistoryToFirebase();
         }
 
         
-        // ================= TỰ ĐỘNG CHỐT SỔ VÀ LƯU LỊCH SỬ CUỐI NGÀY LÊN FIREBASE =================
-        let lastFirebaseHistorySyncTime = 0;
-        let lastMidnightSnapshotSavedDay = -1;
+        // ================= CHỐT SỔ VÀ LƯU LỊCH SỬ DUY NHẤT VÀO 23h50 -> 23h58 =================
+        // Ban ngày hoàn toàn KHÔNG ghi Firebase, tránh xung đột và nghẽn luồng với MQTT
+        let lastMidnightSavedDay = -1;
+        let isMidnightSaving = false;
 
-        function autoSaveDailyHistoryToFirebase(force = false) {
-            if (!database || !latestDailyData) return;
-
-            const now = new Date();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, "0");
-            const dd = String(now.getDate()).padStart(2, "0");
-            const monthKey = `${yyyy}_${mm}`;
-            const dayKey = `day_${dd}`;
-
-            const curMs = Date.now();
-            // Throttling: giãn cách tối thiểu 30 giây giữa các lần ghi trừ khi force = true
-            if (!force && (curMs - lastFirebaseHistorySyncTime < 1000000)) return;
+        function saveMidnightSnapshotToFirebase(curDay) {
+            if (!database || !latestDailyData || isMidnightSaving) return;
 
             const pv = toSafeNumber(latestDailyData.PV_Today);
             const load = toSafeNumber(latestDailyData.Load_Today);
@@ -1068,56 +1057,62 @@
             const charge = toSafeNumber(latestDailyData.Bat_Charge_Today);
             const grid = toSafeNumber(latestDailyData.Grid_Buy_Today);
 
-            // Chỉ lưu khi có dữ liệu năng lượng thực tế
-            if (pv > 0 || load > 0 || batt > 0 || charge > 0) {
-                lastFirebaseHistorySyncTime = curMs;
-                const record = {
-                    pv: Math.round(pv * 10) / 10,
-                    load: Math.round(load * 10) / 10,
-                    batt: Math.round(batt * 10) / 10,
-                    charge: Math.round(charge * 10) / 10,
-                    grid: Math.round(grid * 10) / 10
-                };
+            // Chỉ chốt sổ khi có dữ liệu năng lượng thực tế
+            if (pv <= 0 && load <= 0 && batt <= 0 && charge <= 0) return;
 
-                // 1. Lưu vào cây Lịch sử ngày: /SosenSystem/History/Daily/YYYY_MM/day_DD
-                database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(record, (err) => {
-                    if (!err) {
-                        console.log(`[FIREBASE AUTO-SYNC] Đã lưu lịch sử ngày ${dd}/${mm}/${yyyy}:`, record);
-                    }
-                });
+            isMidnightSaving = true;
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, "0");
+            const dd = String(curDay).padStart(2, "0");
+            const monthKey = `${yyyy}_${mm}`;
+            const dayKey = `day_${dd}`;
 
-                // 2. Đồng bộ cây /SosenSystem/Daily_Energy
-                database.ref("/SosenSystem/Daily_Energy").update({
-                    Energy_Unit: "kWh",
-                    PV_Today: record.pv,
-                    Load_Today: record.load,
-                    Bat_Discharge_Today: record.batt,
-                    Bat_Charge_Today: record.charge,
-                    Grid_Buy_Today: record.grid,
-                    PV_Total_Lifetime: toSafeNumber(latestDailyData.PV_Total_Lifetime),
-                    Bat_Discharge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Discharge_Total_Lifetime),
-                    Bat_Charge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Charge_Total_Lifetime)
-                });
+            const record = {
+                pv: Math.round(pv * 10) / 10,
+                load: Math.round(load * 10) / 10,
+                batt: Math.round(batt * 10) / 10,
+                charge: Math.round(charge * 10) / 10,
+                grid: Math.round(grid * 10) / 10
+            };
 
-                // Lưu bản sao dự phòng vào localStorage
-                try {
-                    localStorage.setItem("sosen_history_backup_" + `${yyyy}_${mm}_${dd}`, JSON.stringify(record));
-                } catch(e) {}
-            }
+            console.log(`[CHỐT SỔ 23h50-23h58] Đang lưu lịch sử ngày ${dd}/${mm}/${yyyy}...`, record);
+
+            database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(record, (err) => {
+                isMidnightSaving = false;
+                if (!err) {
+                    lastMidnightSavedDay = curDay; // LƯU OK THÌ THÔI, DỪNG LẠI KHÔNG GHI NỮA!
+                    console.log(`[CHỐT SỔ THÀNH CÔNG] Đã lưu xong ngày ${dd}/${mm}/${yyyy} lên Firebase!`);
+
+                    // Đồng bộ thêm Daily_Energy
+                    database.ref("/SosenSystem/Daily_Energy").update({
+                        Energy_Unit: "kWh",
+                        PV_Today: record.pv,
+                        Load_Today: record.load,
+                        Bat_Discharge_Today: record.batt,
+                        Bat_Charge_Today: record.charge,
+                        Grid_Buy_Today: record.grid,
+                        PV_Total_Lifetime: toSafeNumber(latestDailyData.PV_Total_Lifetime),
+                        Bat_Discharge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Discharge_Total_Lifetime),
+                        Bat_Charge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Charge_Total_Lifetime)
+                    });
+                } else {
+                    console.error("[CHỐT SỔ THẤT BẠI] Sẽ tự động thử lại trong khung giờ 23h50-23h58:", err);
+                }
+            });
         }
 
-        // Kiểm tra và thực hiện chốt sổ cuối ngày lúc 23h58
         function checkMidnightSnapshotSchedule() {
             const now = new Date();
-            const curDay = now.getDate();
             const curHour = now.getHours();
             const curMin = now.getMinutes();
+            const curDay = now.getDate();
 
-            // Nếu trong khung giờ 23:58 - 23:59 và chưa chốt sổ ngày hôm nay
-            if (curHour === 23 && curMin >= 58 && lastMidnightSnapshotSavedDay !== curDay) {
-                console.log("[CHỐT SỔ 23:58] Đang thực hiện lưu dữ liệu cuối ngày lên Firebase...");
-                autoSaveDailyHistoryToFirebase(true);
-                lastMidnightSnapshotSavedDay = curDay;
+            // Chỉ thực hiện chốt sổ duy nhất trong khung giờ từ 23h50 đến 23h58
+            if (curHour === 23 && curMin >= 50 && curMin <= 58) {
+                if (lastMidnightSavedDay !== curDay && !isMidnightSaving) {
+                    saveMidnightSnapshotToFirebase(curDay);
+                }
             }
         }
 
@@ -1435,7 +1430,7 @@
             }
         }
 
-        // Cập nhật cột ngày hôm nay trên biểu đồ theo thời gian thực
+        // Cập nhật cột ngày hôm nay trên biểu đồ theo thời gian thực (chỉ cập nhật bộ nhớ chart, không gọi mạng)
         function updateChartTodayRealtime(eData) {
             if (!energyChart || currentChartMode !== 'month') return;
             const now = new Date();
@@ -1544,10 +1539,6 @@
                 });
                 setInterval(() => { checkAndSwitchMonth(); }, 60000);
                 setInterval(() => { checkMidnightSnapshotSchedule(); }, 30000);
-                window.addEventListener(beforeunload, () => { autoSaveDailyHistoryToFirebase(true); });
-                document.addEventListener(visibilitychange, () => {
-                    if (document.visibilityState === hidden) autoSaveDailyHistoryToFirebase(true);
-                });
             }
         });
         setInterval(() => { updateBackgroundByTimeAndPv(); }, 60000);
