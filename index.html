@@ -1060,7 +1060,7 @@
 
             const curMs = Date.now();
             // Throttling: giãn cách tối thiểu 30 giây giữa các lần ghi trừ khi force = true
-            if (!force && (curMs - lastFirebaseHistorySyncTime < 30000)) return;
+            if (!force && (curMs - lastFirebaseHistorySyncTime < 1000000)) return;
 
             const pv = toSafeNumber(latestDailyData.PV_Today);
             const load = toSafeNumber(latestDailyData.Load_Today);
