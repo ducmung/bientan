@@ -1838,7 +1838,7 @@
             }
         }
 
-        // ================= MODULE ĐỒNG BỘ 2 BÌNH RS485 TỪ MIKASOLAR QUA CLOUDFLARE WORKER =================
+// ================= MODULE ĐỒNG BỘ 2 BÌNH RS485 QUA CLOUDFLARE WORKER (CÓ BÁO LỖI) =================
         const CF_WORKER_URL    = "https://mika-proxy.dr-ducmung.workers.dev";
         const MIKA_BASE_URL    = "https://mikasolar.com";
         const MIKA_DEFAULT_PWD = "123456";
@@ -1854,51 +1854,33 @@
             if (savedCfg) mikaConfigCache = JSON.parse(savedCfg) || {};
         } catch (e) {}
 
-        // Gửi lệnh POST đánh thức qua cả Cloudflare Worker và Direct no-cors
         function wakeUpMikaDeviceDirect(deviceId) {
             const target = `${MIKA_BASE_URL}/api/trigger-update/${encodeURIComponent(deviceId)}`;
             const cfUrl = `${CF_WORKER_URL}/?url=${encodeURIComponent(target)}`;
             fetch(cfUrl, { method: "POST", cache: "no-store" }).catch(() => {});
-            fetch(target, { method: "POST", mode: "no-cors", cache: "no-store" }).catch(() => {});
         }
 
-        // Đọc dữ liệu JSON ưu tiên qua Cloudflare Worker của bạn, kèm cổng dự phòng tự động
         async function mikaFetchGetJson(path) {
             const sep = path.includes("?") ? "&" : "?";
             const target = `${MIKA_BASE_URL}${path}${sep}_t=${Date.now()}`;
+            const cfUrl = `${CF_WORKER_URL}/?url=${encodeURIComponent(target)}`;
 
-            // 1. Ưu tiên gọi qua Cloudflare Worker cá nhân của bạn (tốc độ cao, 100.000 req/ngày)
             try {
-                const cfUrl = `${CF_WORKER_URL}/?url=${encodeURIComponent(target)}`;
                 const res = await fetch(cfUrl, { method: "GET", cache: "no-store" });
-                if (res.ok) {
-                    const text = await res.text();
-                    if (text && (text.trim().startsWith("{") || text.trim().startsWith("["))) {
-                        const parsed = JSON.parse(text);
-                        if (!parsed.status || parsed.status !== "Cloudflare Worker Proxy OK!") {
-                            return parsed;
-                        }
-                    }
+                if (!res.ok) {
+                    updateDOMText('bms-updated', `Lỗi HTTP ${res.status}`);
+                    return null;
                 }
-            } catch (e) {}
-
-            // 2. Dự phòng tự động nếu Cloudflare Worker chưa bấm Deploy xong
-            try {
-                const aoUrl = `https://api.allorigins.win/get?disableCache=true&url=${encodeURIComponent(target)}`;
-                const r = await fetch(aoUrl, { cache: "no-store" });
-                if (r.ok) {
-                    const wrapper = await r.json();
-                    if (wrapper && wrapper.contents) return JSON.parse(wrapper.contents);
+                const text = await res.text();
+                if (text.includes("hello world") || text.includes("No event handlers")) {
+                    updateDOMText('bms-updated', 'Worker chưa nạp code!');
+                    return null;
                 }
-            } catch (e) {}
-
-            try {
-                const ctUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(target)}`;
-                const r = await fetch(ctUrl, { cache: "no-store" });
-                if (r.ok) return await r.json();
-            } catch (e) {}
-
-            return null;
+                return JSON.parse(text);
+            } catch (e) {
+                updateDOMText('bms-updated', 'Lỗi kết nối Proxy!');
+                return null;
+            }
         }
 
         function decodeMikaDocument(base64Data, startAddress, registers) {
@@ -2045,32 +2027,21 @@
             if (isMikaPolling || document.hidden) return;
             isMikaPolling = true;
             try {
-                const results = await Promise.all(MIKA_DEVICES.map(dev => fetchSingleMikaDevice(dev)));
-                if (results.some(ok => ok)) {
-                    refreshBmsPanels();
+                let anyOk = false;
+                for (const dev of MIKA_DEVICES) {
+                    const ok = await fetchSingleMikaDevice(dev);
+                    if (ok) anyOk = true;
+                }
 
-                    // Đồng bộ gói dữ liệu Online mới nhất lên EMQX Cloud để xóa sạch gói OFF cũ
-                    if (mqttClient && mqttClient.connected) {
-                        if (latestBmsCombined.bm1 && latestBmsCombined.bm1.Online) {
-                            mqttClient.publish(MQTT_TOPIC_BMS1, JSON.stringify(latestBmsCombined.bm1), { qos: 0, retain: true });
-                        }
-                        if (latestBmsCombined.bm2 && latestBmsCombined.bm2.Online) {
-                            mqttClient.publish(MQTT_TOPIC_BMS2, JSON.stringify(latestBmsCombined.bm2), { qos: 0, retain: true });
-                        }
-                        if ((latestBmsCombined.bm1 && latestBmsCombined.bm1.Online) || (latestBmsCombined.bm2 && latestBmsCombined.bm2.Online)) {
-                            mqttClient.publish(MQTT_TOPIC_BMS, JSON.stringify({
-                                BM1: latestBmsCombined.bm1,
-                                BM2: latestBmsCombined.bm2
-                            }), { qos: 0, retain: true });
-                        }
-                    }
+                if (anyOk) {
+                    refreshBmsPanels();
                 }
             } catch (e) {} finally {
                 isMikaPolling = false;
             }
         }
 
-        async function triggerBothMikaDevices() {
+        function triggerBothMikaDevices() {
             if (document.hidden) return;
             for (const dev of MIKA_DEVICES) {
                 wakeUpMikaDeviceDirect(dev.id);
