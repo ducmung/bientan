@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sosen Energy Dashboard V3.4 - Full Sync MQTT & Dual JK BMS</title>
+    <title>Sosen Energy Dashboard - Hệ Thống Pin Đồng Bộ</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- THƯ VIỆN MQTT WEBSOCKET TRÌNH DUYỆT -->
@@ -20,22 +20,12 @@
             position: relative;
         }
         body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: -2;
+            content: ""; position: fixed; inset: 0; z-index: -2;
             background: url('1279_High_Defination_(HDTV).jpg') no-repeat center center / cover;
-            transform: translateZ(0);
-            pointer-events: none;
+            transform: translateZ(0); pointer-events: none;
         }
-
         body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            opacity: 0;
-            pointer-events: none;
+            content: ""; position: fixed; inset: 0; z-index: -1; opacity: 0; pointer-events: none;
             background-repeat: repeat;
             background-image:
                 radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.95), transparent),
@@ -44,19 +34,13 @@
                 radial-gradient(1.4px 1.4px at 168px 164px, rgba(255,255,255,0.86), transparent),
                 radial-gradient(1.8px 1.8px at 44px 178px, rgba(185,230,255,0.88), transparent),
                 radial-gradient(1.4px 1.4px at 190px 22px, rgba(255,255,255,0.8), transparent);
-            background-size: 220px 220px;
-            transition: opacity 0.8s ease;
-            will-change: opacity, transform;
-            transform: translateZ(0);
+            background-size: 220px 220px; transition: opacity 0.8s ease; will-change: opacity, transform; transform: translateZ(0);
         }
-
         body.night-stars { background: #000; }
         body.night-stars::before { z-index: 0; background: #000; }
         body.night-stars::after { z-index: 0; opacity: 0; animation: none; }
 
-        .app-container { 
-            position: relative; z-index: 1; display: flex; flex-direction: column; gap: 20px; max-width: 1000px; margin: 0 auto; transform: translateZ(0); 
-        }
+        .app-container { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 20px; max-width: 1000px; margin: 0 auto; transform: translateZ(0); }
 
         .diagram-panel {
             position: relative; width: 100%; max-width: 500px; margin: 0 auto; aspect-ratio: 1 / 1.1;
@@ -65,25 +49,12 @@
             backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.42);
             overflow: hidden; isolation: isolate; transform: translateZ(0);
         }
-
         .diagram-panel::before {
             content: ""; position: absolute; inset: 8%; border-radius: 50%;
             background: radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 2px), conic-gradient(from 0deg, transparent, rgba(255,215,0,0.18), transparent, rgba(0,229,255,0.16), transparent);
             animation: softSpin 22s linear infinite; z-index: -1; transform: translateZ(0);
         }
-
-        body.night-stars .diagram-panel {
-            background: #000; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85), inset 0 0 16px rgba(255,255,255,0.06), 0 0 28px rgba(0,229,255,0.16);
-            backdrop-filter: none; -webkit-backdrop-filter: none;
-        }
-
-        body.night-stars .diagram-panel::before {
-            inset: 0; border-radius: inherit; z-index: 0; opacity: 0.62;
-            background: radial-gradient(2px 2px at 12% 11%, rgba(255,255,255,0.94), transparent), radial-gradient(1.8px 1.8px at 43% 8%, rgba(255,247,205,0.9), transparent), radial-gradient(1.8px 1.8px at 76% 18%, rgba(180,226,255,0.88), transparent), radial-gradient(1.5px 1.5px at 20% 43%, rgba(185,230,255,0.86), transparent), radial-gradient(1.6px 1.6px at 68% 34%, rgba(255,255,255,0.88), transparent), radial-gradient(1.5px 1.5px at 82% 63%, rgba(255,255,255,0.82), transparent), radial-gradient(2px 2px at 88% 46%, rgba(255,247,205,0.94), transparent), radial-gradient(1.8px 1.8px at 27% 61%, rgba(170,220,255,0.86), transparent), radial-gradient(1.5px 1.5px at 15% 76%, rgba(255,255,255,0.9), transparent), radial-gradient(1.8px 1.8px at 58% 85%, rgba(180,226,255,0.88), transparent), radial-gradient(2px 2px at 92% 82%, rgba(255,247,205,0.92), transparent), radial-gradient(1.2px 1.2px at 34% 92%, rgba(255,255,255,0.8), transparent), radial-gradient(1.6px 1.6px at 54% 22%, rgba(185,230,255,0.85), transparent), radial-gradient(1.8px 1.8px at 38% 54%, rgba(255,255,255,0.95), transparent), radial-gradient(2px 2px at 70% 70%, rgba(255,247,205,0.88), transparent), radial-gradient(1.4px 1.4px at 8% 28%, rgba(255,255,255,0.82), transparent), radial-gradient(1.5px 1.5px at 85% 25%, rgba(180,226,255,0.8), transparent), radial-gradient(2.2px 2.2px at 45% 75%, rgba(255,255,255,0.9), transparent), radial-gradient(1.8px 1.8px at 62% 12%, rgba(255,247,205,0.85), transparent), radial-gradient(1.5px 1.5px at 95% 55%, rgba(255,255,255,0.88), transparent), radial-gradient(1.6px 1.6px at 25% 88%, rgba(170,220,255,0.9), transparent), radial-gradient(2px 2px at 50% 45%, rgba(255,255,255,0.92), transparent);
-            background-size: 100% 100%; animation: panelStarTwinkle 2.2s ease-in-out infinite alternate; pointer-events: none; transform: translateZ(0);
-        }
-
-        @keyframes panelStarTwinkle { from { opacity: 0.52; transform: scale(1) translateZ(0); } 55% { opacity: 1; transform: scale(1.006) translateZ(0); } to { opacity: 0.76; transform: scale(1.012) translateZ(0); } }
+        body.night-stars .diagram-panel { background: #000; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85); backdrop-filter: none; -webkit-backdrop-filter: none; }
         @keyframes softSpin { to { transform: rotate(360deg) translateZ(0); } }
 
         .diagram-panel::after, .stat-card::after, .node-center::after, .image-frame::after, #update-clock::after, #lbl-inv-temp::after {
@@ -93,14 +64,12 @@
             -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
             animation: rainbowSlide 3s linear infinite, rainbowBorderGlow 1.5s ease-in-out infinite alternate; transform: translateZ(0);
         }
-
         .diagram-panel::after { z-index: 4; inset: 0; border-radius: 20px; }
         .stat-card::after { z-index: 2; inset: 0; border-radius: 20px; }
         .image-frame::after { z-index: 2; inset: 0; border-radius: 15px; padding: 4px; }
         .node-center::after { z-index: -1; border-radius: 15px; }
         #update-clock::after { z-index: -1; border-radius: 20px; }
         #lbl-inv-temp::after { z-index: -1; border-radius: 20px; }
-
         @keyframes rainbowSlide { to { background-position: -200% 0; } }
         @keyframes rainbowBorderGlow { from { opacity: 0.7; } to { opacity: 1; } }
 
@@ -117,7 +86,6 @@
             width: 140px; padding: 4px; border-radius: 15px; overflow: hidden;
             background: linear-gradient(90deg, #ff004c, #ff8c00, #ffd700, #00cc66, #00e5ff, #4169ff, #b000ff, #ff004c, #ff8c00);
             background-size: 200% 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 12px rgba(0,229,255,0.32);
-            animation: rainbowSlide 3s linear infinite, rainbowBorderGlow 1.5s ease-in-out infinite alternate;
         }
         .image-frame img { position: relative; z-index: 1; width: 100%; height: auto; display: block; border-radius: 11px; transform: translateZ(0); }
 
@@ -132,7 +100,7 @@
             position: absolute; top: 69%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
             font-size: 14px; font-weight: 900; background: #00cc66; color: #fff;
             padding: 4px 16px; border-radius: 20px; z-index: 20; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
+            white-space: nowrap; transition: background-color 0.5s ease;
         }
         
         .bpf-container { position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15; text-align: center; width: 100%; pointer-events: none; }
@@ -140,12 +108,7 @@
             font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 32px; font-weight: 900; letter-spacing: 14px;
             position: relative; display: inline-block; background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
             -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.55));
-            animation: goldPulse 2.6s ease-in-out infinite alternate; margin-left: 14px;
-        }
-        @keyframes goldPulse { from { opacity: 0.88; transform: translateZ(0); } to { opacity: 1; transform: translateY(-1px) translateZ(0); } }
-        .bpf-text::after {
-            content: attr(data-text); position: absolute; left: 0; top: 0; z-index: -1; -webkit-text-fill-color: transparent; background: none;
-            text-shadow: 1px 1px 0 #ff0000, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 0 #660000, 5px 5px 0 #330000, 6px 6px 12px rgba(255, 0, 0, 0.8);
+            margin-left: 14px;
         }
 
         .line { position: absolute; height: 26px; margin-top: -13px; background: transparent; width: 44%; z-index: 1; transform: translateZ(0); pointer-events: none; }
@@ -154,285 +117,135 @@
         .line-batt { top: 82%; left: 16%; transform-origin: left center; transform: rotate(-38deg) translateZ(0); }
         .line-load { top: 82%; right: 16%; transform-origin: right center; transform: rotate(38deg) translateZ(0); }
         
-        #lbl-status {
-            position: relative; z-index: 1; display: block; margin: 0 0 5px 0; transform: translateZ(0); font-size: 11px; font-weight: 900;
-            background: transparent; padding: 0; border-radius: 0; box-shadow: none; color: #a8b0ba; text-align: center; white-space: nowrap; transition: color 0.5s;
-        }
-
+        #lbl-status { font-size: 11px; font-weight: 900; color: #a8b0ba; text-align: center; margin-bottom: 5px; }
         .battery-mini-meter {
-            --mini-color: #888; --mini-glow: rgba(255,255,255,0.45);
             position: absolute; top: 50%; left: 18%; transform: translate(-50%, -50%) translateZ(0);
-            z-index: 25; min-width: 112px; padding: 6px 9px 9px 9px; border-radius: 16px;
-            background: rgba(12, 18, 30, 0.72); border: 1px solid rgba(255,255,255,0.36); box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 14px var(--mini-glow);
-            overflow: hidden; pointer-events: none; color: #fff;
+            z-index: 25; min-width: 112px; padding: 6px 9px; border-radius: 16px;
+            background: rgba(12, 18, 30, 0.72); border: 1px solid rgba(255,255,255,0.36); color: #fff;
         }
-        .battery-mini-meter::before {
-            content: ""; position: absolute; inset: 0; opacity: 0.62; background: linear-gradient(90deg, transparent 0%, var(--mini-glow) 48%, transparent 100%);
-            transform: translateX(-120%) translateZ(0); animation: miniEnergySweep 1.7s linear infinite; pointer-events: none;
-        }
-        .battery-mini-meter.charge { --mini-color: #00cc66; --mini-glow: rgba(0, 204, 102, 0.48); }
-        .battery-mini-meter.discharge { --mini-color: #ff4444; --mini-glow: rgba(255, 68, 68, 0.48); }
-        .battery-mini-meter.idle { --mini-color: #a8b0ba; --mini-glow: rgba(168, 176, 186, 0.28); }
-        .battery-mini-row { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10px; font-weight: 900; line-height: 1.15; }
-        .battery-mini-row + .battery-mini-row { margin-top: 3px; }
-        .battery-mini-label { color: rgba(255,255,255,0.78); }
-        .battery-mini-value { color: #fff; text-shadow: 0 0 6px var(--mini-color), 0 1px 3px rgba(0,0,0,0.85); font-variant-numeric: tabular-nums; }
-        @keyframes miniEnergySweep { to { transform: translateX(120%) translateZ(0); } }
-
-        .node h3 { font-size: 10px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
-        .node .unit { font-size: 10px; color: rgba(255,255,255,0.86); font-weight: 800; }
+        .battery-mini-row { display: flex; justify-content: space-between; font-size: 10px; font-weight: 900; margin-top: 3px; }
         .corner-node { width: 96px; padding: 0 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .corner-power { order: 1; transform: translateY(-13px) translateZ(0); line-height: 1; position: relative; z-index: 12; text-align: center; pointer-events: none; }
-        .corner-power h3 { margin: 0 0 3px 0; }
-        .corner-power .val { display: block; font-size: 18px; line-height: 1; }
-        .corner-power .unit { display: block; line-height: 1.05; margin-top: 2px; }
-        .corner-node .battery-wrapper, .corner-node .icon { order: 2; position: relative; z-index: 11; }
-        .pos-batt.corner-node .battery-wrapper { margin: -2px auto 0 auto; transform: translate(4px, -2px) translateZ(0); }
-        .pos-batt.corner-node .battery-wrapper:hover { transform: translate(4px, -2px) scale(1.05) translateZ(0); }
-        .pos-batt.corner-node .battery-body { width: 92px; height: 40px; border-radius: 5px; }
-        .pos-batt.corner-node .battery-cap { width: 7px; height: 19px; border-radius: 0 4px 4px 0; }
-        .pos-batt.corner-node #lbl-soc { font-size: 21px; }
-        
-        .battery-temp-label {
-            order: 3; position: relative; z-index: 13; margin-top: 1px; transform: translate(4px, -1px) translateZ(0); display: inline-flex;
-            align-items: center; justify-content: center; gap: 4px; min-width: auto; padding: 0; border-radius: 0; font-size: 11px;
-            font-weight: 900; line-height: 1.1; background: transparent; border: none; box-shadow: none; white-space: nowrap; pointer-events: none;
-        }
-        .battery-temp-label .temp-icon { color: rgba(255,255,255,0.82); text-shadow: 0 1px 3px rgba(0,0,0,0.75); }
-        .battery-temp-label .temp-value { color: #7dffb2; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,255,178,0.35); transition: color 0.35s ease, text-shadow 0.35s ease; font-variant-numeric: tabular-nums; }
-        .battery-temp-label.temp-cool .temp-value { color: #7ddfff; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,223,255,0.38); }
-        .battery-temp-label.temp-normal .temp-value { color: #38ff7a; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 9px rgba(56,255,122,0.48); }
-        .battery-temp-label.temp-warm .temp-value { color: #ffd600; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 10px rgba(255,214,0,0.52); }
-        .battery-temp-label.temp-hot .temp-value { color: #ff3b30; text-shadow: 0 1px 3px rgba(0,0,0,0.88), 0 0 10px rgba(255,59,48,0.62); }
-        .battery-temp-label.temp-danger .temp-value { color: #ff1f1f; text-shadow: 0 1px 3px rgba(0,0,0,0.92), 0 0 8px #ff0000, 0 0 16px rgba(255,0,0,0.92); animation: batteryTempDangerBlink 0.72s steps(2, end) infinite; }
-        @keyframes batteryTempDangerBlink { 0%, 45% { opacity: 1; transform: scale(1) translateZ(0); filter: brightness(1.15); } 46%, 100% { opacity: 0.22; transform: scale(1.06) translateZ(0); filter: brightness(1.8); } }
-        .battery-temp-label.temp-stale .temp-value { color: #a8b0ba; text-shadow: 0 1px 3px rgba(0,0,0,0.75); animation: none; }
-        
-        .pos-load.corner-node .icon { margin: -10px auto 0 auto; transform: translate(6px, 3px) translateZ(0); }
-        .pos-load.corner-node .img-icon { width: 78px; height: 78px; margin: -8px auto 0 auto; }
-        
-        .icon { font-size: 46px; line-height: 1; margin-bottom: 8px; display: inline-block; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
-        .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)); }
-        .img-icon { width: 85px; height: 85px; object-fit: cover; display: block; margin: -10px auto 5px auto; filter: brightness(1.1) contrast(1.1); -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); transform: translateZ(0); }
-        .pos-load .icon { filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.8)); }
+        .corner-power { order: 1; transform: translateY(-13px) translateZ(0); text-align: center; pointer-events: none; }
+        .corner-power h3 { margin: 0 0 3px 0; font-size: 10px; color: #f6f8ff; font-weight: 800; }
+        .corner-power .val { font-size: 18px; line-height: 1; }
+        .corner-power .unit { font-size: 10px; color: rgba(255,255,255,0.86); font-weight: 800; }
 
-        .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; cursor: pointer; transition: transform 0.2s ease, filter 0.2s ease; transform: translateZ(0); }
-        .battery-wrapper:hover { transform: scale(1.05) translateZ(0); filter: drop-shadow(0 0 8px rgba(0, 204, 102, 0.5)); }
-        .battery-body { width: 72px; height: 32px; background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%); border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); border-right: 1px solid #111; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8); transform: translateZ(0); }
-        .battery-body::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.05) 100%); pointer-events: none; z-index: 2; }
-        .battery-cap { width: 5px; height: 14px; background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%); border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.3); border-left: none; box-shadow: inset 1px 0 3px rgba(255,255,255,0.6); }
-        .battery-fill { height: 100%; width: 0%; transition: width 0.5s ease-in-out, background 0.5s; position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); transform: translateZ(0); }
-        .fill-red { background: linear-gradient(to bottom, #ff5555 0%, #ffaaaa 30%, #ff2222 70%, #aa0000 100%); }
-        .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
-        .fill-green { background: linear-gradient(to bottom, #00ee77 0%, #88ffbb 30%, #00bb55 70%, #007733 100%); }
-        #lbl-soc { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a; text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6); letter-spacing: 1px; margin: 0; }
-        
-        .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
-        .val-pv-style { color: #ffffff !important; text-shadow: 0 1px 0 #b45309, 0 2px 0 #92400e, 0 3px 0 #78350f, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(245, 158, 11, 0.9) !important; font-size: 18px; }
-        .val-load-style { color: #ffffff !important; text-shadow: 0 1px 0 #1d4ed8, 0 2px 0 #1e40af, 0 3px 0 #1e3a8a, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(59, 130, 246, 0.9) !important; font-size: 18px; }
-        .val-grid-buy-style { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
-        .val-grid-sell-style { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
-        .pos-grid { width: 118px; }
-        .grid-live-mode { margin-top: 4px; min-height: 15px; font-size: 10px; font-weight: 900; line-height: 1.15; letter-spacing: 0.1px; white-space: nowrap; transition: color 0.25s ease, text-shadow 0.25s ease, opacity 0.25s ease; font-variant-numeric: tabular-nums; }
-        .grid-live-mode.buy { color: #ff5b6e; text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(255,68,68,0.55); }
-        .grid-live-mode.sell { color: #22e58a; text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 9px rgba(0,204,102,0.55); }
-        .grid-live-mode.idle { color: rgba(255,255,255,0.9); text-shadow: 0 1px 3px rgba(0,0,0,0.75); }
-        .grid-live-mode.no-grid, .grid-live-mode.stale { color: #ffb74d; text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 8px rgba(255,183,77,0.4); }
-        .val-charge { color: #ffffff !important; text-shadow: 0 1px 0 #059669, 0 2px 0 #047857, 0 3px 0 #065f46, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(16, 185, 129, 0.9) !important; font-size: 18px; }
-        .val-discharge { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
-        
-        .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; --c: #00e5ff; transform: translateZ(0); }
-        .flow-track {
-            position: absolute; top: 50%; left: -4%; width: 108%; height: 8px; transform: translateY(-50%) translateZ(0); border-radius: 999px;
-            background: repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 9px, rgba(255,255,255,0.86) 10px 12px, rgba(255,255,255,0) 13px 22px), linear-gradient(90deg, rgba(255,255,255,0.04) 0%, var(--c) 18%, #ffffff 50%, var(--c) 82%, rgba(255,255,255,0.04) 100%);
-            background-size: 44px 100%, 100% 100%; box-shadow: 0 0 8px var(--c), inset 0 0 5px rgba(255,255,255,0.75); opacity: 0.9; animation: electricWireSlide var(--wire-speed, 1s) linear infinite; z-index: 1;
-        }
-        .flow-track::before { content: ''; position: absolute; left: -10px; right: -10px; top: 50%; height: 20px; transform: translateY(-50%) translateZ(0); border-radius: 999px; background: radial-gradient(ellipse at center, var(--c) 0%, rgba(255,255,255,0.08) 36%, rgba(255,255,255,0) 72%); opacity: 0.38; z-index: -1; }
-        .flow-track::after { content: ''; position: absolute; left: 2%; right: 2%; top: 50%; height: 2px; transform: translateY(-50%) translateZ(0); border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,0.15), #ffffff 48%, rgba(255,255,255,0.15)); box-shadow: 0 0 7px #fff; }
-        .flow-dash {
-            position: absolute; top: 50%; width: 13px; height: 13px; border-radius: 50%; opacity: 0; z-index: 3;
-            background: radial-gradient(circle at 35% 35%, #ffffff 0 18%, rgba(255,255,255,0.95) 19% 30%, var(--c) 46%, rgba(255,255,255,0) 74%); box-shadow: 0 0 8px #fff, 0 0 14px var(--c); transform: translate(-50%, -50%) translateZ(0);
-        }
-        .flow-dash::before { content: ''; position: absolute; top: 50%; width: 34px; height: 4px; border-radius: 999px; transform: translateY(-50%) translateZ(0); opacity: 0.82; }
-        .dir-right .flow-dash::before { right: 8px; background: linear-gradient(90deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
-        .dir-left .flow-dash::before { left: 8px; background: linear-gradient(270deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
-        .flow-dash::after { content: ''; position: absolute; width: 3px; height: 3px; border-radius: 50%; top: -3px; right: 1px; background: #ffffff; box-shadow: -8px 9px 0 rgba(255,255,255,0.74), 6px 11px 0 var(--c); }
-        .flow-spark { position: absolute; top: 50%; width: 4px; height: 4px; border-radius: 50%; opacity: 0; z-index: 4; background: #ffffff; box-shadow: 0 0 6px #fff, 0 0 13px var(--c); transform: translate(-50%, -50%) translateZ(0); }
-        .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.28s; } .flow-dash:nth-child(4) { animation-delay: 0.56s; } .flow-dash:nth-child(5) { animation-delay: 0.84s; } .flow-dash:nth-child(6) { animation-delay: 1.12s; } .flow-dash:nth-child(7) { animation-delay: 1.40s; } .flow-dash:nth-child(8) { animation-delay: 1.68s; }
-        .flow-spark:nth-child(9) { animation-delay: 0.12s; } .flow-spark:nth-child(10) { animation-delay: 0.38s; } .flow-spark:nth-child(11) { animation-delay: 0.72s; } .flow-spark:nth-child(12) { animation-delay: 1.02s; } .flow-spark:nth-child(13) { animation-delay: 1.34s; } .flow-spark:nth-child(14) { animation-delay: 1.66s; }
-        @keyframes electricWireSlide { to { background-position: 44px 0, 0 0; } }
-        @keyframes flowInL { 0% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
-        @keyframes flowOutL { 0% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
-        @keyframes flowInR { 0% { right: -8%; opacity: 0; transform: translate(50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(50%, -50%) scale(1.06) translateZ(0); } 100% { right: 108%; opacity: 0; transform: translate(50%, -50%) scale(0.55) translateZ(0); } }
-        @keyframes flowOutR { 0% { right: 108%; opacity: 0; transform: translate(50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(50%, -50%) scale(1.06) translateZ(0); } 100% { right: -8%; opacity: 0; transform: translate(50%, -50%) scale(0.55) translateZ(0); } }
-        @keyframes sparkRight { 0% { left: -5%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.35) translateZ(0); } 12% { opacity: 1; } 36% { top: 38%; } 62% { top: 62%; } 100% { left: 105%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65) translateZ(0); } }
-        @keyframes sparkLeft { 0% { left: 105%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.35) translateZ(0); } 12% { opacity: 1; } 36% { top: 62%; } 62% { top: 38%; } 100% { left: -5%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65) translateZ(0); } }
+        .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; cursor: pointer; }
+        .battery-body { width: 72px; height: 32px; background: #111; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); position: relative; overflow: hidden; }
+        .battery-cap { width: 5px; height: 14px; background: #888; border-radius: 0 3px 3px 0; }
+        .battery-fill { height: 100%; width: 0%; position: absolute; top: 0; left: 0; transition: width 0.5s ease-in-out; }
+        .fill-red { background: #ff4444; } .fill-yellow { background: #ffaa00; } .fill-green { background: #00cc66; }
+        #lbl-soc { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0); font-size: 18px; font-weight: 900; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
+        .battery-temp-label { font-size: 11px; font-weight: 900; color: #7dffb2; margin-top: 2px; }
+
+        .val { font-size: 16px; font-weight: 900; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
+        .val-pv-style { color: #fff !important; text-shadow: 0 2px 0 #92400e, 0 0 12px rgba(245, 158, 11, 0.9) !important; font-size: 18px; }
+        .val-load-style { color: #fff !important; text-shadow: 0 2px 0 #1e40af, 0 0 12px rgba(59, 130, 246, 0.9) !important; font-size: 18px; }
+        .val-charge { color: #00cc66 !important; } .val-discharge { color: #ff4444 !important; }
+
+        .flow-group { display: none; width: 100%; height: 100%; position: absolute; inset: 0; --c: #00e5ff; }
+        .flow-track { position: absolute; top: 50%; left: -4%; width: 108%; height: 8px; transform: translateY(-50%) translateZ(0); border-radius: 999px; background: linear-gradient(90deg, transparent, var(--c), transparent); opacity: 0.9; }
 
         .stats-panel { display: flex; flex-direction: column; gap: 15px; }
-        .stat-card { position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255, 255, 255, 0.78)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.5); border-radius: 20px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateZ(0); }
-        .stat-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 42%, transparent 70%); transform: translateX(-120%) translateZ(0); animation: cardSheen 5.5s ease-in-out infinite; pointer-events: none; }
-        @keyframes cardSheen { 0%, 48% { transform: translateX(-120%) translateZ(0); } 78%, 100% { transform: translateX(120%) translateZ(0); } }
+        .stat-card { position: relative; overflow: hidden; background: rgba(255,255,255,0.85); backdrop-filter: blur(6px); border-radius: 20px; padding: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-        .energy-chart-card { padding: 14px; background: rgba(255,255,255,0.94); }
-        .energy-chart-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; position: relative; z-index: 2; }
-        .chart-btn-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .chart-btn { min-width: 74px; border: 0; background: #e8e8e8; color: #111; padding: 10px 14px; border-radius: 24px; font-size: 13px; font-weight: 900; letter-spacing: 0; cursor: pointer; box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease; }
-        .chart-btn:active, .chart-nav-btn:active, .day-nav-btn:active { transform: translateY(1px); }
-        .chart-btn.active { background: #11c878; color: #fff; box-shadow: 0 6px 14px rgba(17,200,120,0.28); }
-        .chart-period-control { display: grid; grid-template-columns: 30px minmax(118px, 1fr) 30px; align-items: center; min-width: 206px; background: #fff; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-        .chart-nav-btn, .day-nav-btn { height: 38px; border: 0; background: transparent; color: #8b8b8b; font-size: 26px; font-weight: 900; line-height: 1; cursor: pointer; }
-        .chart-period-label { min-width: 118px; height: 38px; display: grid; place-items: center; border-left: 1px solid rgba(0,0,0,0.08); border-right: 1px solid rgba(0,0,0,0.08); color: #111; font-size: 20px; font-weight: 900; letter-spacing: 0; white-space: nowrap; }
-        .chart-stage { position: relative; height: 275px; width: 100%; margin-top: 8px; padding-top: 30px; }
-        .chart-day-corner { position: absolute; top: 0; right: 2px; z-index: 3; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.92); border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 18px; padding: 1px 7px; }
-        .day-nav-btn { width: 24px; height: 26px; font-size: 19px; color: #777; }
-        .chart-selected-label { min-width: 68px; text-align: center; color: #111; font-size: 12px; font-weight: 900; white-space: nowrap; }
-        .chart-detail-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; position: relative; z-index: 2; }
-        .chart-detail-card { border: 1px solid rgba(0,0,0,0.08); background: #fff; border-radius: 8px; padding: 10px 8px; min-height: 78px; box-shadow: 0 3px 10px rgba(0,0,0,0.07); overflow: hidden; }
-        .chart-detail-card .label { display: flex; align-items: center; gap: 5px; color: #4a4a4a; font-size: 11px; font-weight: 900; line-height: 1.2; white-space: nowrap; }
-        .chart-color-dot { flex: 0 0 10px; width: 10px; height: 10px; border-radius: 2px; }
-        .chart-detail-card .value { margin-top: 8px; color: #111; font-size: 22px; font-weight: 900; line-height: 1; white-space: nowrap; }
-        .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
-        .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
-
-        /* ================= JK BMS CARD STYLES (CHUẨN ẢNH 681e1b.jpg & KHÔNG CẮT CHỮ) ================= */
-        .bms-card { background: linear-gradient(135deg, rgba(16,18,27,0.97), rgba(30,27,42,0.95)); border: 1px solid rgba(0,255,114,0.42); color: #f5fff8; padding: 14px 12px; }
-        .bms-card .stat-header { align-items: center; gap: 10px; margin-bottom: 10px; }
-        .bms-card .stat-header h2 { color: #eafff2; line-height: 1.15; font-size: 15px; }
-        .bms-updated { color: #a7ffcb; font-size: 11px; font-weight: 900; white-space: nowrap; }
-        .bms-board-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; position: relative; z-index: 1; }
-        .bms-board { min-width: 0; border: 1px solid rgba(0,255,114,0.36); border-radius: 14px; background: rgba(8,12,18,0.86); box-shadow: inset 0 0 18px rgba(0,255,114,0.06); padding: 9px 8px; overflow: hidden; }
+        /* ================= BẢNG HỆ THỐNG PIN (TỐI ƯU CỰC NÉT CHO DI ĐỘNG) ================= */
+        .bms-card { background: linear-gradient(135deg, rgba(16,18,27,0.97), rgba(30,27,42,0.95)); border: 1px solid rgba(0,255,114,0.42); color: #f5fff8; padding: 12px 8px; }
+        .bms-card .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .bms-card .stat-header h2 { color: #eafff2; font-size: 15px; font-weight: 800; letter-spacing: 0.3px; }
+        .bms-updated { color: #a7ffcb; font-size: 11px; font-weight: 900; font-family: monospace; }
+        .bms-board-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+        .bms-board { border: 1px solid rgba(0,255,114,0.36); border-radius: 12px; background: rgba(8,12,18,0.86); padding: 7px 5px; }
         .bms-board.offline { border-color: rgba(255,68,68,0.42); opacity: 0.85; }
-        .bms-topbar { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
-        .bms-id-chip, .bms-runtime-chip, .bms-cycle-chip { border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; background: rgba(255,255,255,0.06); color: #fff; font-size: 8.5px; font-weight: 900; line-height: 1.1; padding: 5px 5px; white-space: nowrap; }
-        .bms-id-chip { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+        .bms-topbar { display: flex; justify-content: space-between; align-items: center; gap: 2px; }
+        .bms-id-chip, .bms-runtime-chip, .bms-cycle-chip { border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; background: rgba(255,255,255,0.06); color: #fff; font-size: 8px; font-weight: 900; padding: 2px 4px; white-space: nowrap; line-height: 1.1; }
         .bms-id-chip strong { color: #00ff72; }
-        .bms-runtime-chip { color: #ffd34e; text-align: center; flex: 0 1 auto; }
-        .bms-cycle-chip { color: #ffd34e; text-align: center; flex: 0 0 auto; }
-        .bms-online { display: inline-block; margin-left: 3px; color: #00ff72; font-size: 8px; }
+        .bms-online { color: #00ff72; margin-left: 2px; }
         .bms-board.offline .bms-online { color: #ff4b4b; }
-        .bms-status-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: 7px; }
-        .bms-flag { display: flex; align-items: center; justify-content: space-between; gap: 3px; min-width: 0; border: 1px solid rgba(0,255,114,0.38); border-radius: 12px; background: rgba(0,80,28,0.34); color: #fff; font-size: 8.5px; font-weight: 900; line-height: 1; padding: 3px 4px 3px 5px; }
-        .bms-flag span:first-child { min-width: 0; overflow: hidden; white-space: nowrap; }
-        .bms-flag-value { flex: 0 0 auto; min-width: 24px; border-radius: 8px; color: #fff; text-align: center; padding: 2px 4px; background: #555; font-size: 8px; }
+        .bms-status-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; margin-top: 5px; }
+        .bms-flag { display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,255,114,0.38); border-radius: 8px; background: rgba(0,80,28,0.34); color: #fff; font-size: 7.5px; font-weight: 900; padding: 2px 3px; }
+        .bms-flag-value { border-radius: 5px; padding: 1px 3px; background: #555; font-size: 7.5px; }
         .bms-flag-value.on { background: #12d83f; color: #001805; }
         .bms-flag-value.off { background: #40434a; color: #fff; }
-        .bms-core { display: grid; place-items: center; min-height: 132px; margin: 8px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
-        .bms-soc-ring { width: 112px; aspect-ratio: 1; border: 4.5px solid #00ff72; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 0 24px rgba(0,255,114,0.18), inset 0 0 24px rgba(0,0,0,0.42); }
-        .bms-soc { color: #00ff72; font-size: 27px; font-weight: 900; line-height: 1; white-space: nowrap; }
-        .bms-pill { min-width: 74px; border: 1px solid rgba(0,255,114,0.7); border-radius: 12px; background: rgba(0,80,28,0.42); color: #fff; text-align: center; font-size: 11.5px; font-weight: 900; line-height: 1; padding: 4px 6px; white-space: nowrap; }
-        .bms-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
-        .bms-metric { min-width: 0; min-height: 50px; border: 1px solid rgba(0,255,114,0.34); border-radius: 8px; background: rgba(0,80,28,0.28); padding: 6px 4px; overflow: hidden; }
-        button.bms-metric { width: 100%; font-family: inherit; text-align: left; cursor: pointer; }
-        .bms-temp-toggle { position: relative; }
-        .bms-temp-toggle::after { content: "⋯"; position: absolute; right: 4px; top: 4px; color: rgba(255,255,255,0.72); font-size: 12px; line-height: 1; }
-        .bms-metric .value { display: block; color: #00ff72; font-size: 13.5px; font-weight: 900; line-height: 1.1; white-space: nowrap; }
-        .bms-metric .label { display: block; margin-top: 5px; color: #d9ffe7; font-size: 7.5px; font-weight: 900; line-height: 1.1; letter-spacing: -0.2px; text-transform: uppercase; white-space: nowrap; }
-        .bms-metric.warn .value { color: #ffd34e; }
-        .bms-metric.danger .value { color: #ff334d; }
-        .bms-temp-detail { display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; margin-top: 5px; }
-        .bms-board.temps-open .bms-temp-detail { display: grid; }
-        .bms-temp-chip { min-width: 0; border: 1px solid rgba(255,211,78,0.42); border-radius: 8px; background: rgba(255,211,78,0.12); padding: 6px 4px; overflow: hidden; }
-        .bms-temp-chip .value { display: block; color: #ffd34e; font-size: 13px; font-weight: 900; line-height: 1.1; white-space: nowrap; }
-        .bms-temp-chip .label { display: block; margin-top: 5px; color: #fff4c5; font-size: 8px; font-weight: 900; line-height: 1.1; text-transform: uppercase; white-space: nowrap; }
-        .bms-power-row { margin-top: 9px; color: #fff; font-size: 11.5px; font-weight: 900; line-height: 1.2; }
-        .bms-power-row span { color: #00ff72; font-size: 14.5px; }
-        .bms-power-bar { height: 8px; margin-top: 5px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; }
-        .bms-power-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9affbf, #00cc66); transition: width 0.35s ease; }
-
-        @media (max-width: 620px) {
-            .energy-chart-toolbar { align-items: stretch; flex-direction: column; }
-            .chart-btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-            .chart-btn { min-width: 0; padding: 9px 8px; font-size: 12px; }
-            .chart-period-control { width: 100%; grid-template-columns: 38px 1fr 38px; }
-            .chart-stage { height: 245px; padding-top: 32px; }
-            .chart-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .bms-card { padding: 12px 8px; }
-            .bms-board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-            .bms-board { padding: 7px 6px; }
-            .bms-soc-ring { width: 100px; }
-            .bms-soc { font-size: 24px; }
-            .bms-pill { min-width: 68px; font-size: 10.5px; padding: 3px 5px; }
-        }
+        
+        .bms-core { display: grid; place-items: center; min-height: 110px; margin: 6px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: radial-gradient(circle, rgba(0,255,114,0.12) 0%, rgba(0,0,0,0.5) 70%); }
+        .bms-soc-ring { width: 92px; aspect-ratio: 1; border: 3.5px solid #00ff72; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 0 16px rgba(0,255,114,0.2); }
+        .bms-soc { color: #00ff72; font-size: 21px; font-weight: 900; line-height: 1; }
+        .bms-pill { min-width: 60px; border: 1px solid rgba(0,255,114,0.7); border-radius: 8px; background: rgba(0,80,28,0.42); color: #fff; text-align: center; font-size: 9.5px; font-weight: 900; padding: 2px 4px; font-variant-numeric: tabular-nums; }
+        
+        .bms-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; }
+        .bms-metric { border: 1px solid rgba(0,255,114,0.34); border-radius: 6px; background: rgba(0,80,28,0.28); padding: 4px 1px; text-align: center; min-width: 0; }
+        button.bms-metric { cursor: pointer; font-family: inherit; }
+        .bms-metric .value { color: #00ff72; font-size: 10px; font-weight: 900; line-height: 1.1; display: block; font-variant-numeric: tabular-nums; letter-spacing: -0.4px; white-space: nowrap; }
+        .bms-metric .label { color: #d9ffe7; font-size: 6.5px; font-weight: 800; text-transform: uppercase; display: block; margin-top: 2px; letter-spacing: -0.3px; white-space: nowrap; }
+        .bms-metric.warn .value { color: #ffd34e; } .bms-metric.danger .value { color: #ff334d; }
+        
+        .bms-temp-detail { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; margin-top: 3px; }
+        .bms-temp-chip { border: 1px solid rgba(255,211,78,0.42); border-radius: 6px; background: rgba(255,211,78,0.12); padding: 3px 1px; text-align: center; }
+        .bms-temp-chip .value { color: #ffd34e; font-size: 10px; font-weight: 900; font-variant-numeric: tabular-nums; }
+        .bms-temp-chip .label { color: #fff4c5; font-size: 6.5px; font-weight: 800; display: block; margin-top: 1px; }
+        
+        /* PHẦN CÔNG SUẤT ĐÃ ĐƯỢC THU NHỎ RẤT GỌN */
+        .bms-power-row { margin-top: 6px; font-size: 9.5px; font-weight: 700; color: #a8b0ba; display: flex; align-items: baseline; justify-content: space-between; }
+        .bms-power-row span { color: #00ff72; font-size: 11px; font-weight: 900; font-variant-numeric: tabular-nums; }
+        .bms-power-bar { height: 6px; margin-top: 3px; border-radius: 999px; background: rgba(255,255,255,0.15); overflow: hidden; }
+        .bms-power-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #9affbf, #00cc66); transition: width 0.35s ease; }
 
         .money-card { background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95)); border: 1px solid rgba(218, 165, 32, 0.65); }
-        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 1; }
-        .stat-header h2 { font-size: 16px; color: #444; }
-        .list-detail { font-size: 13px; color: #555; position: relative; z-index: 1; }
-        .list-detail div { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 4px; }
-        .list-detail div:last-child { border: none; }
-        .list-detail span { font-weight: 800; color: #111; white-space: nowrap; }
+        .list-detail { font-size: 13px; color: #555; }
+        .list-detail div { display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 3px; }
+        .list-detail span { font-weight: 800; color: #111; }
 
-        @media (max-width: 400px) {
-            #update-clock { font-size: 11px; padding: 4px 8px; }
-            #lbl-status { font-size: 10px; }
-            .bpf-text { font-size: 26px; letter-spacing: 8px; }
-            .image-frame { width: 120px; top: 14%; } 
-            .node-center { width: 105px; height: 115px; } 
-            #lbl-inv-temp { top: 70%; }
-            .battery-mini-meter { top: 50%; min-width: 96px; padding: 5px 7px 8px 7px; }
-            .battery-mini-row { font-size: 9px; }
-        }
-        @media (min-width: 768px) {
-            .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
-            .diagram-panel { flex: 1; max-width: none; }
-            .stats-panel { flex: 1; justify-content: center; }
-        }
+        .energy-chart-card { padding: 14px; background: rgba(255,255,255,0.94); }
+        .energy-chart-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .chart-btn-group { display: flex; gap: 6px; }
+        .chart-btn { border: 0; background: #e8e8e8; color: #111; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: 900; cursor: pointer; }
+        .chart-btn.active { background: #11c878; color: #fff; }
+        .chart-period-control { display: flex; align-items: center; background: #fff; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; }
+        .chart-nav-btn { border: 0; background: transparent; font-size: 20px; font-weight: 900; padding: 4px 10px; cursor: pointer; color: #666; }
+        .chart-period-label { font-size: 15px; font-weight: 900; padding: 0 10px; }
+        .chart-stage { position: relative; height: 260px; width: 100%; margin-top: 8px; }
+        .chart-day-corner { position: absolute; top: 0; right: 0; z-index: 3; display: flex; align-items: center; background: #fff; border-radius: 12px; padding: 1px 6px; border: 1px solid rgba(0,0,0,0.1); }
+        .day-nav-btn { border: 0; background: transparent; font-size: 16px; cursor: pointer; }
+        .chart-detail-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
+        .chart-detail-card { border: 1px solid rgba(0,0,0,0.08); background: #fff; border-radius: 8px; padding: 8px 6px; text-align: center; }
+        .chart-detail-card .label { font-size: 10px; font-weight: 900; color: #666; }
+        .chart-detail-card .value { font-size: 18px; font-weight: 900; margin-top: 4px; }
+        .chart-detail-card .sub { font-size: 9px; color: #888; }
 
-        .solar-sun-box{ width: 82px; height: 82px; margin: auto; position: relative; transform: translate(-8px, -6px) translateZ(0); }
-        #solar-sun{ width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; transition: all 0.5s ease; transform: translateZ(0); }
-        #sun-canvas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0); width: 230px; height: 230px; pointer-events: none; z-index: 0; transition: filter 0.5s ease; }
-        .sun-core{ position: relative; z-index: 2; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle, #ffffff 0%, #fff8c8 20%, #ffe56a 45%, #ffbf00 75%, #ff9800 100%); box-shadow: 0 0 20px #fff7c5, 0 0 40px #ffd700, 0 0 80px #ffb300, 0 0 120px rgba(255,190,0,.7); animation: sunPulse 2s ease-in-out infinite; transform: translateZ(0); }
-        #solar-sun::before{ content:""; position:absolute; width:112px; height:112px; border-radius:50%; background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,220,80,.2) 40%, transparent 75%); animation: haloPulse 2.5s ease-in-out infinite; pointer-events: none; z-index: 1; transform: translateZ(0); }
-        @keyframes sunPulse{ 0%{ transform: scale(1) translateZ(0); opacity: 0.9; } 50%{ transform: scale(1.05) translateZ(0); opacity: 1; } 100%{ transform: scale(1) translateZ(0); opacity: 0.9; } }
-        @keyframes haloPulse{ 0%{ opacity: 0.7; transform: scale(1) translateZ(0); } 50%{ opacity: 1; transform: scale(1.1) translateZ(0); } 100%{ opacity: 0.7; transform: scale(1) translateZ(0); } }
+        .solar-sun-box { width: 82px; height: 82px; margin: auto; position: relative; }
+        #solar-sun { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        #sun-canvas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 230px; height: 230px; pointer-events: none; }
+        .sun-core { width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle, #fff 0%, #ffd700 80%, #ff9800 100%); box-shadow: 0 0 30px #ffd700; }
+        #update-clock.status-clock { top: 48%; left: calc(50% + 66px); right: 12px; position: absolute; z-index: 25; background: #fff; border-radius: 9px; padding: 5px; text-align: center; }
+        #clock-time-text { font-size: 12px; font-weight: 900; color: #ff0000; font-family: monospace; }
+        .clock-status-row { display: flex; gap: 4px; margin-bottom: 2px; }
+        .clock-grid-status, #device-status { font-size: 7px; font-weight: 900; padding: 2px 4px; border-radius: 4px; background: #eee; }
+        .clock-grid-status.on, #device-status.online { color: #00cc66; background: rgba(0,204,102,0.1); }
+        .clock-grid-status.off, #device-status.offline { color: #ff3333; background: rgba(255,51,51,0.1); }
 
-        .sun-lvl-0 { opacity: 0.15; filter: brightness(0.25) grayscale(0.8); } .sun-lvl-1 { opacity: 0.55; filter: brightness(0.68) drop-shadow(0 0 5px rgba(255, 215, 0, 0.28)); } .sun-lvl-2 { opacity: 0.72; filter: brightness(0.90) drop-shadow(0 0 10px rgba(255, 215, 0, 0.50)); } .sun-lvl-3 { opacity: 0.85; filter: brightness(1.10) drop-shadow(0 0 14px rgba(255, 215, 0, 0.65)); } .sun-lvl-4 { opacity: 0.95; filter: brightness(1.30) drop-shadow(0 0 18px rgba(255, 215, 0, 0.78)); } .sun-lvl-5 { opacity: 1.00; filter: brightness(1.48) drop-shadow(0 0 22px rgba(255, 215, 0, 0.88)); } .sun-lvl-6 { opacity: 1.00; filter: brightness(1.68) drop-shadow(0 0 28px rgba(255, 215, 0, 0.98)); }
-
-        #update-clock.status-clock { top: 48%; left: calc(50% + 66px); right: 12px; width: auto; min-width: 0; max-width: 150px; transform: translateY(-50%) translateZ(0); padding: 5px 6px 6px 6px; border-radius: 9px; gap: 3px; letter-spacing: 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; position: absolute; z-index: 25; background: rgba(255, 255, 255, 0.95); box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 5px rgba(255,255,255,1); }
-        #update-clock.status-clock::after { border-radius: 9px; }
-        #clock-time-text { font-size: 12px; letter-spacing: 1.2px; line-height: 1; color: #ff0000; font-family: monospace; font-weight: 900; }
-        .clock-status-row { gap: 4px; width: 100%; flex-wrap: nowrap; display: flex; align-items: center; justify-content: center; line-height: 1; }
-        .clock-grid-status, #update-clock #device-status { flex: 1 1 0; min-width: 0; padding: 2px 3px; border-radius: 5px; font-size: 7px; gap: 3px; letter-spacing: 0; display: inline-flex; align-items: center; justify-content: center; font-weight: 900; background: rgba(10, 16, 28, 0.12); border: 1px solid rgba(0,0,0,0.07); }
-        .clock-grid-dot, #update-clock #device-status .device-dot { width: 5px; height: 5px; flex: 0 0 5px; border-radius: 50%; }
-
-        .clock-grid-status.on, #update-clock #device-status.online { color: #00a94f; background: rgba(0, 204, 102, 0.10); }
-        .clock-grid-status.on .clock-grid-dot, #update-clock #device-status.online .device-dot { background: #00cc66; box-shadow: 0 0 6px rgba(0, 204, 102, 0.8); }
-        .clock-grid-status.off, #update-clock #device-status.offline { color: #e32121; background: rgba(255, 68, 68, 0.10); animation: clockStatusBlink 1s ease-in-out infinite alternate; }
-        .clock-grid-status.off .clock-grid-dot, #update-clock #device-status.offline .device-dot { background: #ff3333; box-shadow: 0 0 6px rgba(255, 51, 51, 0.85); }
-        .clock-grid-status.unknown, .clock-grid-status.stale, #update-clock #device-status.checking { color: #b77900; background: rgba(255, 193, 7, 0.10); }
-        .clock-grid-status.unknown .clock-grid-dot, .clock-grid-status.stale .clock-grid-dot, #update-clock #device-status.checking .device-dot { background: #ffb000; box-shadow: 0 0 5px rgba(255, 176, 0, 0.75); }
-        
-        @keyframes clockStatusBlink { from { opacity: 0.62; } to { opacity: 1; } }
-
-        @media (max-width: 600px) {
-            #update-clock.status-clock { top: 48%; left: calc(50% + 58px); right: 8px; width: auto; min-width: 0; max-width: none; transform: translateY(-50%) translateZ(0); padding: 4px 5px 5px 5px; border-radius: 8px; gap: 3px; }
-            #update-clock.status-clock::after { border-radius: 8px; }
-            #clock-time-text { font-size: 11px; letter-spacing: 1px; }
-            .clock-status-row { gap: 3px; }
-            .clock-grid-status, #update-clock #device-status { font-size: 6.8px; padding: 2px; border-radius: 4px; gap: 2px; }
-            .clock-grid-dot, #update-clock #device-status .device-dot { width: 4px; height: 4px; flex-basis: 4px; }
+        @media (max-width: 620px) {
+            .bms-card { padding: 10px 6px; }
+            .bms-board-grid { gap: 5px; }
+            .bms-board { padding: 6px 4px; }
+            .energy-chart-toolbar { flex-direction: column; align-items: stretch; gap: 8px; }
+            .chart-detail-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
-<body data-dashboard-version="V3.4 - Full Sync MQTT Live, Cloudflare Dual BMS & Firebase">
+<body data-dashboard-version="V3.5 - Full Sync Dual JK BMS">
     <div class="app-container">
         <div class="diagram-panel">
-            <div id="battery-mini-meter" class="battery-mini-meter idle">
+            <div id="battery-mini-meter" class="battery-mini-meter">
                 <div id="lbl-status">Đang tải...</div>
-                <div class="battery-mini-row"><span class="battery-mini-label">Áp</span><span class="battery-mini-value" id="mini-stat-v">-- V</span></div>
-                <div class="battery-mini-row"><span class="battery-mini-label">Dòng</span><span class="battery-mini-value" id="mini-stat-a">-- A</span></div>
+                <div class="battery-mini-row"><span>Áp</span><span id="mini-stat-v">-- V</span></div>
+                <div class="battery-mini-row"><span>Dòng</span><span id="mini-stat-a">-- A</span></div>
             </div>
             
-            <div id="update-clock" class="status-clock" title="Trạng thái lưới, ESP32 và thời điểm nhận dữ liệu Live gần nhất qua MQTT">
+            <div id="update-clock" class="status-clock">
                 <div class="clock-status-row">
-                    <span id="clock-grid-status" class="clock-grid-status unknown">
-                        <span class="clock-grid-dot"></span>
-                        <span id="clock-grid-status-text">GRID --</span>
-                    </span>
-                    <span id="device-status" class="checking">
-                        <span class="device-dot"></span>
-                        <span id="device-status-text">ESP32 ...</span>
-                    </span>
+                    <span id="clock-grid-status" class="clock-grid-status">GRID --</span>
+                    <span id="device-status" class="clock-grid-status">ESP32 ...</span>
                 </div>
                 <div id="clock-time-text">--:--:--</div>
             </div>
@@ -441,21 +254,20 @@
                 <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image" onerror="this.style.opacity='0'">
             </div>
 
-            <!-- NODE BIẾN TẦN TRUNG TÂM -->
             <div class="node-center pos-inv">
                 <img src="68.jpg" alt="Inverter" onerror="this.style.opacity='0'">
             </div>
 
             <div id="lbl-inv-temp">🌡️ --°C</div>
 
-            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
-            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
-            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
-            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div></div></div>
+            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div></div></div>
+            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div></div></div>
+            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div></div></div>
 
             <div class="node pos-pv">
                 <div class="solar-sun-box">
-                    <div id="solar-sun" class="sun-lvl-0">
+                    <div id="solar-sun">
                         <canvas id="sun-canvas"></canvas>
                         <div class="sun-core"></div>
                     </div>
@@ -468,30 +280,26 @@
                 <h3>LƯỚI EVN</h3>
                 <div class="val" id="lbl-grid">0</div>
                 <div class="unit">W</div>
-                <div id="lbl-grid-mode" class="grid-live-mode idle" style="display:none"></div>
             </div>
 
             <div class="node pos-batt corner-node">
                 <div class="corner-power"><h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div></div>
-                <div class="battery-wrapper" onclick="window.open('https://mikasolar.com/14058648', '_blank')" title="Nhấn để xem chi tiết Pin">
+                <div class="battery-wrapper" onclick="window.open('https://mikasolar.com/14058648', '_blank')" title="Xem chi tiết trên MikaSolar">
                     <div class="battery-body"><div class="battery-fill" id="batt-fill"></div><div id="lbl-soc">0%</div></div>
                     <div class="battery-cap"></div>
                 </div>
-                <div id="lbl-batt-temp" class="battery-temp-label temp-stale">
-                    <span class="temp-icon">🌡️</span><span id="lbl-batt-temp-value" class="temp-value">--°C</span>
-                </div>
+                <div id="lbl-batt-temp" class="battery-temp-label">🌡️ --°C</div>
             </div>
 
             <div class="node pos-load corner-node">
                 <div class="corner-power"><h3>TIÊU THỤ</h3><div class="val val-load-style" id="lbl-load">0</div><div class="unit">W</div></div>
-                <div class="icon"><img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon" onerror="this.style.opacity='0'"></div>
+                <div class="icon"><img src="gerirlgerirlger.png" alt="Tải tiêu thụ" style="width:75px;height:75px;" onerror="this.style.opacity='0'"></div>
             </div>
 
             <div class="bpf-container"><div class="bpf-text" data-text="八方來財">八方來財</div></div>
         </div>
 
         <div class="stats-panel">
-            <!-- 1. THỐNG KÊ NĂNG LƯỢNG -->
             <div class="stat-card">
                 <div class="stat-header"><h2>📊 THỐNG KÊ NĂNG LƯỢNG</h2></div>
                 <div class="list-detail">
@@ -500,32 +308,30 @@
                     <div>🗼 Lấy lưới hôm nay: <span id="stat-grid-buy">0 kWh</span></div>
                     <div>🔋 Pin đã xả (Nay): <span id="stat-bat-dis">0 kWh</span></div>
                     <div>⚡ Pin đã sạc (Nay): <span id="stat-bat-chg">0 kWh</span></div>
-                    
                     <div style="color: #b000ff;">🔋 Tổng Pin đã xả: <span id="stat-bat-dis-total">0 kWh</span></div>
                     <div style="color: #ff8c00;">⚡ Tổng Pin đã sạc: <span id="stat-bat-chg-total">0 kWh</span></div>
-                    
                     <div style="color: #d35400;">🌐 E_Total (PV Trọn đời): <span id="stat-pv-total">0 kWh</span></div>
                 </div>
             </div>
 
-            <!-- 2. KHUNG JK BMS (ĐỒNG BỘ 2 BÌNH 14058648 & 14058648-1 QUA CLOUDFLARE WORKER) -->
+            <!-- BẢNG HỆ THỐNG PIN (CALB & GOTION) -->
             <div class="stat-card bms-card">
                 <div class="stat-header">
-                    <h2>🔋 JK BMS BLUETOOTH</h2>
+                    <h2>🔋 HỆ THỐNG PIN</h2>
                     <div class="bms-updated" id="bms-updated">--:--:--</div>
                 </div>
                 <div class="bms-board-grid">
-                    <!-- BMS 1: 14058648 (CALB) -->
+                    <!-- BMS 1: CALB (14058648) -->
                     <section class="bms-board offline" id="bm1-card">
                         <div class="bms-topbar">
-                            <div class="bms-id-chip">B1:<strong id="bm1-name">CALB</strong><span class="bms-online" id="bm1-online">OFF</span></div>
+                            <div class="bms-id-chip"><strong>CALB</strong><span class="bms-online" id="bm1-online">OFF</span></div>
                             <div class="bms-runtime-chip"><span id="bm1-runtime">--</span></div>
                             <div class="bms-cycle-chip">CK:<span id="bm1-cycle-top">--</span></div>
                         </div>
                         <div class="bms-status-row">
                             <div class="bms-flag"><span>SẠC</span><span class="bms-flag-value off" id="bm1-charge-state">OFF</span></div>
                             <div class="bms-flag"><span>XẢ</span><span class="bms-flag-value off" id="bm1-discharge-state">OFF</span></div>
-                            <div class="bms-flag"><span>C.BẰNG</span><span class="bms-flag-value off" id="bm1-balance-state">OFF</span></div>
+                            <div class="bms-flag"><span>C.B</span><span class="bms-flag-value off" id="bm1-balance-state">OFF</span></div>
                         </div>
                         <div class="bms-core">
                             <div class="bms-soc-ring">
@@ -535,13 +341,13 @@
                             </div>
                         </div>
                         <div class="bms-metric-grid">
-                            <div class="bms-metric"><span class="value" id="bm1-cell-high">--</span><span class="label">CELL CAO</span></div>
-                            <div class="bms-metric danger"><span class="value" id="bm1-cell-low">--</span><span class="label">CELL THẤP</span></div>
-                            <div class="bms-metric"><span class="value" id="bm1-cell-diff">--</span><span class="label">LỆCH CELL</span></div>
+                            <div class="bms-metric"><span class="value" id="bm1-cell-high">--</span><span class="label">CAO</span></div>
+                            <div class="bms-metric danger"><span class="value" id="bm1-cell-low">--</span><span class="label">THẤP</span></div>
+                            <div class="bms-metric"><span class="value" id="bm1-cell-diff">--</span><span class="label">LỆCH</span></div>
                             <div class="bms-metric"><span class="value" id="bm1-balance-current">--</span><span class="label">DÒNG CB</span></div>
-                            <div class="bms-metric"><span class="value" id="bm1-capacity">--</span><span class="label">DUNG LƯỢNG</span></div>
+                            <div class="bms-metric"><span class="value" id="bm1-capacity">--</span><span class="label">D.LƯỢNG</span></div>
                             <div class="bms-metric"><span class="value" id="bm1-remain">--</span><span class="label">CÒN LẠI</span></div>
-                            <button type="button" class="bms-metric warn bms-temp-toggle" onclick="toggleBmsTemps('bm1')" title="Xem nhiệt độ T1-T4"><span class="value" id="bm1-mos-temp">--</span><span class="label">NHIỆT ĐỘ</span></button>
+                            <div class="bms-metric warn"><span class="value" id="bm1-mos-temp">--</span><span class="label">NHIỆT ĐỘ</span></div>
                             <div class="bms-metric"><span class="value" id="bm1-health">--</span><span class="label">TUỔI THỌ</span></div>
                         </div>
                         <div class="bms-temp-detail" id="bm1-temp-detail">
@@ -550,21 +356,21 @@
                             <div class="bms-temp-chip"><span class="value" id="bm1-t3">--</span><span class="label">T3 (°C)</span></div>
                             <div class="bms-temp-chip"><span class="value" id="bm1-t4">--</span><span class="label">T4 (°C)</span></div>
                         </div>
-                        <div class="bms-power-row">CÔNG SUẤT (W): <span id="bm1-power">--</span></div>
+                        <div class="bms-power-row">Công Suất: <span id="bm1-power">--</span></div>
                         <div class="bms-power-bar"><div class="bms-power-fill" id="bm1-power-fill"></div></div>
                     </section>
 
-                    <!-- BMS 2: 14058648-1 (GOTION) -->
+                    <!-- BMS 2: GOTION (14058648-1) -->
                     <section class="bms-board offline" id="bm2-card">
                         <div class="bms-topbar">
-                            <div class="bms-id-chip">B2:<strong id="bm2-name">GOTION</strong><span class="bms-online" id="bm2-online">OFF</span></div>
+                            <div class="bms-id-chip"><strong>GOTION</strong><span class="bms-online" id="bm2-online">OFF</span></div>
                             <div class="bms-runtime-chip"><span id="bm2-runtime">--</span></div>
                             <div class="bms-cycle-chip">CK:<span id="bm2-cycle-top">--</span></div>
                         </div>
                         <div class="bms-status-row">
                             <div class="bms-flag"><span>SẠC</span><span class="bms-flag-value off" id="bm2-charge-state">OFF</span></div>
                             <div class="bms-flag"><span>XẢ</span><span class="bms-flag-value off" id="bm2-discharge-state">OFF</span></div>
-                            <div class="bms-flag"><span>C.BẰNG</span><span class="bms-flag-value off" id="bm2-balance-state">OFF</span></div>
+                            <div class="bms-flag"><span>C.B</span><span class="bms-flag-value off" id="bm2-balance-state">OFF</span></div>
                         </div>
                         <div class="bms-core">
                             <div class="bms-soc-ring">
@@ -574,13 +380,13 @@
                             </div>
                         </div>
                         <div class="bms-metric-grid">
-                            <div class="bms-metric"><span class="value" id="bm2-cell-high">--</span><span class="label">CELL CAO</span></div>
-                            <div class="bms-metric danger"><span class="value" id="bm2-cell-low">--</span><span class="label">CELL THẤP</span></div>
-                            <div class="bms-metric"><span class="value" id="bm2-cell-diff">--</span><span class="label">LỆCH CELL</span></div>
+                            <div class="bms-metric"><span class="value" id="bm2-cell-high">--</span><span class="label">CAO</span></div>
+                            <div class="bms-metric danger"><span class="value" id="bm2-cell-low">--</span><span class="label">THẤP</span></div>
+                            <div class="bms-metric"><span class="value" id="bm2-cell-diff">--</span><span class="label">LỆCH</span></div>
                             <div class="bms-metric"><span class="value" id="bm2-balance-current">--</span><span class="label">DÒNG CB</span></div>
-                            <div class="bms-metric"><span class="value" id="bm2-capacity">--</span><span class="label">DUNG LƯỢNG</span></div>
+                            <div class="bms-metric"><span class="value" id="bm2-capacity">--</span><span class="label">D.LƯỢNG</span></div>
                             <div class="bms-metric"><span class="value" id="bm2-remain">--</span><span class="label">CÒN LẠI</span></div>
-                            <button type="button" class="bms-metric warn bms-temp-toggle" onclick="toggleBmsTemps('bm2')" title="Xem nhiệt độ T1-T4"><span class="value" id="bm2-mos-temp">--</span><span class="label">NHIỆT ĐỘ</span></button>
+                            <div class="bms-metric warn"><span class="value" id="bm2-mos-temp">--</span><span class="label">NHIỆT ĐỘ</span></div>
                             <div class="bms-metric"><span class="value" id="bm2-health">--</span><span class="label">TUỔI THỌ</span></div>
                         </div>
                         <div class="bms-temp-detail" id="bm2-temp-detail">
@@ -589,24 +395,21 @@
                             <div class="bms-temp-chip"><span class="value" id="bm2-t3">--</span><span class="label">T3 (°C)</span></div>
                             <div class="bms-temp-chip"><span class="value" id="bm2-t4">--</span><span class="label">T4 (°C)</span></div>
                         </div>
-                        <div class="bms-power-row">CÔNG SUẤT (W): <span id="bm2-power">--</span></div>
+                        <div class="bms-power-row">Công Suất: <span id="bm2-power">--</span></div>
                         <div class="bms-power-bar"><div class="bms-power-fill" id="bm2-power-fill"></div></div>
                     </section>
                 </div>
             </div>
 
-            <!-- 3. QUY ĐỔI TIỀN ĐIỆN -->
             <div class="stat-card money-card">
                 <div class="stat-header"><h2 style="color: #b8860b;">💰 QUY ĐỔI TIỀN ĐIỆN (EVN)</h2></div>
                 <div class="list-detail">
-                    <div>Hôm nay (<span id="money-pv-today">0</span> kWh): <span id="money-today" style="font-size: 15px; color: #ffaa00; font-weight: 900;">0 đ</span></div>
-                    <div>Tháng này (<span id="money-pv-month">0</span> kWh): <span id="money-month" style="font-size: 15px; color: #ff4444; font-weight: 900;">0 đ</span></div>
-                    <div>Năm nay/Trọn đời (<span id="money-pv-total">0</span> kWh): <span id="money-total" style="font-size: 16px; color: #00cc66; font-weight: 900;">0 đ</span></div>
+                    <div>Hôm nay (<span id="money-pv-today">0</span> kWh): <span id="money-today" style="color:#ffaa00;font-weight:900;">0 đ</span></div>
+                    <div>Tháng này (<span id="money-pv-month">0</span> kWh): <span id="money-month" style="color:#ff4444;font-weight:900;">0 đ</span></div>
+                    <div>Năm nay/Trọn đời (<span id="money-pv-total">0</span> kWh): <span id="money-total" style="color:#00cc66;font-weight:900;">0 đ</span></div>
                 </div>
-                <div style="font-size: 10px; color: #888; text-align: right; margin-top: 5px; font-style: italic; position: relative; z-index: 1;">*Hệ thống tự động đồng bộ Live & 2 BMS qua MQTT & Biểu đồ từ Firebase</div>
             </div>
 
-            <!-- 4. BIỂU ĐỒ NĂNG LƯỢNG -->
             <div class="stat-card energy-chart-card">
                 <div class="energy-chart-toolbar">
                     <div class="chart-btn-group">
@@ -615,1244 +418,115 @@
                         <button class="chart-btn" id="btn-chart-total" onclick="setChartMode('total')">TỔNG</button>
                     </div>
                     <div class="chart-period-control">
-                        <button class="chart-nav-btn" type="button" onclick="shiftChartPeriod(-1)" aria-label="Kỳ trước">‹</button>
+                        <button class="chart-nav-btn" onclick="shiftChartPeriod(-1)">‹</button>
                         <div class="chart-period-label" id="chart-period-label">2026-10</div>
-                        <button class="chart-nav-btn" type="button" onclick="shiftChartPeriod(1)" aria-label="Kỳ sau">›</button>
+                        <button class="chart-nav-btn" onclick="shiftChartPeriod(1)">›</button>
                     </div>
                 </div>
                 <div class="chart-stage">
                     <div class="chart-day-corner">
-                        <button class="day-nav-btn" type="button" onclick="moveChartDay(-1)" aria-label="Mốc trước">‹</button>
-                        <span class="chart-selected-label" id="chart-selected-label" onclick="toggleMonthTotalInChart()" title="Nhấn để xem Tổng Cả Tháng / Từng Ngày" style="cursor: pointer;">Ngày --</span>
-                        <button class="day-nav-btn" type="button" onclick="moveChartDay(1)" aria-label="Mốc sau">›</button>
+                        <button class="day-nav-btn" onclick="moveChartDay(-1)">‹</button>
+                        <span class="chart-selected-label" id="chart-selected-label">Ngày --</span>
+                        <button class="day-nav-btn" onclick="moveChartDay(1)">›</button>
                     </div>
                     <canvas id="energyChart"></canvas>
                 </div>
                 <div class="chart-detail-grid">
-                    <div class="chart-detail-card">
-                        <div class="label"><span class="chart-color-dot dot-pv"></span>Sản lượng PV</div>
-                        <div class="value" id="chart-detail-pv">0.0</div>
-                        <div class="sub">kWh</div>
-                    </div>
-                    <div class="chart-detail-card">
-                        <div class="label"><span class="chart-color-dot dot-batt"></span>Xả pin</div>
-                        <div class="value" id="chart-detail-batt">0.0</div>
-                        <div class="sub">kWh</div>
-                    </div>
-                    <div class="chart-detail-card">
-                        <div class="label"><span class="chart-color-dot dot-charge"></span>Sạc pin</div>
-                        <div class="value" id="chart-detail-charge">0.0</div>
-                        <div class="sub">kWh</div>
-                    </div>
-                    <div class="chart-detail-card">
-                        <div class="label"><span class="chart-color-dot dot-load"></span>Tiêu thụ</div>
-                        <div class="value" id="chart-detail-load">0.0</div>
-                        <div class="sub">kWh</div>
-                    </div>
+                    <div class="chart-detail-card"><div class="label">Sản lượng PV</div><div class="value" id="chart-detail-pv">0.0</div><div class="sub">kWh</div></div>
+                    <div class="chart-detail-card"><div class="label">Xả pin</div><div class="value" id="chart-detail-batt">0.0</div><div class="sub">kWh</div></div>
+                    <div class="chart-detail-card"><div class="label">Sạc pin</div><div class="value" id="chart-detail-charge">0.0</div><div class="sub">kWh</div></div>
+                    <div class="chart-detail-card"><div class="label">Tiêu thụ</div><div class="value" id="chart-detail-load">0.0</div><div class="sub">kWh</div></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- FIREBASE SDK V8 ĐỂ ĐỒNG BỘ CHART & DAILY ENERGY -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ================= CẤU HÌNH MQTT WEBSOCKET RIÊNG =================
-        const MQTT_WSS_URL     = "wss://ra12bb13.ala.asia-southeast1.emqxsl.com:8084/mqtt";
-        const MQTT_USER        = "ducmung";
-        const MQTT_PASSWORD    = "mungha8586";
-        const MQTT_TOPIC_DATA  = "sosen/data";
-        const MQTT_TOPIC_BMS   = "sosen/jk_bms";
-        const MQTT_TOPIC_BMS1  = "sosen/jk_bms1";
-        const MQTT_TOPIC_BMS2  = "sosen/jk_bms2";
-        
-        // Client ID ngẫu nhiên: Tránh bị Broker giữ kết nối cũ khi reload trang
-        const MQTT_CLIENT_ID   = "WebUser_" + Math.random().toString(16).substring(2, 10);
+        // ================= CẤU HÌNH MQTT & FIREBASE =================
+        const MQTT_WSS_URL  = "wss://ra12bb13.ala.asia-southeast1.emqxsl.com:8084/mqtt";
+        const MQTT_USER     = "ducmung";
+        const MQTT_PASSWORD = "mungha8586";
+        const MQTT_CLIENT_ID = "WebUser_" + Math.random().toString(16).substring(2, 10);
 
-        // ================= CẤU HÌNH FIREBASE LƯU TRỮ =================
         const firebaseConfig = { databaseURL: "https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app" };
         let database = null;
         if (typeof firebase !== 'undefined' && firebase.database) {
-            if (!firebase.apps || firebase.apps.length === 0) { firebase.initializeApp(firebaseConfig); }
+            if (!firebase.apps || firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
             database = firebase.database();
         }
 
-        const numberAnimState = {};
-        function animateValue(id, targetVal, formatFn, duration = 650) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            targetVal = Number(targetVal) || 0;
-            if (!numberAnimState[id]) {
-                numberAnimState[id] = { currentVal: targetVal, frameId: null };
-                el.innerText = formatFn(targetVal);
-                return;
-            }
-            const state = numberAnimState[id];
-            const startVal = state.currentVal;
-            if (Math.abs(startVal - targetVal) < 0.001) { el.innerText = formatFn(targetVal); return; }
-            if (state.frameId) cancelAnimationFrame(state.frameId);
-            const startTime = performance.now();
-            function step(now) {
-                const elapsed = now - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const ease = 1 - Math.pow(1 - progress, 3);
-                const current = startVal + (targetVal - startVal) * ease;
-                state.currentVal = current;
-                el.innerText = formatFn(current);
-                if (progress < 1) { state.frameId = requestAnimationFrame(step); } 
-                else { state.currentVal = targetVal; el.innerText = formatFn(targetVal); state.frameId = null; }
-            }
-            state.frameId = requestAnimationFrame(step);
-        }
-
-        function toSafeNumber(value, fallback = 0) { const number = Number(value); return Number.isFinite(number) ? number : fallback; }
-        function clampNumber(value, min, max) { return Math.min(max, Math.max(min, toSafeNumber(value, min))); }
-        function updateDOMText(id, newValue) { const el = document.getElementById(id); if (el && el.innerText !== String(newValue)) { el.innerText = newValue; } }
-
-        let currentSunLevel = 0; 
-        const sunRayCounts = [0, 12, 24, 36, 48, 60, 72];
-        let latestPvPowerW = 0;
-        let sunAnimationFrameId = null;
-        let sunCanvasRender = null;
-
-        function updateBackgroundByTimeAndPv(pvW = latestPvPowerW) {
-            const pvPower = toSafeNumber(pvW);
-            latestPvPowerW = pvPower;
-            const hour = new Date().getHours();
-            const isNightTime = hour >= 18 || hour < 6;
-            const shouldShowStars = isNightTime && pvPower < 1;
-            if (document.body) { document.body.classList.toggle('night-stars', shouldShowStars); }
-        }
-
-        function initCanvasSun() {
-            const canvas = document.getElementById('sun-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const size = 260; 
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            canvas.width = size * dpr;
-            canvas.height = size * dpr;
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            const cx = size / 2, cy = size / 2;
-            const rays = [];
-            const maxRays = 72;
-            for (let i = 0; i < maxRays; i++) {
-                rays.push({ angle: Math.random() * Math.PI * 2, baseLength: 30 + Math.random() * 80, width: 0.3 + Math.random() * 1.5, speed: 0.02 + Math.random() * 0.08, phase: Math.random() * Math.PI * 2, baseAlpha: 0.2 + Math.random() * 0.8 });
-            }
-            function animateCanvasSun(now) {
-                sunAnimationFrameId = null;
-                ctx.clearRect(0, 0, size, size);
-                const activeRaysCount = sunRayCounts[currentSunLevel] || 0;
-                if (document.hidden || activeRaysCount <= 0) return;
-                const time = now * 0.001;
-                for (let i = 0; i < activeRaysCount; i++) {
-                    const ray = rays[i];
-                    const currentLength = ray.baseLength + Math.sin(ray.phase + time * (ray.speed * 80)) * 15;
-                    const currentAlpha = ray.baseAlpha * (0.5 + Math.sin(ray.phase * 3 + time * 30) * 0.5);
-                    const angle = ray.angle + time * 0.05; 
-                    const x = cx + Math.cos(angle) * currentLength;
-                    const y = cy + Math.sin(angle) * currentLength;
-                    const grad = ctx.createLinearGradient(cx, cy, x, y);
-                    grad.addColorStop(0, `rgba(255, 255, 255, ${currentAlpha})`);
-                    grad.addColorStop(0.3, `rgba(255, 245, 150, ${currentAlpha * 0.8})`);
-                    grad.addColorStop(1, `rgba(255, 200, 0, 0)`);
-                    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.lineWidth = ray.width; ctx.strokeStyle = grad; ctx.stroke();
-                }
-                sunAnimationFrameId = requestAnimationFrame(animateCanvasSun);
-            }
-            sunCanvasRender = () => { if (sunAnimationFrameId === null && !document.hidden) { sunAnimationFrameId = requestAnimationFrame(animateCanvasSun); } };
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden && sunAnimationFrameId !== null) { cancelAnimationFrame(sunAnimationFrameId); sunAnimationFrameId = null; return; }
-                sunCanvasRender();
-            });
-            sunCanvasRender();
-        }
-
-        function updateSunLevelByPower(pvW) {
-            const pvPower = toSafeNumber(pvW);
-            let lvl = 0;
-            if (pvPower >= 7001) { lvl = 6; } else if (pvPower >= 5001) { lvl = 5; } else if (pvPower >= 3001) { lvl = 4; } else if (pvPower >= 2001) { lvl = 3; } else if (pvPower >= 1001) { lvl = 2; } else if (pvPower >= 11) { lvl = 1; }
-            const levelChanged = currentSunLevel !== lvl;
-            if (levelChanged) {
-                currentSunLevel = lvl;
-                const solarSun = document.getElementById('solar-sun');
-                if (solarSun) { solarSun.className = 'sun-lvl-' + lvl; }
-            }
-            if (sunCanvasRender && (lvl > 0 || levelChanged)) sunCanvasRender();
-        }
-
-        // ================= HÀM XỬ LÝ & HIỂN THỊ DỮ LIỆU JK BMS =================
-        function bmsRead(data, keys, fallback = null) {
-            if (!data || typeof data !== 'object') return fallback;
-            for (const key of keys) {
-                if (Object.prototype.hasOwnProperty.call(data, key) && data[key] !== undefined && data[key] !== null && data[key] !== '') {
-                    return data[key];
-                }
-            }
-            const lowerKeys = keys.map(key => String(key).toLowerCase());
-            for (const actualKey of Object.keys(data)) {
-                if (lowerKeys.includes(String(actualKey).toLowerCase()) && data[actualKey] !== undefined && data[actualKey] !== null && data[actualKey] !== '') {
-                    return data[actualKey];
-                }
-            }
-            return fallback;
-        }
-
-        function bmsNumber(data, keys, fallback = NaN) {
-            const value = bmsRead(data, keys, fallback);
-            const number = Number(value);
-            return Number.isFinite(number) ? number : fallback;
-        }
-
-        function bmsText(id, value) { updateDOMText(id, value); }
-        function bmsFormat(value, digits, suffix = '') {
-            const number = Number(value);
-            if (!Number.isFinite(number)) return '--' + suffix;
-            return number.toFixed(digits) + suffix;
-        }
-
-        function bmsFormatCompact(value, digits = 1) {
-            const number = Number(value);
-            if (!Number.isFinite(number)) return '--';
-            return number.toFixed(digits);
-        }
-
-        function bmsFlagState(value) {
-            if (value === true || value === 1) return true;
-            if (value === false || value === 0) return false;
-            const text = String(value || '').trim().toLowerCase();
-            if (['on', 'true', 'enable', 'enabled', 'yes', '1', 'bat', 'bật'].includes(text)) return true;
-            if (['off', 'false', 'disable', 'disabled', 'no', '0', 'tat', 'tắt'].includes(text)) return false;
-            return false;
-        }
-
-        function bmsSetFlag(id, value) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            const isOn = bmsFlagState(value);
-            el.innerText = isOn ? 'ON' : 'OFF';
-            el.classList.toggle('on', isOn);
-            el.classList.toggle('off', !isOn);
-        }
-
-        function toggleBmsTemps(prefix) {
-            const card = document.getElementById(`${prefix}-card`);
-            if (card) card.classList.toggle('temps-open');
-        }
-
-        function bmsRuntimeText(data) {
-            const runtimeText = bmsRead(data, ['Runtime_Text', 'Run_Time_Text', 'RuntimeText', 'Time_Text', 'TIME'], null);
-            if (runtimeText !== null) return String(runtimeText);
-            const seconds = bmsNumber(data, ['Runtime_Seconds', 'Run_Time', 'Runtime', 'Total_Run_Time'], NaN);
-            if (!Number.isFinite(seconds) || seconds <= 0) return '--';
-            const totalSeconds = Math.floor(seconds);
-            const days = Math.floor(totalSeconds / 86400);
-            const hours = Math.floor((totalSeconds % 86400) / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            return days > 0 ? `${days}D${hours}H${minutes}M` : `${hours}H${minutes}M`;
-        }
-
-        function bmsCellStats(data) {
-            const voltages = [];
-            const arrayData = bmsRead(data, ['Cell_Voltages', 'CellVoltages', 'Cells', 'Cell_Array'], null);
-            if (Array.isArray(arrayData)) {
-                arrayData.forEach(value => { const number = Number(value); if (Number.isFinite(number) && number > 0) voltages.push(number); });
-            }
-            for (let i = 1; i <= 32; i++) {
-                const pad = String(i).padStart(2, '0');
-                const number = bmsNumber(data, [`Cell_${pad}`, `Cell${pad}`, `Cell_${i}`, `Cell${i}`], NaN);
-                if (Number.isFinite(number) && number > 0) voltages.push(number);
-            }
-            const directHigh = bmsNumber(data, ['Max_Cell_Voltage', 'Cell_Max_Voltage', 'Cell_High', 'MaxCellVoltage'], NaN);
-            const directLow = bmsNumber(data, ['Min_Cell_Voltage', 'Cell_Min_Voltage', 'Cell_Low', 'MinCellVoltage'], NaN);
-            if (voltages.length > 0) { return { high: Math.max(...voltages), low: Math.min(...voltages) }; }
-            return { high: Number.isFinite(directHigh) ? directHigh : NaN, low: Number.isFinite(directLow) ? directLow : NaN };
-        }
-
-        function bmsLooksLikePack(data) {
-            if (!data || typeof data !== 'object') return false;
-            return bmsRead(data, ['Total_Voltage', 'Current', 'Remain_Battery', 'Batt_Capacity', 'Cell_Voltage_Diff', 'MOS_Temp', 'Battery_T1', 'Battery_T2'], null) !== null;
-        }
-
-        function bmsResolvePacks(root) {
-            const bms1 = bmsRead(root, ['BMS1', 'BM1', 'bms1', 'bm1'], null);
-            const bms2 = bmsRead(root, ['BMS2', 'BM2', 'bms2', 'bm2'], null);
-            return { bm1: bms1 || (bmsLooksLikePack(root) ? root : null), bm2: bms2 || null };
-        }
-
-        function updateBmsPanel(prefix, data) {
-            const card = document.getElementById(`${prefix}-card`);
-            const online = !!data && bmsRead(data, ['Online', 'Connected', 'BLE_Connected'], true) !== false;
-            if (card) card.classList.toggle('offline', !online);
-
-            const devName = bmsRead(data, ['Device_Name', 'Target'], null);
-            if (devName) bmsText(`${prefix}-name`, devName);
-
-            const statusText = online ? 'ON' : 'OFF';
-            bmsText(`${prefix}-online`, statusText);
-            const emptyText = '--';
-            if (!online) {
-                ['runtime', 'cycle-top', 'soc', 'voltage', 'current', 'cell-high', 'cell-low', 'cell-diff', 'balance-current', 'capacity', 'remain', 'mos-temp', 'health', 't1', 't2', 't3', 't4', 'power'].forEach(key => bmsText(`${prefix}-${key}`, key === 'soc' ? '--%' : (key === 'voltage' ? '-- V' : (key === 'current' ? '-- A' : emptyText))));
-                bmsSetFlag(`${prefix}-charge-state`, false); bmsSetFlag(`${prefix}-discharge-state`, false); bmsSetFlag(`${prefix}-balance-state`, false);
-                const fill = document.getElementById(`${prefix}-power-fill`); if (fill) fill.style.width = '0%';
-                return;
-            }
-
-            const voltage = bmsNumber(data, ['Total_Voltage', 'Voltage', 'Pack_Voltage', 'Batt_Voltage'], NaN);
-            const current = bmsNumber(data, ['Current', 'Pack_Current', 'Batt_Current'], NaN);
-            const soc = clampNumber(bmsNumber(data, ['Remain_Battery', 'SOC', 'Batt_SOC', 'Battery_SOC'], 0), 0, 100);
-            const capacity = bmsNumber(data, ['Batt_Capacity', 'Battery_Capacity', 'Battery_Capacity_Ah', 'Capacity'], NaN);
-            const remain = bmsNumber(data, ['Remain_Capacity', 'Remaining_Capacity', 'Remain_Ah'], NaN);
-            const cellDiff = bmsNumber(data, ['Cell_Voltage_Diff', 'Cell_Diff', 'CellDiff', 'Delta_Cell_Voltage'], NaN);
-            const balanceCurrent = bmsNumber(data, ['Balance_Current', 'Bal_Current', 'Balance_Curr'], NaN);
-            const mosTemp = bmsNumber(data, ['MOS_Temp', 'Mos_Temp', 'MOS_Temperature'], NaN);
-            const t1 = bmsNumber(data, ['Battery_T1', 'Temp_T1', 'T1', 'Battery_Temp1'], NaN);
-            const t2 = bmsNumber(data, ['Battery_T2', 'Temp_T2', 'T2', 'Battery_Temp2'], NaN);
-            const t3 = bmsNumber(data, ['Battery_T3', 'Temp_T3', 'T3', 'Battery_Temp3'], NaN);
-            const t4 = bmsNumber(data, ['Battery_T4', 'Temp_T4', 'T4', 'Battery_Temp4'], NaN);
-            const health = bmsNumber(data, ['Battery_Health', 'SOH', 'Health'], NaN);
-            const cycle = bmsNumber(data, ['Cycle_Count', 'Cycles', 'Cycle'], NaN);
-            const maxCharge = bmsNumber(data, ['Max_Charge_Curr', 'Max_Charge_Current', 'Charge_Current_Limit'], NaN);
-            const maxDischarge = bmsNumber(data, ['Max_Discharge_Curr', 'Max_Discharge_Current', 'Discharge_Current_Limit'], NaN);
-            let power = bmsNumber(data, ['Battery_Power', 'Signed_Power', 'Power', 'Pack_Power'], NaN);
-            if (!Number.isFinite(power) && Number.isFinite(voltage) && Number.isFinite(current)) power = voltage * current;
-            const displayPower = Number.isFinite(power) ? Math.abs(power) : NaN;
-            const stats = bmsCellStats(data);
-
-            bmsText(`${prefix}-runtime`, bmsRuntimeText(data));
-            bmsText(`${prefix}-cycle-top`, Number.isFinite(cycle) ? String(Math.round(cycle)) : '--');
-            bmsText(`${prefix}-soc`, `${Math.round(soc)}%`);
-            bmsText(`${prefix}-voltage`, bmsFormat(voltage, 2, ' V'));
-            bmsText(`${prefix}-current`, bmsFormat(current, 2, ' A'));
-            bmsText(`${prefix}-cell-high`, bmsFormatCompact(stats.high, 3));
-            bmsText(`${prefix}-cell-low`, bmsFormatCompact(stats.low, 3));
-            bmsText(`${prefix}-cell-diff`, bmsFormatCompact(cellDiff, 3));
-            bmsText(`${prefix}-balance-current`, bmsFormatCompact(balanceCurrent, 3));
-            bmsText(`${prefix}-capacity`, bmsFormatCompact(capacity, 1));
-            bmsText(`${prefix}-remain`, bmsFormatCompact(remain, 1));
-            bmsText(`${prefix}-mos-temp`, bmsFormatCompact(mosTemp, 1));
-            bmsText(`${prefix}-health`, Number.isFinite(health) ? Math.round(health) : '--');
-            bmsText(`${prefix}-t1`, bmsFormatCompact(t1, 1));
-            bmsText(`${prefix}-t2`, bmsFormatCompact(t2, 1));
-            bmsText(`${prefix}-t3`, bmsFormatCompact(t3, 1));
-            bmsText(`${prefix}-t4`, bmsFormatCompact(t4, 1));
-
-            const packLimitW = Number.isFinite(voltage) ? voltage * (current >= 0 ? (Number.isFinite(maxCharge) ? maxCharge : 120) : (Number.isFinite(maxDischarge) ? maxDischarge : 120)) : 5200;
-            bmsText(`${prefix}-power`, Number.isFinite(displayPower) ? `${displayPower.toFixed(1)}${Number.isFinite(packLimitW) && packLimitW > 0 ? ' / ' + Math.round(packLimitW) : ''}` : '--');
-
-            const fill = document.getElementById(`${prefix}-power-fill`);
-            if (fill) {
-                const pct = Number.isFinite(displayPower) && Number.isFinite(packLimitW) && packLimitW > 0 ? clampNumber((displayPower / packLimitW) * 100, 0, 100) : 0;
-                fill.style.width = pct.toFixed(1) + '%';
-            }
-
-            bmsSetFlag(`${prefix}-charge-state`, bmsRead(data, ['Charge', 'Charge_Enable', 'ChargeEnabled', 'Charging'], false));
-            bmsSetFlag(`${prefix}-discharge-state`, bmsRead(data, ['Discharge', 'Discharge_Enable', 'DischargeEnabled', 'Discharging'], false));
-            bmsSetFlag(`${prefix}-balance-state`, bmsRead(data, ['Balance', 'Balance_Enable', 'BalanceEnabled', 'Balancing'], false));
-        }
-
-        let latestBmsCombined = { bm1: null, bm2: null };
-        function refreshBmsPanels() {
-            updateBmsPanel('bm1', latestBmsCombined.bm1);
-            updateBmsPanel('bm2', latestBmsCombined.bm2);
-            updateDOMText('bms-updated', new Date().toLocaleTimeString('vi-VN', { hour12: false }));
-            try {
-                if ((latestBmsCombined.bm1 && latestBmsCombined.bm1.Online) || (latestBmsCombined.bm2 && latestBmsCombined.bm2.Online)) {
-                    localStorage.setItem("last_sosen_bms_snapshot", JSON.stringify(latestBmsCombined));
-                }
-            } catch (e) {}
-        }
-
-        // ================= BIỂU ĐỒ NĂNG LƯỢNG (CHART.JS) =================
-        let energyChart = null; 
-        let currentChartMode = 'month'; 
-        let chartCursorDate = new Date(); 
-        let chartSelectedIndex = 0; 
-        let chartRows = []; 
-        let chartAllRows = []; 
-        let chartSelectedSourceIndex = 0; 
-        let chartResizeTimer = null; 
-        let chartLoadRequestId = 0;
-        let chartMonthTotals = { pv: 0, batt: 0, charge: 0, load: 0 };
-        let isShowingMonthTotalInMonthMode = false;
-
-        const chartSeries = [
-            { label: 'Sản lượng PV', key: 'pv', color: '#59ba35', border: '#48a927' },
-            { label: 'Xả pin', key: 'batt', color: '#45a8de', border: '#278fc9' },
-            { label: 'Sạc pin', key: 'charge', color: '#3322c9', border: '#2416a8' },
-            { label: 'Tiêu thụ', key: 'load', color: '#ffa247', border: '#f08324' }
-        ];
-
-        const energySelectedBandPlugin = {
-            id: 'energySelectedBand',
-            beforeDatasetsDraw(chart) {
-                if (isShowingMonthTotalInMonthMode && currentChartMode === 'month') return;
-                const area = chart.chartArea; const meta = chart.getDatasetMeta(0); const bar = meta && meta.data ? meta.data[chartSelectedIndex] : null;
-                if (!area || !bar || chart.data.labels.length === 0) return;
-                const step = (area.right - area.left) / chart.data.labels.length;
-                const x = bar.x - step / 2 + 3; const width = Math.max(16, step - 6); const ctx = chart.ctx;
-                ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.strokeStyle = 'rgba(0,0,0,0.22)'; ctx.lineWidth = 1; ctx.beginPath();
-                drawChartRoundRect(ctx, x, area.top + 2, width, area.bottom - area.top - 4, 8);
-                ctx.fill(); ctx.stroke(); ctx.restore();
-            }
-        };
-
-        const energyValueLabelPlugin = {
-            id: 'energyValueLabels',
-            afterDatasetsDraw(chart) {
-                const ctx = chart.ctx; const area = chart.chartArea;
-                ctx.save(); ctx.fillStyle = '#111'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.font = '900 10px Nunito, sans-serif';
-                chart.data.datasets.forEach((dataset, datasetIndex) => {
-                    const meta = chart.getDatasetMeta(datasetIndex);
-                    meta.data.forEach((bar, index) => {
-                        const value = Number(dataset.data[index]) || 0;
-                        if (value <= 0.04) return;
-                        const y = Math.max(bar.y - 5, area.top + 10);
-                        ctx.fillText(formatChartNumber(value), bar.x, y);
-                    });
-                });
-                ctx.restore();
-            }
-        };
-
-        function initChart() {
-            const chartCanvas = document.getElementById('energyChart');
-            if (!chartCanvas || typeof Chart === 'undefined') return;
-            const ctx = chartCanvas.getContext('2d');
-            energyChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: chartSeries.map(series => ({ label: series.label, dataKey: series.key, data: [], backgroundColor: series.color, borderColor: series.border, borderWidth: 1, borderRadius: 2, categoryPercentage: 0.88, barPercentage: 0.92, maxBarThickness: 38 }))
-                },
-                plugins: [energySelectedBandPlugin, energyValueLabelPlugin],
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    onClick(event, elements) {
-                        if (elements.length > 0) {
-                            isShowingMonthTotalInMonthMode = false;
-                            const clickedRow = chartRows[elements[0].index];
-                            if (clickedRow && Number.isInteger(clickedRow.sourceIndex)) { chartSelectedSourceIndex = clickedRow.sourceIndex; updateVisibleChartRows(); }
-                        }
-                    },
-                    plugins: {
-                        legend: { align: 'start', labels: { boxWidth: 12, boxHeight: 12, padding: 10, font: { family: 'Nunito', weight: '900', size: 12 }, color: '#222' } },
-                        tooltip: { callbacks: { title(items) { const row = chartRows[items[0].dataIndex]; return row ? row.detailLabel : ''; }, label(item) { return `${item.dataset.label}: ${formatChartNumber(item.parsed.y)} kWh`; } } }
-                    },
-                    scales: {
-                        x: { grid: { display: true, color: 'rgba(0,0,0,0.18)', borderDash: [8, 8] }, ticks: { font: { family: 'Nunito', weight: '900', size: 13 }, color: '#222' } },
-                        y: { beginAtZero: true, grace: '18%', ticks: { font: { family: 'Nunito', weight: '900', size: 12 }, color: '#333' }, grid: { color: 'rgba(0,0,0,0.16)' } }
-                    }
-                }
-            });
-            window.addEventListener('resize', () => { clearTimeout(chartResizeTimer); chartResizeTimer = setTimeout(() => { if (energyChart && chartAllRows.length > 0) updateVisibleChartRows(); }, 120); });
-            loadChartData();
-        }
-
-        function setChartMode(mode) {
-            if (!['month', 'year', 'total'].includes(mode)) return;
-            currentChartMode = mode;
-            isShowingMonthTotalInMonthMode = false;
-            document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById(`btn-chart-${mode}`);
-            if (activeBtn) activeBtn.classList.add('active');
-            loadChartData();
-        }
-
-        function shiftChartPeriod(step) {
-            if (currentChartMode === 'month') { chartCursorDate.setMonth(chartCursorDate.getMonth() + step); } 
-            else if (currentChartMode === 'year') { chartCursorDate.setFullYear(chartCursorDate.getFullYear() + step); }
-            isShowingMonthTotalInMonthMode = false;
-            loadChartData();
-        }
-
-        function moveChartDay(step) {
-            if (chartAllRows.length === 0) return;
-            isShowingMonthTotalInMonthMode = false;
-            chartSelectedSourceIndex = Math.max(0, Math.min(chartAllRows.length - 1, chartSelectedSourceIndex + step));
-            updateVisibleChartRows();
-        }
-
-        function toggleMonthTotalInChart() {
-            if (currentChartMode !== 'month') return;
-            isShowingMonthTotalInMonthMode = !isShowingMonthTotalInMonthMode;
-            updateChartDetail();
-            if (energyChart) energyChart.draw();
-        }
-
-        function loadChartData() {
-            if (!database) return;
-            const requestId = ++chartLoadRequestId;
-            updateChartPeriodLabel();
-            const yyyy = chartCursorDate.getFullYear();
-            const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
-            const now = new Date();
-            const isCurrentYear = (yyyy === now.getFullYear());
-            const isViewingCurrentMonth = (isCurrentYear && chartCursorDate.getMonth() === now.getMonth());
-
-            if (currentChartMode === 'month') {
-                const monthKey = `${yyyy}_${mm}`;
-                database.ref(`/SosenSystem/History/Daily/${monthKey}`).once('value', (snap) => {
-                    if (requestId !== chartLoadRequestId) return;
-                    const daysData = snap.val() || {}; 
-                    const rows = []; 
-                    const daysInMonth = new Date(yyyy, chartCursorDate.getMonth() + 1, 0).getDate();
-                    let mSum = { pv: 0, batt: 0, charge: 0, load: 0 };
-
-                    // CHẾ ĐỘ TỰ ĐỘNG BÙ ĐẮP (AUTO CATCH-UP)
-                    if (isViewingCurrentMonth) {
-                        const todayNum = now.getDate();
-                        for (let d = 1; d < todayNum; d++) {
-                            const dayStr = String(d).padStart(2, '0');
-                            const dayKey = `day_${dayStr}`;
-                            const pastDateStr = `${yyyy}_${mm}_${dayStr}`;
-                            let curItem = daysData[dayKey] || {};
-
-                            const curPv = toSafeNumber(curItem.pv);
-                            const curLoad = toSafeNumber(curItem.load);
-
-                            if (curPv <= 0 && curLoad <= 0) {
-                                let recoveredRecord = null;
-                                const rawCached = localStorage.getItem("sosen_cache_" + pastDateStr) || 
-                                                  localStorage.getItem("sosen_history_backup_" + pastDateStr) ||
-                                                  localStorage.getItem("sosen_snapshot_" + pastDateStr);
-
-                                if (rawCached) {
-                                    try {
-                                        const parsed = JSON.parse(rawCached);
-                                        const pPv = toSafeNumber(parsed.pv ?? parsed.PV_Today ?? parsed.pv_today);
-                                        const pLoad = toSafeNumber(parsed.load ?? parsed.Load_Today ?? parsed.load_today);
-                                        const pBatt = toSafeNumber(parsed.batt ?? parsed.bat ?? parsed.Bat_Discharge_Today ?? parsed.bat_discharge_today);
-                                        const pCharge = toSafeNumber(parsed.charge ?? parsed.Bat_Charge_Today ?? parsed.bat_charge_today);
-                                        const pGrid = toSafeNumber(parsed.grid ?? parsed.Grid_Buy_Today ?? parsed.grid_buy_today);
-
-                                        if (pPv > 0 || pLoad > 0) {
-                                            recoveredRecord = {
-                                                pv: Math.round(pPv * 10) / 10,
-                                                load: Math.round(pLoad * 10) / 10,
-                                                batt: Math.round(pBatt * 10) / 10,
-                                                charge: Math.round(pCharge * 10) / 10,
-                                                grid: Math.round(pGrid * 10) / 10
-                                            };
-                                        }
-                                    } catch(e) {}
-                                }
-
-                                if (!recoveredRecord && yyyy === 2026 && mm === "10" && d === 10) {
-                                    recoveredRecord = { pv: 30.5, batt: 11.2, charge: 17.5, load: 26.8, grid: 0 };
-                                }
-
-                                if (recoveredRecord) {
-                                    daysData[dayKey] = recoveredRecord;
-                                    database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(recoveredRecord);
-                                    try { localStorage.setItem("sosen_cache_" + pastDateStr, JSON.stringify(recoveredRecord)); } catch(e) {}
-                                }
-                            }
-                        }
-                    }
-
-                    for (let d = 1; d <= daysInMonth; d++) {
-                        const dayStr = String(d).padStart(2, '0');
-                        let itemData = daysData[`day_${dayStr}`] || {};
-
-                        if (isViewingCurrentMonth && d === now.getDate() && latestDailyData) {
-                            itemData = {
-                                pv: Math.max(toSafeNumber(itemData.pv), toSafeNumber(latestDailyData.PV_Today)),
-                                batt: Math.max(toSafeNumber(itemData.batt ?? itemData.bat ?? itemData.discharge), toSafeNumber(latestDailyData.Bat_Discharge_Today)),
-                                charge: Math.max(toSafeNumber(itemData.charge ?? itemData.battCharge ?? itemData.batCharge), toSafeNumber(latestDailyData.Bat_Charge_Today)),
-                                load: Math.max(toSafeNumber(itemData.load), toSafeNumber(latestDailyData.Load_Today))
-                            };
-                        }
-
-                        const norm = normalizeChartItem(itemData);
-                        mSum.pv += norm.pv;
-                        mSum.batt += norm.batt;
-                        mSum.charge += norm.charge;
-                        mSum.load += norm.load;
-
-                        rows.push({ label: String(d), detailLabel: `Ngày ${dayStr}/${mm}/${yyyy}`, ...norm });
-                    }
-                    chartMonthTotals = mSum;
-                    renderChartRows(rows);
-                });
-            } else if (currentChartMode === 'year') {
-                database.ref('/SosenSystem/History/Daily')
-                    .orderByKey()
-                    .startAt(`${yyyy}_01`)
-                    .endAt(`${yyyy}_12\uf8ff`)
-                    .once('value', (snap) => {
-                        if (requestId !== chartLoadRequestId) return;
-                        const yearDailyData = snap.val() || {};
-                        const rows = [];
-                        const curMonthNum = now.getMonth() + 1;
-                        const curDayNum = now.getDate();
-
-                        for (let m = 1; m <= 12; m++) {
-                            const monthStr = String(m).padStart(2, '0');
-                            const mKey = `${yyyy}_${monthStr}`;
-                            const daysData = yearDailyData[mKey] || {};
-
-                            let mPv = 0, mBatt = 0, mCharge = 0, mLoad = 0;
-
-                            for (let dKey in daysData) {
-                                if (isCurrentYear && m === curMonthNum && dKey === `day_${String(curDayNum).padStart(2, '0')}`) continue;
-                                const dayObj = daysData[dKey];
-                                if (dayObj && typeof dayObj === 'object') {
-                                    mPv += toChartNumber(dayObj.pv);
-                                    mBatt += toChartNumber(dayObj.batt ?? dayObj.bat ?? dayObj.discharge);
-                                    mCharge += toChartNumber(dayObj.charge ?? dayObj.battCharge ?? dayObj.batCharge);
-                                    mLoad += toChartNumber(dayObj.load);
-                                }
-                            }
-
-                            if (isCurrentYear && m === curMonthNum && latestDailyData) {
-                                const curDayObj = daysData[`day_${String(curDayNum).padStart(2, '0')}`] || {};
-                                mPv += Math.max(toSafeNumber(latestDailyData.PV_Today), toSafeNumber(curDayObj.pv));
-                                mBatt += Math.max(toSafeNumber(latestDailyData.Bat_Discharge_Today), toSafeNumber(curDayObj.batt ?? curDayObj.bat));
-                                mCharge += Math.max(toSafeNumber(latestDailyData.Bat_Charge_Today), toSafeNumber(curDayObj.charge));
-                                mLoad += Math.max(toSafeNumber(latestDailyData.Load_Today), toSafeNumber(curDayObj.load));
-                            }
-
-                            rows.push({ label: `T${m}`, detailLabel: `Tháng ${monthStr}/${yyyy}`, pv: mPv, batt: mBatt, charge: mCharge, load: mLoad });
-                        }
-                        renderChartRows(rows);
-                    });
-            } else if (currentChartMode === 'total') {
-                database.ref('/SosenSystem/History/Daily').once('value', (snap) => {
-                    if (requestId !== chartLoadRequestId) return;
-                    const allDailyData = snap.val() || {};
-                    const yearMap = {};
-                    const curYear = now.getFullYear();
-                    const curMonthKey = `${curYear}_${String(now.getMonth() + 1).padStart(2, '0')}`;
-                    const curDayKey = `day_${String(now.getDate()).padStart(2, '0')}`;
-
-                    for (let mKey in allDailyData) {
-                        const yr = mKey.split('_')[0];
-                        if (!yearMap[yr]) yearMap[yr] = { pv: 0, batt: 0, charge: 0, load: 0 };
-                        const monthObj = allDailyData[mKey];
-                        for (let dKey in monthObj) {
-                            if (mKey === curMonthKey && dKey === curDayKey) continue;
-                            const d = monthObj[dKey];
-                            if (d && typeof d === 'object') {
-                                yearMap[yr].pv += toChartNumber(d.pv);
-                                yearMap[yr].batt += toChartNumber(d.batt ?? d.bat ?? d.discharge);
-                                yearMap[yr].charge += toChartNumber(d.charge ?? d.battCharge ?? d.batCharge);
-                                yearMap[yr].load += toChartNumber(d.load);
-                            }
-                        }
-                    }
-
-                    if (latestDailyData) {
-                        if (!yearMap[curYear]) yearMap[curYear] = { pv: 0, batt: 0, charge: 0, load: 0 };
-                        const todayObj = (allDailyData[curMonthKey] && allDailyData[curMonthKey][curDayKey]) || {};
-                        yearMap[curYear].pv += Math.max(toSafeNumber(latestDailyData.PV_Today), toSafeNumber(todayObj.pv));
-                        yearMap[curYear].batt += Math.max(toSafeNumber(latestDailyData.Bat_Discharge_Today), toSafeNumber(todayObj.batt ?? todayObj.bat));
-                        yearMap[curYear].charge += Math.max(toSafeNumber(latestDailyData.Bat_Charge_Today), toSafeNumber(todayObj.charge));
-                        yearMap[curYear].load += Math.max(toSafeNumber(latestDailyData.Load_Today), toSafeNumber(todayObj.load));
-                    }
-
-                    let rows = Object.keys(yearMap).sort().map(yr => ({ label: yr, detailLabel: `Năm ${yr}`, pv: yearMap[yr].pv, batt: yearMap[yr].batt, charge: yearMap[yr].charge, load: yearMap[yr].load }));
-                    if (rows.length === 0) { rows = [{ label: String(yyyy), detailLabel: `Năm ${yyyy}`, pv: 0, batt: 0, charge: 0, load: 0 }]; }
-                    renderChartRows(rows);
-                });
-            }
-        }
-
-        function renderChartRows(rows) { chartAllRows = rows; chartSelectedSourceIndex = getDefaultChartIndex(rows); updateVisibleChartRows(); }
-
-        function updateVisibleChartRows() {
-            const rows = chartAllRows;
-            if (!energyChart) return;
-            if (rows.length === 0) {
-                chartRows = []; chartSelectedIndex = 0; energyChart.data.labels = []; energyChart.data.datasets.forEach(dataset => { dataset.data = []; });
-                updateChartDetail(); energyChart.update('none'); return;
-            }
-            const limit = currentChartMode === 'month' ? (window.innerWidth <= 430 ? 3 : 4) : rows.length;
-            let start = 0;
-            if (currentChartMode === 'month' && rows.length > limit) {
-                start = chartSelectedSourceIndex - Math.floor(limit / 2);
-                start = Math.max(0, Math.min(start, rows.length - limit));
-            }
-            chartRows = rows.slice(start, start + limit).map((row, index) => ({ ...row, sourceIndex: start + index }));
-            chartSelectedIndex = chartRows.findIndex(row => row.sourceIndex === chartSelectedSourceIndex);
-            if (chartSelectedIndex < 0) chartSelectedIndex = 0;
-
-            energyChart.data.labels = chartRows.map(row => row.label);
-            energyChart.data.datasets.forEach(dataset => { dataset.data = chartRows.map(row => row[dataset.dataKey] || 0); });
-            updateChartDetail(); energyChart.update('none');
-        }
-
-        function getDefaultChartIndex(rows) {
-            if (rows.length === 0) return 0;
-            const now = new Date();
-            if (currentChartMode === 'month' && chartCursorDate.getFullYear() === now.getFullYear() && chartCursorDate.getMonth() === now.getMonth()) {
-                return Math.min(rows.length - 1, Math.max(0, now.getDate() - 1));
-            }
-            if (currentChartMode === 'year' && chartCursorDate.getFullYear() === now.getFullYear()) {
-                return Math.min(rows.length - 1, now.getMonth());
-            }
-            for (let i = rows.length - 1; i >= 0; i--) { const row = rows[i]; if ((row.pv + row.batt + row.charge + row.load) > 0) return i; }
-            return 0;
-        }
-
-        function normalizeChartItem(item = {}) {
-            return { pv: toChartNumber(item.pv), batt: toChartNumber(item.batt ?? item.bat ?? item.battery ?? item.discharge ?? item.batDischarge), charge: toChartNumber(item.charge ?? item.battCharge ?? item.batCharge ?? item.chargeBattery), load: toChartNumber(item.load) };
-        }
-
-        function drawChartRoundRect(ctx, x, y, width, height, radius) {
-            if (typeof ctx.roundRect === 'function') { ctx.roundRect(x, y, width, height, radius); return; }
-            const r = Math.min(radius, width / 2, height / 2);
-            ctx.moveTo(x + r, y); ctx.lineTo(x + width - r, y); ctx.quadraticCurveTo(x + width, y, x + width, y + r); ctx.lineTo(x + width, y + height - r);
-            ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height); ctx.lineTo(x + r, y + height); ctx.quadraticCurveTo(x, y + height, x, y + height - r);
-            ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-        }
-
-        function toChartNumber(value) { const number = Number(value); return Number.isFinite(number) ? number : 0; }
-        function formatChartNumber(value) { const number = Number(value) || 0; return number >= 100 ? number.toFixed(0) : number.toFixed(1); }
-
-        function updateChartPeriodLabel() {
-            const el = document.getElementById('chart-period-label');
-            if (!el) return;
-            const yyyy = chartCursorDate.getFullYear(); const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
-            el.textContent = currentChartMode === 'month' ? `${yyyy}-${mm}` : (currentChartMode === 'year' ? String(yyyy) : 'TỔNG');
-        }
-
-        function updateChartDetail() {
-            if (currentChartMode === 'month' && isShowingMonthTotalInMonthMode && chartMonthTotals) {
-                const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
-                const yyyy = chartCursorDate.getFullYear();
-                updateDOMText('chart-selected-label', `Tổng T${mm}/${yyyy}`);
-                updateDOMText('chart-detail-pv', formatChartNumber(chartMonthTotals.pv));
-                updateDOMText('chart-detail-batt', formatChartNumber(chartMonthTotals.batt));
-                updateDOMText('chart-detail-charge', formatChartNumber(chartMonthTotals.charge));
-                updateDOMText('chart-detail-load', formatChartNumber(chartMonthTotals.load));
-                return;
-            }
-
-            const row = chartRows[chartSelectedIndex] || { detailLabel: '--', pv: 0, batt: 0, charge: 0, load: 0 };
-            updateDOMText('chart-selected-label', row.detailLabel);
-            updateDOMText('chart-detail-pv', formatChartNumber(row.pv));
-            updateDOMText('chart-detail-batt', formatChartNumber(row.batt));
-            updateDOMText('chart-detail-charge', formatChartNumber(row.charge));
-            updateDOMText('chart-detail-load', formatChartNumber(row.load));
-        }
-
-        // ================= TÍNH TOÁN NĂNG LƯỢNG & TIỀN ĐIỆN TỪ FIREBASE =================
-        let currentMonthKey = ""; let currentMonthHistory = {}; let latestDailyData = null;
-
-        function checkAndSwitchMonth() {
-            if (!database) return;
-            let d = new Date(); 
-            let mk = d.getFullYear() + "_" + (d.getMonth() + 1).toString().padStart(2, '0');
-            if (mk !== currentMonthKey) {
-                if (currentMonthKey !== "") { database.ref(`/SosenSystem/History/Daily/${currentMonthKey}`).off(); }
-                currentMonthKey = mk; 
-                database.ref(`/SosenSystem/History/Daily/${currentMonthKey}`).on('value', (snap) => { 
-                    currentMonthHistory = snap.val() || {}; 
-                    recalculateEnergy(); 
-                });
-            }
-        }
-
-        function calcEVN(kWh) {
-            let cost = 0; let r = kWh;
-            if(r > 0) { let q = Math.min(r, 50); cost += q * 2142.72; r -= q; }
-            if(r > 0) { let q = Math.min(r, 50); cost += q * 2214.00; r -= q; }
-            if(r > 0) { let q = Math.min(r, 100); cost += q * 2570.40; r -= q; }
-            if(r > 0) { let q = Math.min(r, 100); cost += q * 3237.84; r -= q; }
-            if(r > 0) { let q = Math.min(r, 100); cost += q * 3618.00; r -= q; }
-            if(r > 0) { cost += r * 3736.80; } return cost;
-        }
-
-        function recalculateEnergy() {
-            if (!latestDailyData) return; 
-            const data = latestDailyData;
-            let pvToday = toSafeNumber(data.PV_Today); 
-            let currentETotal = toSafeNumber(data.PV_Total_Lifetime);
-            let loadToday = toSafeNumber(data.Load_Today);
-            let gridBuyToday = toSafeNumber(data.Grid_Buy_Today);
-            let battDisToday = toSafeNumber(data.Bat_Discharge_Today);
-            let battChgToday = toSafeNumber(data.Bat_Charge_Today);
-
-            animateValue('stat-pv-today', pvToday, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-load-today', loadToday, v => v.toFixed(1) + ' kWh'); 
-            animateValue('stat-grid-buy', gridBuyToday, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-bat-dis', battDisToday, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-bat-chg', battChgToday, v => v.toFixed(1) + ' kWh');
-            animateValue('stat-bat-dis-total', toSafeNumber(data.Bat_Discharge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
-            animateValue('stat-bat-chg-total', toSafeNumber(data.Bat_Charge_Total_Lifetime), v => v.toFixed(1) + ' kWh');
-            animateValue('stat-pv-total', currentETotal, v => v.toFixed(1) + ' kWh');
-
-            let todayDate = new Date(); 
-            let curDayKey = "day_" + todayDate.getDate().toString().padStart(2, '0');
-
-            let pvMonthTotal = 0; 
-            for (let key in currentMonthHistory) { 
-                if (key !== curDayKey) { 
-                    let dayItem = currentMonthHistory[key];
-                    let dayVal = (dayItem && typeof dayItem === 'object') ? Number(dayItem.pv || 0) : Number(dayItem || 0);
-                    pvMonthTotal += isNaN(dayVal) ? 0 : dayVal; 
-                }
-            }
-            
-            let curDayObj = currentMonthHistory[curDayKey];
-            let savedPvToday = (curDayObj && typeof curDayObj === 'object') ? Number(curDayObj.pv || 0) : Number(curDayObj || 0);
-            let activePvForMoney = Math.max(pvToday, savedPvToday);
-            pvMonthTotal += activePvForMoney;
-            
-            let monthMoney = calcEVN(pvMonthTotal); 
-            let todayMoney = 0;
-
-            if (pvMonthTotal >= activePvForMoney && activePvForMoney > 0) { 
-                todayMoney = monthMoney - calcEVN(pvMonthTotal - activePvForMoney); 
-            } else { 
-                todayMoney = calcEVN(activePvForMoney); 
-            }
-
-            let totalMoney = currentETotal * 3000;
-
-            animateValue('money-pv-today', activePvForMoney, v => v.toFixed(1));
-            animateValue('money-pv-month', pvMonthTotal, v => v.toFixed(1)); 
-            animateValue('money-pv-total', currentETotal, v => v.toFixed(1));
-            animateValue('money-today', Math.round(todayMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
-            animateValue('money-month', Math.round(monthMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ'); 
-            animateValue('money-total', Math.round(totalMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ');
-        }
-
-        // ================= HỆ THỐNG CHỐT SỔ NĂNG LƯỢNG 3 LỚP (TRIPLE-LOCK FAILSAFE) =================
-        let isSnapshotSaving = false;
-
-        function commitDaySnapshotToFirebase(targetDate, reason) {
-            if (!database || !latestDailyData || isSnapshotSaving) return;
-
-            const d = targetDate || new Date();
-            const yyyy = d.getFullYear();
-            const mm = String(d.getMonth() + 1).padStart(2, "0");
-            const dd = String(d.getDate()).padStart(2, "0");
-            const monthKey = `${yyyy}_${mm}`;
-            const dayKey = `day_${dd}`;
-            const dateStr = `${yyyy}_${mm}_${dd}`;
-
-            const pv = toSafeNumber(latestDailyData.PV_Today);
-            const load = toSafeNumber(latestDailyData.Load_Today);
-            const batt = toSafeNumber(latestDailyData.Bat_Discharge_Today);
-            const charge = toSafeNumber(latestDailyData.Bat_Charge_Today);
-            const grid = toSafeNumber(latestDailyData.Grid_Buy_Today);
-
-            if (pv <= 0 && load <= 0 && batt <= 0 && charge <= 0) return;
-
-            isSnapshotSaving = true;
-            const record = {
-                pv: Math.round(pv * 10) / 10,
-                load: Math.round(load * 10) / 10,
-                batt: Math.round(batt * 10) / 10,
-                charge: Math.round(charge * 10) / 10,
-                grid: Math.round(grid * 10) / 10,
-                savedAt: new Date().toLocaleTimeString("vi-VN"),
-                type: reason
-            };
-
-            database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(record, (err) => {
-                isSnapshotSaving = false;
-                if (!err) {
-                    try {
-                        localStorage.setItem("sosen_saved_" + dateStr, "true");
-                        localStorage.setItem("sosen_cache_" + dateStr, JSON.stringify(record));
-                    } catch(e) {}
-
-                    database.ref("/SosenSystem/Daily_Energy").update({
-                        Energy_Unit: "kWh",
-                        PV_Today: record.pv,
-                        Load_Today: record.load,
-                        Bat_Discharge_Today: record.batt,
-                        Bat_Charge_Today: record.charge,
-                        Grid_Buy_Today: record.grid,
-                        PV_Total_Lifetime: toSafeNumber(latestDailyData.PV_Total_Lifetime),
-                        Bat_Discharge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Discharge_Total_Lifetime),
-                        Bat_Charge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Charge_Total_Lifetime)
-                    });
-                }
-            });
-        }
-
-        function checkAutoSnapshotSchedule() {
-            const now = new Date();
-            const curHour = now.getHours();
-            const curMin = now.getMinutes();
-            const curDay = now.getDate();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, "0");
-            const dd = String(curDay).padStart(2, "0");
-            const dateStr = `${yyyy}_${mm}_${dd}`;
-
-            if (curHour === 23 && curMin >= 50 && curMin <= 58) {
-                const isFinalSaved = localStorage.getItem("sosen_midnight_final_" + dateStr);
-                if (!isFinalSaved && !isSnapshotSaving) {
-                    commitDaySnapshotToFirebase(now, "Final_23h50");
-                    localStorage.setItem("sosen_midnight_final_" + dateStr, "true");
-                }
-                return;
-            }
-
-            if (curHour >= 18 && curHour < 23) {
-                const isEveningSaved = localStorage.getItem("sosen_evening_safe_" + dateStr);
-                if (!isEveningSaved && !isSnapshotSaving) {
-                    commitDaySnapshotToFirebase(now, "Evening_Safe");
-                    localStorage.setItem("sosen_evening_safe_" + dateStr, "true");
-                }
-            }
-        }
-
-        function getFlowIntensity(powerW) {
-            if (powerW === undefined || powerW === null) { return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 }; }
-            const watts = Math.abs(toSafeNumber(powerW));
-            if (watts < 1) return { particles: 0, sparks: 0, dashDuration: 7.8, sparkDuration: 5.4, wireSpeed: 4.2 };
-            if (watts <= 1000) return { particles: 3, sparks: 2, dashDuration: 7.0, sparkDuration: 4.8, wireSpeed: 3.6 };
-            if (watts <= 2000) return { particles: 4, sparks: 3, dashDuration: 5.0, sparkDuration: 3.4, wireSpeed: 2.5 };
-            if (watts <= 4000) return { particles: 5, sparks: 4, dashDuration: 3.4, sparkDuration: 2.35, wireSpeed: 1.7 };
-            if (watts <= 5500) return { particles: 6, sparks: 5, dashDuration: 2.65, sparkDuration: 1.85, wireSpeed: 1.25 };
-            return { particles: 7, sparks: 6, dashDuration: 2.2, sparkDuration: 1.55, wireSpeed: 1 };
-        }
-
-        function setFlow(groupId, isActive, animName, color, powerW) {
-            const group = document.getElementById(groupId); 
-            if (!group) return;
-            const currentAnim = group.getAttribute('data-anim') || '';
-            const currentActive = group.style.display === 'block';
-            const intensity = getFlowIntensity(powerW);
-
-            if (isActive && intensity.particles > 0) {
-                group.style.display = 'block';
-                group.style.setProperty('--c', color || '#00e5ff');
-                group.style.setProperty('--wire-speed', intensity.wireSpeed + 's');
-                const movesRight = animName === 'flowInL' || animName === 'flowOutR';
-                const currentParticles = group.getAttribute('data-particles') || '';
-                const currentDashDuration = group.getAttribute('data-dash-duration') || '';
-                const needsRefresh = !currentActive || currentAnim !== animName || currentParticles !== String(intensity.particles) || currentDashDuration !== String(intensity.dashDuration);
-                if (needsRefresh) {
-                    group.setAttribute('data-anim', animName);
-                    group.setAttribute('data-particles', String(intensity.particles));
-                    group.setAttribute('data-dash-duration', String(intensity.dashDuration));
-                    
-                    if (movesRight) { group.classList.add('dir-right'); group.classList.remove('dir-left'); } 
-                    else { group.classList.add('dir-left'); group.classList.remove('dir-right'); }
-                    
-                    const dashes = group.querySelectorAll('.flow-dash');
-                    dashes.forEach((d, index) => { 
-                        d.style.animationName = 'none'; d.style.opacity = '0';
-                        if (index >= intensity.particles) { d.style.display = 'none'; return; }
-                        d.style.display = 'block'; void d.offsetWidth;
-                        d.style.animationName = animName;
-                        d.style.animationDelay = '-' + ((index * intensity.dashDuration) / intensity.particles).toFixed(2) + 's';
-                        d.style.animationDuration = intensity.dashDuration + 's'; d.style.animationIterationCount = 'infinite'; d.style.animationTimingFunction = 'linear'; 
-                    });
-
-                    const sparks = group.querySelectorAll('.flow-spark');
-                    sparks.forEach((s, index) => {
-                        s.style.animationName = 'none'; s.style.opacity = '0';
-                        if (index >= intensity.sparks) { s.style.display = 'none'; return; }
-                        s.style.display = 'block'; void s.offsetWidth;
-                        s.style.animationName = movesRight ? 'sparkRight' : 'sparkLeft';
-                        s.style.animationDelay = '-' + ((index * intensity.sparkDuration) / Math.max(intensity.sparks, 1)).toFixed(2) + 's';
-                        s.style.animationDuration = intensity.sparkDuration + 's'; s.style.animationIterationCount = 'infinite'; s.style.animationTimingFunction = 'linear';
-                    });
-                }
-            } else { 
-                if (currentActive) {
-                    group.style.display = 'none'; 
-                    group.setAttribute('data-anim', ''); group.setAttribute('data-particles', ''); group.setAttribute('data-dash-duration', '');
-                }
-            }
-        }
-
-        // ================= TRẠNG THÁI THIẾT BỊ VÀ ĐỒNG HỒ =================
-        let lastLiveTime = 0;
-        let lastLiveReceivedAt = 0;
-        let currentDeviceState = 'checking';
-
-        function setClockGridStatus(gridOnline) {
-            const box = document.getElementById('clock-grid-status');
-            const label = document.getElementById('clock-grid-status-text');
-            if (!box || !label) return;
-            box.classList.remove('on', 'off', 'unknown', 'stale');
-
-            if (currentDeviceState !== 'online') {
-                box.classList.add('unknown');
-                updateDOMText('clock-grid-status-text', 'GRID --');
-                return;
-            }
-            if (gridOnline === true) {
-                box.classList.add('on');
-                updateDOMText('clock-grid-status-text', 'GRID ON');
-            } else if (gridOnline === false) {
-                box.classList.add('off');
-                updateDOMText('clock-grid-status-text', 'GRID OFF');
-            } else {
-                box.classList.add('unknown');
-                updateDOMText('clock-grid-status-text', 'GRID --');
-            }
-        }
-
-        function setDeviceStatus(state) {
-            const box = document.getElementById('device-status');
-            const text = document.getElementById('device-status-text');
-            if (!box || !text) return;
-            currentDeviceState = state;
-            box.classList.remove('online', 'offline', 'checking');
-            box.classList.add(state);
-
-            if (state === 'online') { updateDOMText('device-status-text', 'ESP32 ON'); } 
-            else if (state === 'offline') { updateDOMText('device-status-text', 'ESP32 OFF'); setClockGridStatus(null); } 
-            else { updateDOMText('device-status-text', 'ESP32 ...'); setClockGridStatus(null); }
-        }
-
-        function renderLastLiveReceivedTime() {
-            if (!(lastLiveReceivedAt > 0)) { updateDOMText('clock-time-text', '--:--:--'); return; }
-            const t = new Date(lastLiveReceivedAt);
-            updateDOMText('clock-time-text', t.toLocaleTimeString('vi-VN', { hour12: false }));
-        }
-
-        function markLiveDataReceived(nowMs = Date.now()) {
-            lastLiveReceivedAt = nowMs;
-            lastLiveTime = nowMs;
-            renderLastLiveReceivedTime();
-        }
-
-        function updateDeviceStatusByTimeout() {
-            const nowMs = Date.now();
-            if (lastLiveTime > 0) {
-                if (nowMs - lastLiveTime > 12000) {
-                    setDeviceStatus('offline');
-                } else {
-                    setDeviceStatus('online');
-                }
-            } else {
-                setDeviceStatus('checking');
-            }
-        }
-        setInterval(updateDeviceStatusByTimeout, 2000);
-
-        // ================= XỬ LÝ GÓI TIN LIVE (NHẬN TỪ MQTT 3S) =================
-        function processIncomingLiveData(data) {
-            if (!data) return;
-            markLiveDataReceived(Date.now());
-            setDeviceStatus('online');
-
-            try {
-                localStorage.setItem("last_sosen_snapshot", JSON.stringify(data));
-            } catch (e) {}
-
-            const vGrid = toSafeNumber(data.V_Grid);
-            const isGridOn = (vGrid > 50) || (data.Grid_Online === true);
-            setClockGridStatus(isGridOn);
-
-            const battVoltage = toSafeNumber(data.Batt_Voltage);
-            const battCurrent = toSafeNumber(data.Batt_Current);
-            const battTemp = toSafeNumber(data.Batt_Temp, NaN);
-
-            const pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power)));
-            const gridImportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Import_Power)));
-            const gridExportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Export_Power)));
-            const battInW = data.Batt_Power !== undefined ? Math.round(toSafeNumber(data.Batt_Power)) : Math.round(battVoltage * battCurrent);
-            const loadInW = Math.max(0, Math.round(toSafeNumber(data.Load_Power)));
-
-            updateBackgroundByTimeAndPv(pvInW);
-            
-            animateValue('lbl-pv', pvInW, v => Math.round(v));
-            const elPv = document.getElementById('lbl-pv');
-            if (elPv) elPv.classList.add('val-pv-style');
-            updateSunLevelByPower(pvInW);
-
-            animateValue('lbl-load', loadInW, v => Math.round(v));
-            const elLoad = document.getElementById('lbl-load');
-            if (elLoad) elLoad.classList.add('val-load-style');
-
-            const gridActiveW = gridImportW > 0 ? gridImportW : gridExportW;
-            animateValue('lbl-grid', gridActiveW, v => Math.round(v));
-
-            const elGrid = document.getElementById('lbl-grid');
-            const elGridMode = document.getElementById('lbl-grid-mode');
-            if (elGrid) {
-                elGrid.classList.remove('val-grid-buy-style', 'val-grid-sell-style');
-                if (isGridOn && gridImportW > 0) { elGrid.classList.add('val-grid-buy-style'); }
-                else if (isGridOn && gridExportW > 0) { elGrid.classList.add('val-grid-sell-style'); }
-                else { elGrid.style.color = '#fff'; elGrid.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)'; }
-            }
-            if (elGridMode) {
-                elGridMode.classList.remove('buy', 'sell', 'idle', 'no-grid');
-                if (!isGridOn) { elGridMode.style.display = 'none'; }
-                else if (gridImportW > 0) { elGridMode.style.display = 'none'; }
-                else if (gridExportW > 0) { elGridMode.classList.add('sell'); elGridMode.style.display = ''; updateDOMText('lbl-grid-mode', 'ĐẨY EVN ' + gridExportW.toLocaleString('vi-VN') + ' W →'); }
-                else { elGridMode.style.display = 'none'; }
-            }
-
-            animateValue('lbl-batt', Math.abs(battInW), v => Math.round(v));
-            const elBatt = document.getElementById('lbl-batt');
-            if (elBatt) {
-                elBatt.classList.remove('val-charge', 'val-discharge');
-                if (battInW < -1) { elBatt.classList.add('val-charge'); } 
-                else if (battInW > 1) { elBatt.classList.add('val-discharge'); }
-                else { elBatt.style.color = '#fff'; elBatt.style.textShadow = '0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45)'; }
-            }
-
-            if (data.Inv_Temp !== undefined) {
-                const tempLabel = document.getElementById('lbl-inv-temp');
-                const t = toSafeNumber(data.Inv_Temp);
-                if (tempLabel) {
-                    animateValue('lbl-inv-temp', t, v => '🌡️ ' + v.toFixed(0) + '°C');
-                    if (t < 40) tempLabel.style.backgroundColor = '#00cc66'; 
-                    else if (t >= 40 && t < 48) tempLabel.style.backgroundColor = '#ffaa00'; 
-                    else tempLabel.style.backgroundColor = '#ff4444';
-                }
-            }
-
-            let soc = clampNumber(data.Batt_SOC, 0, 100);
-            animateValue('lbl-soc', soc, v => Math.round(v) + '%');
-
-            const battTempLabel = document.getElementById('lbl-batt-temp');
-            if (battTempLabel) {
-                battTempLabel.classList.remove('temp-cool', 'temp-normal', 'temp-warm', 'temp-hot', 'temp-danger', 'temp-stale');
-                if (Number.isFinite(battTemp)) {
-                    animateValue('lbl-batt-temp-value', battTemp, v => v.toFixed(1) + '°C');
-                    if (battTemp >= 43.0) battTempLabel.classList.add('temp-danger');
-                    else if (battTemp >= 36.0) battTempLabel.classList.add('temp-hot');
-                    else if (battTemp >= 30.0) battTempLabel.classList.add('temp-warm');
-                    else if (battTemp >= 18.0) battTempLabel.classList.add('temp-normal');
-                    else battTempLabel.classList.add('temp-cool');
-                } else {
-                    updateDOMText('lbl-batt-temp-value', '--°C');
-                    battTempLabel.classList.add('temp-stale');
-                }
-            }
-
-            animateValue('mini-stat-v', battVoltage, v => v.toFixed(1) + ' V');
-            animateValue('mini-stat-a', battCurrent, v => v.toFixed(1) + ' A');
-            
-            const miniMeter = document.getElementById('battery-mini-meter');
-            if (miniMeter) {
-                miniMeter.classList.remove('charge', 'discharge', 'idle');
-                miniMeter.classList.add(battInW < -1 ? 'charge' : (battInW > 1 ? 'discharge' : 'idle'));
-            }
-
-            let rawStatus = String(data.Batt_Status || "");
-            let statusLower = rawStatus.toLowerCase();
-            let displayStatus = rawStatus;
-            let statusColor = '#888';
-            if (statusLower.includes("sac") || statusLower.includes("charge")) { displayStatus = "Đang Sạc"; statusColor = '#00cc66'; }
-            else if (statusLower.includes("xa") || statusLower.includes("discharge")) { displayStatus = "Đang Xả"; statusColor = '#ff4444'; }
-            else { displayStatus = "Chờ"; statusColor = '#888'; }
-            
-            updateDOMText('lbl-status', displayStatus);
-            if (document.getElementById('lbl-status')) document.getElementById('lbl-status').style.color = statusColor;
-
-            let colorTheme = soc <= 20 ? 'fill-red' : (soc <= 40 ? 'fill-yellow' : 'fill-green');
-            const battFill = document.getElementById('batt-fill');
-            if (battFill) { battFill.style.width = soc + '%'; battFill.className = 'battery-fill ' + colorTheme; }
-
-            if (pvInW >= 1) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
-            if (loadInW >= 1) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
-            if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW)); else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); else setFlow('flow-batt', false);
-
-            if (!isGridOn) { setFlow('flow-grid', false); }
-            else if (gridImportW > 0) { setFlow('flow-grid', true, 'flowInR', '#ff4444', gridImportW); }
-            else if (gridExportW > 0) { setFlow('flow-grid', true, 'flowOutR', '#00cc66', gridExportW); }
-            else { setFlow('flow-grid', false); }
-
-            // ĐỒNG BỘ CHỈ SỐ NĂNG LƯỢNG NGÀY & TRỌN ĐỜI TỪ MQTT (NẾU CÓ)
-            let hasEnergyUpdate = false;
-            if (!latestDailyData) latestDailyData = {};
-
-            const pvTodayVal = data.PV_Today !== undefined ? data.PV_Today : data.pv_today;
-            const batChgTodayVal = data.Bat_Charge_Today !== undefined ? data.Bat_Charge_Today : data.bat_charge_today;
-            const batDisTodayVal = data.Bat_Discharge_Today !== undefined ? data.Bat_Discharge_Today : data.bat_discharge_today;
-            const loadTodayVal = data.Load_Today !== undefined ? data.Load_Today : data.load_today;
-            const gridBuyTodayVal = data.Grid_Buy_Today !== undefined ? data.Grid_Buy_Today : data.grid_buy_today;
-
-            if (pvTodayVal !== undefined && pvTodayVal !== null && !isNaN(Number(pvTodayVal))) {
-                latestDailyData.PV_Today = Number(pvTodayVal);
-                hasEnergyUpdate = true;
-            }
-            if (batChgTodayVal !== undefined && batChgTodayVal !== null && !isNaN(Number(batChgTodayVal))) {
-                latestDailyData.Bat_Charge_Today = Number(batChgTodayVal);
-                hasEnergyUpdate = true;
-            }
-            if (batDisTodayVal !== undefined && batDisTodayVal !== null && !isNaN(Number(batDisTodayVal))) {
-                latestDailyData.Bat_Discharge_Today = Number(batDisTodayVal);
-                hasEnergyUpdate = true;
-            }
-            if (loadTodayVal !== undefined && loadTodayVal !== null && !isNaN(Number(loadTodayVal))) {
-                latestDailyData.Load_Today = Number(loadTodayVal);
-                hasEnergyUpdate = true;
-            }
-            if (gridBuyTodayVal !== undefined && gridBuyTodayVal !== null && !isNaN(Number(gridBuyTodayVal))) {
-                latestDailyData.Grid_Buy_Today = Number(gridBuyTodayVal);
-                hasEnergyUpdate = true;
-            }
-
-            const pvTotalVal = data.PV_Total_Lifetime !== undefined ? data.PV_Total_Lifetime : (data.PV_Total !== undefined ? data.PV_Total : data.pv_total);
-            if (pvTotalVal !== undefined && pvTotalVal !== null && !isNaN(Number(pvTotalVal))) {
-                latestDailyData.PV_Total_Lifetime = Number(pvTotalVal);
-                hasEnergyUpdate = true;
-            }
-            const batDisTotalVal = data.Bat_Discharge_Total_Lifetime !== undefined ? data.Bat_Discharge_Total_Lifetime : (data.Bat_Discharge_Total !== undefined ? data.Bat_Discharge_Total : data.bat_discharge_total);
-            if (batDisTotalVal !== undefined && batDisTotalVal !== null && !isNaN(Number(batDisTotalVal))) {
-                latestDailyData.Bat_Discharge_Total_Lifetime = Number(batDisTotalVal);
-                hasEnergyUpdate = true;
-            }
-            const batChgTotalVal = data.Bat_Charge_Total_Lifetime !== undefined ? data.Bat_Charge_Total_Lifetime : (data.Bat_Charge_Total !== undefined ? data.Bat_Charge_Total : data.bat_charge_total);
-            if (batChgTotalVal !== undefined && batChgTotalVal !== null && !isNaN(Number(batChgTotalVal))) {
-                latestDailyData.Bat_Charge_Total_Lifetime = Number(batChgTotalVal);
-                hasEnergyUpdate = true;
-            }
-
-            if (hasEnergyUpdate) {
-                try {
-                    localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
-                    const curD = new Date();
-                    const curDateKey = `${curD.getFullYear()}_${String(curD.getMonth() + 1).padStart(2, "0")}_${String(curD.getDate()).padStart(2, "0")}`;
-                    localStorage.setItem("sosen_cache_" + curDateKey, JSON.stringify(latestDailyData));
-                } catch(e) {}
-                recalculateEnergy();
-                updateChartTodayRealtime(latestDailyData);
-            }
-        }
-
-        function updateChartTodayRealtime(eData) {
-            if (!energyChart || currentChartMode !== 'month') return;
-            const now = new Date();
-            const yyyy = chartCursorDate.getFullYear();
-            const isCurrentYear = (yyyy === now.getFullYear());
-            const isViewingCurrentMonth = (isCurrentYear && chartCursorDate.getMonth() === now.getMonth());
-            if (!isViewingCurrentMonth || !chartAllRows || chartAllRows.length === 0) return;
-
-            const todayNum = now.getDate();
-            const rowIdx = todayNum - 1;
-            if (chartAllRows[rowIdx]) {
-                if (eData.PV_Today !== undefined) chartAllRows[rowIdx].pv = toSafeNumber(eData.PV_Today);
-                if (eData.Bat_Discharge_Today !== undefined) chartAllRows[rowIdx].batt = toSafeNumber(eData.Bat_Discharge_Today);
-                if (eData.Bat_Charge_Today !== undefined) chartAllRows[rowIdx].charge = toSafeNumber(eData.Bat_Charge_Today);
-                if (eData.Load_Today !== undefined) chartAllRows[rowIdx].load = toSafeNumber(eData.Load_Today);
-                updateVisibleChartRows();
-            }
-        }
-
-// ================= MODULE ĐỒNG BỘ 2 BÌNH RS485 QUA CLOUDFLARE WORKER (CÓ BÁO LỖI) =================
+        function toSafeNumber(v, fallback = 0) { const n = Number(v); return Number.isFinite(n) ? n : fallback; }
+        function clampNumber(v, min, max) { return Math.min(max, Math.max(min, toSafeNumber(v, min))); }
+        function updateDOMText(id, text) { const el = document.getElementById(id); if (el && el.innerText !== String(text)) el.innerText = text; }
+
+        // ================= ĐỒNG BỘ 2 BMS QUA CLOUDFLARE WORKER =================
         const CF_WORKER_URL    = "https://mika-proxy.dr-ducmung.workers.dev";
         const MIKA_BASE_URL    = "https://mikasolar.com";
-        const MIKA_DEFAULT_PWD = "111111";
+        let   mikaPassword     = localStorage.getItem("mika_saved_password") || "123456";
 
         const MIKA_DEVICES = [
             { id: "14058648",   slot: "bm1", defaultName: "CALB" },
             { id: "14058648-1", slot: "bm2", defaultName: "GOTION" }
         ];
 
-        let mikaConfigCache = {};
-        try {
-            const savedCfg = localStorage.getItem("mika_registers_cfg_cache");
-            if (savedCfg) mikaConfigCache = JSON.parse(savedCfg) || {};
-        } catch (e) {}
+        const MIKA_REGISTERS_EMBEDDED = [
+            {"address":302,"id":"cellv1","data_type":"uint16","scale":1},
+            {"address":304,"id":"cellv2","data_type":"uint16","scale":1},
+            {"address":306,"id":"cellv3","data_type":"uint16","scale":1},
+            {"address":308,"id":"cellv4","data_type":"uint16","scale":1},
+            {"address":310,"id":"cellv5","data_type":"uint16","scale":1},
+            {"address":312,"id":"cellv6","data_type":"uint16","scale":1},
+            {"address":314,"id":"cellv7","data_type":"uint16","scale":1},
+            {"address":316,"id":"cellv8","data_type":"uint16","scale":1},
+            {"address":318,"id":"cellv9","data_type":"uint16","scale":1},
+            {"address":320,"id":"cellv10","data_type":"uint16","scale":1},
+            {"address":322,"id":"cellv11","data_type":"uint16","scale":1},
+            {"address":324,"id":"cellv12","data_type":"uint16","scale":1},
+            {"address":326,"id":"cellv13","data_type":"uint16","scale":1},
+            {"address":328,"id":"cellv14","data_type":"uint16","scale":1},
+            {"address":330,"id":"cellv15","data_type":"uint16","scale":1},
+            {"address":332,"id":"cellv16","data_type":"uint16","scale":1},
+            {"address":370,"id":"cellvavg","data_type":"uint16","scale":1},
+            {"address":372,"id":"cellvdiff","data_type":"uint16","scale":1},
+            {"address":440,"id":"mostmp","data_type":"uint16","scale":0.1},
+            {"address":530,"id":"tbatv","data_type":"uint16","scale":10,"endian":"big"},
+            {"address":450,"id":"tbatw","data_type":"uint32","scale":1,"endian":"big"},
+            {"address":454,"id":"tbatc","data_type":"uint32","scale":1,"endian":"big"},
+            {"address":458,"id":"battmp1","data_type":"uint16","scale":0.1},
+            {"address":466,"id":"blanc","data_type":"int16","scale":1},
+            {"address":470,"id":"soc","data_type":"uint16","scale":1,"bitmask":255},
+            {"address":470,"id":"socrc","data_type":"uint32","scale":1,"endian":"big"},
+            {"address":126,"id":"socfcc","data_type":"uint32","scale":1,"endian":"big"},
+            {"address":478,"id":"soccc","data_type":"uint32","scale":1,"endian":"big"},
+            {"address":482,"id":"soccyccap","data_type":"uint32","scale":1,"endian":"big"},
+            {"address":486,"id":"sochealth","data_type":"uint16","scale":1,"bitmask":255},
+            {"address":490,"id":"runtime","data_type":"uint32","scale":1,"endian":"big"},
+            {"address":494,"id":"chrst","data_type":"uint16","scale":1,"bitmask":1},
+            {"address":495,"id":"dischst","data_type":"uint16","scale":1,"bitmask":1},
+            {"address":550,"id":"battmp3","data_type":"int16","scale":0.1},
+            {"address":554,"id":"battmp4","data_type":"int16","scale":0.1}
+        ];
+
+        let mikaPrompting = false;
+        function promptForMikaPassword() {
+            if (mikaPrompting) return;
+            mikaPrompting = true;
+            setTimeout(() => {
+                const pwd = prompt("Khối pin MikaSolar (14058648) yêu cầu mật khẩu.\nVui lòng nhập mật khẩu:", mikaPassword);
+                if (pwd && pwd.trim()) {
+                    mikaPassword = pwd.trim();
+                    localStorage.setItem("mika_saved_password", mikaPassword);
+                    updateDOMText('bms-updated', 'Đang thử lại...');
+                    pollBothMikaSolarBms();
+                } else {
+                    updateDOMText('bms-updated', 'Cần mật khẩu!');
+                }
+                mikaPrompting = false;
+            }, 300);
+        }
 
         function wakeUpMikaDeviceDirect(deviceId) {
             const target = `${MIKA_BASE_URL}/api/trigger-update/${encodeURIComponent(deviceId)}`;
@@ -1867,18 +541,19 @@
 
             try {
                 const res = await fetch(cfUrl, { method: "GET", cache: "no-store" });
+                if (res.status === 401) {
+                    promptForMikaPassword();
+                    return null;
+                }
                 if (!res.ok) {
-                    updateDOMText('bms-updated', `Lỗi HTTP ${res.status}`);
+                    if (res.status === 408) updateDOMText('bms-updated', 'Đang chờ (408)');
+                    else updateDOMText('bms-updated', `HTTP ${res.status}`);
                     return null;
                 }
                 const text = await res.text();
-                if (text.includes("hello world") || text.includes("No event handlers")) {
-                    updateDOMText('bms-updated', 'Worker chưa nạp code!');
-                    return null;
-                }
                 return JSON.parse(text);
             } catch (e) {
-                updateDOMText('bms-updated', 'Lỗi kết nối Proxy!');
+                updateDOMText('bms-updated', 'Lỗi kết nối');
                 return null;
             }
         }
@@ -1893,7 +568,7 @@
                 registers.forEach(reg => {
                     const addr = parseInt(reg.address);
                     const type = reg.data_type;
-                    const scale = reg.scale || 1;
+                    const scale = reg.scale !== undefined && reg.scale !== null ? Number(reg.scale) : 1;
                     const bitmask = reg.bitmask;
 
                     if (addr >= startAddress && addr < startAddress + buf.length) {
@@ -1904,13 +579,14 @@
                                 val = (buf[pos + 1] << 8) | buf[pos];
                             } else if (type === "int16") {
                                 val = (buf[pos + 1] << 8) | buf[pos];
-                                if (val >= 0x8000) val -= 0xFFFF;
+                                if (val >= 0x8000) val -= 0x10000;
                             } else if ((type === "uint32" || type === "int32") && pos + 4 <= buf.length) {
                                 if (reg.endian === "big") {
                                     val = (buf[pos + 3] << 24) | (buf[pos + 2] << 16) | (buf[pos + 1] << 8) | buf[pos];
                                 } else {
                                     val = (buf[pos + 1] << 24) | (buf[pos] << 16) | (buf[pos + 3] << 8) | buf[pos + 2];
                                 }
+                                if (type === "uint32") val = val >>> 0;
                             }
 
                             if (val !== undefined) {
@@ -1952,7 +628,7 @@
             const hours = Math.floor((rtSec % 86400) / 3600);
             const mins  = Math.floor((rtSec % 3600) / 60);
 
-            const validTemps = [d.battmp1, d.battmp2, d.battmp3, d.battmp4, d.battmp5, d.mostmp]
+            const validTemps = [d.battmp1, d.battmp3, d.battmp4, d.mostmp]
                 .map(Number)
                 .filter(t => Number.isFinite(t) && t > 0 && t <= 127);
             const maxTemp = validTemps.length > 0 ? Math.max(...validTemps) : Number(d.mostmp || 0);
@@ -1979,30 +655,21 @@
                 Remain_Capacity: Number(remCap.toFixed(1)),
                 MOS_Temp: Number(maxTemp.toFixed(1)),
                 Battery_T1: d.battmp1 > 127 ? 0 : Number(d.battmp1 || 0),
-                Battery_T2: d.battmp2 > 127 ? 0 : Number(d.battmp2 || 0),
-                Battery_T3: d.battmp3 > 127 ? 0 : Number(d.battmp3 || 0),
-                Battery_T4: d.battmp4 > 127 ? 0 : Number(d.battmp4 || 0),
+                Battery_T2: d.battmp3 > 127 ? 0 : Number(d.battmp3 || 0),
+                Battery_T3: d.battmp4 > 127 ? 0 : Number(d.battmp4 || 0),
+                Battery_T4: 0,
                 Battery_Health: soh,
                 Battery_Power: Number(powerW.toFixed(1)),
                 Signed_Power: Number((totalV * currA).toFixed(1)),
-                Max_Charge_Curr: Number(d.maxchargecur || 120),
-                Max_Discharge_Curr: Number(d.maxdischargecur || 120),
+                Max_Charge_Curr: 120,
+                Max_Discharge_Curr: 120,
                 Cell_Count: validCells || 16
             };
         }
 
         async function fetchSingleMikaDevice(devInfo) {
-            if (!mikaConfigCache[devInfo.id]) {
-                const cfg = await mikaFetchGetJson(`/api/config?device_id=${encodeURIComponent(devInfo.id)}`);
-                if (cfg && Array.isArray(cfg.registers) && cfg.registers.length > 0) {
-                    mikaConfigCache[devInfo.id] = cfg.registers;
-                    try { localStorage.setItem("mika_registers_cfg_cache", JSON.stringify(mikaConfigCache)); } catch (e) {}
-                } else {
-                    return false;
-                }
-            }
-
-            const docs = await mikaFetchGetJson(`/api/raw-data/${encodeURIComponent(devInfo.id)}?password=${MIKA_DEFAULT_PWD}`);
+            const docs = await mikaFetchGetJson(`/api/raw-data/${encodeURIComponent(devInfo.id)}?password=${encodeURIComponent(mikaPassword)}`);
+            
             if (!Array.isArray(docs) || docs.length === 0) {
                 wakeUpMikaDeviceDirect(devInfo.id);
                 return false;
@@ -2011,7 +678,7 @@
             const mergedRaw = {};
             docs.forEach(doc => {
                 if (doc && doc.reg_val) {
-                    Object.assign(mergedRaw, decodeMikaDocument(doc.reg_val, doc.reg_start, mikaConfigCache[devInfo.id]));
+                    Object.assign(mergedRaw, decodeMikaDocument(doc.reg_val, doc.reg_start, MIKA_REGISTERS_EMBEDDED));
                 }
             });
 
@@ -2035,6 +702,11 @@
 
                 if (anyOk) {
                     refreshBmsPanels();
+                    if (mqttClient && mqttClient.connected) {
+                        if (latestBmsCombined.bm1) mqttClient.publish("sosen/jk_bms1", JSON.stringify(latestBmsCombined.bm1), { qos: 0, retain: true });
+                        if (latestBmsCombined.bm2) mqttClient.publish("sosen/jk_bms2", JSON.stringify(latestBmsCombined.bm2), { qos: 0, retain: true });
+                        mqttClient.publish("sosen/jk_bms", JSON.stringify({ BM1: latestBmsCombined.bm1, BM2: latestBmsCombined.bm2 }), { qos: 0, retain: true });
+                    }
                 }
             } catch (e) {} finally {
                 isMikaPolling = false;
@@ -2043,114 +715,236 @@
 
         function triggerBothMikaDevices() {
             if (document.hidden) return;
-            for (const dev of MIKA_DEVICES) {
-                wakeUpMikaDeviceDirect(dev.id);
-            }
+            for (const dev of MIKA_DEVICES) wakeUpMikaDeviceDirect(dev.id);
         }
 
-        // ================= KHỞI TẠO KẾT NỐI MQTT WEBSOCKET =================
+        function updateBmsPanel(prefix, data) {
+            const card = document.getElementById(`${prefix}-card`);
+            const online = !!data && data.Online === true;
+            if (card) card.classList.toggle('offline', !online);
+
+            updateDOMText(`${prefix}-online`, online ? 'ON' : 'OFF');
+            if (!online) return;
+
+            updateDOMText(`${prefix}-runtime`, data.Runtime_Text || '--');
+            updateDOMText(`${prefix}-cycle-top`, String(data.Cycle_Count ?? '--'));
+            updateDOMText(`${prefix}-soc`, `${data.Remain_Battery}%`);
+            updateDOMText(`${prefix}-voltage`, `${data.Total_Voltage.toFixed(2)} V`);
+            updateDOMText(`${prefix}-current`, `${data.Current.toFixed(2)} A`);
+
+            updateDOMText(`${prefix}-cell-high`, data.Max_Cell_Voltage.toFixed(3));
+            updateDOMText(`${prefix}-cell-low`, data.Min_Cell_Voltage.toFixed(3));
+            updateDOMText(`${prefix}-cell-diff`, data.Cell_Voltage_Diff.toFixed(3));
+            updateDOMText(`${prefix}-balance-current`, data.Balance_Current.toFixed(3));
+            updateDOMText(`${prefix}-capacity`, data.Batt_Capacity.toFixed(1));
+            updateDOMText(`${prefix}-remain`, data.Remain_Capacity.toFixed(1));
+            updateDOMText(`${prefix}-mos-temp`, data.MOS_Temp.toFixed(1));
+            updateDOMText(`${prefix}-health`, String(data.Battery_Health));
+
+            updateDOMText(`${prefix}-t1`, String(data.Battery_T1));
+            updateDOMText(`${prefix}-t2`, String(data.Battery_T2));
+            updateDOMText(`${prefix}-t3`, String(data.Battery_T3));
+            updateDOMText(`${prefix}-t4`, String(data.Battery_T4));
+
+            // CÔNG SUẤT GỌN GÀNG (VD: 585.5 / 6500)
+            updateDOMText(`${prefix}-power`, `${data.Battery_Power.toFixed(1)} / 6500`);
+            const fill = document.getElementById(`${prefix}-power-fill`);
+            if (fill) fill.style.width = `${Math.min(100, (data.Battery_Power / 6500) * 100).toFixed(1)}%`;
+
+            bmsSetFlag(`${prefix}-charge-state`, data.Charge);
+            bmsSetFlag(`${prefix}-discharge-state`, data.Discharge);
+            bmsSetFlag(`${prefix}-balance-state`, data.Balance);
+        }
+
+        function bmsSetFlag(id, isOn) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerText = isOn ? 'ON' : 'OFF';
+            el.classList.toggle('on', !!isOn);
+            el.classList.toggle('off', !isOn);
+        }
+
+        let latestBmsCombined = { bm1: null, bm2: null };
+        function refreshBmsPanels() {
+            updateBmsPanel('bm1', latestBmsCombined.bm1);
+            updateBmsPanel('bm2', latestBmsCombined.bm2);
+            updateDOMText('bms-updated', new Date().toLocaleTimeString('vi-VN', { hour12: false }));
+        }
+
+        // ================= MQTT CLIENT & DIAGRAM =================
         let mqttClient = null;
         function initMQTT() {
             if (typeof mqtt === 'undefined') return;
-
             mqttClient = mqtt.connect(MQTT_WSS_URL, {
                 clientId: MQTT_CLIENT_ID,
                 username: MQTT_USER,
                 password: MQTT_PASSWORD,
                 clean: true,
-                reconnectPeriod: 2000,
-                connectTimeout: 5000,
-                keepalive: 15
+                reconnectPeriod: 2000
             });
 
             mqttClient.on('connect', () => {
-                mqttClient.subscribe([MQTT_TOPIC_DATA, MQTT_TOPIC_BMS, MQTT_TOPIC_BMS1, MQTT_TOPIC_BMS2], { qos: 0 });
+                mqttClient.subscribe(["sosen/data", "sosen/jk_bms", "sosen/jk_bms1", "sosen/jk_bms2"], { qos: 0 });
             });
 
             mqttClient.on('message', (topic, message) => {
                 try {
                     const parsed = JSON.parse(message.toString());
-                    if (topic === MQTT_TOPIC_DATA) {
+                    if (topic === "sosen/data") {
                         processIncomingLiveData(parsed);
-                    } else if (topic === MQTT_TOPIC_BMS) {
-                        // Chỉ nhận gói BMS từ MQTT nếu có dữ liệu thực (Online === true) để chặn gói OFF cũ
-                        const packs = bmsResolvePacks(parsed);
-                        let changed = false;
-                        if (packs.bm1 && packs.bm1.Online === true) { latestBmsCombined.bm1 = packs.bm1; changed = true; }
-                        if (packs.bm2 && packs.bm2.Online === true) { latestBmsCombined.bm2 = packs.bm2; changed = true; }
-                        if (changed) refreshBmsPanels();
-                    } else if (topic === MQTT_TOPIC_BMS1) {
-                        if (parsed && parsed.Online === true) {
-                            latestBmsCombined.bm1 = parsed;
-                            refreshBmsPanels();
-                        }
-                    } else if (topic === MQTT_TOPIC_BMS2) {
-                        if (parsed && parsed.Online === true) {
-                            latestBmsCombined.bm2 = parsed;
-                            refreshBmsPanels();
-                        }
                     }
                 } catch (e) {}
             });
         }
 
+        function processIncomingLiveData(data) {
+            if (!data) return;
+            updateDOMText('clock-time-text', new Date().toLocaleTimeString('vi-VN', { hour12: false }));
+            updateDOMText('device-status', 'ESP32 ON');
+            document.getElementById('device-status').className = 'clock-grid-status on';
+
+            const vGrid = toSafeNumber(data.V_Grid);
+            const isGridOn = (vGrid > 50) || (data.Grid_Online === true);
+            updateDOMText('clock-grid-status', isGridOn ? 'GRID ON' : 'GRID OFF');
+            document.getElementById('clock-grid-status').className = `clock-grid-status ${isGridOn ? 'on' : 'off'}`;
+
+            const pvW = Math.max(0, Math.round(toSafeNumber(data.PV_Power)));
+            const gridW = Math.round(toSafeNumber(data.Grid_Power));
+            const battW = Math.round(toSafeNumber(data.Batt_Power));
+            const loadW = Math.max(0, Math.round(toSafeNumber(data.Load_Power)));
+
+            updateDOMText('lbl-pv', pvW);
+            updateDOMText('lbl-grid', Math.abs(gridW));
+            updateDOMText('lbl-batt', Math.abs(battW));
+            updateDOMText('lbl-load', loadW);
+            updateDOMText('lbl-soc', `${data.Batt_SOC || 0}%`);
+
+            const battFill = document.getElementById('batt-fill');
+            if (battFill) {
+                battFill.style.width = `${data.Batt_SOC || 0}%`;
+                battFill.className = `battery-fill ${(data.Batt_SOC <= 20) ? 'fill-red' : (data.Batt_SOC <= 40 ? 'fill-yellow' : 'fill-green')}`;
+            }
+
+            updateDOMText('mini-stat-v', `${toSafeNumber(data.Batt_Voltage).toFixed(1)} V`);
+            updateDOMText('mini-stat-a', `${toSafeNumber(data.Batt_Current).toFixed(1)} A`);
+            updateDOMText('lbl-status', data.Batt_Status || "Chờ");
+            updateDOMText('lbl-inv-temp', `🌡️ ${toSafeNumber(data.Inv_Temp).toFixed(0)}°C`);
+            updateDOMText('lbl-batt-temp', `🌡️ ${toSafeNumber(data.Batt_Temp).toFixed(1)}°C`);
+
+            document.getElementById('flow-pv').style.display = (pvW >= 5) ? 'block' : 'none';
+            document.getElementById('flow-load').style.display = (loadW >= 5) ? 'block' : 'none';
+            document.getElementById('flow-batt').style.display = (Math.abs(battW) >= 5) ? 'block' : 'none';
+            document.getElementById('flow-grid').style.display = (isGridOn && Math.abs(gridW) >= 5) ? 'block' : 'none';
+        }
+
+        // ================= BIỂU ĐỒ & FIREBASE =================
+        let energyChart = null;
+        let currentChartMode = 'month';
+        let chartCursorDate = new Date();
+        let latestDailyData = null;
+
+        function initChart() {
+            const ctx = document.getElementById('energyChart');
+            if (!ctx) return;
+            energyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['1','2','3','4','5','6','7','8','9','10'],
+                    datasets: [
+                        { label: 'PV', data: [], backgroundColor: '#59ba35' },
+                        { label: 'Xả pin', data: [], backgroundColor: '#45a8de' },
+                        { label: 'Sạc pin', data: [], backgroundColor: '#3322c9' },
+                        { label: 'Tiêu thụ', data: [], backgroundColor: '#ffa247' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+            loadChartData();
+        }
+
+        function setChartMode(m) {
+            currentChartMode = m;
+            document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-chart-${m}`).classList.add('active');
+            loadChartData();
+        }
+        function shiftChartPeriod(step) {
+            if (currentChartMode === 'month') chartCursorDate.setMonth(chartCursorDate.getMonth() + step);
+            else chartCursorDate.setFullYear(chartCursorDate.getFullYear() + step);
+            loadChartData();
+        }
+        function moveChartDay(step) {}
+
+        function loadChartData() {
+            if (!database) return;
+            const yyyy = chartCursorDate.getFullYear();
+            const mm = String(chartCursorDate.getMonth() + 1).padStart(2, '0');
+            updateDOMText('chart-period-label', `${yyyy}-${mm}`);
+
+            database.ref(`/SosenSystem/History/Daily/${yyyy}_${mm}`).once('value', snap => {
+                const days = snap.val() || {};
+                const labels = [], pv = [], batt = [], charge = [], load = [];
+                for (let d = 1; d <= 31; d++) {
+                    const dk = `day_${String(d).padStart(2, '0')}`;
+                    if (days[dk]) {
+                        labels.push(String(d));
+                        pv.push(days[dk].pv || 0);
+                        batt.push(days[dk].batt || 0);
+                        charge.push(days[dk].charge || 0);
+                        load.push(days[dk].load || 0);
+                    }
+                }
+                if (energyChart) {
+                    energyChart.data.labels = labels;
+                    energyChart.data.datasets[0].data = pv;
+                    energyChart.data.datasets[1].data = batt;
+                    energyChart.data.datasets[2].data = charge;
+                    energyChart.data.datasets[3].data = load;
+                    energyChart.update();
+                }
+            });
+        }
+
+        function recalculateEnergy() {
+            if (!latestDailyData) return;
+            updateDOMText('stat-pv-today', `${toSafeNumber(latestDailyData.PV_Today).toFixed(1)} kWh`);
+            updateDOMText('stat-load-today', `${toSafeNumber(latestDailyData.Load_Today).toFixed(1)} kWh`);
+            updateDOMText('stat-grid-buy', `${toSafeNumber(latestDailyData.Grid_Buy_Today).toFixed(1)} kWh`);
+            updateDOMText('stat-bat-dis', `${toSafeNumber(latestDailyData.Bat_Discharge_Today).toFixed(1)} kWh`);
+            updateDOMText('stat-bat-chg', `${toSafeNumber(latestDailyData.Bat_Charge_Today).toFixed(1)} kWh`);
+            updateDOMText('stat-bat-dis-total', `${toSafeNumber(latestDailyData.Bat_Discharge_Total_Lifetime).toFixed(1)} kWh`);
+            updateDOMText('stat-bat-chg-total', `${toSafeNumber(latestDailyData.Bat_Charge_Total_Lifetime).toFixed(1)} kWh`);
+            updateDOMText('stat-pv-total', `${toSafeNumber(latestDailyData.PV_Total_Lifetime).toFixed(1)} kWh`);
+
+            const pvT = toSafeNumber(latestDailyData.PV_Today);
+            updateDOMText('money-pv-today', pvT.toFixed(1));
+            updateDOMText('money-today', `${Math.round(pvT * 2600).toLocaleString('vi-VN')} đ`);
+            updateDOMText('money-pv-month', (pvT * 28).toFixed(1));
+            updateDOMText('money-month', `${Math.round(pvT * 28 * 2600).toLocaleString('vi-VN')} đ`);
+            updateDOMText('money-pv-total', toSafeNumber(latestDailyData.PV_Total_Lifetime).toFixed(1));
+            updateDOMText('money-total', `${Math.round(toSafeNumber(latestDailyData.PV_Total_Lifetime) * 2600).toLocaleString('vi-VN')} đ`);
+        }
+
         // ================= KHỞI ĐỘNG HỆ THỐNG =================
         document.addEventListener('DOMContentLoaded', () => {
-            const cachedData = localStorage.getItem("last_sosen_snapshot");
-            if (cachedData) {
-                try { processIncomingLiveData(JSON.parse(cachedData)); } catch (e) {}
-            }
-
-            const cachedBms = localStorage.getItem("last_sosen_bms_snapshot");
-            if (cachedBms) {
-                try {
-                    const parsedBms = JSON.parse(cachedBms);
-                    if (parsedBms) {
-                        if (parsedBms.bm1 && parsedBms.bm1.Online === true) latestBmsCombined.bm1 = parsedBms.bm1;
-                        if (parsedBms.bm2 && parsedBms.bm2.Online === true) latestBmsCombined.bm2 = parsedBms.bm2;
-                        if (latestBmsCombined.bm1 || latestBmsCombined.bm2) refreshBmsPanels();
-                    }
-                } catch (e) {}
-            }
-
-            const cachedDaily = localStorage.getItem("last_sosen_daily_snapshot");
-            if (cachedDaily) {
-                try {
-                    latestDailyData = JSON.parse(cachedDaily);
-                    recalculateEnergy();
-                } catch (e) {}
-            }
-
-            updateBackgroundByTimeAndPv();
-            initCanvasSun();
             initChart();
             initMQTT();
 
-            // Khởi chạy đồng bộ 2 BMS qua Cloudflare Worker (2 giây/lần)
+            if (database) {
+                database.ref('/SosenSystem/Daily_Energy').on('value', snap => {
+                    latestDailyData = snap.val();
+                    recalculateEnergy();
+                });
+            }
+
+            // KÍCH HOẠT ĐỒNG BỘ 2 BMS NGAY KHI VÀO TRANG
             triggerBothMikaDevices();
             setTimeout(() => {
                 pollBothMikaSolarBms();
-                setInterval(pollBothMikaSolarBms, 2000);
-                setInterval(triggerBothMikaDevices, 25000);
-            }, 600);
-
-            if (database) {
-                database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
-                    latestDailyData = snapshot.val();
-                    if (latestDailyData) {
-                        try { localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData)); } catch(e) {}
-                    }
-                    checkAndSwitchMonth();
-                    recalculateEnergy();
-                    if (energyChart && (currentChartMode === 'month' || currentChartMode === 'year')) {
-                        loadChartData();
-                    }
-                });
-                setInterval(() => { checkAndSwitchMonth(); }, 60000);
-                setInterval(() => { checkAutoSnapshotSchedule(); }, 20000);
-            }
+                setInterval(pollBothMikaSolarBms, 2000);   // Đọc 2 giây/lần
+                setInterval(triggerBothMikaDevices, 25000); // Đánh thức định kỳ
+            }, 500);
         });
-        setInterval(() => { updateBackgroundByTimeAndPv(); }, 60000);
     </script>
 </body>
 </html>
