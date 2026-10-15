@@ -294,49 +294,57 @@
         .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
         .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
 
-        /* ================= JK BMS CARD STYLES (CHUẨN ẢNH 681e1b.jpg & KHÔNG CẮT CHỮ) ================= */
-        .bms-card { background: linear-gradient(135deg, rgba(16,18,27,0.97), rgba(30,27,42,0.95)); border: 1px solid rgba(0,255,114,0.42); color: #f5fff8; padding: 14px 12px; }
-        .bms-card .stat-header { align-items: center; gap: 10px; margin-bottom: 10px; }
-        .bms-card .stat-header h2 { color: #eafff2; line-height: 1.15; font-size: 15px; }
+        /* ================= BMS CARD STYLES (TỐI ƯU GIAO DIỆN DI ĐỘNG & KHÔNG BỊ KHUẤT SỐ) ================= */
+        .bms-card { background: linear-gradient(135deg, rgba(16,18,27,0.97), rgba(30,27,42,0.95)); border: 1px solid rgba(0,255,114,0.42); color: #f5fff8; padding: 14px 10px; }
+        .bms-card .stat-header { align-items: center; gap: 8px; margin-bottom: 10px; }
+        .bms-card .stat-header h2 { color: #eafff2; line-height: 1.15; font-size: 15px; letter-spacing: 0.3px; }
         .bms-updated { color: #a7ffcb; font-size: 11px; font-weight: 900; white-space: nowrap; }
-        .bms-board-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; position: relative; z-index: 1; }
-        .bms-board { min-width: 0; border: 1px solid rgba(0,255,114,0.36); border-radius: 14px; background: rgba(8,12,18,0.86); box-shadow: inset 0 0 18px rgba(0,255,114,0.06); padding: 9px 8px; overflow: hidden; }
+        .bms-board-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; position: relative; z-index: 1; }
+        .bms-board { min-width: 0; border: 1px solid rgba(0,255,114,0.36); border-radius: 14px; background: rgba(8,12,18,0.86); box-shadow: inset 0 0 18px rgba(0,255,114,0.06); padding: 8px 6px; overflow: hidden; }
         .bms-board.offline { border-color: rgba(255,68,68,0.42); opacity: 0.85; }
-        .bms-topbar { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
-        .bms-id-chip, .bms-runtime-chip, .bms-cycle-chip { border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; background: rgba(255,255,255,0.06); color: #fff; font-size: 8.5px; font-weight: 900; line-height: 1.1; padding: 5px 5px; white-space: nowrap; }
+        .bms-topbar { display: flex; align-items: center; justify-content: space-between; gap: 3px; }
+        .bms-id-chip, .bms-runtime-chip, .bms-cycle-chip { border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; background: rgba(255,255,255,0.06); color: #fff; font-size: 8px; font-weight: 900; line-height: 1.1; padding: 4px 4px; white-space: nowrap; }
         .bms-id-chip { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
         .bms-id-chip strong { color: #00ff72; }
         .bms-runtime-chip { color: #ffd34e; text-align: center; flex: 0 1 auto; }
         .bms-cycle-chip { color: #ffd34e; text-align: center; flex: 0 0 auto; }
-        .bms-online { display: inline-block; margin-left: 3px; color: #00ff72; font-size: 8px; }
+        .bms-online { display: inline-block; margin-left: 2px; color: #00ff72; font-size: 7.5px; }
         .bms-board.offline .bms-online { color: #ff4b4b; }
-        .bms-status-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: 7px; }
-        .bms-flag { display: flex; align-items: center; justify-content: space-between; gap: 3px; min-width: 0; border: 1px solid rgba(0,255,114,0.38); border-radius: 12px; background: rgba(0,80,28,0.34); color: #fff; font-size: 8.5px; font-weight: 900; line-height: 1; padding: 3px 4px 3px 5px; }
+        .bms-status-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; margin-top: 6px; }
+        .bms-flag { display: flex; align-items: center; justify-content: space-between; gap: 2px; min-width: 0; border: 1px solid rgba(0,255,114,0.38); border-radius: 12px; background: rgba(0,80,28,0.34); color: #fff; font-size: 8px; font-weight: 900; line-height: 1; padding: 3px 3px 3px 4px; }
         .bms-flag span:first-child { min-width: 0; overflow: hidden; white-space: nowrap; }
-        .bms-flag-value { flex: 0 0 auto; min-width: 24px; border-radius: 8px; color: #fff; text-align: center; padding: 2px 4px; background: #555; font-size: 8px; }
+        .bms-flag-value { flex: 0 0 auto; min-width: 22px; border-radius: 8px; color: #fff; text-align: center; padding: 2px 3px; background: #555; font-size: 7.5px; }
         .bms-flag-value.on { background: #12d83f; color: #001805; }
         .bms-flag-value.off { background: #40434a; color: #fff; }
-        .bms-core { display: grid; place-items: center; min-height: 132px; margin: 8px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
-        .bms-soc-ring { width: 112px; aspect-ratio: 1; border: 4.5px solid #00ff72; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 0 24px rgba(0,255,114,0.18), inset 0 0 24px rgba(0,0,0,0.42); }
-        .bms-soc { color: #00ff72; font-size: 27px; font-weight: 900; line-height: 1; white-space: nowrap; }
-        .bms-pill { min-width: 74px; border: 1px solid rgba(0,255,114,0.7); border-radius: 12px; background: rgba(0,80,28,0.42); color: #fff; text-align: center; font-size: 11.5px; font-weight: 900; line-height: 1; padding: 4px 6px; white-space: nowrap; }
-        .bms-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
-        .bms-metric { min-width: 0; min-height: 50px; border: 1px solid rgba(0,255,114,0.34); border-radius: 8px; background: rgba(0,80,28,0.28); padding: 6px 4px; overflow: hidden; }
-        button.bms-metric { width: 100%; font-family: inherit; text-align: left; cursor: pointer; }
+        
+        .bms-core { display: grid; place-items: center; min-height: 126px; margin: 7px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
+        .bms-soc-ring { width: 104px; aspect-ratio: 1; border: 4px solid #00ff72; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 0 20px rgba(0,255,114,0.18), inset 0 0 20px rgba(0,0,0,0.42); }
+        .bms-soc { color: #00ff72; font-size: 24px; font-weight: 900; line-height: 1; white-space: nowrap; }
+        .bms-pill { min-width: 66px; border: 1px solid rgba(0,255,114,0.7); border-radius: 12px; background: rgba(0,80,28,0.42); color: #fff; text-align: center; font-size: 10.5px; font-weight: 900; line-height: 1; padding: 3px 5px; white-space: nowrap; }
+        
+        /* Grid hiển thị thông số Pin (tối ưu không bị mất số trên màn hình hẹp) */
+        .bms-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3.5px; }
+        .bms-metric { min-width: 0; min-height: 46px; border: 1px solid rgba(0,255,114,0.34); border-radius: 7px; background: rgba(0,80,28,0.28); padding: 5px 2px; overflow: hidden; text-align: center; }
+        button.bms-metric { width: 100%; font-family: inherit; text-align: center; cursor: pointer; }
         .bms-temp-toggle { position: relative; }
-        .bms-temp-toggle::after { content: "⋯"; position: absolute; right: 4px; top: 4px; color: rgba(255,255,255,0.72); font-size: 12px; line-height: 1; }
-        .bms-metric .value { display: block; color: #00ff72; font-size: 13.5px; font-weight: 900; line-height: 1.1; white-space: nowrap; }
-        .bms-metric .label { display: block; margin-top: 5px; color: #d9ffe7; font-size: 7.5px; font-weight: 900; line-height: 1.1; letter-spacing: -0.2px; text-transform: uppercase; white-space: nowrap; }
+        .bms-temp-toggle::after { content: "⋯"; position: absolute; right: 2px; top: 1px; color: rgba(255,255,255,0.7); font-size: 10px; line-height: 1; }
+        
+        .bms-metric .value { display: block; color: #00ff72; font-size: 11.5px; font-weight: 900; line-height: 1.1; white-space: nowrap; letter-spacing: -0.3px; }
+        .bms-metric .label { display: block; margin-top: 3px; color: #d9ffe7; font-size: 7px; font-weight: 900; line-height: 1; letter-spacing: -0.3px; text-transform: uppercase; white-space: nowrap; }
         .bms-metric.warn .value { color: #ffd34e; }
         .bms-metric.danger .value { color: #ff334d; }
-        .bms-temp-detail { display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; margin-top: 5px; }
+        
+        .bms-temp-detail { display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3.5px; margin-top: 4px; }
         .bms-board.temps-open .bms-temp-detail { display: grid; }
-        .bms-temp-chip { min-width: 0; border: 1px solid rgba(255,211,78,0.42); border-radius: 8px; background: rgba(255,211,78,0.12); padding: 6px 4px; overflow: hidden; }
-        .bms-temp-chip .value { display: block; color: #ffd34e; font-size: 13px; font-weight: 900; line-height: 1.1; white-space: nowrap; }
-        .bms-temp-chip .label { display: block; margin-top: 5px; color: #fff4c5; font-size: 8px; font-weight: 900; line-height: 1.1; text-transform: uppercase; white-space: nowrap; }
-        .bms-power-row { margin-top: 9px; color: #fff; font-size: 11.5px; font-weight: 900; line-height: 1.2; }
-        .bms-power-row span { color: #00ff72; font-size: 14.5px; }
-        .bms-power-bar { height: 8px; margin-top: 5px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; }
+        .bms-temp-chip { min-width: 0; border: 1px solid rgba(255,211,78,0.42); border-radius: 7px; background: rgba(255,211,78,0.12); padding: 5px 2px; overflow: hidden; text-align: center; }
+        .bms-temp-chip .value { display: block; color: #ffd34e; font-size: 11px; font-weight: 900; line-height: 1.1; white-space: nowrap; letter-spacing: -0.3px; }
+        .bms-temp-chip .label { display: block; margin-top: 3px; color: #fff4c5; font-size: 7px; font-weight: 900; line-height: 1; text-transform: uppercase; white-space: nowrap; }
+        
+        /* Hiển thị dòng Công Suất gọn gàng */
+        .bms-power-row { margin-top: 7px; display: flex; align-items: baseline; gap: 4px; white-space: nowrap; overflow: hidden; }
+        .bms-power-label { color: #a0aec0; font-size: 9.5px; font-weight: 800; text-transform: none; letter-spacing: 0; }
+        .bms-power-row span.power-val { color: #00ff72; font-size: 12.5px; font-weight: 900; }
+        .bms-power-bar { height: 6px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; }
         .bms-power-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9affbf, #00cc66); transition: width 0.35s ease; }
 
         @media (max-width: 620px) {
@@ -346,12 +354,21 @@
             .chart-period-control { width: 100%; grid-template-columns: 38px 1fr 38px; }
             .chart-stage { height: 245px; padding-top: 32px; }
             .chart-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .bms-card { padding: 12px 8px; }
-            .bms-board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-            .bms-board { padding: 7px 6px; }
-            .bms-soc-ring { width: 100px; }
-            .bms-soc { font-size: 24px; }
-            .bms-pill { min-width: 68px; font-size: 10.5px; padding: 3px 5px; }
+            
+            .bms-card { padding: 10px 6px; }
+            .bms-board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+            .bms-board { padding: 6px 4px; }
+            .bms-soc-ring { width: 92px; }
+            .bms-soc { font-size: 21px; }
+            .bms-pill { min-width: 58px; font-size: 9.5px; padding: 2.5px 4px; }
+            .bms-metric { min-height: 42px; padding: 4px 1px; }
+            .bms-metric .value { font-size: 10.5px; letter-spacing: -0.4px; }
+            .bms-metric .label { font-size: 6.8px; letter-spacing: -0.4px; }
+            .bms-temp-chip { padding: 4px 1px; }
+            .bms-temp-chip .value { font-size: 10.5px; }
+            .bms-temp-chip .label { font-size: 6.8px; }
+            .bms-power-label { font-size: 9px; }
+            .bms-power-row span.power-val { font-size: 11.5px; }
         }
 
         .money-card { background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95)); border: 1px solid rgba(218, 165, 32, 0.65); }
@@ -508,10 +525,10 @@
                 </div>
             </div>
 
-            <!-- 2. KHUNG JK BMS (ĐỒNG BỘ 2 BÌNH 14058648 & 14058648-1 QUA CLOUDFLARE WORKER) -->
+            <!-- 2. KHUNG HỆ THỐNG PIN (ĐỒNG BỘ 2 BÌNH 14058648 & 14058648-1 QUA CLOUDFLARE WORKER) -->
             <div class="stat-card bms-card">
                 <div class="stat-header">
-                    <h2>🔋 JK BMS BLUETOOTH</h2>
+                    <h2>🔋 HỆ THỐNG PIN</h2>
                     <div class="bms-updated" id="bms-updated">--:--:--</div>
                 </div>
                 <div class="bms-board-grid">
@@ -550,7 +567,7 @@
                             <div class="bms-temp-chip"><span class="value" id="bm1-t3">--</span><span class="label">T3 (°C)</span></div>
                             <div class="bms-temp-chip"><span class="value" id="bm1-t4">--</span><span class="label">T4 (°C)</span></div>
                         </div>
-                        <div class="bms-power-row">CÔNG SUẤT (W): <span id="bm1-power">--</span></div>
+                        <div class="bms-power-row"><span class="bms-power-label">Công Suất:</span> <span class="power-val" id="bm1-power">--</span></div>
                         <div class="bms-power-bar"><div class="bms-power-fill" id="bm1-power-fill"></div></div>
                     </section>
 
@@ -589,7 +606,7 @@
                             <div class="bms-temp-chip"><span class="value" id="bm2-t3">--</span><span class="label">T3 (°C)</span></div>
                             <div class="bms-temp-chip"><span class="value" id="bm2-t4">--</span><span class="label">T4 (°C)</span></div>
                         </div>
-                        <div class="bms-power-row">CÔNG SUẤT (W): <span id="bm2-power">--</span></div>
+                        <div class="bms-power-row"><span class="bms-power-label">Công Suất:</span> <span class="power-val" id="bm2-power">--</span></div>
                         <div class="bms-power-bar"><div class="bms-power-fill" id="bm2-power-fill"></div></div>
                     </section>
                 </div>
@@ -1838,7 +1855,7 @@
             }
         }
 
-// ================= MODULE ĐỒNG BỘ 2 BÌNH RS485 QUA CLOUDFLARE WORKER (CÓ BÁO LỖI) =================
+        // ================= MODULE ĐỒNG BỘ 2 BÌNH RS485 QUA CLOUDFLARE WORKER =================
         const CF_WORKER_URL    = "https://mika-proxy.dr-ducmung.workers.dev";
         const MIKA_BASE_URL    = "https://mikasolar.com";
         const MIKA_DEFAULT_PWD = "111111";
@@ -2073,7 +2090,6 @@
                     if (topic === MQTT_TOPIC_DATA) {
                         processIncomingLiveData(parsed);
                     } else if (topic === MQTT_TOPIC_BMS) {
-                        // Chỉ nhận gói BMS từ MQTT nếu có dữ liệu thực (Online === true) để chặn gói OFF cũ
                         const packs = bmsResolvePacks(parsed);
                         let changed = false;
                         if (packs.bm1 && packs.bm1.Online === true) { latestBmsCombined.bm1 = packs.bm1; changed = true; }
