@@ -1622,7 +1622,8 @@
             else { setFlow('flow-grid', false); }
         }
 
-        // ================= MODULE ĐỒNG BỘ 2 BÌNH RS485 TỪ MIKASOLAR (CÓ ĐÁNH THỨC NO-CORS & 3 PROXY) =================
+        // ================= MODULE ĐỒNG BỘ 2 BÌNH RS485 TỪ MIKASOLAR QUA CLOUDFLARE WORKER =================
+        const CF_WORKER_URL    = "https://mika-proxy.dr-ducmung.workers.dev";
         const MIKA_BASE_URL    = "https://mikasolar.com";
         const MIKA_DEFAULT_PWD = "123456";
 
@@ -1637,50 +1638,23 @@
             if (savedCfg) mikaConfigCache = JSON.parse(savedCfg) || {};
         } catch (e) {}
 
-        // Gửi lệnh POST đánh thức trực tiếp tới MikaSolar bằng mode: 'no-cors' (Không bao giờ bị chặn!)
+        // Gửi lệnh POST đánh thức mạch qua Cloudflare Worker
         function wakeUpMikaDeviceDirect(deviceId) {
-            const url = `${MIKA_BASE_URL}/api/trigger-update/${encodeURIComponent(deviceId)}`;
-            fetch(url, { method: "POST", mode: "no-cors", cache: "no-store" }).catch(() => {});
+            const target = `${MIKA_BASE_URL}/api/trigger-update/${encodeURIComponent(deviceId)}`;
+            const url = `${CF_WORKER_URL}/?url=${encodeURIComponent(target)}`;
+            fetch(url, { method: "POST", cache: "no-store" }).catch(() => {});
         }
 
-        // Hệ thống 3 Proxy xoay vòng cho lệnh GET JSON
-        let preferredProxyIdx = 0;
+        // Đọc dữ liệu JSON qua Cloudflare Worker không bị giới hạn
         async function mikaFetchGetJson(path) {
             const sep = path.includes("?") ? "&" : "?";
-            const freshUrl = `${MIKA_BASE_URL}${path}${sep}_t=${Date.now()}`;
-
-            const proxyBuilders = [
-                // Proxy 1: AllOrigins JSON wrapper (disableCache=true)
-                async (u) => {
-                    const r = await fetch(`https://api.allorigins.win/get?disableCache=true&url=${encodeURIComponent(u)}`, { cache: "no-store" });
-                    if (!r.ok) throw new Error("AO status " + r.status);
-                    const wrapper = await r.json();
-                    if (!wrapper || !wrapper.contents) throw new Error("AO empty");
-                    return JSON.parse(wrapper.contents);
-                },
-                // Proxy 2: CodeTabs Proxy
-                async (u) => {
-                    const r = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`, { cache: "no-store" });
-                    if (!r.ok) throw new Error("CT status " + r.status);
-                    return await r.json();
-                },
-                // Proxy 3: AllOrigins Raw
-                async (u) => {
-                    const r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`, { cache: "no-store" });
-                    if (!r.ok) throw new Error("AORaw status " + r.status);
-                    return await r.json();
-                }
-            ];
-
-            for (let attempt = 0; attempt < proxyBuilders.length; attempt++) {
-                const idx = (preferredProxyIdx + attempt) % proxyBuilders.length;
-                try {
-                    const data = await proxyBuilders[idx](freshUrl);
-                    if (data !== null && data !== undefined) {
-                        preferredProxyIdx = idx; // Nhớ cổng Proxy nhanh nhất
-                        return data;
-                    }
-                } catch (e) {}
+            const target = `${MIKA_BASE_URL}${path}${sep}_t=${Date.now()}`;
+            const url = `${CF_WORKER_URL}/?url=${encodeURIComponent(target)}`;
+            try {
+                const res = await fetch(url, { method: "GET", cache: "no-store" });
+                if (res.ok) return await res.json();
+            } catch (e) {
+                console.warn("[CF Worker] Lỗi kết nối:", e);
             }
             return null;
         }
@@ -1794,7 +1768,6 @@
         }
 
         async function fetchSingleMikaDevice(devInfo) {
-            // 1. Lấy cấu hình thanh ghi (chỉ tải 1 lần và lưu vào localStorage)
             if (!mikaConfigCache[devInfo.id]) {
                 const cfg = await mikaFetchGetJson(`/api/config?device_id=${encodeURIComponent(devInfo.id)}`);
                 if (cfg && Array.isArray(cfg.registers) && cfg.registers.length > 0) {
@@ -1805,10 +1778,8 @@
                 }
             }
 
-            // 2. Lấy dữ liệu thô
             const docs = await mikaFetchGetJson(`/api/raw-data/${encodeURIComponent(devInfo.id)}?password=${MIKA_DEFAULT_PWD}`);
             if (!Array.isArray(docs) || docs.length === 0) {
-                // Nếu BMS đang ngủ (408 Timeout), bắn lệnh đánh thức trực tiếp ngay lập tức
                 wakeUpMikaDeviceDirect(devInfo.id);
                 return false;
             }
@@ -1832,12 +1803,10 @@
             if (isMikaPolling || document.hidden) return;
             isMikaPolling = true;
             try {
-                // Đọc tuần tự từng bình cách nhau 250ms để không bị Proxy giới hạn băng thông
                 let anyOk = false;
                 for (const dev of MIKA_DEVICES) {
                     const ok = await fetchSingleMikaDevice(dev);
                     if (ok) anyOk = true;
-                    await new Promise(r => setTimeout(r, 250));
                 }
 
                 if (anyOk) {
@@ -1861,111 +1830,12 @@
             }
         }
 
-        // Đánh thức trực tiếp 2 mạch trên MikaSolar (cách nhau 3 giây)
         async function triggerBothMikaDevices() {
             if (document.hidden) return;
             for (const dev of MIKA_DEVICES) {
                 wakeUpMikaDeviceDirect(dev.id);
-                await new Promise(r => setTimeout(r, 3000));
             }
         }
-
-        // ================= KHỞI TẠO KẾT NỐI MQTT WEBSOCKET =================
-        let mqttClient = null;
-        function initMQTT() {
-            if (typeof mqtt === 'undefined') return;
-
-            mqttClient = mqtt.connect(MQTT_WSS_URL, {
-                clientId: MQTT_CLIENT_ID,
-                username: MQTT_USER,
-                password: MQTT_PASSWORD,
-                clean: true,
-                reconnectPeriod: 2000,
-                connectTimeout: 5000,
-                keepalive: 15
-            });
-
-            mqttClient.on('connect', () => {
-                mqttClient.subscribe([MQTT_TOPIC_DATA, MQTT_TOPIC_BMS, MQTT_TOPIC_BMS1, MQTT_TOPIC_BMS2], { qos: 0 });
-            });
-
-            mqttClient.on('message', (topic, message) => {
-                try {
-                    const parsed = JSON.parse(message.toString());
-                    if (topic === MQTT_TOPIC_DATA) {
-                        processIncomingLiveData(parsed);
-                    } else if (topic === MQTT_TOPIC_BMS) {
-                        const packs = bmsResolvePacks(parsed);
-                        if (packs.bm1) latestBmsCombined.bm1 = packs.bm1;
-                        if (packs.bm2) latestBmsCombined.bm2 = packs.bm2;
-                        refreshBmsPanels();
-                    } else if (topic === MQTT_TOPIC_BMS1) {
-                        latestBmsCombined.bm1 = parsed;
-                        refreshBmsPanels();
-                    } else if (topic === MQTT_TOPIC_BMS2) {
-                        latestBmsCombined.bm2 = parsed;
-                        refreshBmsPanels();
-                    }
-                } catch (e) {}
-            });
-        }
-
-        // ================= KHỞI ĐỘNG HỆ THỐNG =================
-        document.addEventListener('DOMContentLoaded', () => {
-            const cachedData = localStorage.getItem("last_sosen_snapshot");
-            if (cachedData) {
-                try { processIncomingLiveData(JSON.parse(cachedData)); } catch (e) {}
-            }
-
-            const cachedBms = localStorage.getItem("last_sosen_bms_snapshot");
-            if (cachedBms) {
-                try {
-                    const parsedBms = JSON.parse(cachedBms);
-                    if (parsedBms && (parsedBms.bm1 || parsedBms.bm2)) {
-                        latestBmsCombined = parsedBms;
-                        refreshBmsPanels();
-                    }
-                } catch (e) {}
-            }
-
-            const cachedDaily = localStorage.getItem("last_sosen_daily_snapshot");
-            if (cachedDaily) {
-                try {
-                    latestDailyData = JSON.parse(cachedDaily);
-                    recalculateEnergy();
-                } catch (e) {}
-            }
-
-            updateBackgroundByTimeAndPv();
-            initCanvasSun();
-            initChart();
-            initMQTT();
-
-            // Đánh thức ngay lập tức 2 BMS và bắt đầu chu kỳ đọc 2 giây/lần
-            wakeUpMikaDeviceDirect("14058648");
-            setTimeout(() => wakeUpMikaDeviceDirect("14058648-1"), 1500);
-            setTimeout(() => {
-                pollBothMikaSolarBms();
-                setInterval(pollBothMikaSolarBms, 2200);
-                setInterval(triggerBothMikaDevices, 25000);
-            }, 1200);
-
-            if (database) {
-                database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
-                    latestDailyData = snapshot.val();
-                    if (latestDailyData) {
-                        try { localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData)); } catch(e) {}
-                    }
-                    checkAndSwitchMonth();
-                    recalculateEnergy();
-                    if (energyChart && (currentChartMode === 'month' || currentChartMode === 'year')) {
-                        loadChartData();
-                    }
-                });
-                setInterval(() => { checkAndSwitchMonth(); }, 60000);
-            }
-        });
-        setInterval(() => { updateBackgroundByTimeAndPv(); }, 60000);
-    </script>
+       
 </body>
 </html>
