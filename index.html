@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sosen Energy Dashboard V3.2 - Ultra Fast MQTT & Dual RS485 BMS</title>
+    <title>Sosen Energy Dashboard V3.3 - Ultra Fast MQTT & Dual RS485 BMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- THƯ VIỆN MQTT WEBSOCKET TRÌNH DUYỆT -->
@@ -294,47 +294,49 @@
         .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
         .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
 
-        /* ================= JK BMS CARD STYLES (CHUẨN ẢNH 681e1b.jpg) ================= */
-        .bms-card { background: linear-gradient(135deg, rgba(16,18,27,0.97), rgba(30,27,42,0.95)); border: 1px solid rgba(0,255,114,0.42); color: #f5fff8; }
-        .bms-card .stat-header { align-items: flex-start; gap: 10px; margin-bottom: 12px; }
-        .bms-card .stat-header h2 { color: #eafff2; line-height: 1.15; }
-        .bms-updated { color: #a7ffcb; font-size: 11px; font-weight: 900; white-space: nowrap; padding-top: 2px; }
-        .bms-board-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; position: relative; z-index: 1; }
-        .bms-board { min-width: 0; border: 1px solid rgba(0,255,114,0.36); border-radius: 14px; background: rgba(8,12,18,0.86); box-shadow: inset 0 0 18px rgba(0,255,114,0.06); padding: 11px; overflow: hidden; }
-        .bms-board.offline { border-color: rgba(255,68,68,0.42); opacity: 0.78; }
-        .bms-topbar { display: grid; grid-template-columns: minmax(62px, 1fr) minmax(88px, auto) minmax(58px, auto); align-items: center; gap: 6px; }
-        .bms-id-chip, .bms-runtime-chip, .bms-cycle-chip { min-width: 0; border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; background: rgba(255,255,255,0.06); color: #fff; font-size: 10px; font-weight: 900; line-height: 1; padding: 6px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* ================= JK BMS CARD STYLES (ĐÃ FIX KHÔNG BỊ CẮT CHỮ "...") ================= */
+        .bms-card { background: linear-gradient(135deg, rgba(16,18,27,0.97), rgba(30,27,42,0.95)); border: 1px solid rgba(0,255,114,0.42); color: #f5fff8; padding: 14px 12px; }
+        .bms-card .stat-header { align-items: center; gap: 10px; margin-bottom: 10px; }
+        .bms-card .stat-header h2 { color: #eafff2; line-height: 1.15; font-size: 15px; }
+        .bms-updated { color: #a7ffcb; font-size: 11px; font-weight: 900; white-space: nowrap; }
+        .bms-board-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; position: relative; z-index: 1; }
+        .bms-board { min-width: 0; border: 1px solid rgba(0,255,114,0.36); border-radius: 14px; background: rgba(8,12,18,0.86); box-shadow: inset 0 0 18px rgba(0,255,114,0.06); padding: 9px 8px; overflow: hidden; }
+        .bms-board.offline { border-color: rgba(255,68,68,0.42); opacity: 0.85; }
+        .bms-topbar { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+        .bms-id-chip, .bms-runtime-chip, .bms-cycle-chip { border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; background: rgba(255,255,255,0.06); color: #fff; font-size: 8.5px; font-weight: 900; line-height: 1.1; padding: 5px 5px; white-space: nowrap; }
+        .bms-id-chip { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
         .bms-id-chip strong { color: #00ff72; }
-        .bms-runtime-chip, .bms-cycle-chip { color: #ffd34e; text-align: center; }
-        .bms-online { display: inline-block; margin-left: 4px; color: #00ff72; }
+        .bms-runtime-chip { color: #ffd34e; text-align: center; flex: 0 1 auto; }
+        .bms-cycle-chip { color: #ffd34e; text-align: center; flex: 0 0 auto; }
+        .bms-online { display: inline-block; margin-left: 3px; color: #00ff72; font-size: 8px; }
         .bms-board.offline .bms-online { color: #ff4b4b; }
-        .bms-status-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
-        .bms-flag { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; border: 1px solid rgba(0,255,114,0.38); border-radius: 14px; background: rgba(0,80,28,0.34); color: #fff; font-size: 10px; font-weight: 900; line-height: 1; padding: 4px 5px 4px 7px; }
-        .bms-flag span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .bms-flag-value { flex: 0 0 auto; min-width: 32px; border-radius: 10px; color: #fff; text-align: center; padding: 3px 5px; background: #555; }
+        .bms-status-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: 7px; }
+        .bms-flag { display: flex; align-items: center; justify-content: space-between; gap: 3px; min-width: 0; border: 1px solid rgba(0,255,114,0.38); border-radius: 12px; background: rgba(0,80,28,0.34); color: #fff; font-size: 8.5px; font-weight: 900; line-height: 1; padding: 3px 4px 3px 5px; }
+        .bms-flag span:first-child { min-width: 0; overflow: hidden; white-space: nowrap; }
+        .bms-flag-value { flex: 0 0 auto; min-width: 24px; border-radius: 8px; color: #fff; text-align: center; padding: 2px 4px; background: #555; font-size: 8px; }
         .bms-flag-value.on { background: #12d83f; color: #001805; }
         .bms-flag-value.off { background: #40434a; color: #fff; }
-        .bms-core { display: grid; place-items: center; min-height: 142px; margin: 10px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
-        .bms-soc-ring { width: 122px; aspect-ratio: 1; border: 5px solid #00ff72; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 0 26px rgba(0,255,114,0.18), inset 0 0 28px rgba(0,0,0,0.42); }
-        .bms-soc { color: #00ff72; font-size: 30px; font-weight: 900; line-height: 1; white-space: nowrap; }
-        .bms-pill { min-width: 80px; border: 1px solid rgba(0,255,114,0.7); border-radius: 13px; background: rgba(0,80,28,0.42); color: #fff; text-align: center; font-size: 13px; font-weight: 900; line-height: 1; padding: 5px 8px; white-space: nowrap; }
-        .bms-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
-        .bms-metric { min-width: 0; min-height: 54px; border: 1px solid rgba(0,255,114,0.34); border-radius: 8px; background: rgba(0,80,28,0.28); padding: 7px 6px; overflow: hidden; }
+        .bms-core { display: grid; place-items: center; min-height: 132px; margin: 8px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
+        .bms-soc-ring { width: 112px; aspect-ratio: 1; border: 4.5px solid #00ff72; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 0 24px rgba(0,255,114,0.18), inset 0 0 24px rgba(0,0,0,0.42); }
+        .bms-soc { color: #00ff72; font-size: 27px; font-weight: 900; line-height: 1; white-space: nowrap; }
+        .bms-pill { min-width: 74px; border: 1px solid rgba(0,255,114,0.7); border-radius: 12px; background: rgba(0,80,28,0.42); color: #fff; text-align: center; font-size: 11.5px; font-weight: 900; line-height: 1; padding: 4px 6px; white-space: nowrap; }
+        .bms-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+        .bms-metric { min-width: 0; min-height: 50px; border: 1px solid rgba(0,255,114,0.34); border-radius: 8px; background: rgba(0,80,28,0.28); padding: 6px 4px; overflow: hidden; }
         button.bms-metric { width: 100%; font-family: inherit; text-align: left; cursor: pointer; }
         .bms-temp-toggle { position: relative; }
-        .bms-temp-toggle::after { content: "⋯"; position: absolute; right: 7px; top: 6px; color: rgba(255,255,255,0.72); font-size: 14px; line-height: 1; }
-        .bms-metric .value { display: block; color: #00ff72; font-size: 15px; font-weight: 900; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .bms-metric .label { display: block; margin-top: 6px; color: #d9ffe7; font-size: 9px; font-weight: 900; line-height: 1.1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bms-temp-toggle::after { content: "⋯"; position: absolute; right: 4px; top: 4px; color: rgba(255,255,255,0.72); font-size: 12px; line-height: 1; }
+        .bms-metric .value { display: block; color: #00ff72; font-size: 13.5px; font-weight: 900; line-height: 1.1; white-space: nowrap; }
+        .bms-metric .label { display: block; margin-top: 5px; color: #d9ffe7; font-size: 7.5px; font-weight: 900; line-height: 1.1; letter-spacing: -0.2px; text-transform: uppercase; white-space: nowrap; }
         .bms-metric.warn .value { color: #ffd34e; }
         .bms-metric.danger .value { color: #ff334d; }
-        .bms-temp-detail { display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
+        .bms-temp-detail { display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; margin-top: 5px; }
         .bms-board.temps-open .bms-temp-detail { display: grid; }
-        .bms-temp-chip { min-width: 0; border: 1px solid rgba(255,211,78,0.42); border-radius: 8px; background: rgba(255,211,78,0.12); padding: 7px 6px; overflow: hidden; }
-        .bms-temp-chip .value { display: block; color: #ffd34e; font-size: 15px; font-weight: 900; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .bms-temp-chip .label { display: block; margin-top: 6px; color: #fff4c5; font-size: 9px; font-weight: 900; line-height: 1.1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .bms-power-row { margin-top: 11px; color: #fff; font-size: 13px; font-weight: 900; line-height: 1.2; }
-        .bms-power-row span { color: #00ff72; font-size: 17px; }
-        .bms-power-bar { height: 9px; margin-top: 6px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; }
+        .bms-temp-chip { min-width: 0; border: 1px solid rgba(255,211,78,0.42); border-radius: 8px; background: rgba(255,211,78,0.12); padding: 6px 4px; overflow: hidden; }
+        .bms-temp-chip .value { display: block; color: #ffd34e; font-size: 13px; font-weight: 900; line-height: 1.1; white-space: nowrap; }
+        .bms-temp-chip .label { display: block; margin-top: 5px; color: #fff4c5; font-size: 8px; font-weight: 900; line-height: 1.1; text-transform: uppercase; white-space: nowrap; }
+        .bms-power-row { margin-top: 9px; color: #fff; font-size: 11.5px; font-weight: 900; line-height: 1.2; }
+        .bms-power-row span { color: #00ff72; font-size: 14.5px; }
+        .bms-power-bar { height: 8px; margin-top: 5px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; }
         .bms-power-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9affbf, #00cc66); transition: width 0.35s ease; }
 
         @media (max-width: 620px) {
@@ -344,12 +346,12 @@
             .chart-period-control { width: 100%; grid-template-columns: 38px 1fr 38px; }
             .chart-stage { height: 245px; padding-top: 32px; }
             .chart-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .bms-card { padding: 14px 10px; }
-            .bms-board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-            .bms-board { padding: 8px; }
-            .bms-soc-ring { width: 106px; }
-            .bms-soc { font-size: 26px; }
-            .bms-pill { min-width: 72px; font-size: 11px; padding: 4px 6px; }
+            .bms-card { padding: 12px 8px; }
+            .bms-board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+            .bms-board { padding: 7px 6px; }
+            .bms-soc-ring { width: 100px; }
+            .bms-soc { font-size: 24px; }
+            .bms-pill { min-width: 68px; font-size: 10.5px; padding: 3px 5px; }
         }
 
         .money-card { background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,248,220,0.95)); border: 1px solid rgba(218, 165, 32, 0.65); }
@@ -412,7 +414,7 @@
         }
     </style>
 </head>
-<body data-dashboard-version="V3.2 - Ultra Fast MQTT Live & 2s RS485 Dual JK BMS">
+<body data-dashboard-version="V3.3 - Ultra Fast MQTT Live & 2s RS485 Dual JK BMS">
     <div class="app-container">
         <div class="diagram-panel">
             <div id="battery-mini-meter" class="battery-mini-meter idle">
@@ -506,24 +508,24 @@
                 </div>
             </div>
 
-            <!-- 2. KHUNG JK BMS (ĐỒNG BỘ 2 BÌNH RS485 2 GIÂY/LẦN GIỐNG HỆT ẢNH 681e1b.jpg) -->
+            <!-- 2. KHUNG JK BMS (ĐÃ SỬA LỖI CẮT CHỮ "..." VÀ KẾT NỐI TRỰC TIẾP 2 BMS) -->
             <div class="stat-card bms-card">
                 <div class="stat-header">
                     <h2>🔋 JK BMS BLUETOOTH</h2>
-                    <div class="bms-updated" id="bms-updated">--:--:--</div>
+                    <div class="bms-updated" id="bms-updated">Đang kết nối BMS...</div>
                 </div>
                 <div class="bms-board-grid">
                     <!-- BMS 1: 14058648 (CALB) -->
                     <section class="bms-board offline" id="bm1-card">
                         <div class="bms-topbar">
-                            <div class="bms-id-chip">BMS1: <strong id="bm1-name">CALB</strong><span class="bms-online" id="bm1-online">OFFLINE</span></div>
-                            <div class="bms-runtime-chip">TIME: <span id="bm1-runtime">--</span></div>
-                            <div class="bms-cycle-chip">CYCL: <span id="bm1-cycle-top">--</span></div>
+                            <div class="bms-id-chip">B1:<strong id="bm1-name">CALB</strong><span class="bms-online" id="bm1-online">OFF</span></div>
+                            <div class="bms-runtime-chip"><span id="bm1-runtime">--</span></div>
+                            <div class="bms-cycle-chip">CK:<span id="bm1-cycle-top">--</span></div>
                         </div>
                         <div class="bms-status-row">
                             <div class="bms-flag"><span>SẠC</span><span class="bms-flag-value off" id="bm1-charge-state">OFF</span></div>
                             <div class="bms-flag"><span>XẢ</span><span class="bms-flag-value off" id="bm1-discharge-state">OFF</span></div>
-                            <div class="bms-flag"><span>CÂN BẰNG</span><span class="bms-flag-value off" id="bm1-balance-state">OFF</span></div>
+                            <div class="bms-flag"><span>C.BẰNG</span><span class="bms-flag-value off" id="bm1-balance-state">OFF</span></div>
                         </div>
                         <div class="bms-core">
                             <div class="bms-soc-ring">
@@ -533,14 +535,14 @@
                             </div>
                         </div>
                         <div class="bms-metric-grid">
-                            <div class="bms-metric"><span class="value" id="bm1-cell-high">--</span><span class="label">CELL CAO (V)</span></div>
-                            <div class="bms-metric danger"><span class="value" id="bm1-cell-low">--</span><span class="label">CELL THẤP (V)</span></div>
-                            <div class="bms-metric"><span class="value" id="bm1-cell-diff">--</span><span class="label">LỆCH CELL (V)</span></div>
-                            <div class="bms-metric"><span class="value" id="bm1-balance-current">--</span><span class="label">DÒNG CB (A)</span></div>
-                            <div class="bms-metric"><span class="value" id="bm1-capacity">--</span><span class="label">DUNG LƯỢNG (AH)</span></div>
-                            <div class="bms-metric"><span class="value" id="bm1-remain">--</span><span class="label">CÒN LẠI (AH)</span></div>
-                            <button type="button" class="bms-metric warn bms-temp-toggle" onclick="toggleBmsTemps('bm1')" title="Xem nhiệt độ T1-T4"><span class="value" id="bm1-mos-temp">--</span><span class="label">MOS (°C)</span></button>
-                            <div class="bms-metric"><span class="value" id="bm1-health">--</span><span class="label">TUỔI THỌ (%)</span></div>
+                            <div class="bms-metric"><span class="value" id="bm1-cell-high">--</span><span class="label">CELL CAO</span></div>
+                            <div class="bms-metric danger"><span class="value" id="bm1-cell-low">--</span><span class="label">CELL THẤP</span></div>
+                            <div class="bms-metric"><span class="value" id="bm1-cell-diff">--</span><span class="label">LỆCH CELL</span></div>
+                            <div class="bms-metric"><span class="value" id="bm1-balance-current">--</span><span class="label">DÒNG CB</span></div>
+                            <div class="bms-metric"><span class="value" id="bm1-capacity">--</span><span class="label">DUNG LƯỢNG</span></div>
+                            <div class="bms-metric"><span class="value" id="bm1-remain">--</span><span class="label">CÒN LẠI</span></div>
+                            <button type="button" class="bms-metric warn bms-temp-toggle" onclick="toggleBmsTemps('bm1')" title="Xem nhiệt độ T1-T4"><span class="value" id="bm1-mos-temp">--</span><span class="label">NHIỆT ĐỘ</span></button>
+                            <div class="bms-metric"><span class="value" id="bm1-health">--</span><span class="label">TUỔI THỌ</span></div>
                         </div>
                         <div class="bms-temp-detail" id="bm1-temp-detail">
                             <div class="bms-temp-chip"><span class="value" id="bm1-t1">--</span><span class="label">T1 (°C)</span></div>
@@ -555,14 +557,14 @@
                     <!-- BMS 2: 14058648-1 (GOTION) -->
                     <section class="bms-board offline" id="bm2-card">
                         <div class="bms-topbar">
-                            <div class="bms-id-chip">BMS2: <strong id="bm2-name">GOTION</strong><span class="bms-online" id="bm2-online">OFFLINE</span></div>
-                            <div class="bms-runtime-chip">TIME: <span id="bm2-runtime">--</span></div>
-                            <div class="bms-cycle-chip">CYCL: <span id="bm2-cycle-top">--</span></div>
+                            <div class="bms-id-chip">B2:<strong id="bm2-name">GOTION</strong><span class="bms-online" id="bm2-online">OFF</span></div>
+                            <div class="bms-runtime-chip"><span id="bm2-runtime">--</span></div>
+                            <div class="bms-cycle-chip">CK:<span id="bm2-cycle-top">--</span></div>
                         </div>
                         <div class="bms-status-row">
                             <div class="bms-flag"><span>SẠC</span><span class="bms-flag-value off" id="bm2-charge-state">OFF</span></div>
                             <div class="bms-flag"><span>XẢ</span><span class="bms-flag-value off" id="bm2-discharge-state">OFF</span></div>
-                            <div class="bms-flag"><span>CÂN BẰNG</span><span class="bms-flag-value off" id="bm2-balance-state">OFF</span></div>
+                            <div class="bms-flag"><span>C.BẰNG</span><span class="bms-flag-value off" id="bm2-balance-state">OFF</span></div>
                         </div>
                         <div class="bms-core">
                             <div class="bms-soc-ring">
@@ -572,14 +574,14 @@
                             </div>
                         </div>
                         <div class="bms-metric-grid">
-                            <div class="bms-metric"><span class="value" id="bm2-cell-high">--</span><span class="label">CELL CAO (V)</span></div>
-                            <div class="bms-metric danger"><span class="value" id="bm2-cell-low">--</span><span class="label">CELL THẤP (V)</span></div>
-                            <div class="bms-metric"><span class="value" id="bm2-cell-diff">--</span><span class="label">LỆCH CELL (V)</span></div>
-                            <div class="bms-metric"><span class="value" id="bm2-balance-current">--</span><span class="label">DÒNG CB (A)</span></div>
-                            <div class="bms-metric"><span class="value" id="bm2-capacity">--</span><span class="label">DUNG LƯỢNG (AH)</span></div>
-                            <div class="bms-metric"><span class="value" id="bm2-remain">--</span><span class="label">CÒN LẠI (AH)</span></div>
-                            <button type="button" class="bms-metric warn bms-temp-toggle" onclick="toggleBmsTemps('bm2')" title="Xem nhiệt độ T1-T4"><span class="value" id="bm2-mos-temp">--</span><span class="label">MOS (°C)</span></button>
-                            <div class="bms-metric"><span class="value" id="bm2-health">--</span><span class="label">TUỔI THỌ (%)</span></div>
+                            <div class="bms-metric"><span class="value" id="bm2-cell-high">--</span><span class="label">CELL CAO</span></div>
+                            <div class="bms-metric danger"><span class="value" id="bm2-cell-low">--</span><span class="label">CELL THẤP</span></div>
+                            <div class="bms-metric"><span class="value" id="bm2-cell-diff">--</span><span class="label">LỆCH CELL</span></div>
+                            <div class="bms-metric"><span class="value" id="bm2-balance-current">--</span><span class="label">DÒNG CB</span></div>
+                            <div class="bms-metric"><span class="value" id="bm2-capacity">--</span><span class="label">DUNG LƯỢNG</span></div>
+                            <div class="bms-metric"><span class="value" id="bm2-remain">--</span><span class="label">CÒN LẠI</span></div>
+                            <button type="button" class="bms-metric warn bms-temp-toggle" onclick="toggleBmsTemps('bm2')" title="Xem nhiệt độ T1-T4"><span class="value" id="bm2-mos-temp">--</span><span class="label">NHIỆT ĐỘ</span></button>
+                            <div class="bms-metric"><span class="value" id="bm2-health">--</span><span class="label">TUỔI THỌ</span></div>
                         </div>
                         <div class="bms-temp-detail" id="bm2-temp-detail">
                             <div class="bms-temp-chip"><span class="value" id="bm2-t1">--</span><span class="label">T1 (°C)</span></div>
@@ -887,7 +889,7 @@
             const devName = bmsRead(data, ['Device_Name', 'Target'], null);
             if (devName) bmsText(`${prefix}-name`, devName);
 
-            const statusText = online ? 'ONLINE' : 'OFFLINE';
+            const statusText = online ? 'ON' : 'OFF';
             bmsText(`${prefix}-online`, statusText);
             const emptyText = '--';
             if (!online) {
@@ -1620,42 +1622,64 @@
             else { setFlow('flow-grid', false); }
         }
 
-        // ================= MODULE ĐỒNG BỘ 2 BÌNH RS485 TỪ MIKASOLAR (2 GIÂY / LẦN) =================
+        // ================= MODULE ĐỒNG BỘ 2 BÌNH RS485 TỪ MIKASOLAR (CÓ ĐÁNH THỨC NO-CORS & 3 PROXY) =================
         const MIKA_BASE_URL    = "https://mikasolar.com";
         const MIKA_DEFAULT_PWD = "123456";
 
-        // 2 bình RS485 của bạn trên ESP32-C3: 14058648 (CALB) & 14058648-1 (GOTION)
         const MIKA_DEVICES = [
             { id: "14058648",   slot: "bm1", defaultName: "CALB" },
             { id: "14058648-1", slot: "bm2", defaultName: "GOTION" }
         ];
 
-        const mikaConfigCache = {};
-        let mikaUseProxy = false;
+        let mikaConfigCache = {};
+        try {
+            const savedCfg = localStorage.getItem("mika_registers_cfg_cache");
+            if (savedCfg) mikaConfigCache = JSON.parse(savedCfg) || {};
+        } catch (e) {}
 
-        async function mikaFetchJson(path, method = "GET") {
-            const targetUrl = MIKA_BASE_URL + path;
+        // Gửi lệnh POST đánh thức trực tiếp tới MikaSolar bằng mode: 'no-cors' (Không bao giờ bị chặn!)
+        function wakeUpMikaDeviceDirect(deviceId) {
+            const url = `${MIKA_BASE_URL}/api/trigger-update/${encodeURIComponent(deviceId)}`;
+            fetch(url, { method: "POST", mode: "no-cors", cache: "no-store" }).catch(() => {});
+        }
 
-            if (!mikaUseProxy) {
-                try {
-                    const res = await fetch(targetUrl, { method, cache: "no-store" });
-                    if (res.ok) return await res.json();
-                } catch (err) {
-                    mikaUseProxy = true;
+        // Hệ thống 3 Proxy xoay vòng cho lệnh GET JSON
+        let preferredProxyIdx = 0;
+        async function mikaFetchGetJson(path) {
+            const sep = path.includes("?") ? "&" : "?";
+            const freshUrl = `${MIKA_BASE_URL}${path}${sep}_t=${Date.now()}`;
+
+            const proxyBuilders = [
+                // Proxy 1: AllOrigins JSON wrapper (disableCache=true)
+                async (u) => {
+                    const r = await fetch(`https://api.allorigins.win/get?disableCache=true&url=${encodeURIComponent(u)}`, { cache: "no-store" });
+                    if (!r.ok) throw new Error("AO status " + r.status);
+                    const wrapper = await r.json();
+                    if (!wrapper || !wrapper.contents) throw new Error("AO empty");
+                    return JSON.parse(wrapper.contents);
+                },
+                // Proxy 2: CodeTabs Proxy
+                async (u) => {
+                    const r = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`, { cache: "no-store" });
+                    if (!r.ok) throw new Error("CT status " + r.status);
+                    return await r.json();
+                },
+                // Proxy 3: AllOrigins Raw
+                async (u) => {
+                    const r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`, { cache: "no-store" });
+                    if (!r.ok) throw new Error("AORaw status " + r.status);
+                    return await r.json();
                 }
-            }
+            ];
 
-            try {
-                const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(targetUrl);
-                const res = await fetch(proxyUrl, { method, cache: "no-store" });
-                if (res.ok) return await res.json();
-            } catch (e) {}
-
-            if (method === "GET") {
+            for (let attempt = 0; attempt < proxyBuilders.length; attempt++) {
+                const idx = (preferredProxyIdx + attempt) % proxyBuilders.length;
                 try {
-                    const backupUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(targetUrl) + "&t=" + Date.now();
-                    const res = await fetch(backupUrl, { cache: "no-store" });
-                    if (res.ok) return await res.json();
+                    const data = await proxyBuilders[idx](freshUrl);
+                    if (data !== null && data !== undefined) {
+                        preferredProxyIdx = idx; // Nhớ cổng Proxy nhanh nhất
+                        return data;
+                    }
                 } catch (e) {}
             }
             return null;
@@ -1729,7 +1753,6 @@
             const days  = Math.floor(rtSec / 86400);
             const hours = Math.floor((rtSec % 86400) / 3600);
             const mins  = Math.floor((rtSec % 3600) / 60);
-            const secs  = Math.floor(rtSec % 60);
 
             const validTemps = [d.battmp1, d.battmp2, d.battmp3, d.battmp4, d.battmp5, d.mostmp]
                 .map(Number)
@@ -1739,10 +1762,10 @@
             return {
                 Online: true,
                 Target: devInfo.slot.toUpperCase(),
-                Device_Name: devInfo.customName || devInfo.defaultName,
+                Device_Name: devInfo.defaultName,
                 BLE_Address: devInfo.id,
                 Runtime_Seconds: rtSec,
-                Runtime_Text: `${days}D${hours}H${mins}M${secs}S`,
+                Runtime_Text: `${days}D${hours}H${mins}M`,
                 Cycle_Count: Number(d.soccc || 0),
                 Charge: Number(d.chrst) > 0,
                 Discharge: Number(d.dischst) > 0,
@@ -1771,25 +1794,30 @@
         }
 
         async function fetchSingleMikaDevice(devInfo) {
+            // 1. Lấy cấu hình thanh ghi (chỉ tải 1 lần và lưu vào localStorage)
             if (!mikaConfigCache[devInfo.id]) {
-                const cfg = await mikaFetchJson(`/api/config?device_id=${encodeURIComponent(devInfo.id)}`, "GET");
+                const cfg = await mikaFetchGetJson(`/api/config?device_id=${encodeURIComponent(devInfo.id)}`);
                 if (cfg && Array.isArray(cfg.registers) && cfg.registers.length > 0) {
                     mikaConfigCache[devInfo.id] = cfg.registers;
+                    try { localStorage.setItem("mika_registers_cfg_cache", JSON.stringify(mikaConfigCache)); } catch (e) {}
                 } else {
                     return false;
                 }
-                const nameRes = await mikaFetchJson(`/api/custom-name/${encodeURIComponent(devInfo.id)}`, "GET");
-                if (nameRes && nameRes.custom_name && nameRes.custom_name.trim()) {
-                    devInfo.customName = nameRes.custom_name.trim();
-                }
             }
 
-            const docs = await mikaFetchJson(`/api/raw-data/${encodeURIComponent(devInfo.id)}?password=${MIKA_DEFAULT_PWD}`, "GET");
-            if (!Array.isArray(docs) || docs.length === 0) return false;
+            // 2. Lấy dữ liệu thô
+            const docs = await mikaFetchGetJson(`/api/raw-data/${encodeURIComponent(devInfo.id)}?password=${MIKA_DEFAULT_PWD}`);
+            if (!Array.isArray(docs) || docs.length === 0) {
+                // Nếu BMS đang ngủ (408 Timeout), bắn lệnh đánh thức trực tiếp ngay lập tức
+                wakeUpMikaDeviceDirect(devInfo.id);
+                return false;
+            }
 
             const mergedRaw = {};
             docs.forEach(doc => {
-                Object.assign(mergedRaw, decodeMikaDocument(doc.reg_val, doc.reg_start, mikaConfigCache[devInfo.id]));
+                if (doc && doc.reg_val) {
+                    Object.assign(mergedRaw, decodeMikaDocument(doc.reg_val, doc.reg_start, mikaConfigCache[devInfo.id]));
+                }
             });
 
             if (mergedRaw.tbatv === undefined) return false;
@@ -1804,8 +1832,15 @@
             if (isMikaPolling || document.hidden) return;
             isMikaPolling = true;
             try {
-                const results = await Promise.all(MIKA_DEVICES.map(dev => fetchSingleMikaDevice(dev)));
-                if (results.some(ok => ok)) {
+                // Đọc tuần tự từng bình cách nhau 250ms để không bị Proxy giới hạn băng thông
+                let anyOk = false;
+                for (const dev of MIKA_DEVICES) {
+                    const ok = await fetchSingleMikaDevice(dev);
+                    if (ok) anyOk = true;
+                    await new Promise(r => setTimeout(r, 250));
+                }
+
+                if (anyOk) {
                     refreshBmsPanels();
 
                     if (mqttClient && mqttClient.connected) {
@@ -1826,11 +1861,12 @@
             }
         }
 
+        // Đánh thức trực tiếp 2 mạch trên MikaSolar (cách nhau 3 giây)
         async function triggerBothMikaDevices() {
             if (document.hidden) return;
             for (const dev of MIKA_DEVICES) {
-                mikaFetchJson(`/api/trigger-update/${encodeURIComponent(dev.id)}`, "POST");
-                await new Promise(r => setTimeout(r, 5000));
+                wakeUpMikaDeviceDirect(dev.id);
+                await new Promise(r => setTimeout(r, 3000));
             }
         }
 
@@ -1905,13 +1941,14 @@
             initChart();
             initMQTT();
 
-            // Khởi chạy đồng bộ 2 BMS RS485 đúng chu kỳ 2 giây/lần (2000ms)
+            // Đánh thức ngay lập tức 2 BMS và bắt đầu chu kỳ đọc 2 giây/lần
+            wakeUpMikaDeviceDirect("14058648");
+            setTimeout(() => wakeUpMikaDeviceDirect("14058648-1"), 1500);
             setTimeout(() => {
-                triggerBothMikaDevices();
                 pollBothMikaSolarBms();
-                setInterval(pollBothMikaSolarBms, 2000);     // Cập nhật đúng 2 giây / 1 lần
-                setInterval(triggerBothMikaDevices, 30000);  // Giữ luồng RS485 ESP32-C3 liên tục
-            }, 500);
+                setInterval(pollBothMikaSolarBms, 2200);
+                setInterval(triggerBothMikaDevices, 25000);
+            }, 1200);
 
             if (database) {
                 database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
