@@ -294,7 +294,7 @@
         .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
         .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
 
-        /* ================= BMS CARD STYLES (ĐÃ SỬA VÒNG TRÒN 4 NẤC MÀU & CÔNG SUẤT NHẤP NHÁY) ================= */
+        /* ================= BMS CARD STYLES (VÒNG TRÒN 4 NẤC MÀU + VỆT SÁNG THEO DÒNG CURRENT + CÔNG SUẤT NHẤP NHÁY) ================= */
         .bms-card { background: linear-gradient(135deg, rgba(16,18,27,0.97), rgba(30,27,42,0.95)); border: 1px solid rgba(0,255,114,0.42); color: #f5fff8; padding: 14px 10px; }
         .bms-card .stat-header { align-items: center; gap: 8px; margin-bottom: 10px; }
         .bms-card .stat-header h2 { color: #eafff2; line-height: 1.15; font-size: 15px; letter-spacing: 0.3px; }
@@ -319,12 +319,13 @@
         
         .bms-core { display: grid; place-items: center; min-height: 126px; margin: 7px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
         
-        /* VÒNG TRÒN PIN CO GIÃN ĐỘ DÀI THEO % CÒN LẠI & ĐỔI 4 NẤC MÀU */
+        /* VÒNG TRÒN PIN CO GIÃN ĐỘ DÀI THEO % CÒN LẠI, 4 NẤC MÀU & VỆT SÁNG CHẠY THEO DÒNG ĐIỆN */
         .bms-soc-ring {
             --soc-pct: 0;
             --ring-color: #00ff72;
             --ring-glow: rgba(0, 255, 114, 0.25);
             --pill-bg: rgba(0, 80, 28, 0.42);
+            --sweep-speed: 2s;
             position: relative;
             width: 104px;
             aspect-ratio: 1;
@@ -351,6 +352,44 @@
             pointer-events: none;
             transition: background 0.4s ease;
         }
+        /* Vệt sáng (light streak) quét quanh vòng tròn với tốc độ theo dòng điện Current */
+        .bms-soc-ring::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            padding: 5px;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                transparent 285deg,
+                var(--ring-color) 320deg,
+                rgba(255, 255, 255, 0.98) 352deg,
+                #ffffff 358deg,
+                transparent 360deg
+            );
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0;
+            filter: drop-shadow(0 0 6px #ffffff) drop-shadow(0 0 10px var(--ring-color));
+            transform: rotate(0deg) translateZ(0);
+            transition: opacity 0.35s ease;
+        }
+        .bms-soc-ring.charging::after {
+            opacity: 1;
+            animation: bmsRingSweep var(--sweep-speed, 2s) linear infinite;
+        }
+        .bms-soc-ring.discharging::after {
+            opacity: 1;
+            animation: bmsRingSweep var(--sweep-speed, 2s) linear infinite reverse;
+        }
+        @keyframes bmsRingSweep {
+            from { transform: rotate(0deg) translateZ(0); }
+            to { transform: rotate(360deg) translateZ(0); }
+        }
+
         /* 4 Nấc màu phần trăm Pin */
         .bms-soc-ring.soc-lvl-1 { --ring-color: #ff334d; --ring-glow: rgba(255, 51, 77, 0.35); --pill-bg: rgba(90, 14, 24, 0.45); }
         .bms-soc-ring.soc-lvl-2 { --ring-color: #ffd700; --ring-glow: rgba(255, 215, 0, 0.32); --pill-bg: rgba(90, 75, 0, 0.42); }
@@ -381,7 +420,7 @@
         /* HIỂN THỊ DÒNG CÔNG SUẤT: XẢ MÀU ĐỎ, SẠC MÀU XANH & HIỆU ỨNG NHẤP NHÁY */
         .bms-power-row { margin-top: 7px; display: flex; align-items: baseline; gap: 4px; white-space: nowrap; overflow: hidden; }
         .bms-power-label { color: #a0aec0; font-size: 9.5px; font-weight: 800; text-transform: none; letter-spacing: 0; transition: color 0.3s ease, text-shadow 0.3s ease; }
-        .bms-power-row span.power-val { color: #00ff72; font-size: 12.5px; font-weight: 900; transition: color 0.3s ease, text-shadow 0.3s ease; }
+        .bms-power-row span.power-val { color: #00ff72; font-size: 12.5px; font-weight: 900; transition: color 0.3s ease, text-shadow 0.35s ease; }
 
         /* Khi Đang Sạc: Màu Xanh + Nhấp nháy */
         .bms-power-row.charging .bms-power-label,
@@ -402,10 +441,43 @@
             100% { opacity: 0.28; filter: brightness(0.85); }
         }
 
-        .bms-power-bar { height: 6px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; }
-        .bms-power-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9affbf, #00cc66); transition: width 0.35s ease, background 0.35s ease; }
-        .bms-power-fill.charging { background: linear-gradient(90deg, #80ffaa, #00ff72); box-shadow: 0 0 8px rgba(0, 255, 114, 0.65); }
-        .bms-power-fill.discharging { background: linear-gradient(90deg, #ff8a98, #ff2a45); box-shadow: 0 0 8px rgba(255, 51, 77, 0.65); }
+        /* THANH CÔNG SUẤT CÓ VỆT SÁNG CHẠY NHANH/CHẬM ĐỒNG BỘ THEO DÒNG ĐIỆN CURRENT */
+        .bms-power-bar { height: 6px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; position: relative; }
+        .bms-power-fill {
+            --sweep-speed: 2s;
+            position: relative;
+            overflow: hidden;
+            width: 0%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #9affbf, #00cc66);
+            transition: width 0.35s ease, background 0.35s ease;
+        }
+        .bms-power-fill.charging { background: linear-gradient(90deg, #00994d, #00ff72); box-shadow: 0 0 8px rgba(0, 255, 114, 0.65); }
+        .bms-power-fill.discharging { background: linear-gradient(90deg, #99001a, #ff2a45); box-shadow: 0 0 8px rgba(255, 51, 77, 0.65); }
+        .bms-power-fill::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 55%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 50%, rgba(255,255,255,0) 100%);
+            transform: translateX(-160%) translateZ(0);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .bms-power-fill.charging::after {
+            opacity: 1;
+            animation: bmsBarLightSweep var(--sweep-speed, 2s) linear infinite;
+        }
+        .bms-power-fill.discharging::after {
+            opacity: 1;
+            animation: bmsBarLightSweep var(--sweep-speed, 2s) linear infinite reverse;
+        }
+        @keyframes bmsBarLightSweep {
+            0% { transform: translateX(-160%) translateZ(0); }
+            100% { transform: translateX(260%) translateZ(0); }
+        }
 
         @media (max-width: 620px) {
             .energy-chart-toolbar { align-items: stretch; flex-direction: column; }
@@ -958,6 +1030,15 @@
             return { bm1: bms1 || (bmsLooksLikePack(root) ? root : null), bm2: bms2 || null };
         }
 
+        // HÀM TÍNH TỐC ĐỘ VỆT SÁNG THEO DÒNG ĐIỆN SẠC/XẢ THỰC TẾ (CURRENT)
+        function calcBmsSweepSpeed(currentA) {
+            const absCurr = Number.isFinite(currentA) ? Math.abs(currentA) : 0;
+            const maxRefCurr = 100; // Mốc dòng cao tham chiếu (100A)
+            const ratio = clampNumber(absCurr / maxRefCurr, 0, 1);
+            // Dòng từ 0A -> 100A+: chu kỳ giảm mượt từ 3.20s (chậm) xuống 0.45s (rất nhanh)
+            return (3.2 - ratio * 2.75).toFixed(2) + 's';
+        }
+
         function updateBmsPanel(prefix, data) {
             const card = document.getElementById(`${prefix}-card`);
             const online = !!data && bmsRead(data, ['Online', 'Connected', 'BLE_Connected'], true) !== false;
@@ -978,7 +1059,7 @@
                 bmsSetFlag(`${prefix}-charge-state`, false); bmsSetFlag(`${prefix}-discharge-state`, false); bmsSetFlag(`${prefix}-balance-state`, false);
                 if (socRing) {
                     socRing.style.setProperty('--soc-pct', 0);
-                    socRing.classList.remove('soc-lvl-1', 'soc-lvl-2', 'soc-lvl-3', 'soc-lvl-4');
+                    socRing.classList.remove('soc-lvl-1', 'soc-lvl-2', 'soc-lvl-3', 'soc-lvl-4', 'charging', 'discharging');
                 }
                 if (powerRow) {
                     powerRow.classList.remove('charging', 'discharging');
@@ -1013,10 +1094,18 @@
 
             const roundedSoc = Math.round(soc);
 
-            // CẬP NHẬT VÒNG TRÒN THEO % CÒN LẠI VÀ 4 NẤC MÀU
+            // XÁC ĐỊNH TRẠNG THÁI SẠC / XẢ & TỐC ĐỘ VỆT SÁNG THEO DÒNG ĐIỆN THỰC TẾ (CURRENT)
+            const signedPwr = bmsNumber(data, ['Signed_Power'], Number.isFinite(voltage) && Number.isFinite(current) ? voltage * current : NaN);
+            const effectiveCurrent = Number.isFinite(current) ? current : (Number.isFinite(signedPwr) && Number.isFinite(voltage) && voltage > 0 ? signedPwr / voltage : 0);
+            const isCharging = effectiveCurrent > 0.05;
+            const isDischarging = effectiveCurrent < -0.05;
+            const sweepSpeed = calcBmsSweepSpeed(effectiveCurrent);
+
+            // CẬP NHẬT VÒNG TRÒN THEO % CÒN LẠI, 4 NẤC MÀU & TỐC ĐỘ VỆT SÁNG
             if (socRing) {
                 socRing.style.setProperty('--soc-pct', roundedSoc);
-                socRing.classList.remove('soc-lvl-1', 'soc-lvl-2', 'soc-lvl-3', 'soc-lvl-4');
+                socRing.style.setProperty('--sweep-speed', sweepSpeed);
+                socRing.classList.remove('soc-lvl-1', 'soc-lvl-2', 'soc-lvl-3', 'soc-lvl-4', 'charging', 'discharging');
                 if (roundedSoc <= 25) {
                     socRing.classList.add('soc-lvl-1'); // Nấc 1: 5% - 25% (màu đỏ)
                 } else if (roundedSoc <= 50) {
@@ -1026,6 +1115,8 @@
                 } else {
                     socRing.classList.add('soc-lvl-4'); // Nấc 4: 81% - 100% (màu xanh)
                 }
+                if (isCharging) socRing.classList.add('charging');
+                else if (isDischarging) socRing.classList.add('discharging');
             }
 
             bmsText(`${prefix}-runtime`, bmsRuntimeText(data));
@@ -1049,11 +1140,6 @@
             const packLimitW = Number.isFinite(voltage) ? voltage * (current >= 0 ? (Number.isFinite(maxCharge) ? maxCharge : 120) : (Number.isFinite(maxDischarge) ? maxDischarge : 120)) : 5200;
             bmsText(`${prefix}-power`, Number.isFinite(displayPower) ? `${displayPower.toFixed(1)}${Number.isFinite(packLimitW) && packLimitW > 0 ? ' / ' + Math.round(packLimitW) : ''}` : '--');
 
-            // XÁC ĐỊNH TRẠNG THÁI SẠC / XẢ ĐỂ ĐỔI MÀU CHỮ CÔNG SUẤT & NHẤP NHÁY
-            const signedPwr = bmsNumber(data, ['Signed_Power'], Number.isFinite(voltage) && Number.isFinite(current) ? voltage * current : NaN);
-            const isCharging = (Number.isFinite(current) && current > 0.05) || (!Number.isFinite(current) && Number.isFinite(signedPwr) && signedPwr > 1);
-            const isDischarging = (Number.isFinite(current) && current < -0.05) || (!Number.isFinite(current) && Number.isFinite(signedPwr) && signedPwr < -1);
-
             if (powerRow) {
                 powerRow.classList.remove('charging', 'discharging');
                 if (isCharging) powerRow.classList.add('charging');
@@ -1063,6 +1149,7 @@
             if (fill) {
                 const pct = Number.isFinite(displayPower) && Number.isFinite(packLimitW) && packLimitW > 0 ? clampNumber((displayPower / packLimitW) * 100, 0, 100) : 0;
                 fill.style.width = pct.toFixed(1) + '%';
+                fill.style.setProperty('--sweep-speed', sweepSpeed);
                 fill.classList.remove('charging', 'discharging');
                 if (isCharging) fill.classList.add('charging');
                 else if (isDischarging) fill.classList.add('discharging');
