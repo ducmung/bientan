@@ -294,7 +294,13 @@
         .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
         .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
 
-        /* ================= BMS CARD STYLES (VÒNG TRÒN 4 NẤC MÀU + VỆT SÁNG THEO DÒNG CURRENT + CÔNG SUẤT NHẤP NHÁY) ================= */
+        /* ================= BMS CARD STYLES (VỆT SÁNG CHẠY ĐIỀM ĐẠM TRONG PHẠM VI % PIN & CHỈ SỐ CÔNG SUẤT NHÁY CHẬM) ================= */
+        @property --sweep-p {
+            syntax: '<number>';
+            inherits: false;
+            initial-value: 0;
+        }
+
         .bms-card { background: linear-gradient(135deg, rgba(16,18,27,0.97), rgba(30,27,42,0.95)); border: 1px solid rgba(0,255,114,0.42); color: #f5fff8; padding: 14px 10px; }
         .bms-card .stat-header { align-items: center; gap: 8px; margin-bottom: 10px; }
         .bms-card .stat-header h2 { color: #eafff2; line-height: 1.15; font-size: 15px; letter-spacing: 0.3px; }
@@ -319,13 +325,13 @@
         
         .bms-core { display: grid; place-items: center; min-height: 126px; margin: 7px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
         
-        /* VÒNG TRÒN PIN CO GIÃN ĐỘ DÀI THEO % CÒN LẠI, 4 NẤC MÀU & VỆT SÁNG CHẠY THEO DÒNG ĐIỆN */
+        /* VÒNG TRÒN PIN CO GIÃN ĐỘ DÀI THEO % CÒN LẠI, 4 NẤC MÀU & VỆT SÁNG CHỈ CHẠY TRONG VẠCH % PIN HIỆN TẠI */
         .bms-soc-ring {
             --soc-pct: 0;
             --ring-color: #00ff72;
             --ring-glow: rgba(0, 255, 114, 0.25);
             --pill-bg: rgba(0, 80, 28, 0.42);
-            --sweep-speed: 2s;
+            --sweep-speed: 4s;
             position: relative;
             width: 104px;
             aspect-ratio: 1;
@@ -352,20 +358,24 @@
             pointer-events: none;
             transition: background 0.4s ease;
         }
-        /* Vệt sáng (light streak) quét quanh vòng tròn với tốc độ theo dòng điện Current */
+        /* Vệt sáng chỉ chạy từ 0deg đến đúng góc % pin hiện tại (--end-deg), không bao giờ vượt quá vạch % pin */
         .bms-soc-ring::after {
             content: "";
             position: absolute;
             inset: 0;
             border-radius: 50%;
             padding: 5px;
+            --end-deg: calc(var(--soc-pct) * 3.6deg);
+            --band-deg: min(32deg, var(--end-deg));
+            --s-start: calc(var(--sweep-p) * (var(--end-deg) - var(--band-deg)));
+            --s-mid: calc(var(--s-start) + (var(--band-deg) * 0.5));
+            --s-end: calc(var(--s-start) + var(--band-deg));
             background: conic-gradient(
                 from 0deg,
                 transparent 0deg,
-                transparent 285deg,
-                var(--ring-color) 320deg,
-                rgba(255, 255, 255, 0.98) 352deg,
-                #ffffff 358deg,
+                transparent var(--s-start),
+                rgba(255, 255, 255, 0.95) var(--s-mid),
+                transparent var(--s-end),
                 transparent 360deg
             );
             -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -373,21 +383,26 @@
             mask-composite: exclude;
             pointer-events: none;
             opacity: 0;
-            filter: drop-shadow(0 0 6px #ffffff) drop-shadow(0 0 10px var(--ring-color));
-            transform: rotate(0deg) translateZ(0);
-            transition: opacity 0.35s ease;
+            filter: drop-shadow(0 0 5px #ffffff);
+            transform: translateZ(0);
         }
         .bms-soc-ring.charging::after {
-            opacity: 1;
-            animation: bmsRingSweep var(--sweep-speed, 2s) linear infinite;
+            animation: bmsRingSweepCharge var(--sweep-speed, 4s) ease-in-out infinite;
         }
         .bms-soc-ring.discharging::after {
-            opacity: 1;
-            animation: bmsRingSweep var(--sweep-speed, 2s) linear infinite reverse;
+            animation: bmsRingSweepDischarge var(--sweep-speed, 4s) ease-in-out infinite;
         }
-        @keyframes bmsRingSweep {
-            from { transform: rotate(0deg) translateZ(0); }
-            to { transform: rotate(360deg) translateZ(0); }
+        @keyframes bmsRingSweepCharge {
+            0% { --sweep-p: 0; opacity: 0; }
+            15% { opacity: 0.9; }
+            85% { opacity: 0.9; }
+            100% { --sweep-p: 1; opacity: 0; }
+        }
+        @keyframes bmsRingSweepDischarge {
+            0% { --sweep-p: 1; opacity: 0; }
+            15% { opacity: 0.9; }
+            85% { opacity: 0.9; }
+            100% { --sweep-p: 0; opacity: 0; }
         }
 
         /* 4 Nấc màu phần trăm Pin */
@@ -417,34 +432,32 @@
         .bms-temp-chip .value { display: block; color: #ffd34e; font-size: 11px; font-weight: 900; line-height: 1.1; white-space: nowrap; letter-spacing: -0.3px; }
         .bms-temp-chip .label { display: block; margin-top: 3px; color: #fff4c5; font-size: 7px; font-weight: 900; line-height: 1; text-transform: uppercase; white-space: nowrap; }
         
-        /* HIỂN THỊ DÒNG CÔNG SUẤT: XẢ MÀU ĐỎ, SẠC MÀU XANH & HIỆU ỨNG NHẤP NHÁY */
+        /* HIỂN THỊ DÒNG CÔNG SUẤT: CHỮ "Công Suất:" ĐỨNG YÊN, CHỈ SỐ ĐỔI MÀU & NHẤP NHÁY CHẬM */
         .bms-power-row { margin-top: 7px; display: flex; align-items: baseline; gap: 4px; white-space: nowrap; overflow: hidden; }
-        .bms-power-label { color: #a0aec0; font-size: 9.5px; font-weight: 800; text-transform: none; letter-spacing: 0; transition: color 0.3s ease, text-shadow 0.3s ease; }
-        .bms-power-row span.power-val { color: #00ff72; font-size: 12.5px; font-weight: 900; transition: color 0.3s ease, text-shadow 0.35s ease; }
+        .bms-power-label { color: #a0aec0; font-size: 9.5px; font-weight: 800; text-transform: none; letter-spacing: 0; }
+        .bms-power-row span.power-val { color: #00ff72; font-size: 12.5px; font-weight: 900; transition: color 0.35s ease, text-shadow 0.35s ease; }
 
-        /* Khi Đang Sạc: Màu Xanh + Nhấp nháy */
-        .bms-power-row.charging .bms-power-label,
+        /* Khi Đang Sạc: Chỉ số màu Xanh + Nhấp nháy chậm điềm đạm (2.2s) */
         .bms-power-row.charging span.power-val {
             color: #00ff72 !important;
-            text-shadow: 0 0 10px rgba(0, 255, 114, 0.75);
-            animation: bmsPowerBlink 0.9s ease-in-out infinite alternate;
+            text-shadow: 0 0 8px rgba(0, 255, 114, 0.65);
+            animation: bmsPowerBlinkSlow 2.2s ease-in-out infinite alternate;
         }
-        /* Khi Đang Xả: Màu Đỏ + Nhấp nháy */
-        .bms-power-row.discharging .bms-power-label,
+        /* Khi Đang Xả: Chỉ số màu Đỏ + Nhấp nháy chậm điềm đạm (2.2s) */
         .bms-power-row.discharging span.power-val {
             color: #ff334d !important;
-            text-shadow: 0 0 10px rgba(255, 51, 77, 0.8);
-            animation: bmsPowerBlink 0.9s ease-in-out infinite alternate;
+            text-shadow: 0 0 8px rgba(255, 51, 77, 0.7);
+            animation: bmsPowerBlinkSlow 2.2s ease-in-out infinite alternate;
         }
-        @keyframes bmsPowerBlink {
-            0% { opacity: 1; filter: brightness(1.2); }
-            100% { opacity: 0.28; filter: brightness(0.85); }
+        @keyframes bmsPowerBlinkSlow {
+            0% { opacity: 1; filter: brightness(1.12); }
+            100% { opacity: 0.38; filter: brightness(0.88); }
         }
 
-        /* THANH CÔNG SUẤT CÓ VỆT SÁNG CHẠY NHANH/CHẬM ĐỒNG BỘ THEO DÒNG ĐIỆN CURRENT */
+        /* THANH CÔNG SUẤT CÓ VỆT SÁNG CHẠY ĐIỀM ĐẠM TRONG PHẠM VI CÔNG SUẤT HIỆN TẠI */
         .bms-power-bar { height: 6px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; position: relative; }
         .bms-power-fill {
-            --sweep-speed: 2s;
+            --sweep-speed: 4s;
             position: relative;
             overflow: hidden;
             width: 0%;
@@ -460,23 +473,23 @@
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 55%;
-            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 50%, rgba(255,255,255,0) 100%);
-            transform: translateX(-160%) translateZ(0);
+            width: 45%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0) 100%);
+            transform: translateX(-140%) translateZ(0);
             opacity: 0;
             pointer-events: none;
         }
         .bms-power-fill.charging::after {
             opacity: 1;
-            animation: bmsBarLightSweep var(--sweep-speed, 2s) linear infinite;
+            animation: bmsBarLightSweep var(--sweep-speed, 4s) ease-in-out infinite;
         }
         .bms-power-fill.discharging::after {
             opacity: 1;
-            animation: bmsBarLightSweep var(--sweep-speed, 2s) linear infinite reverse;
+            animation: bmsBarLightSweep var(--sweep-speed, 4s) ease-in-out infinite reverse;
         }
         @keyframes bmsBarLightSweep {
-            0% { transform: translateX(-160%) translateZ(0); }
-            100% { transform: translateX(260%) translateZ(0); }
+            0% { transform: translateX(-140%) translateZ(0); }
+            100% { transform: translateX(240%) translateZ(0); }
         }
 
         @media (max-width: 620px) {
@@ -1030,13 +1043,13 @@
             return { bm1: bms1 || (bmsLooksLikePack(root) ? root : null), bm2: bms2 || null };
         }
 
-        // HÀM TÍNH TỐC ĐỘ VỆT SÁNG THEO DÒNG ĐIỆN SẠC/XẢ THỰC TẾ (CURRENT)
+        // HÀM TÍNH TỐC ĐỘ VỆT SÁNG CHẬM ĐIỀM ĐẠM THEO DÒNG ĐIỆN SẠC/XẢ THỰC TẾ (CURRENT)
         function calcBmsSweepSpeed(currentA) {
             const absCurr = Number.isFinite(currentA) ? Math.abs(currentA) : 0;
             const maxRefCurr = 100; // Mốc dòng cao tham chiếu (100A)
             const ratio = clampNumber(absCurr / maxRefCurr, 0, 1);
-            // Dòng từ 0A -> 100A+: chu kỳ giảm mượt từ 3.20s (chậm) xuống 0.45s (rất nhanh)
-            return (3.2 - ratio * 2.75).toFixed(2) + 's';
+            // Tốc độ điềm đạm: từ 5.50s (dòng nhỏ) xuống tối đa 2.80s (khi dòng cao 100A)
+            return (5.5 - ratio * 2.7).toFixed(2) + 's';
         }
 
         function updateBmsPanel(prefix, data) {
@@ -1094,7 +1107,7 @@
 
             const roundedSoc = Math.round(soc);
 
-            // XÁC ĐỊNH TRẠNG THÁI SẠC / XẢ & TỐC ĐỘ VỆT SÁNG THEO DÒNG ĐIỆN THỰC TẾ (CURRENT)
+            // XÁC ĐỊNH TRẠNG THÁI SẠC / XẢ & TỐC ĐỘ VỆT SÁNG ĐIỀM ĐẠM THEO DÒNG ĐIỆN THỰC TẾ (CURRENT)
             const signedPwr = bmsNumber(data, ['Signed_Power'], Number.isFinite(voltage) && Number.isFinite(current) ? voltage * current : NaN);
             const effectiveCurrent = Number.isFinite(current) ? current : (Number.isFinite(signedPwr) && Number.isFinite(voltage) && voltage > 0 ? signedPwr / voltage : 0);
             const isCharging = effectiveCurrent > 0.05;
