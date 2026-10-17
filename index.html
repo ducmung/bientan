@@ -294,7 +294,7 @@
         .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
         .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
 
-        /* ================= BMS CARD STYLES (VỆT SÁNG CHẠY ĐIỀM ĐẠM TRONG PHẠM VI % PIN & CHỈ SỐ CÔNG SUẤT NHÁY CHẬM) ================= */
+        /* ================= BMS CARD STYLES (BỎ B1/B2 & VỆT SÁNG TO RÕ NÉT TRONG PHẠM VI % PIN) ================= */
         @property --sweep-p {
             syntax: '<number>';
             inherits: false;
@@ -309,12 +309,12 @@
         .bms-board { min-width: 0; border: 1px solid rgba(0,255,114,0.36); border-radius: 14px; background: rgba(8,12,18,0.86); box-shadow: inset 0 0 18px rgba(0,255,114,0.06); padding: 8px 6px; overflow: hidden; }
         .bms-board.offline { border-color: rgba(255,68,68,0.42); opacity: 0.85; }
         .bms-topbar { display: flex; align-items: center; justify-content: space-between; gap: 3px; }
-        .bms-id-chip, .bms-runtime-chip, .bms-cycle-chip { border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; background: rgba(255,255,255,0.06); color: #fff; font-size: 8px; font-weight: 900; line-height: 1.1; padding: 4px 4px; white-space: nowrap; }
+        .bms-id-chip, .bms-runtime-chip, .bms-cycle-chip { border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; background: rgba(255,255,255,0.06); color: #fff; font-size: 8.5px; font-weight: 900; line-height: 1.1; padding: 4px 6px; white-space: nowrap; }
         .bms-id-chip { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-        .bms-id-chip strong { color: #00ff72; }
+        .bms-id-chip strong { color: #00ff72; letter-spacing: 0.3px; }
         .bms-runtime-chip { color: #ffd34e; text-align: center; flex: 0 1 auto; }
         .bms-cycle-chip { color: #ffd34e; text-align: center; flex: 0 0 auto; }
-        .bms-online { display: inline-block; margin-left: 2px; color: #00ff72; font-size: 7.5px; }
+        .bms-online { display: inline-block; margin-left: 3px; color: #00ff72; font-size: 8px; }
         .bms-board.offline .bms-online { color: #ff4b4b; }
         .bms-status-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; margin-top: 6px; }
         .bms-flag { display: flex; align-items: center; justify-content: space-between; gap: 2px; min-width: 0; border: 1px solid rgba(0,255,114,0.38); border-radius: 12px; background: rgba(0,80,28,0.34); color: #fff; font-size: 8px; font-weight: 900; line-height: 1; padding: 3px 3px 3px 4px; }
@@ -325,7 +325,7 @@
         
         .bms-core { display: grid; place-items: center; min-height: 126px; margin: 7px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
         
-        /* VÒNG TRÒN PIN CO GIÃN ĐỘ DÀI THEO % CÒN LẠI, 4 NẤC MÀU & VỆT SÁNG CHỈ CHẠY TRONG VẠCH % PIN HIỆN TẠI */
+        /* VÒNG TRÒN PIN 4 NẤC MÀU & VỆT SÁNG TO RÕ NÉT CHẠY ĐIỀM ĐẠM TRONG VẠCH % PIN */
         .bms-soc-ring {
             --soc-pct: 0;
             --ring-color: #00ff72;
@@ -342,7 +342,7 @@
             align-items: center;
             justify-content: center;
             gap: 4px;
-            box-shadow: 0 0 20px var(--ring-glow), inset 0 0 20px rgba(0,0,0,0.42);
+            box-shadow: 0 0 22px var(--ring-glow), inset 0 0 20px rgba(0,0,0,0.45);
             transition: box-shadow 0.4s ease;
         }
         .bms-soc-ring::before {
@@ -350,7 +350,7 @@
             position: absolute;
             inset: 0;
             border-radius: 50%;
-            padding: 5px;
+            padding: 5.5px;
             background: conic-gradient(from 0deg, var(--ring-color) calc(var(--soc-pct) * 1%), rgba(255, 255, 255, 0.12) 0);
             -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
             -webkit-mask-composite: xor;
@@ -358,23 +358,29 @@
             pointer-events: none;
             transition: background 0.4s ease;
         }
-        /* Vệt sáng chỉ chạy từ 0deg đến đúng góc % pin hiện tại (--end-deg), không bao giờ vượt quá vạch % pin */
+        /* Vệt sáng Sao Chổi (Comet Streak) to, dày, lõi trắng rực rỡ + hào quang kép, chỉ chạy trong góc --end-deg */
         .bms-soc-ring::after {
             content: "";
             position: absolute;
-            inset: 0;
+            inset: -1.5px;
             border-radius: 50%;
-            padding: 5px;
+            padding: 7.5px;
             --end-deg: calc(var(--soc-pct) * 3.6deg);
-            --band-deg: min(32deg, var(--end-deg));
+            --band-deg: min(64deg, var(--end-deg));
             --s-start: calc(var(--sweep-p) * (var(--end-deg) - var(--band-deg)));
-            --s-mid: calc(var(--s-start) + (var(--band-deg) * 0.5));
+            --s-glow1: calc(var(--s-start) + (var(--band-deg) * 0.16));
+            --s-core1: calc(var(--s-start) + (var(--band-deg) * 0.32));
+            --s-core2: calc(var(--s-start) + (var(--band-deg) * 0.68));
+            --s-glow2: calc(var(--s-start) + (var(--band-deg) * 0.84));
             --s-end: calc(var(--s-start) + var(--band-deg));
             background: conic-gradient(
                 from 0deg,
                 transparent 0deg,
                 transparent var(--s-start),
-                rgba(255, 255, 255, 0.95) var(--s-mid),
+                var(--ring-color) var(--s-glow1),
+                #ffffff var(--s-core1),
+                #ffffff var(--s-core2),
+                var(--ring-color) var(--s-glow2),
                 transparent var(--s-end),
                 transparent 360deg
             );
@@ -383,8 +389,9 @@
             mask-composite: exclude;
             pointer-events: none;
             opacity: 0;
-            filter: drop-shadow(0 0 5px #ffffff);
+            filter: drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 10px #ffffff) drop-shadow(0 0 16px var(--ring-color)) brightness(1.3);
             transform: translateZ(0);
+            z-index: 2;
         }
         .bms-soc-ring.charging::after {
             animation: bmsRingSweepCharge var(--sweep-speed, 4s) ease-in-out infinite;
@@ -394,14 +401,14 @@
         }
         @keyframes bmsRingSweepCharge {
             0% { --sweep-p: 0; opacity: 0; }
-            15% { opacity: 0.9; }
-            85% { opacity: 0.9; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
             100% { --sweep-p: 1; opacity: 0; }
         }
         @keyframes bmsRingSweepDischarge {
             0% { --sweep-p: 1; opacity: 0; }
-            15% { opacity: 0.9; }
-            85% { opacity: 0.9; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
             100% { --sweep-p: 0; opacity: 0; }
         }
 
@@ -411,8 +418,8 @@
         .bms-soc-ring.soc-lvl-3 { --ring-color: #ff8c00; --ring-glow: rgba(255, 140, 0, 0.32); --pill-bg: rgba(95, 48, 0, 0.45); }
         .bms-soc-ring.soc-lvl-4 { --ring-color: #00ff72; --ring-glow: rgba(0, 255, 114, 0.28); --pill-bg: rgba(0, 80, 28, 0.42); }
 
-        .bms-soc { color: var(--ring-color); font-size: 24px; font-weight: 900; line-height: 1; white-space: nowrap; text-shadow: 0 0 10px var(--ring-glow); transition: color 0.35s ease, text-shadow 0.35s ease; }
-        .bms-pill { min-width: 66px; border: 1px solid var(--ring-color); border-radius: 12px; background: var(--pill-bg); color: #fff; text-align: center; font-size: 10.5px; font-weight: 900; line-height: 1; padding: 3px 5px; white-space: nowrap; transition: border-color 0.35s ease, background 0.35s ease; }
+        .bms-soc { position: relative; z-index: 3; color: var(--ring-color); font-size: 24px; font-weight: 900; line-height: 1; white-space: nowrap; text-shadow: 0 0 10px var(--ring-glow); transition: color 0.35s ease, text-shadow 0.35s ease; }
+        .bms-pill { position: relative; z-index: 3; min-width: 66px; border: 1px solid var(--ring-color); border-radius: 12px; background: var(--pill-bg); color: #fff; text-align: center; font-size: 10.5px; font-weight: 900; line-height: 1; padding: 3px 5px; white-space: nowrap; transition: border-color 0.35s ease, background 0.35s ease; }
         
         /* Grid hiển thị thông số Pin */
         .bms-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3.5px; }
@@ -454,7 +461,7 @@
             100% { opacity: 0.38; filter: brightness(0.88); }
         }
 
-        /* THANH CÔNG SUẤT CÓ VỆT SÁNG CHẠY ĐIỀM ĐẠM TRONG PHẠM VI CÔNG SUẤT HIỆN TẠI */
+        /* THANH CÔNG SUẤT CÓ VỆT SÁNG TO RÕ NÉT CHẠY ĐIỀM ĐẠM */
         .bms-power-bar { height: 6px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; position: relative; }
         .bms-power-fill {
             --sweep-speed: 4s;
@@ -466,15 +473,16 @@
             background: linear-gradient(90deg, #9affbf, #00cc66);
             transition: width 0.35s ease, background 0.35s ease;
         }
-        .bms-power-fill.charging { background: linear-gradient(90deg, #00994d, #00ff72); box-shadow: 0 0 8px rgba(0, 255, 114, 0.65); }
-        .bms-power-fill.discharging { background: linear-gradient(90deg, #99001a, #ff2a45); box-shadow: 0 0 8px rgba(255, 51, 77, 0.65); }
+        .bms-power-fill.charging { background: linear-gradient(90deg, #00994d, #00ff72); box-shadow: 0 0 10px rgba(0, 255, 114, 0.75); }
+        .bms-power-fill.discharging { background: linear-gradient(90deg, #99001a, #ff2a45); box-shadow: 0 0 10px rgba(255, 51, 77, 0.75); }
         .bms-power-fill::after {
             content: "";
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 45%;
-            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0) 100%);
+            width: 55%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 35%, #ffffff 50%, rgba(255,255,255,0.95) 65%, rgba(255,255,255,0) 100%);
+            filter: drop-shadow(0 0 6px #ffffff);
             transform: translateX(-140%) translateZ(0);
             opacity: 0;
             pointer-events: none;
@@ -670,7 +678,7 @@
                 </div>
             </div>
 
-            <!-- 2. KHUNG HỆ THỐNG PIN (ĐỒNG BỘ 2 BÌNH 14058648 & 14058648-1 QUA CLOUDFLARE WORKER) -->
+            <!-- 2. KHUNG HỆ THỐNG PIN (CHỈ HIỂN THỊ CALB & GOTION) -->
             <div class="stat-card bms-card">
                 <div class="stat-header">
                     <h2>🔋 HỆ THỐNG PIN</h2>
@@ -680,7 +688,7 @@
                     <!-- BMS 1: 14058648 (CALB) -->
                     <section class="bms-board offline" id="bm1-card">
                         <div class="bms-topbar">
-                            <div class="bms-id-chip">B1:<strong id="bm1-name">CALB</strong><span class="bms-online" id="bm1-online">OFF</span></div>
+                            <div class="bms-id-chip"><strong id="bm1-name">CALB</strong><span class="bms-online" id="bm1-online">OFF</span></div>
                             <div class="bms-runtime-chip"><span id="bm1-runtime">--</span></div>
                             <div class="bms-cycle-chip">CK:<span id="bm1-cycle-top">--</span></div>
                         </div>
@@ -719,7 +727,7 @@
                     <!-- BMS 2: 14058648-1 (GOTION) -->
                     <section class="bms-board offline" id="bm2-card">
                         <div class="bms-topbar">
-                            <div class="bms-id-chip">B2:<strong id="bm2-name">GOTION</strong><span class="bms-online" id="bm2-online">OFF</span></div>
+                            <div class="bms-id-chip"><strong id="bm2-name">GOTION</strong><span class="bms-online" id="bm2-online">OFF</span></div>
                             <div class="bms-runtime-chip"><span id="bm2-runtime">--</span></div>
                             <div class="bms-cycle-chip">CK:<span id="bm2-cycle-top">--</span></div>
                         </div>
@@ -1061,8 +1069,12 @@
             const powerRow = card ? card.querySelector('.bms-power-row') : null;
             const fill = document.getElementById(`${prefix}-power-fill`);
 
-            const devName = bmsRead(data, ['Device_Name', 'Target'], null);
-            if (devName) bmsText(`${prefix}-name`, devName);
+            // Giữ cố định tên CALB và GOTION (không bị ghi đè thành BM1/BM2)
+            let devName = bmsRead(data, ['Device_Name'], null);
+            if (!devName || ['BM1', 'BMS1', 'B1', 'BM2', 'BMS2', 'B2'].includes(String(devName).trim().toUpperCase())) {
+                devName = prefix === 'bm1' ? 'CALB' : 'GOTION';
+            }
+            bmsText(`${prefix}-name`, devName);
 
             const statusText = online ? 'ON' : 'OFF';
             bmsText(`${prefix}-online`, statusText);
