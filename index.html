@@ -294,7 +294,7 @@
         .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
         .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
 
-        /* ================= BMS CARD STYLES (TỐI ƯU GIAO DIỆN DI ĐỘNG & KHÔNG BỊ KHUẤT SỐ) ================= */
+        /* ================= BMS CARD STYLES (ĐÃ SỬA VÒNG TRÒN 4 NẤC MÀU & CÔNG SUẤT NHẤP NHÁY) ================= */
         .bms-card { background: linear-gradient(135deg, rgba(16,18,27,0.97), rgba(30,27,42,0.95)); border: 1px solid rgba(0,255,114,0.42); color: #f5fff8; padding: 14px 10px; }
         .bms-card .stat-header { align-items: center; gap: 8px; margin-bottom: 10px; }
         .bms-card .stat-header h2 { color: #eafff2; line-height: 1.15; font-size: 15px; letter-spacing: 0.3px; }
@@ -318,11 +318,49 @@
         .bms-flag-value.off { background: #40434a; color: #fff; }
         
         .bms-core { display: grid; place-items: center; min-height: 126px; margin: 7px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
-        .bms-soc-ring { width: 104px; aspect-ratio: 1; border: 4px solid #00ff72; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 0 20px rgba(0,255,114,0.18), inset 0 0 20px rgba(0,0,0,0.42); }
-        .bms-soc { color: #00ff72; font-size: 24px; font-weight: 900; line-height: 1; white-space: nowrap; }
-        .bms-pill { min-width: 66px; border: 1px solid rgba(0,255,114,0.7); border-radius: 12px; background: rgba(0,80,28,0.42); color: #fff; text-align: center; font-size: 10.5px; font-weight: 900; line-height: 1; padding: 3px 5px; white-space: nowrap; }
         
-        /* Grid hiển thị thông số Pin (tối ưu không bị mất số trên màn hình hẹp) */
+        /* VÒNG TRÒN PIN CO GIÃN ĐỘ DÀI THEO % CÒN LẠI & ĐỔI 4 NẤC MÀU */
+        .bms-soc-ring {
+            --soc-pct: 0;
+            --ring-color: #00ff72;
+            --ring-glow: rgba(0, 255, 114, 0.25);
+            --pill-bg: rgba(0, 80, 28, 0.42);
+            position: relative;
+            width: 104px;
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: 0 0 20px var(--ring-glow), inset 0 0 20px rgba(0,0,0,0.42);
+            transition: box-shadow 0.4s ease;
+        }
+        .bms-soc-ring::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            padding: 5px;
+            background: conic-gradient(from 0deg, var(--ring-color) calc(var(--soc-pct) * 1%), rgba(255, 255, 255, 0.12) 0);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            transition: background 0.4s ease;
+        }
+        /* 4 Nấc màu phần trăm Pin */
+        .bms-soc-ring.soc-lvl-1 { --ring-color: #ff334d; --ring-glow: rgba(255, 51, 77, 0.35); --pill-bg: rgba(90, 14, 24, 0.45); }
+        .bms-soc-ring.soc-lvl-2 { --ring-color: #ffd700; --ring-glow: rgba(255, 215, 0, 0.32); --pill-bg: rgba(90, 75, 0, 0.42); }
+        .bms-soc-ring.soc-lvl-3 { --ring-color: #ff8c00; --ring-glow: rgba(255, 140, 0, 0.32); --pill-bg: rgba(95, 48, 0, 0.45); }
+        .bms-soc-ring.soc-lvl-4 { --ring-color: #00ff72; --ring-glow: rgba(0, 255, 114, 0.28); --pill-bg: rgba(0, 80, 28, 0.42); }
+
+        .bms-soc { color: var(--ring-color); font-size: 24px; font-weight: 900; line-height: 1; white-space: nowrap; text-shadow: 0 0 10px var(--ring-glow); transition: color 0.35s ease, text-shadow 0.35s ease; }
+        .bms-pill { min-width: 66px; border: 1px solid var(--ring-color); border-radius: 12px; background: var(--pill-bg); color: #fff; text-align: center; font-size: 10.5px; font-weight: 900; line-height: 1; padding: 3px 5px; white-space: nowrap; transition: border-color 0.35s ease, background 0.35s ease; }
+        
+        /* Grid hiển thị thông số Pin */
         .bms-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3.5px; }
         .bms-metric { min-width: 0; min-height: 46px; border: 1px solid rgba(0,255,114,0.34); border-radius: 7px; background: rgba(0,80,28,0.28); padding: 5px 2px; overflow: hidden; text-align: center; }
         button.bms-metric { width: 100%; font-family: inherit; text-align: center; cursor: pointer; }
@@ -340,12 +378,34 @@
         .bms-temp-chip .value { display: block; color: #ffd34e; font-size: 11px; font-weight: 900; line-height: 1.1; white-space: nowrap; letter-spacing: -0.3px; }
         .bms-temp-chip .label { display: block; margin-top: 3px; color: #fff4c5; font-size: 7px; font-weight: 900; line-height: 1; text-transform: uppercase; white-space: nowrap; }
         
-        /* Hiển thị dòng Công Suất gọn gàng */
+        /* HIỂN THỊ DÒNG CÔNG SUẤT: XẢ MÀU ĐỎ, SẠC MÀU XANH & HIỆU ỨNG NHẤP NHÁY */
         .bms-power-row { margin-top: 7px; display: flex; align-items: baseline; gap: 4px; white-space: nowrap; overflow: hidden; }
-        .bms-power-label { color: #a0aec0; font-size: 9.5px; font-weight: 800; text-transform: none; letter-spacing: 0; }
-        .bms-power-row span.power-val { color: #00ff72; font-size: 12.5px; font-weight: 900; }
+        .bms-power-label { color: #a0aec0; font-size: 9.5px; font-weight: 800; text-transform: none; letter-spacing: 0; transition: color 0.3s ease, text-shadow 0.3s ease; }
+        .bms-power-row span.power-val { color: #00ff72; font-size: 12.5px; font-weight: 900; transition: color 0.3s ease, text-shadow 0.3s ease; }
+
+        /* Khi Đang Sạc: Màu Xanh + Nhấp nháy */
+        .bms-power-row.charging .bms-power-label,
+        .bms-power-row.charging span.power-val {
+            color: #00ff72 !important;
+            text-shadow: 0 0 10px rgba(0, 255, 114, 0.75);
+            animation: bmsPowerBlink 0.9s ease-in-out infinite alternate;
+        }
+        /* Khi Đang Xả: Màu Đỏ + Nhấp nháy */
+        .bms-power-row.discharging .bms-power-label,
+        .bms-power-row.discharging span.power-val {
+            color: #ff334d !important;
+            text-shadow: 0 0 10px rgba(255, 51, 77, 0.8);
+            animation: bmsPowerBlink 0.9s ease-in-out infinite alternate;
+        }
+        @keyframes bmsPowerBlink {
+            0% { opacity: 1; filter: brightness(1.2); }
+            100% { opacity: 0.28; filter: brightness(0.85); }
+        }
+
         .bms-power-bar { height: 6px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; }
-        .bms-power-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9affbf, #00cc66); transition: width 0.35s ease; }
+        .bms-power-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9affbf, #00cc66); transition: width 0.35s ease, background 0.35s ease; }
+        .bms-power-fill.charging { background: linear-gradient(90deg, #80ffaa, #00ff72); box-shadow: 0 0 8px rgba(0, 255, 114, 0.65); }
+        .bms-power-fill.discharging { background: linear-gradient(90deg, #ff8a98, #ff2a45); box-shadow: 0 0 8px rgba(255, 51, 77, 0.65); }
 
         @media (max-width: 620px) {
             .energy-chart-toolbar { align-items: stretch; flex-direction: column; }
@@ -903,6 +963,10 @@
             const online = !!data && bmsRead(data, ['Online', 'Connected', 'BLE_Connected'], true) !== false;
             if (card) card.classList.toggle('offline', !online);
 
+            const socRing = card ? card.querySelector('.bms-soc-ring') : null;
+            const powerRow = card ? card.querySelector('.bms-power-row') : null;
+            const fill = document.getElementById(`${prefix}-power-fill`);
+
             const devName = bmsRead(data, ['Device_Name', 'Target'], null);
             if (devName) bmsText(`${prefix}-name`, devName);
 
@@ -912,7 +976,17 @@
             if (!online) {
                 ['runtime', 'cycle-top', 'soc', 'voltage', 'current', 'cell-high', 'cell-low', 'cell-diff', 'balance-current', 'capacity', 'remain', 'mos-temp', 'health', 't1', 't2', 't3', 't4', 'power'].forEach(key => bmsText(`${prefix}-${key}`, key === 'soc' ? '--%' : (key === 'voltage' ? '-- V' : (key === 'current' ? '-- A' : emptyText))));
                 bmsSetFlag(`${prefix}-charge-state`, false); bmsSetFlag(`${prefix}-discharge-state`, false); bmsSetFlag(`${prefix}-balance-state`, false);
-                const fill = document.getElementById(`${prefix}-power-fill`); if (fill) fill.style.width = '0%';
+                if (socRing) {
+                    socRing.style.setProperty('--soc-pct', 0);
+                    socRing.classList.remove('soc-lvl-1', 'soc-lvl-2', 'soc-lvl-3', 'soc-lvl-4');
+                }
+                if (powerRow) {
+                    powerRow.classList.remove('charging', 'discharging');
+                }
+                if (fill) {
+                    fill.style.width = '0%';
+                    fill.classList.remove('charging', 'discharging');
+                }
                 return;
             }
 
@@ -937,9 +1011,26 @@
             const displayPower = Number.isFinite(power) ? Math.abs(power) : NaN;
             const stats = bmsCellStats(data);
 
+            const roundedSoc = Math.round(soc);
+
+            // CẬP NHẬT VÒNG TRÒN THEO % CÒN LẠI VÀ 4 NẤC MÀU
+            if (socRing) {
+                socRing.style.setProperty('--soc-pct', roundedSoc);
+                socRing.classList.remove('soc-lvl-1', 'soc-lvl-2', 'soc-lvl-3', 'soc-lvl-4');
+                if (roundedSoc <= 25) {
+                    socRing.classList.add('soc-lvl-1'); // Nấc 1: 5% - 25% (màu đỏ)
+                } else if (roundedSoc <= 50) {
+                    socRing.classList.add('soc-lvl-2'); // Nấc 2: 26% - 50% (màu vàng)
+                } else if (roundedSoc <= 80) {
+                    socRing.classList.add('soc-lvl-3'); // Nấc 3: 51% - 80% (màu cam)
+                } else {
+                    socRing.classList.add('soc-lvl-4'); // Nấc 4: 81% - 100% (màu xanh)
+                }
+            }
+
             bmsText(`${prefix}-runtime`, bmsRuntimeText(data));
             bmsText(`${prefix}-cycle-top`, Number.isFinite(cycle) ? String(Math.round(cycle)) : '--');
-            bmsText(`${prefix}-soc`, `${Math.round(soc)}%`);
+            bmsText(`${prefix}-soc`, `${roundedSoc}%`);
             bmsText(`${prefix}-voltage`, bmsFormat(voltage, 2, ' V'));
             bmsText(`${prefix}-current`, bmsFormat(current, 2, ' A'));
             bmsText(`${prefix}-cell-high`, bmsFormatCompact(stats.high, 3));
@@ -958,10 +1049,23 @@
             const packLimitW = Number.isFinite(voltage) ? voltage * (current >= 0 ? (Number.isFinite(maxCharge) ? maxCharge : 120) : (Number.isFinite(maxDischarge) ? maxDischarge : 120)) : 5200;
             bmsText(`${prefix}-power`, Number.isFinite(displayPower) ? `${displayPower.toFixed(1)}${Number.isFinite(packLimitW) && packLimitW > 0 ? ' / ' + Math.round(packLimitW) : ''}` : '--');
 
-            const fill = document.getElementById(`${prefix}-power-fill`);
+            // XÁC ĐỊNH TRẠNG THÁI SẠC / XẢ ĐỂ ĐỔI MÀU CHỮ CÔNG SUẤT & NHẤP NHÁY
+            const signedPwr = bmsNumber(data, ['Signed_Power'], Number.isFinite(voltage) && Number.isFinite(current) ? voltage * current : NaN);
+            const isCharging = (Number.isFinite(current) && current > 0.05) || (!Number.isFinite(current) && Number.isFinite(signedPwr) && signedPwr > 1);
+            const isDischarging = (Number.isFinite(current) && current < -0.05) || (!Number.isFinite(current) && Number.isFinite(signedPwr) && signedPwr < -1);
+
+            if (powerRow) {
+                powerRow.classList.remove('charging', 'discharging');
+                if (isCharging) powerRow.classList.add('charging');
+                else if (isDischarging) powerRow.classList.add('discharging');
+            }
+
             if (fill) {
                 const pct = Number.isFinite(displayPower) && Number.isFinite(packLimitW) && packLimitW > 0 ? clampNumber((displayPower / packLimitW) * 100, 0, 100) : 0;
                 fill.style.width = pct.toFixed(1) + '%';
+                fill.classList.remove('charging', 'discharging');
+                if (isCharging) fill.classList.add('charging');
+                else if (isDischarging) fill.classList.add('discharging');
             }
 
             bmsSetFlag(`${prefix}-charge-state`, bmsRead(data, ['Charge', 'Charge_Enable', 'ChargeEnabled', 'Charging'], false));
