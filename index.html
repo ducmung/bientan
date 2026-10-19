@@ -294,7 +294,7 @@
         .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
         .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
 
-        /* ================= BMS CARD STYLES (BỎ B1/B2 & VỆT SÁNG TO RÕ NÉT TRONG PHẠM VI % PIN) ================= */
+        /* ================= BMS CARD STYLES (NẤC 2 MÀU HỒNG & VỆT SÁNG GIỌT NƯỚC PHÁT SÁNG) ================= */
         @property --sweep-p {
             syntax: '<number>';
             inherits: false;
@@ -325,7 +325,7 @@
         
         .bms-core { display: grid; place-items: center; min-height: 126px; margin: 7px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
         
-        /* VÒNG TRÒN PIN 4 NẤC MÀU & VỆT SÁNG TO RÕ NÉT CHẠY ĐIỀM ĐẠM TRONG VẠCH % PIN */
+        /* VÒNG TRÒN PIN 4 NẤC MÀU & GIỌT NƯỚC PHÁT SÁNG CHẠY ĐIỀM ĐẠM TRONG VẠCH % PIN */
         .bms-soc-ring {
             --soc-pct: 0;
             --ring-color: #00ff72;
@@ -358,45 +358,58 @@
             pointer-events: none;
             transition: background 0.4s ease;
         }
-        /* Vệt sáng Sao Chổi (Comet Streak) to, dày, lõi trắng rực rỡ + hào quang kép, chỉ chạy trong góc --end-deg */
+        /* Hiệu ứng Giọt Nước Phát Sáng (Glowing Water Droplet) gọn gàng, đầu tròn sáng trắng + đuôi ngắn thon */
         .bms-soc-ring::after {
             content: "";
             position: absolute;
             inset: -1.5px;
             border-radius: 50%;
-            padding: 7.5px;
+            padding: 8px;
             --end-deg: calc(var(--soc-pct) * 3.6deg);
-            --band-deg: min(64deg, var(--end-deg));
+            --band-deg: min(20deg, var(--end-deg));
             --s-start: calc(var(--sweep-p) * (var(--end-deg) - var(--band-deg)));
-            --s-glow1: calc(var(--s-start) + (var(--band-deg) * 0.16));
-            --s-core1: calc(var(--s-start) + (var(--band-deg) * 0.32));
-            --s-core2: calc(var(--s-start) + (var(--band-deg) * 0.68));
-            --s-glow2: calc(var(--s-start) + (var(--band-deg) * 0.84));
             --s-end: calc(var(--s-start) + var(--band-deg));
-            background: conic-gradient(
-                from 0deg,
-                transparent 0deg,
-                transparent var(--s-start),
-                var(--ring-color) var(--s-glow1),
-                #ffffff var(--s-core1),
-                #ffffff var(--s-core2),
-                var(--ring-color) var(--s-glow2),
-                transparent var(--s-end),
-                transparent 360deg
-            );
             -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
             opacity: 0;
-            filter: drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 10px #ffffff) drop-shadow(0 0 16px var(--ring-color)) brightness(1.3);
+            filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px #ffffff) drop-shadow(0 0 12px var(--ring-color)) brightness(1.35);
             transform: translateZ(0);
             z-index: 2;
         }
+        /* Khi Sạc: Đầu giọt nước tròn hướng theo chiều kim đồng hồ, đuôi vuốt nhẹ phía sau */
         .bms-soc-ring.charging::after {
+            --d-tail: calc(var(--s-start) + (var(--band-deg) * 0.42));
+            --d-head1: calc(var(--s-start) + (var(--band-deg) * 0.68));
+            --d-head2: calc(var(--s-start) + (var(--band-deg) * 0.92));
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                transparent var(--s-start),
+                var(--ring-color) var(--d-tail),
+                #ffffff var(--d-head1),
+                #ffffff var(--d-head2),
+                transparent var(--s-end),
+                transparent 360deg
+            );
             animation: bmsRingSweepCharge var(--sweep-speed, 4s) ease-in-out infinite;
         }
+        /* Khi Xả: Đầu giọt nước tròn đảo ngược chiều kim đồng hồ, đuôi vuốt nhẹ phía sau */
         .bms-soc-ring.discharging::after {
+            --d-head1: calc(var(--s-start) + (var(--band-deg) * 0.08));
+            --d-head2: calc(var(--s-start) + (var(--band-deg) * 0.32));
+            --d-tail: calc(var(--s-start) + (var(--band-deg) * 0.58));
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                transparent var(--s-start),
+                #ffffff var(--d-head1),
+                #ffffff var(--d-head2),
+                var(--ring-color) var(--d-tail),
+                transparent var(--s-end),
+                transparent 360deg
+            );
             animation: bmsRingSweepDischarge var(--sweep-speed, 4s) ease-in-out infinite;
         }
         @keyframes bmsRingSweepCharge {
@@ -412,9 +425,9 @@
             100% { --sweep-p: 0; opacity: 0; }
         }
 
-        /* 4 Nấc màu phần trăm Pin */
+        /* 4 Nấc màu phần trăm Pin (Nấc 2 từ 26% - 50% là màu Hồng) */
         .bms-soc-ring.soc-lvl-1 { --ring-color: #ff334d; --ring-glow: rgba(255, 51, 77, 0.35); --pill-bg: rgba(90, 14, 24, 0.45); }
-        .bms-soc-ring.soc-lvl-2 { --ring-color: #ffd700; --ring-glow: rgba(255, 215, 0, 0.32); --pill-bg: rgba(90, 75, 0, 0.42); }
+        .bms-soc-ring.soc-lvl-2 { --ring-color: #ff33a1; --ring-glow: rgba(255, 51, 161, 0.38); --pill-bg: rgba(90, 14, 58, 0.45); }
         .bms-soc-ring.soc-lvl-3 { --ring-color: #ff8c00; --ring-glow: rgba(255, 140, 0, 0.32); --pill-bg: rgba(95, 48, 0, 0.45); }
         .bms-soc-ring.soc-lvl-4 { --ring-color: #00ff72; --ring-glow: rgba(0, 255, 114, 0.28); --pill-bg: rgba(0, 80, 28, 0.42); }
 
@@ -461,7 +474,7 @@
             100% { opacity: 0.38; filter: brightness(0.88); }
         }
 
-        /* THANH CÔNG SUẤT CÓ VỆT SÁNG TO RÕ NÉT CHẠY ĐIỀM ĐẠM */
+        /* THANH CÔNG SUẤT CÓ GIỌT SÁNG GỌN CHẠY ĐIỀM ĐẠM */
         .bms-power-bar { height: 6px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; position: relative; }
         .bms-power-fill {
             --sweep-speed: 4s;
@@ -480,9 +493,10 @@
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 55%;
-            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 35%, #ffffff 50%, rgba(255,255,255,0.95) 65%, rgba(255,255,255,0) 100%);
-            filter: drop-shadow(0 0 6px #ffffff);
+            width: 24%;
+            border-radius: 999px;
+            background: radial-gradient(ellipse at center, #ffffff 0%, #ffffff 42%, rgba(255,255,255,0) 100%);
+            filter: drop-shadow(0 0 5px #ffffff);
             transform: translateX(-140%) translateZ(0);
             opacity: 0;
             pointer-events: none;
@@ -497,7 +511,7 @@
         }
         @keyframes bmsBarLightSweep {
             0% { transform: translateX(-140%) translateZ(0); }
-            100% { transform: translateX(240%) translateZ(0); }
+            100% { transform: translateX(420%) translateZ(0); }
         }
 
         @media (max-width: 620px) {
@@ -593,7 +607,7 @@
                 <div class="battery-mini-row"><span class="battery-mini-label">Dòng</span><span class="battery-mini-value" id="mini-stat-a">-- A</span></div>
             </div>
             
-            <div id="update-clock" class="status-clock" title="Trạng thái lưới, ESP32 và thời điểm nhận dữ liệu Live gần nhất qua MQTT">
+            <div id="update-clock" class="status-clock" title="Trạng thái lưới, PC và thời điểm nhận dữ liệu Live gần nhất qua MQTT">
                 <div class="clock-status-row">
                     <span id="clock-grid-status" class="clock-grid-status unknown">
                         <span class="clock-grid-dot"></span>
@@ -601,7 +615,7 @@
                     </span>
                     <span id="device-status" class="checking">
                         <span class="device-dot"></span>
-                        <span id="device-status-text">ESP32 ...</span>
+                        <span id="device-status-text">PC ...</span>
                     </span>
                 </div>
                 <div id="clock-time-text">--:--:--</div>
@@ -1051,7 +1065,7 @@
             return { bm1: bms1 || (bmsLooksLikePack(root) ? root : null), bm2: bms2 || null };
         }
 
-        // HÀM TÍNH TỐC ĐỘ VỆT SÁNG CHẬM ĐIỀM ĐẠM THEO DÒNG ĐIỆN SẠC/XẢ THỰC TẾ (CURRENT)
+        // HÀM TÍNH TỐC ĐỘ GIỌT NƯỚC CHẬM ĐIỀM ĐẠM THEO DÒNG ĐIỆN SẠC/XẢ THỰC TẾ (CURRENT)
         function calcBmsSweepSpeed(currentA) {
             const absCurr = Number.isFinite(currentA) ? Math.abs(currentA) : 0;
             const maxRefCurr = 100; // Mốc dòng cao tham chiếu (100A)
@@ -1119,14 +1133,14 @@
 
             const roundedSoc = Math.round(soc);
 
-            // XÁC ĐỊNH TRẠNG THÁI SẠC / XẢ & TỐC ĐỘ VỆT SÁNG ĐIỀM ĐẠM THEO DÒNG ĐIỆN THỰC TẾ (CURRENT)
+            // XÁC ĐỊNH TRẠNG THÁI SẠC / XẢ & TỐC ĐỘ GIỌT NƯỚC ĐIỀM ĐẠM THEO DÒNG ĐIỆN THỰC TẾ (CURRENT)
             const signedPwr = bmsNumber(data, ['Signed_Power'], Number.isFinite(voltage) && Number.isFinite(current) ? voltage * current : NaN);
             const effectiveCurrent = Number.isFinite(current) ? current : (Number.isFinite(signedPwr) && Number.isFinite(voltage) && voltage > 0 ? signedPwr / voltage : 0);
             const isCharging = effectiveCurrent > 0.05;
             const isDischarging = effectiveCurrent < -0.05;
             const sweepSpeed = calcBmsSweepSpeed(effectiveCurrent);
 
-            // CẬP NHẬT VÒNG TRÒN THEO % CÒN LẠI, 4 NẤC MÀU & TỐC ĐỘ VỆT SÁNG
+            // CẬP NHẬT VÒNG TRÒN THEO % CÒN LẠI, 4 NẤC MÀU & TỐC ĐỘ GIỌT NƯỚC
             if (socRing) {
                 socRing.style.setProperty('--soc-pct', roundedSoc);
                 socRing.style.setProperty('--sweep-speed', sweepSpeed);
@@ -1134,7 +1148,7 @@
                 if (roundedSoc <= 25) {
                     socRing.classList.add('soc-lvl-1'); // Nấc 1: 5% - 25% (màu đỏ)
                 } else if (roundedSoc <= 50) {
-                    socRing.classList.add('soc-lvl-2'); // Nấc 2: 26% - 50% (màu vàng)
+                    socRing.classList.add('soc-lvl-2'); // Nấc 2: 26% - 50% (màu hồng)
                 } else if (roundedSoc <= 80) {
                     socRing.classList.add('soc-lvl-3'); // Nấc 3: 51% - 80% (màu cam)
                 } else {
@@ -1799,7 +1813,7 @@
             }
         }
 
-        // ================= TRẠNG THÁI THIẾT BỊ VÀ ĐỒNG HỒ =================
+        // ================= TRẠNG THÁI THIẾT BỊ (PC ON/OFF) VÀ ĐỒNG HỒ =================
         let lastLiveTime = 0;
         let lastLiveReceivedAt = 0;
         let currentDeviceState = 'checking';
@@ -1835,9 +1849,9 @@
             box.classList.remove('online', 'offline', 'checking');
             box.classList.add(state);
 
-            if (state === 'online') { updateDOMText('device-status-text', 'ESP32 ON'); } 
-            else if (state === 'offline') { updateDOMText('device-status-text', 'ESP32 OFF'); setClockGridStatus(null); } 
-            else { updateDOMText('device-status-text', 'ESP32 ...'); setClockGridStatus(null); }
+            if (state === 'online') { updateDOMText('device-status-text', 'PC ON'); } 
+            else if (state === 'offline') { updateDOMText('device-status-text', 'PC OFF'); setClockGridStatus(null); } 
+            else { updateDOMText('device-status-text', 'PC ...'); setClockGridStatus(null); }
         }
 
         function renderLastLiveReceivedTime() {
