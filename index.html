@@ -294,13 +294,7 @@
         .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
         .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
 
-        /* ================= BMS CARD STYLES (NẤC 2 MÀU HỒNG & VỆT SÁNG GIỌT NƯỚC PHÁT SÁNG) ================= */
-        @property --sweep-p {
-            syntax: '<number>';
-            inherits: false;
-            initial-value: 0;
-        }
-
+        /* ================= BMS CARD STYLES (HIỆU ỨNG SAO BĂNG CANVAS TRÊN VÒNG TRÒN PIN) ================= */
         .bms-card { background: linear-gradient(135deg, rgba(16,18,27,0.97), rgba(30,27,42,0.95)); border: 1px solid rgba(0,255,114,0.42); color: #f5fff8; padding: 14px 10px; }
         .bms-card .stat-header { align-items: center; gap: 8px; margin-bottom: 10px; }
         .bms-card .stat-header h2 { color: #eafff2; line-height: 1.15; font-size: 15px; letter-spacing: 0.3px; }
@@ -325,13 +319,12 @@
         
         .bms-core { display: grid; place-items: center; min-height: 126px; margin: 7px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
         
-        /* VÒNG TRÒN PIN 4 NẤC MÀU & GIỌT NƯỚC PHÁT SÁNG CHẠY ĐIỀM ĐẠM TRONG VẠCH % PIN */
+        /* VÒNG TRÒN PIN 4 NẤC MÀU & CANVAS SAO BĂNG */
         .bms-soc-ring {
             --soc-pct: 0;
             --ring-color: #00ff72;
             --ring-glow: rgba(0, 255, 114, 0.25);
             --pill-bg: rgba(0, 80, 28, 0.42);
-            --sweep-speed: 4s;
             position: relative;
             width: 104px;
             aspect-ratio: 1;
@@ -357,72 +350,15 @@
             mask-composite: exclude;
             pointer-events: none;
             transition: background 0.4s ease;
+            z-index: 1;
         }
-        /* Hiệu ứng Giọt Nước Phát Sáng (Glowing Water Droplet) gọn gàng, đầu tròn sáng trắng + đuôi ngắn thon */
-        .bms-soc-ring::after {
-            content: "";
+        .bms-meteor-canvas {
             position: absolute;
-            inset: -1.5px;
-            border-radius: 50%;
-            padding: 8px;
-            --end-deg: calc(var(--soc-pct) * 3.6deg);
-            --band-deg: min(20deg, var(--end-deg));
-            --s-start: calc(var(--sweep-p) * (var(--end-deg) - var(--band-deg)));
-            --s-end: calc(var(--s-start) + var(--band-deg));
-            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            inset: -14px;
+            width: calc(100% + 28px);
+            height: calc(100% + 28px);
             pointer-events: none;
-            opacity: 0;
-            filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px #ffffff) drop-shadow(0 0 12px var(--ring-color)) brightness(1.35);
-            transform: translateZ(0);
             z-index: 2;
-        }
-        /* Khi Sạc: Đầu giọt nước tròn hướng theo chiều kim đồng hồ, đuôi vuốt nhẹ phía sau */
-        .bms-soc-ring.charging::after {
-            --d-tail: calc(var(--s-start) + (var(--band-deg) * 0.42));
-            --d-head1: calc(var(--s-start) + (var(--band-deg) * 0.68));
-            --d-head2: calc(var(--s-start) + (var(--band-deg) * 0.92));
-            background: conic-gradient(
-                from 0deg,
-                transparent 0deg,
-                transparent var(--s-start),
-                var(--ring-color) var(--d-tail),
-                #ffffff var(--d-head1),
-                #ffffff var(--d-head2),
-                transparent var(--s-end),
-                transparent 360deg
-            );
-            animation: bmsRingSweepCharge var(--sweep-speed, 4s) ease-in-out infinite;
-        }
-        /* Khi Xả: Đầu giọt nước tròn đảo ngược chiều kim đồng hồ, đuôi vuốt nhẹ phía sau */
-        .bms-soc-ring.discharging::after {
-            --d-head1: calc(var(--s-start) + (var(--band-deg) * 0.08));
-            --d-head2: calc(var(--s-start) + (var(--band-deg) * 0.32));
-            --d-tail: calc(var(--s-start) + (var(--band-deg) * 0.58));
-            background: conic-gradient(
-                from 0deg,
-                transparent 0deg,
-                transparent var(--s-start),
-                #ffffff var(--d-head1),
-                #ffffff var(--d-head2),
-                var(--ring-color) var(--d-tail),
-                transparent var(--s-end),
-                transparent 360deg
-            );
-            animation: bmsRingSweepDischarge var(--sweep-speed, 4s) ease-in-out infinite;
-        }
-        @keyframes bmsRingSweepCharge {
-            0% { --sweep-p: 0; opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { --sweep-p: 1; opacity: 0; }
-        }
-        @keyframes bmsRingSweepDischarge {
-            0% { --sweep-p: 1; opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { --sweep-p: 0; opacity: 0; }
         }
 
         /* 4 Nấc màu phần trăm Pin (Nấc 2 từ 26% - 50% là màu Hồng) */
@@ -474,7 +410,7 @@
             100% { opacity: 0.38; filter: brightness(0.88); }
         }
 
-        /* THANH CÔNG SUẤT CÓ GIỌT SÁNG GỌN CHẠY ĐIỀM ĐẠM */
+        /* THANH CÔNG SUẤT CÓ VỆT SAO BĂNG MƯỢT CHẠY ĐIỀM ĐẠM */
         .bms-power-bar { height: 6px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; position: relative; }
         .bms-power-fill {
             --sweep-speed: 4s;
@@ -493,9 +429,9 @@
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 24%;
+            width: 38%;
             border-radius: 999px;
-            background: radial-gradient(ellipse at center, #ffffff 0%, #ffffff 42%, rgba(255,255,255,0) 100%);
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 55%, #ffffff 92%, rgba(255,255,255,0) 100%);
             filter: drop-shadow(0 0 5px #ffffff);
             transform: translateX(-140%) translateZ(0);
             opacity: 0;
@@ -507,11 +443,12 @@
         }
         .bms-power-fill.discharging::after {
             opacity: 1;
+            background: linear-gradient(270deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 55%, #ffffff 92%, rgba(255,255,255,0) 100%);
             animation: bmsBarLightSweep var(--sweep-speed, 4s) ease-in-out infinite reverse;
         }
         @keyframes bmsBarLightSweep {
             0% { transform: translateX(-140%) translateZ(0); }
-            100% { transform: translateX(420%) translateZ(0); }
+            100% { transform: translateX(300%) translateZ(0); }
         }
 
         @media (max-width: 620px) {
@@ -692,7 +629,7 @@
                 </div>
             </div>
 
-            <!-- 2. KHUNG HỆ THỐNG PIN (CHỈ HIỂN THỊ CALB & GOTION) -->
+            <!-- 2. KHUNG HỆ THỐNG PIN (CHỈ HIỂN THỊ CALB & GOTION + SAO BĂNG CANVAS) -->
             <div class="stat-card bms-card">
                 <div class="stat-header">
                     <h2>🔋 HỆ THỐNG PIN</h2>
@@ -713,6 +650,7 @@
                         </div>
                         <div class="bms-core">
                             <div class="bms-soc-ring">
+                                <canvas class="bms-meteor-canvas" id="bm1-meteor-canvas"></canvas>
                                 <div class="bms-soc" id="bm1-soc">--%</div>
                                 <div class="bms-pill" id="bm1-voltage">-- V</div>
                                 <div class="bms-pill" id="bm1-current">-- A</div>
@@ -752,6 +690,7 @@
                         </div>
                         <div class="bms-core">
                             <div class="bms-soc-ring">
+                                <canvas class="bms-meteor-canvas" id="bm2-meteor-canvas"></canvas>
                                 <div class="bms-soc" id="bm2-soc">--%</div>
                                 <div class="bms-pill" id="bm2-voltage">-- V</div>
                                 <div class="bms-pill" id="bm2-current">-- A</div>
@@ -966,6 +905,167 @@
             if (sunCanvasRender && (lvl > 0 || levelChanged)) sunCanvasRender();
         }
 
+        // ================= HIỆU ỨNG SAO BĂNG (SHOOTING STAR) TRÊN VÒNG TRÒN PIN =================
+        const bmsMeteorState = {
+            bm1: { soc: 0, mode: 'idle', durationMs: 4200, color: [0, 255, 114], phase: 0 },
+            bm2: { soc: 0, mode: 'idle', durationMs: 4200, color: [0, 255, 114], phase: 0.35 }
+        };
+        let bmsMeteorFrameId = null;
+        let bmsMeteorLastTs = 0;
+
+        function getSocLevelRgb(soc) {
+            if (soc <= 25) return [255, 51, 77];     // Nấc 1: Đỏ (#ff334d)
+            if (soc <= 50) return [255, 51, 161];    // Nấc 2: Hồng (#ff33a1)
+            if (soc <= 80) return [255, 140, 0];     // Nấc 3: Cam (#ff8c00)
+            return [0, 255, 114];                    // Nấc 4: Xanh (#00ff72)
+        }
+
+        function drawSingleBmsMeteor(prefix, dt) {
+            const canvas = document.getElementById(`${prefix}-meteor-canvas`);
+            if (!canvas) return;
+            const ring = canvas.parentElement;
+            if (!ring) return;
+
+            const pad = 14;
+            const ringSize = ring.clientWidth || 104;
+            const cssSize = ringSize + pad * 2;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            if (canvas.width !== Math.round(cssSize * dpr) || canvas.height !== Math.round(cssSize * dpr)) {
+                canvas.width = Math.round(cssSize * dpr);
+                canvas.height = Math.round(cssSize * dpr);
+            }
+
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, cssSize, cssSize);
+
+            const st = bmsMeteorState[prefix];
+            if (!st || st.mode === 'idle' || st.soc <= 2) return;
+
+            st.phase = (st.phase + dt / Math.max(1200, st.durationMs)) % 1;
+
+            const cx = cssSize / 2;
+            const cy = cssSize / 2;
+            const ringThickness = 5.5;
+            const r = (ringSize / 2) - (ringThickness / 2);
+
+            const socDeg = clampNumber(st.soc, 0, 100) * 3.6;
+            const tailMaxDeg = Math.min(68, Math.max(16, socDeg * 0.62));
+            const totalTravel = socDeg + tailMaxDeg;
+            const u = st.phase * totalTravel;
+
+            let headDeg, tailDeg;
+            const isCharge = st.mode === 'charge';
+
+            if (isCharge) {
+                headDeg = Math.min(u, socDeg);
+                tailDeg = Math.max(0, u - tailMaxDeg);
+            } else {
+                headDeg = Math.max(0, socDeg - u);
+                tailDeg = Math.min(socDeg, socDeg - u + tailMaxDeg);
+            }
+
+            let envAlpha = 1;
+            if (st.phase < 0.08) {
+                envAlpha = st.phase / 0.08;
+            } else if (u > socDeg) {
+                envAlpha = Math.max(0, 1 - ((u - socDeg) / tailMaxDeg));
+            }
+
+            if (envAlpha <= 0.01) return;
+
+            const [cr, cg, cb] = st.color;
+            const spanDeg = headDeg - tailDeg;
+
+            // 1. Vẽ đuôi sao băng vuốt nhọn từ đầu tròn về mũi kim mờ dần
+            if (Math.abs(spanDeg) > 0.3) {
+                const steps = 38;
+                for (let i = 1; i <= steps; i++) {
+                    const t0 = (i - 1) / steps;
+                    const t1 = i / steps;
+                    const deg0 = tailDeg + spanDeg * t0;
+                    const deg1 = tailDeg + spanDeg * t1;
+                    const a0 = (-90 + deg0) * Math.PI / 180;
+                    const a1 = (-90 + deg1) * Math.PI / 180;
+                    const ccw = !isCharge;
+
+                    // Lớp hào quang màu bên ngoài đuôi sao băng (vuốt thon dần)
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r, a0, a1, ccw);
+                    ctx.lineWidth = 0.6 + 8.2 * Math.pow(t1, 1.55);
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = `rgba(${cr}, ${cg}, ${cb}, ${(envAlpha * 0.38 * Math.pow(t1, 1.45)).toFixed(3)})`;
+                    ctx.stroke();
+
+                    // Lớp lõi trắng sáng bên trong đuôi sao băng (vuốt nhọn từ 5.2px về 0.3px)
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r, a0, a1, ccw);
+                    ctx.lineWidth = 0.3 + 4.9 * Math.pow(t1, 2.15);
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${(envAlpha * 0.96 * Math.pow(t1, 1.9)).toFixed(3)})`;
+                    ctx.stroke();
+                }
+            }
+
+            // 2. Vẽ đầu sao băng (nhân cầu tròn rực sáng + quầng sáng tỏa mềm)
+            const headRad = (-90 + headDeg) * Math.PI / 180;
+            const hx = cx + Math.cos(headRad) * r;
+            const hy = cy + Math.sin(headRad) * r;
+
+            // Quầng hào quang quanh đầu sao băng
+            const haloRadius = 11.5;
+            const haloGrad = ctx.createRadialGradient(hx, hy, 0.5, hx, hy, haloRadius);
+            haloGrad.addColorStop(0, `rgba(255, 255, 255, ${(0.98 * envAlpha).toFixed(3)})`);
+            haloGrad.addColorStop(0.32, `rgba(255, 255, 255, ${(0.75 * envAlpha).toFixed(3)})`);
+            haloGrad.addColorStop(0.62, `rgba(${cr}, ${cg}, ${cb}, ${(0.42 * envAlpha).toFixed(3)})`);
+            haloGrad.addColorStop(1, `rgba(${cr}, ${cg}, ${cb}, 0)`);
+
+            ctx.fillStyle = haloGrad;
+            ctx.beginPath();
+            ctx.arc(hx, hy, haloRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Nhân sao băng tròn trắng tinh khiết ở mũi dẫn đầu
+            ctx.fillStyle = `rgba(255, 255, 255, ${envAlpha.toFixed(3)})`;
+            ctx.beginPath();
+            ctx.arc(hx, hy, 3.3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function animateBmsMeteors(now) {
+            bmsMeteorFrameId = null;
+            if (document.hidden) return;
+            const dt = bmsMeteorLastTs > 0 ? Math.min(64, now - bmsMeteorLastTs) : 16;
+            bmsMeteorLastTs = now;
+
+            drawSingleBmsMeteor('bm1', dt);
+            drawSingleBmsMeteor('bm2', dt);
+
+            if (bmsMeteorState.bm1.mode !== 'idle' || bmsMeteorState.bm2.mode !== 'idle') {
+                bmsMeteorFrameId = requestAnimationFrame(animateBmsMeteors);
+            } else {
+                bmsMeteorLastTs = 0;
+            }
+        }
+
+        function ensureBmsMeteorLoop() {
+            if (bmsMeteorFrameId === null && !document.hidden) {
+                bmsMeteorLastTs = performance.now();
+                bmsMeteorFrameId = requestAnimationFrame(animateBmsMeteors);
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && bmsMeteorFrameId !== null) {
+                cancelAnimationFrame(bmsMeteorFrameId);
+                bmsMeteorFrameId = null;
+                bmsMeteorLastTs = 0;
+            } else if (!document.hidden) {
+                ensureBmsMeteorLoop();
+            }
+        });
+
         // ================= HÀM XỬ LÝ & HIỂN THỊ DỮ LIỆU JK BMS =================
         function bmsRead(data, keys, fallback = null) {
             if (!data || typeof data !== 'object') return fallback;
@@ -1065,7 +1165,7 @@
             return { bm1: bms1 || (bmsLooksLikePack(root) ? root : null), bm2: bms2 || null };
         }
 
-        // HÀM TÍNH TỐC ĐỘ GIỌT NƯỚC CHẬM ĐIỀM ĐẠM THEO DÒNG ĐIỆN SẠC/XẢ THỰC TẾ (CURRENT)
+        // HÀM TÍNH TỐC ĐỘ SAO BĂNG CHẬM ĐIỀM ĐẠM THEO DÒNG ĐIỆN SẠC/XẢ THỰC TẾ (CURRENT)
         function calcBmsSweepSpeed(currentA) {
             const absCurr = Number.isFinite(currentA) ? Math.abs(currentA) : 0;
             const maxRefCurr = 100; // Mốc dòng cao tham chiếu (100A)
@@ -1100,6 +1200,11 @@
                     socRing.style.setProperty('--soc-pct', 0);
                     socRing.classList.remove('soc-lvl-1', 'soc-lvl-2', 'soc-lvl-3', 'soc-lvl-4', 'charging', 'discharging');
                 }
+                if (bmsMeteorState[prefix]) {
+                    bmsMeteorState[prefix].mode = 'idle';
+                    bmsMeteorState[prefix].soc = 0;
+                    drawSingleBmsMeteor(prefix, 0);
+                }
                 if (powerRow) {
                     powerRow.classList.remove('charging', 'discharging');
                 }
@@ -1133,17 +1238,16 @@
 
             const roundedSoc = Math.round(soc);
 
-            // XÁC ĐỊNH TRẠNG THÁI SẠC / XẢ & TỐC ĐỘ GIỌT NƯỚC ĐIỀM ĐẠM THEO DÒNG ĐIỆN THỰC TẾ (CURRENT)
+            // XÁC ĐỊNH TRẠNG THÁI SẠC / XẢ & TỐC ĐỘ SAO BĂNG ĐIỀM ĐẠM THEO DÒNG ĐIỆN THỰC TẾ (CURRENT)
             const signedPwr = bmsNumber(data, ['Signed_Power'], Number.isFinite(voltage) && Number.isFinite(current) ? voltage * current : NaN);
             const effectiveCurrent = Number.isFinite(current) ? current : (Number.isFinite(signedPwr) && Number.isFinite(voltage) && voltage > 0 ? signedPwr / voltage : 0);
             const isCharging = effectiveCurrent > 0.05;
             const isDischarging = effectiveCurrent < -0.05;
             const sweepSpeed = calcBmsSweepSpeed(effectiveCurrent);
 
-            // CẬP NHẬT VÒNG TRÒN THEO % CÒN LẠI, 4 NẤC MÀU & TỐC ĐỘ GIỌT NƯỚC
+            // CẬP NHẬT VÒNG TRÒN THEO % CÒN LẠI & 4 NẤC MÀU
             if (socRing) {
                 socRing.style.setProperty('--soc-pct', roundedSoc);
-                socRing.style.setProperty('--sweep-speed', sweepSpeed);
                 socRing.classList.remove('soc-lvl-1', 'soc-lvl-2', 'soc-lvl-3', 'soc-lvl-4', 'charging', 'discharging');
                 if (roundedSoc <= 25) {
                     socRing.classList.add('soc-lvl-1'); // Nấc 1: 5% - 25% (màu đỏ)
@@ -1156,6 +1260,19 @@
                 }
                 if (isCharging) socRing.classList.add('charging');
                 else if (isDischarging) socRing.classList.add('discharging');
+            }
+
+            // CẬP NHẬT TRẠNG THÁI SAO BĂNG CANVAS
+            if (bmsMeteorState[prefix]) {
+                bmsMeteorState[prefix].soc = roundedSoc;
+                bmsMeteorState[prefix].mode = isCharging ? 'charge' : (isDischarging ? 'discharge' : 'idle');
+                bmsMeteorState[prefix].durationMs = parseFloat(sweepSpeed) * 1000;
+                bmsMeteorState[prefix].color = getSocLevelRgb(roundedSoc);
+                if (bmsMeteorState[prefix].mode !== 'idle') {
+                    ensureBmsMeteorLoop();
+                } else {
+                    drawSingleBmsMeteor(prefix, 0);
+                }
             }
 
             bmsText(`${prefix}-runtime`, bmsRuntimeText(data));
