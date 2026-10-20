@@ -46,7 +46,6 @@
                 radial-gradient(1.4px 1.4px at 190px 22px, rgba(255,255,255,0.8), transparent);
             background-size: 220px 220px;
             transition: opacity 0.8s ease;
-            will-change: opacity, transform;
             transform: translateZ(0);
         }
 
@@ -216,7 +215,7 @@
         .img-icon { width: 85px; height: 85px; object-fit: cover; display: block; margin: -10px auto 5px auto; filter: brightness(1.1) contrast(1.1); -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); transform: translateZ(0); }
         .pos-load .icon { filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.8)); }
 
-        .battery-wrapper { display: flex; align-items: center; justify-content: border-box; margin: 10px auto 5px auto; position: relative; cursor: pointer; transition: transform 0.2s ease, filter 0.2s ease; transform: translateZ(0); }
+        .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; cursor: pointer; transition: transform 0.2s ease, filter 0.2s ease; transform: translateZ(0); }
         .battery-wrapper:hover { transform: scale(1.05) translateZ(0); filter: drop-shadow(0 0 8px rgba(0, 204, 102, 0.5)); }
         .battery-body { width: 72px; height: 32px; background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%); border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); border-right: 1px solid #111; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8); transform: translateZ(0); }
         .battery-body::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.05) 100%); pointer-events: none; z-index: 2; }
@@ -294,13 +293,7 @@
         .chart-detail-card .sub { margin-top: 6px; color: #777; font-size: 10px; font-weight: 800; white-space: nowrap; }
         .dot-pv { background: #59ba35; } .dot-batt { background: #45a8de; } .dot-charge { background: #3322c9; } .dot-load { background: #ffa247; }
 
-        /* ================= BMS CARD STYLES (CHUẨN CẤU TRÚC GỐC + SAO BĂNG CSS GPU SIÊU NHẸ) ================= */
-        @property --sweep-p {
-            syntax: '<number>';
-            inherits: false;
-            initial-value: 0;
-        }
-
+        /* ================= BMS CARD STYLES (HIỆU ỨNG SAO BĂNG CANVAS TRÊN VÒNG TRÒN PIN) ================= */
         .bms-card { background: linear-gradient(135deg, rgba(16,18,27,0.97), rgba(30,27,42,0.95)); border: 1px solid rgba(0,255,114,0.42); color: #f5fff8; padding: 14px 10px; }
         .bms-card .stat-header { align-items: center; gap: 8px; margin-bottom: 10px; }
         .bms-card .stat-header h2 { color: #eafff2; line-height: 1.15; font-size: 15px; letter-spacing: 0.3px; }
@@ -309,12 +302,12 @@
         .bms-board { min-width: 0; border: 1px solid rgba(0,255,114,0.36); border-radius: 14px; background: rgba(8,12,18,0.86); box-shadow: inset 0 0 18px rgba(0,255,114,0.06); padding: 8px 6px; overflow: hidden; }
         .bms-board.offline { border-color: rgba(255,68,68,0.42); opacity: 0.85; }
         .bms-topbar { display: flex; align-items: center; justify-content: space-between; gap: 3px; }
-        .bms-id-chip, .bms-runtime-chip, .bms-cycle-chip { border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; background: rgba(255,255,255,0.06); color: #fff; font-size: 8px; font-weight: 900; line-height: 1.1; padding: 4px 4px; white-space: nowrap; }
+        .bms-id-chip, .bms-runtime-chip, .bms-cycle-chip { border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; background: rgba(255,255,255,0.06); color: #fff; font-size: 8.5px; font-weight: 900; line-height: 1.1; padding: 4px 6px; white-space: nowrap; }
         .bms-id-chip { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-        .bms-id-chip strong { color: #00ff72; }
+        .bms-id-chip strong { color: #00ff72; letter-spacing: 0.3px; }
         .bms-runtime-chip { color: #ffd34e; text-align: center; flex: 0 1 auto; }
         .bms-cycle-chip { color: #ffd34e; text-align: center; flex: 0 0 auto; }
-        .bms-online { display: inline-block; margin-left: 2px; color: #00ff72; font-size: 7.5px; }
+        .bms-online { display: inline-block; margin-left: 3px; color: #00ff72; font-size: 8px; }
         .bms-board.offline .bms-online { color: #ff4b4b; }
         .bms-status-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; margin-top: 6px; }
         .bms-flag { display: flex; align-items: center; justify-content: space-between; gap: 2px; min-width: 0; border: 1px solid rgba(0,255,114,0.38); border-radius: 12px; background: rgba(0,80,28,0.34); color: #fff; font-size: 8px; font-weight: 900; line-height: 1; padding: 3px 3px 3px 4px; }
@@ -325,13 +318,12 @@
         
         .bms-core { display: grid; place-items: center; min-height: 126px; margin: 7px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: radial-gradient(circle at center, rgba(0,255,114,0.12) 0, rgba(0,0,0,0.48) 42%, rgba(0,0,0,0.22) 100%), rgba(0,0,0,0.26); }
         
-        /* Vòng tròn 4 nấc màu & Sao băng thuần CSS rgba(255,255,255,a) không viền đen, không tốn CPU JS */
+        /* VÒNG TRÒN PIN 4 NẤC MÀU & CANVAS SAO BĂNG */
         .bms-soc-ring {
             --soc-pct: 0;
             --ring-color: #00ff72;
-            --ring-glow: rgba(0, 255, 114, 0.18);
+            --ring-glow: rgba(0, 255, 114, 0.25);
             --pill-bg: rgba(0, 80, 28, 0.42);
-            --sweep-speed: 4s;
             position: relative;
             width: 104px;
             aspect-ratio: 1;
@@ -342,99 +334,42 @@
             align-items: center;
             justify-content: center;
             gap: 4px;
-            box-shadow: 0 0 20px var(--ring-glow), inset 0 0 20px rgba(0,0,0,0.42);
-            transform: translateZ(0);
+            box-shadow: 0 0 22px var(--ring-glow), inset 0 0 20px rgba(0,0,0,0.45);
+            transition: box-shadow 0.4s ease;
         }
         .bms-soc-ring::before {
             content: "";
             position: absolute;
             inset: 0;
             border-radius: 50%;
-            padding: 4px;
+            padding: 5.5px;
             background: conic-gradient(from 0deg, var(--ring-color) calc(var(--soc-pct) * 1%), rgba(255, 255, 255, 0.12) 0);
             -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
+            transition: background 0.4s ease;
+            z-index: 1;
         }
-        /* Sao băng dùng dải trắng trong suốt rgba(255,255,255,0) -> #ffffff (tuyệt đối không có màu đen) */
-        .bms-soc-ring::after {
-            content: "";
+        .bms-meteor-canvas {
             position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            padding: 4px;
-            --end-deg: calc(var(--soc-pct) * 3.6deg);
-            --band-deg: min(52deg, var(--end-deg));
-            --s-start: calc(var(--sweep-p) * (var(--end-deg) - var(--band-deg)));
-            --s-p1: calc(var(--s-start) + (var(--band-deg) * 0.25));
-            --s-p2: calc(var(--s-start) + (var(--band-deg) * 0.55));
-            --s-p3: calc(var(--s-start) + (var(--band-deg) * 0.82));
-            --s-p4: calc(var(--s-start) + (var(--band-deg) * 0.96));
-            --s-end: calc(var(--s-start) + var(--band-deg));
-            background: conic-gradient(
-                from 0deg,
-                rgba(255, 255, 255, 0) 0deg,
-                rgba(255, 255, 255, 0) var(--s-start),
-                rgba(255, 255, 255, 0.10) var(--s-p1),
-                rgba(255, 255, 255, 0.34) var(--s-p2),
-                rgba(255, 255, 255, 0.80) var(--s-p3),
-                #ffffff var(--s-p4),
-                rgba(255, 255, 255, 0) var(--s-end),
-                rgba(255, 255, 255, 0) 360deg
-            );
-            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            inset: -14px;
+            width: calc(100% + 28px);
+            height: calc(100% + 28px);
             pointer-events: none;
-            opacity: 0;
-            filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 7px var(--ring-color));
-            transform: translateZ(0);
-        }
-        .bms-soc-ring.charging::after {
-            animation: bmsRingMeteorCharge var(--sweep-speed, 4s) ease-in-out infinite;
-        }
-        .bms-soc-ring.discharging::after {
-            --s-p1: calc(var(--s-start) + (var(--band-deg) * 0.04));
-            --s-p2: calc(var(--s-start) + (var(--band-deg) * 0.18));
-            --s-p3: calc(var(--s-start) + (var(--band-deg) * 0.45));
-            --s-p4: calc(var(--s-start) + (var(--band-deg) * 0.75));
-            background: conic-gradient(
-                from 0deg,
-                rgba(255, 255, 255, 0) 0deg,
-                rgba(255, 255, 255, 0) var(--s-start),
-                #ffffff var(--s-p1),
-                rgba(255, 255, 255, 0.80) var(--s-p2),
-                rgba(255, 255, 255, 0.34) var(--s-p3),
-                rgba(255, 255, 255, 0.10) var(--s-p4),
-                rgba(255, 255, 255, 0) var(--s-end),
-                rgba(255, 255, 255, 0) 360deg
-            );
-            animation: bmsRingMeteorDischarge var(--sweep-speed, 4s) ease-in-out infinite;
-        }
-        @keyframes bmsRingMeteorCharge {
-            0% { --sweep-p: 0; opacity: 0; }
-            12% { opacity: 1; }
-            88% { opacity: 1; }
-            100% { --sweep-p: 1; opacity: 0; }
-        }
-        @keyframes bmsRingMeteorDischarge {
-            0% { --sweep-p: 1; opacity: 0; }
-            12% { opacity: 1; }
-            88% { opacity: 1; }
-            100% { --sweep-p: 0; opacity: 0; }
+            z-index: 2;
         }
 
-        /* 4 Nấc màu phần trăm Pin (Nấc 1: Đỏ, Nấc 2: Hồng, Nấc 3: Cam, Nấc 4: Xanh) */
-        .bms-soc-ring.soc-lvl-1 { --ring-color: #ff334d; --ring-glow: rgba(255, 51, 77, 0.28); --pill-bg: rgba(90, 14, 24, 0.42); }
-        .bms-soc-ring.soc-lvl-2 { --ring-color: #ff33a1; --ring-glow: rgba(255, 51, 161, 0.30); --pill-bg: rgba(90, 14, 58, 0.42); }
-        .bms-soc-ring.soc-lvl-3 { --ring-color: #ff8c00; --ring-glow: rgba(255, 140, 0, 0.28); --pill-bg: rgba(95, 48, 0, 0.42); }
-        .bms-soc-ring.soc-lvl-4 { --ring-color: #00ff72; --ring-glow: rgba(0, 255, 114, 0.22); --pill-bg: rgba(0, 80, 28, 0.42); }
+        /* 4 Nấc màu phần trăm Pin (Nấc 2 từ 26% - 50% là màu Hồng) */
+        .bms-soc-ring.soc-lvl-1 { --ring-color: #ff334d; --ring-glow: rgba(255, 51, 77, 0.35); --pill-bg: rgba(90, 14, 24, 0.45); }
+        .bms-soc-ring.soc-lvl-2 { --ring-color: #ff33a1; --ring-glow: rgba(255, 51, 161, 0.38); --pill-bg: rgba(90, 14, 58, 0.45); }
+        .bms-soc-ring.soc-lvl-3 { --ring-color: #ff8c00; --ring-glow: rgba(255, 140, 0, 0.32); --pill-bg: rgba(95, 48, 0, 0.45); }
+        .bms-soc-ring.soc-lvl-4 { --ring-color: #00ff72; --ring-glow: rgba(0, 255, 114, 0.28); --pill-bg: rgba(0, 80, 28, 0.42); }
 
-        .bms-soc { color: var(--ring-color); font-size: 24px; font-weight: 900; line-height: 1; white-space: nowrap; }
-        .bms-pill { min-width: 66px; border: 1px solid var(--ring-color); border-radius: 12px; background: var(--pill-bg); color: #fff; text-align: center; font-size: 10.5px; font-weight: 900; line-height: 1; padding: 3px 5px; white-space: nowrap; }
+        .bms-soc { position: relative; z-index: 3; color: var(--ring-color); font-size: 24px; font-weight: 900; line-height: 1; white-space: nowrap; text-shadow: 0 0 10px var(--ring-glow); transition: color 0.35s ease, text-shadow 0.35s ease; }
+        .bms-pill { position: relative; z-index: 3; min-width: 66px; border: 1px solid var(--ring-color); border-radius: 12px; background: var(--pill-bg); color: #fff; text-align: center; font-size: 10.5px; font-weight: 900; line-height: 1; padding: 3px 5px; white-space: nowrap; transition: border-color 0.35s ease, background 0.35s ease; }
         
-        /* Grid hiển thị thông số Pin (tối ưu không bị mất số trên màn hình hẹp) */
+        /* Grid hiển thị thông số Pin */
         .bms-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3.5px; }
         .bms-metric { min-width: 0; min-height: 46px; border: 1px solid rgba(0,255,114,0.34); border-radius: 7px; background: rgba(0,80,28,0.28); padding: 5px 2px; overflow: hidden; text-align: center; }
         button.bms-metric { width: 100%; font-family: inherit; text-align: center; cursor: pointer; }
@@ -452,19 +387,68 @@
         .bms-temp-chip .value { display: block; color: #ffd34e; font-size: 11px; font-weight: 900; line-height: 1.1; white-space: nowrap; letter-spacing: -0.3px; }
         .bms-temp-chip .label { display: block; margin-top: 3px; color: #fff4c5; font-size: 7px; font-weight: 900; line-height: 1; text-transform: uppercase; white-space: nowrap; }
         
-        /* Hiển thị dòng Công Suất: Chữ Công Suất đứng yên, chỉ số đổi màu & nháy chậm */
+        /* HIỂN THỊ DÒNG CÔNG SUẤT: CHỮ "Công Suất:" ĐỨNG YÊN, CHỈ SỐ ĐỔI MÀU & NHẤP NHÁY CHẬM */
         .bms-power-row { margin-top: 7px; display: flex; align-items: baseline; gap: 4px; white-space: nowrap; overflow: hidden; }
         .bms-power-label { color: #a0aec0; font-size: 9.5px; font-weight: 800; text-transform: none; letter-spacing: 0; }
-        .bms-power-row span.power-val { color: #00ff72; font-size: 12.5px; font-weight: 900; }
-        .bms-power-row.charging span.power-val { color: #00ff72; animation: bmsPowerBlinkSlow 2.2s ease-in-out infinite alternate; }
-        .bms-power-row.discharging span.power-val { color: #ff334d; animation: bmsPowerBlinkSlow 2.2s ease-in-out infinite alternate; }
-        @keyframes bmsPowerBlinkSlow {
-            from { opacity: 1; }
-            to { opacity: 0.38; }
+        .bms-power-row span.power-val { color: #00ff72; font-size: 12.5px; font-weight: 900; transition: color 0.35s ease, text-shadow 0.35s ease; }
+
+        /* Khi Đang Sạc: Chỉ số màu Xanh + Nhấp nháy chậm điềm đạm (2.2s) */
+        .bms-power-row.charging span.power-val {
+            color: #00ff72 !important;
+            text-shadow: 0 0 8px rgba(0, 255, 114, 0.65);
+            animation: bmsPowerBlinkSlow 2.2s ease-in-out infinite alternate;
         }
-        .bms-power-bar { height: 6px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; }
-        .bms-power-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9affbf, #00cc66); transition: width 0.35s ease; }
-        .bms-power-fill.discharging { background: linear-gradient(90deg, #ff8a98, #ff334d); }
+        /* Khi Đang Xả: Chỉ số màu Đỏ + Nhấp nháy chậm điềm đạm (2.2s) */
+        .bms-power-row.discharging span.power-val {
+            color: #ff334d !important;
+            text-shadow: 0 0 8px rgba(255, 51, 77, 0.7);
+            animation: bmsPowerBlinkSlow 2.2s ease-in-out infinite alternate;
+        }
+        @keyframes bmsPowerBlinkSlow {
+            0% { opacity: 1; filter: brightness(1.12); }
+            100% { opacity: 0.38; filter: brightness(0.88); }
+        }
+
+        /* THANH CÔNG SUẤT CÓ VỆT SAO BĂNG MƯỢT CHẠY ĐIỀM ĐẠM */
+        .bms-power-bar { height: 6px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; position: relative; }
+        .bms-power-fill {
+            --sweep-speed: 4s;
+            position: relative;
+            overflow: hidden;
+            width: 0%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #9affbf, #00cc66);
+            transition: width 0.35s ease, background 0.35s ease;
+        }
+        .bms-power-fill.charging { background: linear-gradient(90deg, #00994d, #00ff72); box-shadow: 0 0 10px rgba(0, 255, 114, 0.75); }
+        .bms-power-fill.discharging { background: linear-gradient(90deg, #99001a, #ff2a45); box-shadow: 0 0 10px rgba(255, 51, 77, 0.75); }
+        .bms-power-fill::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 38%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 55%, #ffffff 92%, rgba(255,255,255,0) 100%);
+            filter: drop-shadow(0 0 5px #ffffff);
+            transform: translateX(-140%) translateZ(0);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .bms-power-fill.charging::after {
+            opacity: 1;
+            animation: bmsBarLightSweep var(--sweep-speed, 4s) ease-in-out infinite;
+        }
+        .bms-power-fill.discharging::after {
+            opacity: 1;
+            background: linear-gradient(270deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 55%, #ffffff 92%, rgba(255,255,255,0) 100%);
+            animation: bmsBarLightSweep var(--sweep-speed, 4s) ease-in-out infinite reverse;
+        }
+        @keyframes bmsBarLightSweep {
+            0% { transform: translateX(-140%) translateZ(0); }
+            100% { transform: translateX(300%) translateZ(0); }
+        }
 
         @media (max-width: 620px) {
             .energy-chart-toolbar { align-items: stretch; flex-direction: column; }
@@ -548,7 +532,24 @@
             .clock-grid-status, #update-clock #device-status { font-size: 6.8px; padding: 2px; border-radius: 4px; gap: 2px; }
             .clock-grid-dot, #update-clock #device-status .device-dot { width: 4px; height: 4px; flex-basis: 4px; }
         }
-    </style>
+        /* FIX: Pause CSS animations when tab is hidden to reduce GPU/CPU usage */
+        body.page-hidden .diagram-panel::before,
+        body.page-hidden .stat-card::before,
+        body.page-hidden .image-frame,
+        body.page-hidden .node-center::after,
+        body.page-hidden .bms-power-fill::after,
+        body.page-hidden .bpf-text,
+        body.page-hidden .sun-core,
+        body.page-hidden #solar-sun::before,
+        body.page-hidden .battery-mini-meter::before,
+        body.page-hidden .diagram-panel::after,
+        body.page-hidden .stat-card::after,
+        body.page-hidden .image-frame::after,
+        body.page-hidden .node-center::after,
+        body.page-hidden #update-clock::after,
+        body.page-hidden #lbl-inv-temp::after {
+            animation-play-state: paused !important;
+        }    </style>
 </head>
 <body data-dashboard-version="V3.4 - Full Sync MQTT Live, Cloudflare Dual BMS & Firebase">
     <div class="app-container">
@@ -644,7 +645,7 @@
                 </div>
             </div>
 
-            <!-- 2. KHUNG HỆ THỐNG PIN (ĐỒNG BỘ 2 BÌNH 14058648 & 14058648-1 QUA CLOUDFLARE WORKER) -->
+            <!-- 2. KHUNG HỆ THỐNG PIN (CHỈ HIỂN THỊ CALB & GOTION + SAO BĂNG CANVAS) -->
             <div class="stat-card bms-card">
                 <div class="stat-header">
                     <h2>🔋 HỆ THỐNG PIN</h2>
@@ -665,6 +666,7 @@
                         </div>
                         <div class="bms-core">
                             <div class="bms-soc-ring">
+                                <canvas class="bms-meteor-canvas" id="bm1-meteor-canvas"></canvas>
                                 <div class="bms-soc" id="bm1-soc">--%</div>
                                 <div class="bms-pill" id="bm1-voltage">-- V</div>
                                 <div class="bms-pill" id="bm1-current">-- A</div>
@@ -704,6 +706,7 @@
                         </div>
                         <div class="bms-core">
                             <div class="bms-soc-ring">
+                                <canvas class="bms-meteor-canvas" id="bm2-meteor-canvas"></canvas>
                                 <div class="bms-soc" id="bm2-soc">--%</div>
                                 <div class="bms-pill" id="bm2-voltage">-- V</div>
                                 <div class="bms-pill" id="bm2-current">-- A</div>
@@ -899,6 +902,7 @@
             }
             sunCanvasRender = () => { if (sunAnimationFrameId === null && !document.hidden) { sunAnimationFrameId = requestAnimationFrame(animateCanvasSun); } };
             document.addEventListener('visibilitychange', () => {
+                document.body.classList.toggle('page-hidden', document.hidden);
                 if (document.hidden && sunAnimationFrameId !== null) { cancelAnimationFrame(sunAnimationFrameId); sunAnimationFrameId = null; return; }
                 sunCanvasRender();
             });
@@ -918,7 +922,168 @@
             if (sunCanvasRender && (lvl > 0 || levelChanged)) sunCanvasRender();
         }
 
-        // ================= HÀM XỬ LÝ & HIỂN THỊ DỮ LIỆU JK BMS (THEO CODE GỐC) =================
+        // ================= HIỆU ỨNG SAO BĂNG (SHOOTING STAR) TRÊN VÒNG TRÒN PIN =================
+        const bmsMeteorState = {
+            bm1: { soc: 0, mode: 'idle', durationMs: 4200, color: [0, 255, 114], phase: 0 },
+            bm2: { soc: 0, mode: 'idle', durationMs: 4200, color: [0, 255, 114], phase: 0.35 }
+        };
+        let bmsMeteorFrameId = null;
+        let bmsMeteorLastTs = 0;
+
+        function getSocLevelRgb(soc) {
+            if (soc <= 25) return [255, 51, 77];     // Nấc 1: Đỏ (#ff334d)
+            if (soc <= 50) return [255, 51, 161];    // Nấc 2: Hồng (#ff33a1)
+            if (soc <= 80) return [255, 140, 0];     // Nấc 3: Cam (#ff8c00)
+            return [0, 255, 114];                    // Nấc 4: Xanh (#00ff72)
+        }
+
+        function drawSingleBmsMeteor(prefix, dt) {
+            const canvas = document.getElementById(`${prefix}-meteor-canvas`);
+            if (!canvas) return;
+            const ring = canvas.parentElement;
+            if (!ring) return;
+
+            const pad = 14;
+            const ringSize = ring.clientWidth || 104;
+            const cssSize = ringSize + pad * 2;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            if (canvas.width !== Math.round(cssSize * dpr) || canvas.height !== Math.round(cssSize * dpr)) {
+                canvas.width = Math.round(cssSize * dpr);
+                canvas.height = Math.round(cssSize * dpr);
+            }
+
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, cssSize, cssSize);
+
+            const st = bmsMeteorState[prefix];
+            if (!st || st.mode === 'idle' || st.soc <= 2) return;
+
+            st.phase = (st.phase + dt / Math.max(1200, st.durationMs)) % 1;
+
+            const cx = cssSize / 2;
+            const cy = cssSize / 2;
+            const ringThickness = 5.5;
+            const r = (ringSize / 2) - (ringThickness / 2);
+
+            const socDeg = clampNumber(st.soc, 0, 100) * 3.6;
+            const tailMaxDeg = Math.min(68, Math.max(16, socDeg * 0.62));
+            const totalTravel = socDeg + tailMaxDeg;
+            const u = st.phase * totalTravel;
+
+            let headDeg, tailDeg;
+            const isCharge = st.mode === 'charge';
+
+            if (isCharge) {
+                headDeg = Math.min(u, socDeg);
+                tailDeg = Math.max(0, u - tailMaxDeg);
+            } else {
+                headDeg = Math.max(0, socDeg - u);
+                tailDeg = Math.min(socDeg, socDeg - u + tailMaxDeg);
+            }
+
+            let envAlpha = 1;
+            if (st.phase < 0.08) {
+                envAlpha = st.phase / 0.08;
+            } else if (u > socDeg) {
+                envAlpha = Math.max(0, 1 - ((u - socDeg) / tailMaxDeg));
+            }
+
+            if (envAlpha <= 0.01) return;
+
+            const [cr, cg, cb] = st.color;
+            const spanDeg = headDeg - tailDeg;
+
+            // 1. Vẽ đuôi sao băng vuốt nhọn từ đầu tròn về mũi kim mờ dần
+            if (Math.abs(spanDeg) > 0.3) {
+                const steps = 38;
+                for (let i = 1; i <= steps; i++) {
+                    const t0 = (i - 1) / steps;
+                    const t1 = i / steps;
+                    const deg0 = tailDeg + spanDeg * t0;
+                    const deg1 = tailDeg + spanDeg * t1;
+                    const a0 = (-90 + deg0) * Math.PI / 180;
+                    const a1 = (-90 + deg1) * Math.PI / 180;
+                    const ccw = !isCharge;
+
+                    // Lớp hào quang màu bên ngoài đuôi sao băng (vuốt thon dần)
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r, a0, a1, ccw);
+                    ctx.lineWidth = 0.6 + 8.2 * Math.pow(t1, 1.55);
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = `rgba(${cr}, ${cg}, ${cb}, ${(envAlpha * 0.38 * Math.pow(t1, 1.45)).toFixed(3)})`;
+                    ctx.stroke();
+
+                    // Lớp lõi trắng sáng bên trong đuôi sao băng (vuốt nhọn từ 5.2px về 0.3px)
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r, a0, a1, ccw);
+                    ctx.lineWidth = 0.3 + 4.9 * Math.pow(t1, 2.15);
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${(envAlpha * 0.96 * Math.pow(t1, 1.9)).toFixed(3)})`;
+                    ctx.stroke();
+                }
+            }
+
+            // 2. Vẽ đầu sao băng (nhân cầu tròn rực sáng + quầng sáng tỏa mềm)
+            const headRad = (-90 + headDeg) * Math.PI / 180;
+            const hx = cx + Math.cos(headRad) * r;
+            const hy = cy + Math.sin(headRad) * r;
+
+            // Quầng hào quang quanh đầu sao băng
+            const haloRadius = 11.5;
+            const haloGrad = ctx.createRadialGradient(hx, hy, 0.5, hx, hy, haloRadius);
+            haloGrad.addColorStop(0, `rgba(255, 255, 255, ${(0.98 * envAlpha).toFixed(3)})`);
+            haloGrad.addColorStop(0.32, `rgba(255, 255, 255, ${(0.75 * envAlpha).toFixed(3)})`);
+            haloGrad.addColorStop(0.62, `rgba(${cr}, ${cg}, ${cb}, ${(0.42 * envAlpha).toFixed(3)})`);
+            haloGrad.addColorStop(1, `rgba(${cr}, ${cg}, ${cb}, 0)`);
+
+            ctx.fillStyle = haloGrad;
+            ctx.beginPath();
+            ctx.arc(hx, hy, haloRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Nhân sao băng tròn trắng tinh khiết ở mũi dẫn đầu
+            ctx.fillStyle = `rgba(255, 255, 255, ${envAlpha.toFixed(3)})`;
+            ctx.beginPath();
+            ctx.arc(hx, hy, 3.3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function animateBmsMeteors(now) {
+            bmsMeteorFrameId = null;
+            if (document.hidden) return;
+            const dt = bmsMeteorLastTs > 0 ? Math.min(64, now - bmsMeteorLastTs) : 16;
+            bmsMeteorLastTs = now;
+
+            drawSingleBmsMeteor('bm1', dt);
+            drawSingleBmsMeteor('bm2', dt);
+
+            if (bmsMeteorState.bm1.mode !== 'idle' || bmsMeteorState.bm2.mode !== 'idle') {
+                bmsMeteorFrameId = requestAnimationFrame(animateBmsMeteors);
+            } else {
+                bmsMeteorLastTs = 0;
+            }
+        }
+
+        function ensureBmsMeteorLoop() {
+            if (bmsMeteorFrameId === null && !document.hidden) {
+                bmsMeteorLastTs = performance.now();
+                bmsMeteorFrameId = requestAnimationFrame(animateBmsMeteors);
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && bmsMeteorFrameId !== null) {
+                cancelAnimationFrame(bmsMeteorFrameId);
+                bmsMeteorFrameId = null;
+                bmsMeteorLastTs = 0;
+            } else if (!document.hidden) {
+                ensureBmsMeteorLoop();
+            }
+        });
+
+        // ================= HÀM XỬ LÝ & HIỂN THỊ DỮ LIỆU JK BMS =================
         function bmsRead(data, keys, fallback = null) {
             if (!data || typeof data !== 'object') return fallback;
             for (const key of keys) {
@@ -1017,6 +1182,15 @@
             return { bm1: bms1 || (bmsLooksLikePack(root) ? root : null), bm2: bms2 || null };
         }
 
+        // HÀM TÍNH TỐC ĐỘ SAO BĂNG CHẬM ĐIỀM ĐẠM THEO DÒNG ĐIỆN SẠC/XẢ THỰC TẾ (CURRENT)
+        function calcBmsSweepSpeed(currentA) {
+            const absCurr = Number.isFinite(currentA) ? Math.abs(currentA) : 0;
+            const maxRefCurr = 100; // Mốc dòng cao tham chiếu (100A)
+            const ratio = clampNumber(absCurr / maxRefCurr, 0, 1);
+            // Tốc độ điềm đạm: từ 5.50s (dòng nhỏ) xuống tối đa 2.80s (khi dòng cao 100A)
+            return (5.5 - ratio * 2.7).toFixed(2) + 's';
+        }
+
         function updateBmsPanel(prefix, data) {
             const card = document.getElementById(`${prefix}-card`);
             const online = !!data && bmsRead(data, ['Online', 'Connected', 'BLE_Connected'], true) !== false;
@@ -1024,7 +1198,9 @@
 
             const socRing = card ? card.querySelector('.bms-soc-ring') : null;
             const powerRow = card ? card.querySelector('.bms-power-row') : null;
+            const fill = document.getElementById(`${prefix}-power-fill`);
 
+            // Giữ cố định tên CALB và GOTION (không bị ghi đè thành BM1/BM2)
             let devName = bmsRead(data, ['Device_Name'], null);
             if (!devName || ['BM1', 'BMS1', 'B1', 'BM2', 'BMS2', 'B2'].includes(String(devName).trim().toUpperCase())) {
                 devName = prefix === 'bm1' ? 'CALB' : 'GOTION';
@@ -1041,9 +1217,18 @@
                     socRing.style.setProperty('--soc-pct', 0);
                     socRing.classList.remove('soc-lvl-1', 'soc-lvl-2', 'soc-lvl-3', 'soc-lvl-4', 'charging', 'discharging');
                 }
-                if (powerRow) powerRow.classList.remove('charging', 'discharging');
-                const fill = document.getElementById(`${prefix}-power-fill`);
-                if (fill) { fill.style.width = '0%'; fill.classList.remove('discharging'); }
+                if (bmsMeteorState[prefix]) {
+                    bmsMeteorState[prefix].mode = 'idle';
+                    bmsMeteorState[prefix].soc = 0;
+                    drawSingleBmsMeteor(prefix, 0);
+                }
+                if (powerRow) {
+                    powerRow.classList.remove('charging', 'discharging');
+                }
+                if (fill) {
+                    fill.style.width = '0%';
+                    fill.classList.remove('charging', 'discharging');
+                }
                 return;
             }
 
@@ -1069,27 +1254,42 @@
             const stats = bmsCellStats(data);
 
             const roundedSoc = Math.round(soc);
-            const absCurr = Number.isFinite(current) ? Math.abs(current) : 0;
-            const sweepSpeed = (5.5 - clampNumber(absCurr / 100, 0, 1) * 2.7).toFixed(2) + 's';
-            const isCharging = Number.isFinite(current) && current > 0.05;
-            const isDischarging = Number.isFinite(current) && current < -0.05;
 
+            // XÁC ĐỊNH TRẠNG THÁI SẠC / XẢ & TỐC ĐỘ SAO BĂNG ĐIỀM ĐẠM THEO DÒNG ĐIỆN THỰC TẾ (CURRENT)
+            const signedPwr = bmsNumber(data, ['Signed_Power'], Number.isFinite(voltage) && Number.isFinite(current) ? voltage * current : NaN);
+            const effectiveCurrent = Number.isFinite(current) ? current : (Number.isFinite(signedPwr) && Number.isFinite(voltage) && voltage > 0 ? signedPwr / voltage : 0);
+            const isCharging = effectiveCurrent > 0.05;
+            const isDischarging = effectiveCurrent < -0.05;
+            const sweepSpeed = calcBmsSweepSpeed(effectiveCurrent);
+
+            // CẬP NHẬT VÒNG TRÒN THEO % CÒN LẠI & 4 NẤC MÀU
             if (socRing) {
                 socRing.style.setProperty('--soc-pct', roundedSoc);
-                socRing.style.setProperty('--sweep-speed', sweepSpeed);
                 socRing.classList.remove('soc-lvl-1', 'soc-lvl-2', 'soc-lvl-3', 'soc-lvl-4', 'charging', 'discharging');
-                if (roundedSoc <= 25) socRing.classList.add('soc-lvl-1');
-                else if (roundedSoc <= 50) socRing.classList.add('soc-lvl-2');
-                else if (roundedSoc <= 80) socRing.classList.add('soc-lvl-3');
-                else socRing.classList.add('soc-lvl-4');
+                if (roundedSoc <= 25) {
+                    socRing.classList.add('soc-lvl-1'); // Nấc 1: 5% - 25% (màu đỏ)
+                } else if (roundedSoc <= 50) {
+                    socRing.classList.add('soc-lvl-2'); // Nấc 2: 26% - 50% (màu hồng)
+                } else if (roundedSoc <= 80) {
+                    socRing.classList.add('soc-lvl-3'); // Nấc 3: 51% - 80% (màu cam)
+                } else {
+                    socRing.classList.add('soc-lvl-4'); // Nấc 4: 81% - 100% (màu xanh)
+                }
                 if (isCharging) socRing.classList.add('charging');
                 else if (isDischarging) socRing.classList.add('discharging');
             }
 
-            if (powerRow) {
-                powerRow.classList.remove('charging', 'discharging');
-                if (isCharging) powerRow.classList.add('charging');
-                else if (isDischarging) powerRow.classList.add('discharging');
+            // CẬP NHẬT TRẠNG THÁI SAO BĂNG CANVAS
+            if (bmsMeteorState[prefix]) {
+                bmsMeteorState[prefix].soc = roundedSoc;
+                bmsMeteorState[prefix].mode = isCharging ? 'charge' : (isDischarging ? 'discharge' : 'idle');
+                bmsMeteorState[prefix].durationMs = parseFloat(sweepSpeed) * 1000;
+                bmsMeteorState[prefix].color = getSocLevelRgb(roundedSoc);
+                if (bmsMeteorState[prefix].mode !== 'idle') {
+                    ensureBmsMeteorLoop();
+                } else {
+                    drawSingleBmsMeteor(prefix, 0);
+                }
             }
 
             bmsText(`${prefix}-runtime`, bmsRuntimeText(data));
@@ -1113,11 +1313,19 @@
             const packLimitW = Number.isFinite(voltage) ? voltage * (current >= 0 ? (Number.isFinite(maxCharge) ? maxCharge : 120) : (Number.isFinite(maxDischarge) ? maxDischarge : 120)) : 5200;
             bmsText(`${prefix}-power`, Number.isFinite(displayPower) ? `${displayPower.toFixed(1)}${Number.isFinite(packLimitW) && packLimitW > 0 ? ' / ' + Math.round(packLimitW) : ''}` : '--');
 
-            const fill = document.getElementById(`${prefix}-power-fill`);
+            if (powerRow) {
+                powerRow.classList.remove('charging', 'discharging');
+                if (isCharging) powerRow.classList.add('charging');
+                else if (isDischarging) powerRow.classList.add('discharging');
+            }
+
             if (fill) {
                 const pct = Number.isFinite(displayPower) && Number.isFinite(packLimitW) && packLimitW > 0 ? clampNumber((displayPower / packLimitW) * 100, 0, 100) : 0;
                 fill.style.width = pct.toFixed(1) + '%';
-                fill.classList.toggle('discharging', isDischarging);
+                fill.style.setProperty('--sweep-speed', sweepSpeed);
+                fill.classList.remove('charging', 'discharging');
+                if (isCharging) fill.classList.add('charging');
+                else if (isDischarging) fill.classList.add('discharging');
             }
 
             bmsSetFlag(`${prefix}-charge-state`, bmsRead(data, ['Charge', 'Charge_Enable', 'ChargeEnabled', 'Charging'], false));
@@ -1616,6 +1824,7 @@
             if (pv <= 0 && load <= 0 && batt <= 0 && charge <= 0) return;
 
             isSnapshotSaving = true;
+            const snapshotSavingTimeout = setTimeout(() => { isSnapshotSaving = false; }, 15000);
             const record = {
                 pv: Math.round(pv * 10) / 10,
                 load: Math.round(load * 10) / 10,
@@ -1627,6 +1836,7 @@
             };
 
             database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(record, (err) => {
+                clearTimeout(snapshotSavingTimeout);
                 isSnapshotSaving = false;
                 if (!err) {
                     try {
@@ -1739,7 +1949,7 @@
             }
         }
 
-        // ================= TRẠNG THÁI THIẾT BỊ VÀ ĐỒNG HỒ =================
+        // ================= TRẠNG THÁI THIẾT BỊ (PC ON/OFF) VÀ ĐỒNG HỒ =================
         let lastLiveTime = 0;
         let lastLiveReceivedAt = 0;
         let currentDeviceState = 'checking';
@@ -2076,7 +2286,7 @@
                                 val = (buf[pos + 1] << 8) | buf[pos];
                             } else if (type === "int16") {
                                 val = (buf[pos + 1] << 8) | buf[pos];
-                                if (val >= 0x8000) val -= 0xFFFF;
+                                if (val >= 0x8000) val -= 0x10000;
                             } else if ((type === "uint32" || type === "int32") && pos + 4 <= buf.length) {
                                 if (reg.endian === "big") {
                                     val = (buf[pos + 3] << 24) | (buf[pos + 2] << 16) | (buf[pos + 1] << 8) | buf[pos];
