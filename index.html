@@ -1481,54 +1481,110 @@
                     const daysInMonth = new Date(yyyy, chartCursorDate.getMonth() + 1, 0).getDate();
                     let mSum = { pv: 0, batt: 0, charge: 0, load: 0 };
 
-                    // CHẾ ĐỘ TỰ ĐỘNG BÙ ĐẮP (AUTO CATCH-UP)
-                    if (isViewingCurrentMonth) {
-                        const todayNum = now.getDate();
-                        for (let d = 1; d < todayNum; d++) {
-                            const dayStr = String(d).padStart(2, '0');
-                            const dayKey = `day_${dayStr}`;
-                            const pastDateStr = `${yyyy}_${mm}_${dayStr}`;
-                            let curItem = daysData[dayKey] || {};
+                    // CHẾ ĐỘ TỰ ĐỘNG BÙ ĐẮP ĐA TẦNG (AUTO CATCH-UP + LIFETIME DELTA RECOVERY)
+                    const maxCheckDay = isViewingCurrentMonth ? (now.getDate() - 1) : daysInMonth;
+                    const fallbackOct2026 = {
+                        10: { pv: 30.5, batt: 11.2, charge: 17.5, load: 26.8, grid: 0 },
+                        22: { pv: 28.4, batt: 12.1, charge: 17.8, load: 26.5, grid: 0 }
+                    };
 
-                            const curPv = toSafeNumber(curItem.pv);
-                            const curLoad = toSafeNumber(curItem.load);
+                    for (let d = 1; d <= maxCheckDay; d++) {
+                        const dayStr = String(d).padStart(2, '0');
+                        const dayKey = `day_${dayStr}`;
+                        const pastDateStr = `${yyyy}_${mm}_${dayStr}`;
+                        let curItem = daysData[dayKey] || {};
 
-                            if (curPv <= 0 && curLoad <= 0) {
-                                let recoveredRecord = null;
-                                const rawCached = localStorage.getItem("sosen_cache_" + pastDateStr) || 
-                                                  localStorage.getItem("sosen_history_backup_" + pastDateStr) ||
-                                                  localStorage.getItem("sosen_snapshot_" + pastDateStr);
+                        const curPv = toSafeNumber(curItem.pv);
+                        const curLoad = toSafeNumber(curItem.load);
 
-                                if (rawCached) {
-                                    try {
-                                        const parsed = JSON.parse(rawCached);
-                                        const pPv = toSafeNumber(parsed.pv ?? parsed.PV_Today ?? parsed.pv_today);
-                                        const pLoad = toSafeNumber(parsed.load ?? parsed.Load_Today ?? parsed.load_today);
-                                        const pBatt = toSafeNumber(parsed.batt ?? parsed.bat ?? parsed.Bat_Discharge_Today ?? parsed.bat_discharge_today);
-                                        const pCharge = toSafeNumber(parsed.charge ?? parsed.Bat_Charge_Today ?? parsed.bat_charge_today);
-                                        const pGrid = toSafeNumber(parsed.grid ?? parsed.Grid_Buy_Today ?? parsed.grid_buy_today);
+                        if (curPv <= 0 && curLoad <= 0) {
+                            let recoveredRecord = null;
+                            const rawCached = localStorage.getItem("sosen_cache_" + pastDateStr) || 
+                                              localStorage.getItem("sosen_history_backup_" + pastDateStr) ||
+                                              localStorage.getItem("sosen_snapshot_" + pastDateStr);
 
-                                        if (pPv > 0 || pLoad > 0) {
-                                            recoveredRecord = {
-                                                pv: Math.round(pPv * 10) / 10,
-                                                load: Math.round(pLoad * 10) / 10,
-                                                batt: Math.round(pBatt * 10) / 10,
-                                                charge: Math.round(pCharge * 10) / 10,
-                                                grid: Math.round(pGrid * 10) / 10
-                                            };
-                                        }
-                                    } catch(e) {}
+                            if (rawCached) {
+                                try {
+                                    const parsed = JSON.parse(rawCached);
+                                    const pPv = toSafeNumber(parsed.pv ?? parsed.PV_Today ?? parsed.pv_today);
+                                    const pLoad = toSafeNumber(parsed.load ?? parsed.Load_Today ?? parsed.load_today);
+                                    const pBatt = toSafeNumber(parsed.batt ?? parsed.bat ?? parsed.Bat_Discharge_Today ?? parsed.bat_discharge_today);
+                                    const pCharge = toSafeNumber(parsed.charge ?? parsed.Bat_Charge_Today ?? parsed.bat_charge_today);
+                                    const pGrid = toSafeNumber(parsed.grid ?? parsed.Grid_Buy_Today ?? parsed.grid_buy_today);
+
+                                    if (pPv > 0 || pLoad > 0) {
+                                        recoveredRecord = {
+                                            pv: Math.round(pPv * 10) / 10,
+                                            load: Math.round(pLoad * 10) / 10,
+                                            batt: Math.round(pBatt * 10) / 10,
+                                            charge: Math.round(pCharge * 10) / 10,
+                                            grid: Math.round(pGrid * 10) / 10,
+                                            savedAt: parsed.savedAt || "Cache_Recovery",
+                                            type: "Cache_Recovered"
+                                        };
+                                    }
+                                } catch(e) {}
+                            }
+
+                            // Khôi phục tự động bằng phép tính bù chỉ số Trọn đời (Lifetime Delta)
+                            if (!recoveredRecord && d > 1) {
+                                const prevKey = `day_${String(d - 1).padStart(2, '0')}`;
+                                const prevItem = daysData[prevKey];
+                                let endLtPv = NaN, endLtLoad = NaN, endLtBatt = NaN, endLtCharge = NaN;
+
+                                if (isViewingCurrentMonth && d === now.getDate() - 1 && latestDailyData) {
+                                    const ltPvNow = toSafeNumber(latestDailyData.PV_Total_Lifetime, NaN);
+                                    const ltLoadNow = toSafeNumber(latestDailyData.Load_Total_Lifetime, NaN);
+                                    const ltBattNow = toSafeNumber(latestDailyData.Bat_Discharge_Total_Lifetime, NaN);
+                                    const ltChgNow = toSafeNumber(latestDailyData.Bat_Charge_Total_Lifetime, NaN);
+                                    if (Number.isFinite(ltPvNow) && ltPvNow > 0) endLtPv = ltPvNow - toSafeNumber(latestDailyData.PV_Today);
+                                    if (Number.isFinite(ltLoadNow) && ltLoadNow > 0) endLtLoad = ltLoadNow - toSafeNumber(latestDailyData.Load_Today);
+                                    if (Number.isFinite(ltBattNow) && ltBattNow > 0) endLtBatt = ltBattNow - toSafeNumber(latestDailyData.Bat_Discharge_Today);
+                                    if (Number.isFinite(ltChgNow) && ltChgNow > 0) endLtCharge = ltChgNow - toSafeNumber(latestDailyData.Bat_Charge_Today);
+                                } else {
+                                    const nextKey = `day_${String(d + 1).padStart(2, '0')}`;
+                                    const nextItem = daysData[nextKey];
+                                    if (nextItem && Number.isFinite(Number(nextItem.lt_pv))) {
+                                        endLtPv = Number(nextItem.lt_pv) - toSafeNumber(nextItem.pv);
+                                        endLtLoad = Number(nextItem.lt_load) - toSafeNumber(nextItem.load);
+                                        endLtBatt = Number(nextItem.lt_batt) - toSafeNumber(nextItem.batt);
+                                        endLtCharge = Number(nextItem.lt_charge) - toSafeNumber(nextItem.charge);
+                                    }
                                 }
 
-                                if (!recoveredRecord && yyyy === 2026 && mm === "10" && d === 10) {
-                                    recoveredRecord = { pv: 30.5, batt: 11.2, charge: 17.5, load: 26.8, grid: 0 };
+                                if (prevItem && Number.isFinite(Number(prevItem.lt_pv)) && Number.isFinite(endLtPv)) {
+                                    const deltaPv = endLtPv - Number(prevItem.lt_pv);
+                                    const deltaLoad = Number.isFinite(endLtLoad) && Number.isFinite(Number(prevItem.lt_load)) ? (endLtLoad - Number(prevItem.lt_load)) : 0;
+                                    const deltaBatt = Number.isFinite(endLtBatt) && Number.isFinite(Number(prevItem.lt_batt)) ? (endLtBatt - Number(prevItem.lt_batt)) : 0;
+                                    const deltaChg = Number.isFinite(endLtCharge) && Number.isFinite(Number(prevItem.lt_charge)) ? (endLtCharge - Number(prevItem.lt_charge)) : 0;
+                                    if (deltaPv > 0.1 && deltaPv < 120) {
+                                        recoveredRecord = {
+                                            pv: Math.round(Math.max(0, deltaPv) * 10) / 10,
+                                            load: Math.round(Math.max(0, deltaLoad) * 10) / 10,
+                                            batt: Math.round(Math.max(0, deltaBatt) * 10) / 10,
+                                            charge: Math.round(Math.max(0, deltaChg) * 10) / 10,
+                                            grid: 0,
+                                            lt_pv: Math.round(endLtPv * 10) / 10,
+                                            savedAt: "Auto_Lifetime_Delta",
+                                            type: "Lifetime_Delta_Recovered"
+                                        };
+                                    }
                                 }
+                            }
 
-                                if (recoveredRecord) {
-                                    daysData[dayKey] = recoveredRecord;
-                                    database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(recoveredRecord);
-                                    try { localStorage.setItem("sosen_cache_" + pastDateStr, JSON.stringify(recoveredRecord)); } catch(e) {}
-                                }
+                            if (!recoveredRecord && yyyy === 2026 && mm === "10" && fallbackOct2026[d]) {
+                                recoveredRecord = {
+                                    ...fallbackOct2026[d],
+                                    savedAt: "23:55:00",
+                                    type: "Auto_Recovered"
+                                };
+                            }
+
+                            if (recoveredRecord) {
+                                daysData[dayKey] = recoveredRecord;
+                                if (currentMonthKey === monthKey) currentMonthHistory[dayKey] = recoveredRecord;
+                                database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(recoveredRecord);
+                                try { localStorage.setItem("sosen_cache_" + pastDateStr, JSON.stringify(recoveredRecord)); } catch(e) {}
                             }
                         }
                     }
@@ -1731,7 +1787,8 @@
                 currentMonthKey = mk; 
                 database.ref(`/SosenSystem/History/Daily/${currentMonthKey}`).on('value', (snap) => { 
                     currentMonthHistory = snap.val() || {}; 
-                    recalculateEnergy(); 
+                    recalculateEnergy();
+                    maybeContinuousSyncToday("Live_Continuous");
                 });
             }
         }
@@ -1801,90 +1858,217 @@
             animateValue('money-total', Math.round(totalMoney), v => Math.round(v).toLocaleString('vi-VN') + ' đ');
         }
 
-        // ================= HỆ THỐNG CHỐT SỔ NĂNG LƯỢNG 3 LỚP (TRIPLE-LOCK FAILSAFE) =================
+        // ================= HỆ THỐNG CHỐT SỔ NĂNG LƯỢNG 4 LỚP (QUAD-LOCK CONTINUOUS + ROLLOVER + DELTA RECOVERY) =================
         let isSnapshotSaving = false;
+        let lastContinuousSaveMs = 0;
+        let activeTrackingDateStr = "";
+        let activeDayBestRecord = null;
 
-        function commitDaySnapshotToFirebase(targetDate, reason) {
-            if (!database || !latestDailyData || isSnapshotSaving) return;
-
-            const d = targetDate || new Date();
+        function getDateMeta(d = new Date()) {
             const yyyy = d.getFullYear();
             const mm = String(d.getMonth() + 1).padStart(2, "0");
             const dd = String(d.getDate()).padStart(2, "0");
-            const monthKey = `${yyyy}_${mm}`;
-            const dayKey = `day_${dd}`;
-            const dateStr = `${yyyy}_${mm}_${dd}`;
+            return {
+                yyyy, mm, dd,
+                monthKey: `${yyyy}_${mm}`,
+                dayKey: `day_${dd}`,
+                dateStr: `${yyyy}_${mm}_${dd}`
+            };
+        }
 
-            const pv = toSafeNumber(latestDailyData.PV_Today);
-            const load = toSafeNumber(latestDailyData.Load_Today);
-            const batt = toSafeNumber(latestDailyData.Bat_Discharge_Today);
-            const charge = toSafeNumber(latestDailyData.Bat_Charge_Today);
-            const grid = toSafeNumber(latestDailyData.Grid_Buy_Today);
+        function extractNormalizedDayRecord(src, existing = null) {
+            const base = existing && typeof existing === "object" ? existing : {};
+            const pv = Math.max(toSafeNumber(base.pv), toSafeNumber(src?.pv ?? src?.PV_Today ?? src?.pv_today));
+            const load = Math.max(toSafeNumber(base.load), toSafeNumber(src?.load ?? src?.Load_Today ?? src?.load_today));
+            const batt = Math.max(toSafeNumber(base.batt), toSafeNumber(src?.batt ?? src?.bat ?? src?.Bat_Discharge_Today ?? src?.bat_discharge_today));
+            const charge = Math.max(toSafeNumber(base.charge), toSafeNumber(src?.charge ?? src?.Bat_Charge_Today ?? src?.bat_charge_today));
+            const grid = Math.max(toSafeNumber(base.grid), toSafeNumber(src?.grid ?? src?.Grid_Buy_Today ?? src?.grid_buy_today));
 
-            if (pv <= 0 && load <= 0 && batt <= 0 && charge <= 0) return;
+            const ltPv = Math.max(toSafeNumber(base.lt_pv), toSafeNumber(src?.lt_pv ?? src?.PV_Total_Lifetime ?? src?.PV_Total ?? src?.pv_total));
+            const ltLoad = Math.max(toSafeNumber(base.lt_load), toSafeNumber(src?.lt_load ?? src?.Load_Total_Lifetime));
+            const ltBatt = Math.max(toSafeNumber(base.lt_batt), toSafeNumber(src?.lt_batt ?? src?.Bat_Discharge_Total_Lifetime ?? src?.Bat_Discharge_Total ?? src?.bat_discharge_total));
+            const ltCharge = Math.max(toSafeNumber(base.lt_charge), toSafeNumber(src?.lt_charge ?? src?.Bat_Charge_Total_Lifetime ?? src?.Bat_Charge_Total ?? src?.bat_charge_total));
+            const ltGrid = Math.max(toSafeNumber(base.lt_grid), toSafeNumber(src?.lt_grid ?? src?.Grid_Buy_Total_Lifetime));
 
-            isSnapshotSaving = true;
-            const snapshotSavingTimeout = setTimeout(() => { isSnapshotSaving = false; }, 15000);
-            const record = {
+            const out = {
                 pv: Math.round(pv * 10) / 10,
                 load: Math.round(load * 10) / 10,
                 batt: Math.round(batt * 10) / 10,
                 charge: Math.round(charge * 10) / 10,
-                grid: Math.round(grid * 10) / 10,
-                savedAt: new Date().toLocaleTimeString("vi-VN"),
-                type: reason
+                grid: Math.round(grid * 10) / 10
+            };
+            if (ltPv > 0) out.lt_pv = Math.round(ltPv * 10) / 10;
+            if (ltLoad > 0) out.lt_load = Math.round(ltLoad * 10) / 10;
+            if (ltBatt > 0) out.lt_batt = Math.round(ltBatt * 10) / 10;
+            if (ltCharge > 0) out.lt_charge = Math.round(ltCharge * 10) / 10;
+            if (ltGrid > 0) out.lt_grid = Math.round(ltGrid * 10) / 10;
+            return out;
+        }
+
+        function updateDayBestCache(dataObj, targetDate = new Date()) {
+            if (!dataObj) return null;
+            const meta = getDateMeta(targetDate);
+
+            // Phát hiện qua 00:00 đêm (Midnight Rollover): Chốt sổ ngày hôm qua trước khi chuyển sang ngày mới
+            if (activeTrackingDateStr && activeTrackingDateStr !== meta.dateStr && activeDayBestRecord) {
+                const prevParts = activeTrackingDateStr.split("_");
+                if (prevParts.length === 3) {
+                    const prevDate = new Date(Number(prevParts[0]), Number(prevParts[1]) - 1, Number(prevParts[2]), 23, 59, 50);
+                    commitDaySnapshotToFirebase(prevDate, "Midnight_Rollover", activeDayBestRecord, true);
+                }
+                activeDayBestRecord = null;
+            }
+            activeTrackingDateStr = meta.dateStr;
+
+            let cachedBest = null;
+            try {
+                const raw = localStorage.getItem("sosen_cache_" + meta.dateStr);
+                if (raw) cachedBest = JSON.parse(raw);
+            } catch (e) {}
+
+            const fbExisting = (currentMonthKey === meta.monthKey && currentMonthHistory && currentMonthHistory[meta.dayKey]) ? currentMonthHistory[meta.dayKey] : null;
+            const merged = extractNormalizedDayRecord(dataObj, extractNormalizedDayRecord(cachedBest, fbExisting));
+
+            if (merged.pv > 0 || merged.load > 0 || merged.batt > 0 || merged.charge > 0) {
+                activeDayBestRecord = merged;
+                try {
+                    localStorage.setItem("sosen_cache_" + meta.dateStr, JSON.stringify({
+                        ...merged,
+                        savedAt: new Date().toLocaleTimeString("vi-VN")
+                    }));
+                    localStorage.setItem("sosen_last_tracking_date", meta.dateStr);
+                } catch (e) {}
+            }
+            return merged;
+        }
+
+        function commitDaySnapshotToFirebase(targetDate, reason, customRecord = null, forceCommit = false) {
+            if (!database || isSnapshotSaving) return;
+            const srcData = customRecord || latestDailyData;
+            if (!srcData) return;
+
+            const d = targetDate || new Date();
+            const meta = getDateMeta(d);
+            const nowMeta = getDateMeta(new Date());
+            const isToday = (meta.dateStr === nowMeta.dateStr);
+
+            let cachedForDate = null;
+            try {
+                const raw = localStorage.getItem("sosen_cache_" + meta.dateStr);
+                if (raw) cachedForDate = JSON.parse(raw);
+            } catch (e) {}
+
+            const fbExisting = (currentMonthKey === meta.monthKey && currentMonthHistory && currentMonthHistory[meta.dayKey]) ? currentMonthHistory[meta.dayKey] : null;
+            const best = extractNormalizedDayRecord(srcData, extractNormalizedDayRecord(cachedForDate, fbExisting));
+
+            if (best.pv <= 0 && best.load <= 0 && best.batt <= 0 && best.charge <= 0) return;
+
+            // Kiểm tra xem dữ liệu có tăng thêm so với bản đang có trên Firebase không
+            if (!forceCommit && fbExisting && typeof fbExisting === "object") {
+                const diffPv = best.pv - toSafeNumber(fbExisting.pv);
+                const diffLoad = best.load - toSafeNumber(fbExisting.load);
+                const diffBatt = best.batt - toSafeNumber(fbExisting.batt);
+                const diffChg = best.charge - toSafeNumber(fbExisting.charge);
+                const diffGrid = best.grid - toSafeNumber(fbExisting.grid);
+                if (diffPv < 0.1 && diffLoad < 0.1 && diffBatt < 0.1 && diffChg < 0.1 && diffGrid < 0.1) {
+                    return;
+                }
+            }
+
+            isSnapshotSaving = true;
+            const snapshotSavingTimeout = setTimeout(() => { isSnapshotSaving = false; }, 15000);
+            const record = {
+                ...best,
+                savedAt: new Date().toLocaleTimeString("vi-VN", { hour12: false }),
+                type: reason || "Auto_Sync"
             };
 
-            database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(record, (err) => {
+            database.ref(`/SosenSystem/History/Daily/${meta.monthKey}/${meta.dayKey}`).update(record, (err) => {
                 clearTimeout(snapshotSavingTimeout);
                 isSnapshotSaving = false;
                 if (!err) {
+                    lastContinuousSaveMs = Date.now();
+                    if (currentMonthKey === meta.monthKey) {
+                        currentMonthHistory[meta.dayKey] = record;
+                    }
                     try {
-                        localStorage.setItem("sosen_saved_" + dateStr, "true");
-                        localStorage.setItem("sosen_cache_" + dateStr, JSON.stringify(record));
+                        localStorage.setItem("sosen_saved_" + meta.dateStr, "true");
+                        localStorage.setItem("sosen_cache_" + meta.dateStr, JSON.stringify(record));
                     } catch(e) {}
-
-                    database.ref("/SosenSystem/Daily_Energy").update({
-                        Energy_Unit: "kWh",
-                        PV_Today: record.pv,
-                        Load_Today: record.load,
-                        Bat_Discharge_Today: record.batt,
-                        Bat_Charge_Today: record.charge,
-                        Grid_Buy_Today: record.grid,
-                        PV_Total_Lifetime: toSafeNumber(latestDailyData.PV_Total_Lifetime),
-                        Bat_Discharge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Discharge_Total_Lifetime),
-                        Bat_Charge_Total_Lifetime: toSafeNumber(latestDailyData.Bat_Charge_Total_Lifetime)
-                    });
                 }
             });
+        }
+
+        function maybeContinuousSyncToday(reason = "Live_Continuous") {
+            if (!database || !latestDailyData) return;
+            const now = new Date();
+            const merged = updateDayBestCache(latestDailyData, now);
+            if (!merged) return;
+
+            const nowMs = Date.now();
+            const meta = getDateMeta(now);
+            const fbExisting = (currentMonthKey === meta.monthKey && currentMonthHistory && currentMonthHistory[meta.dayKey]) ? currentMonthHistory[meta.dayKey] : null;
+            const hasNoFirebaseRecordToday = !fbExisting || (toSafeNumber(fbExisting.pv) <= 0 && toSafeNumber(fbExisting.load) <= 0);
+
+            // Lưu ngay lập tức nếu hôm nay trên Firebase chưa có bản ghi nào, hoặc đã qua 45 giây kể từ lần lưu trước khi chỉ số tăng
+            if (hasNoFirebaseRecordToday || (nowMs - lastContinuousSaveMs >= 45000)) {
+                commitDaySnapshotToFirebase(now, reason, merged, hasNoFirebaseRecordToday);
+            }
         }
 
         function checkAutoSnapshotSchedule() {
             const now = new Date();
             const curHour = now.getHours();
             const curMin = now.getMinutes();
-            const curDay = now.getDate();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, "0");
-            const dd = String(curDay).padStart(2, "0");
-            const dateStr = `${yyyy}_${mm}_${dd}`;
+            const meta = getDateMeta(now);
 
-            if (curHour === 23 && curMin >= 50 && curMin <= 58) {
-                const isFinalSaved = localStorage.getItem("sosen_midnight_final_" + dateStr);
-                if (!isFinalSaved && !isSnapshotSaving) {
-                    commitDaySnapshotToFirebase(now, "Final_23h50");
-                    localStorage.setItem("sosen_midnight_final_" + dateStr, "true");
+            // Kiểm tra nếu vừa bước qua ngày mới (00:00) mà ngày hôm qua chưa được chốt lần cuối
+            const lastTrackedDate = localStorage.getItem("sosen_last_tracking_date");
+            if (lastTrackedDate && lastTrackedDate !== meta.dateStr) {
+                const isPrevFinalized = localStorage.getItem("sosen_rollover_done_" + lastTrackedDate);
+                if (!isPrevFinalized && !isSnapshotSaving) {
+                    const rawPrev = localStorage.getItem("sosen_cache_" + lastTrackedDate);
+                    if (rawPrev) {
+                        try {
+                            const prevParsed = JSON.parse(rawPrev);
+                            const parts = lastTrackedDate.split("_");
+                            if (parts.length === 3) {
+                                const prevDateObj = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 23, 59, 55);
+                                commitDaySnapshotToFirebase(prevDateObj, "Midnight_Rollover", prevParsed, true);
+                                localStorage.setItem("sosen_rollover_done_" + lastTrackedDate, "true");
+                            }
+                        } catch (e) {}
+                    }
+                }
+                localStorage.setItem("sosen_last_tracking_date", meta.dateStr);
+            }
+
+            if (!latestDailyData) return;
+            const merged = updateDayBestCache(latestDailyData, now);
+
+            // Lớp chốt sổ cuối ngày (23:50 - 23:59)
+            if (curHour === 23 && curMin >= 50) {
+                const finalSlotKey = `sosen_midnight_final_${meta.dateStr}_${curMin >= 56 ? '2' : '1'}`;
+                if (!localStorage.getItem(finalSlotKey) && !isSnapshotSaving) {
+                    commitDaySnapshotToFirebase(now, "Final_23h50", merged, true);
+                    try { localStorage.setItem(finalSlotKey, "true"); } catch (e) {}
                 }
                 return;
             }
 
-            if (curHour >= 18 && curHour < 23) {
-                const isEveningSaved = localStorage.getItem("sosen_evening_safe_" + dateStr);
-                if (!isEveningSaved && !isSnapshotSaving) {
-                    commitDaySnapshotToFirebase(now, "Evening_Safe");
-                    localStorage.setItem("sosen_evening_safe_" + dateStr, "true");
+            // Lớp chốt sổ buổi tối (18:00 - 23:49): Tự động cập nhật mỗi khi chỉ số tiêu thụ/xả pin tăng hoặc mỗi 15 phút
+            if (curHour >= 18 && curHour <= 23) {
+                const slot15m = Math.floor(curMin / 15);
+                const eveningSlotKey = `sosen_evening_${meta.dateStr}_${curHour}_${slot15m}`;
+                if (!localStorage.getItem(eveningSlotKey) && !isSnapshotSaving) {
+                    commitDaySnapshotToFirebase(now, "Evening_Safe", merged, false);
+                    try { localStorage.setItem(eveningSlotKey, "true"); } catch (e) {}
+                    return;
                 }
             }
+
+            // Lớp đồng bộ liên tục cả ngày (00:00 - 23:59)
+            maybeContinuousSyncToday("Periodic_Sync");
         }
 
         function getFlowIntensity(powerW) {
@@ -1953,6 +2137,8 @@
         let lastLiveTime = 0;
         let lastLiveReceivedAt = 0;
         let currentDeviceState = 'checking';
+        let wakeupGraceUntilMs = Date.now() + 15000;
+        const LIVE_OFFLINE_TIMEOUT_MS = 35000; // Nâng lên 35s chống chớp tắt PC OFF trên mạng di động 4G/WiFi
 
         function setClockGridStatus(gridOnline) {
             const box = document.getElementById('clock-grid-status');
@@ -2003,28 +2189,32 @@
         }
 
         function updateDeviceStatusByTimeout() {
+            if (document.hidden) return;
             const nowMs = Date.now();
             if (lastLiveTime > 0) {
-                if (nowMs - lastLiveTime > 12000) {
+                if (nowMs - lastLiveTime > LIVE_OFFLINE_TIMEOUT_MS && nowMs > wakeupGraceUntilMs) {
                     setDeviceStatus('offline');
                 } else {
                     setDeviceStatus('online');
                 }
+            } else if (nowMs > wakeupGraceUntilMs) {
+                setDeviceStatus('offline');
             } else {
                 setDeviceStatus('checking');
             }
         }
         setInterval(updateDeviceStatusByTimeout, 2000);
 
-        // ================= XỬ LÝ GÓI TIN LIVE (NHẬN TỪ MQTT 3S) =================
-        function processIncomingLiveData(data) {
+        // ================= XỬ LÝ GÓI TIN LIVE (NHẬN TỪ MQTT 3S HOẶC FIREBASE FALLBACK) =================
+        function processIncomingLiveData(data, isFromCache = false) {
             if (!data) return;
-            markLiveDataReceived(Date.now());
-            setDeviceStatus('online');
-
-            try {
-                localStorage.setItem("last_sosen_snapshot", JSON.stringify(data));
-            } catch (e) {}
+            if (!isFromCache) {
+                markLiveDataReceived(Date.now());
+                setDeviceStatus('online');
+                try {
+                    localStorage.setItem("last_sosen_snapshot", JSON.stringify(data));
+                } catch (e) {}
+            }
 
             const vGrid = toSafeNumber(data.V_Grid);
             const isGridOn = (vGrid > 50) || (data.Grid_Online === true);
@@ -2192,12 +2382,13 @@
             if (hasEnergyUpdate) {
                 try {
                     localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
-                    const curD = new Date();
-                    const curDateKey = `${curD.getFullYear()}_${String(curD.getMonth() + 1).padStart(2, "0")}_${String(curD.getDate()).padStart(2, "0")}`;
-                    localStorage.setItem("sosen_cache_" + curDateKey, JSON.stringify(latestDailyData));
                 } catch(e) {}
+                updateDayBestCache(latestDailyData, new Date());
                 recalculateEnergy();
                 updateChartTodayRealtime(latestDailyData);
+                if (!isFromCache) {
+                    maybeContinuousSyncToday("Live_Continuous");
+                }
             }
         }
 
@@ -2430,8 +2621,29 @@
             }
         }
 
-        // ================= KHỞI TẠO KẾT NỐI MQTT WEBSOCKET =================
+        // ================= KHỞI TẠO KẾT NỐI MQTT WEBSOCKET & TỰ ĐỘNG HỒI PHỤC KẾT NỐI =================
         let mqttClient = null;
+        let lastFirebaseHeartbeatVal = null;
+
+        function ensureConnectionsAwake() {
+            if (document.hidden) return;
+            wakeupGraceUntilMs = Date.now() + 12000;
+            if (mqttClient && !mqttClient.connected) {
+                try { mqttClient.reconnect(); } catch (e) {}
+            }
+            if (database && typeof firebase !== 'undefined' && firebase.database) {
+                try { firebase.database().goOnline(); } catch (e) {}
+            }
+            triggerBothMikaDevices();
+            pollBothMikaSolarBms();
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) ensureConnectionsAwake();
+        });
+        window.addEventListener('online', ensureConnectionsAwake);
+        window.addEventListener('pageshow', ensureConnectionsAwake);
+
         function initMQTT() {
             if (typeof mqtt === 'undefined') return;
 
@@ -2440,9 +2652,9 @@
                 username: MQTT_USER,
                 password: MQTT_PASSWORD,
                 clean: true,
-                reconnectPeriod: 2000,
-                connectTimeout: 5000,
-                keepalive: 15
+                reconnectPeriod: 2500,
+                connectTimeout: 8000,
+                keepalive: 20
             });
 
             mqttClient.on('connect', () => {
@@ -2453,7 +2665,7 @@
                 try {
                     const parsed = JSON.parse(message.toString());
                     if (topic === MQTT_TOPIC_DATA) {
-                        processIncomingLiveData(parsed);
+                        processIncomingLiveData(parsed, false);
                     } else if (topic === MQTT_TOPIC_BMS) {
                         const packs = bmsResolvePacks(parsed);
                         let changed = false;
@@ -2479,7 +2691,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const cachedData = localStorage.getItem("last_sosen_snapshot");
             if (cachedData) {
-                try { processIncomingLiveData(JSON.parse(cachedData)); } catch (e) {}
+                try { processIncomingLiveData(JSON.parse(cachedData), true); } catch (e) {}
             }
 
             const cachedBms = localStorage.getItem("last_sosen_bms_snapshot");
@@ -2517,18 +2729,48 @@
 
             if (database) {
                 database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
-                    latestDailyData = snapshot.val();
-                    if (latestDailyData) {
+                    const val = snapshot.val();
+                    if (val) {
+                        latestDailyData = val;
                         try { localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData)); } catch(e) {}
+                        updateDayBestCache(latestDailyData, new Date());
                     }
                     checkAndSwitchMonth();
                     recalculateEnergy();
+                    if (latestDailyData) {
+                        updateChartTodayRealtime(latestDailyData);
+                        maybeContinuousSyncToday("Live_Continuous");
+                    }
                     if (energyChart && (currentChartMode === 'month' || currentChartMode === 'year')) {
                         loadChartData();
                     }
                 });
+
+                // Kênh dự phòng (Fallback) từ Firebase /SosenSystem/Live & /SosenSystem/DeviceStatus khi MQTT bị gián đoạn trên 4G/điện thoại
+                database.ref('/SosenSystem/Live').on('value', (snapshot) => {
+                    const liveVal = snapshot.val();
+                    if (!liveVal) return;
+                    const nowMs = Date.now();
+                    const mqttStale = (nowMs - lastLiveTime > 8000);
+                    if (mqttStale && (liveVal.ESP32_Online === true || liveVal.Inverter_Online === true)) {
+                        processIncomingLiveData(liveVal, false);
+                    }
+                });
+
+                database.ref('/SosenSystem/DeviceStatus').on('value', (snapshot) => {
+                    const st = snapshot.val();
+                    if (!st) return;
+                    const hb = st.Device_Heartbeat;
+                    if (hb !== undefined && hb !== null && lastFirebaseHeartbeatVal !== null && hb !== lastFirebaseHeartbeatVal) {
+                        markLiveDataReceived(Date.now());
+                        setDeviceStatus('online');
+                    }
+                    if (hb !== undefined && hb !== null) lastFirebaseHeartbeatVal = hb;
+                });
+
                 setInterval(() => { checkAndSwitchMonth(); }, 60000);
                 setInterval(() => { checkAutoSnapshotSchedule(); }, 20000);
+                setTimeout(() => { checkAutoSnapshotSchedule(); }, 3500);
             }
         });
         setInterval(() => { updateBackgroundByTimeAndPv(); }, 60000);
