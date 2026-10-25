@@ -5591,29 +5591,26 @@
             } catch (e) {}
         }
 
-        // Vòng lặp 3 giây/lần đọc thẳng /api/v1/inverter/{sn} (customInfoMap 120+ thanh ghi) + /flow + đánh thức cục WiFi zin
+        // Vòng lặp 3 giây/lần CHỈ đọc 1 API /api/v1/inverter/{sn} (customInfoMap 120+ thanh ghi) + đánh thức cục WiFi zin mỗi 20 giây
         let fastPollTickCount = 0;
+        let lastWifiWakeupMs = 0;
         async function pollSosenFastFlow5s() {
             if (!sosenCloudAuth.access_token || document.hidden) return;
             const sn = sosenCloudAuth.invSn || 'S8303002425022100221';
             const gsn = sosenCloudAuth.gwSn || 'E47F24C03812';
             fastPollTickCount++;
             try {
-                // Mỗi 9 giây (3 nhịp x 3s) gửi kèm lệnh đánh thức realTimeUpdateByInv để ép cục WiFi đọc mới liên tục
-                if (fastPollTickCount % 3 === 0) {
+                // Mỗi 20 giây gửi kèm lệnh đánh thức realTimeUpdateByInv để ép cục WiFi đọc mới liên tục
+                const nowMs = Date.now();
+                if (nowMs - lastWifiWakeupMs >= 20000) {
+                    lastWifiWakeupMs = nowMs;
                     sosenCloudRequest('GET', `/api/v1/inverter/${gsn}/realTimeUpdateByInv?gsn=${gsn}&userId=157769`).catch(() => {});
                 }
-                const [detailRes, flowRes] = await Promise.allSettled([
-                    sosenCloudRequest('GET', `/api/v1/inverter/${sn}`),
-                    sosenCloudRequest('GET', `/api/v1/inverter/${sn}/flow`)
-                ]);
-                if (detailRes.status === 'fulfilled' && detailRes.value?.code === 0 && detailRes.value.data) {
-                    lastCloudDetailCache = detailRes.value.data;
+                const detailRes = await sosenCloudRequest('GET', `/api/v1/inverter/${sn}`);
+                if (detailRes && detailRes.code === 0 && detailRes.data) {
+                    lastCloudDetailCache = detailRes.data;
                 }
-                const flData = (flowRes.status === 'fulfilled' && flowRes.value?.code === 0 && flowRes.value.data)
-                    ? flowRes.value.data
-                    : (lastCloudFlowCache || {});
-                applySosenFastFlowData(flData);
+                applySosenFastFlowData(lastCloudFlowCache || {});
             } catch (e) {}
         }
 
@@ -5935,7 +5932,7 @@
                     if (!document.hidden && sosenCloudAuth.access_token) {
                         pollSosenCloudRealtime(false);
                     }
-                }, 15000);
+                }, 40000); // Đọc đầy đủ 12 API mỗi 40 giây (giảm tải server Cloud Sosen)
             }
         }
     </script>
