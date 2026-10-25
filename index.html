@@ -110,8 +110,8 @@
         .pos-grid { top: 18%; left: 84%; }
         .pos-batt { top: 82%; left: 16%; }
         .pos-load { top: 82%; left: 84%; }
-        .pos-batt.corner-node { top: 83%; left: 20%; width: auto; min-width: 155px; }
-        .pos-load.corner-node { top: 86%; left: 88%; }
+        .pos-batt.corner-node { top: 85%; left: 17%; width: 96px; }
+        .pos-load.corner-node { top: 87%; left: 81%; width: 96px; }
 
         .image-frame {
             position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15;
@@ -135,19 +135,6 @@
             padding: 4px 16px; border-radius: 20px; z-index: 20; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
-        
-        .bpf-container { position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15; text-align: center; width: 100%; pointer-events: none; }
-        .bpf-text {
-            font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 32px; font-weight: 900; letter-spacing: 14px;
-            position: relative; display: inline-block; background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
-            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.55));
-            animation: goldPulse 2.6s ease-in-out infinite alternate; margin-left: 14px;
-        }
-        @keyframes goldPulse { from { opacity: 0.88; transform: translateZ(0); } to { opacity: 1; transform: translateY(-1px) translateZ(0); } }
-        .bpf-text::after {
-            content: attr(data-text); position: absolute; left: 0; top: 0; z-index: -1; -webkit-text-fill-color: transparent; background: none;
-            text-shadow: 1px 1px 0 #ff0000, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 0 #660000, 5px 5px 0 #330000, 6px 6px 12px rgba(255, 0, 0, 0.8);
-        }
 
         .line { position: absolute; height: 26px; margin-top: -13px; background: transparent; width: 44%; z-index: 1; transform: translateZ(0); pointer-events: none; }
         .line-pv { top: 18%; left: 16%; transform-origin: left center; transform: rotate(38deg) translateZ(0); }
@@ -155,28 +142,12 @@
         .line-batt { top: 82%; left: 16%; transform-origin: left center; transform: rotate(-38deg) translateZ(0); }
         .line-load { top: 82%; right: 16%; transform-origin: right center; transform: rotate(38deg) translateZ(0); }
         
-        /* Khung thông số Pin (Sạc/Xả, Áp, Dòng, Nhiệt) đặt cạnh Quả Pin dựng đứng */
-        .battery-combo-row {
-            order: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            position: relative;
-            z-index: 11;
-            margin: -6px auto 0 auto;
-        }
-
-        #lbl-status {
-            position: relative; z-index: 1; display: block; margin: 0 0 3px 0; transform: translateZ(0); font-size: 10px; font-weight: 900;
-            background: transparent; padding: 0; border-radius: 0; box-shadow: none; color: #a8b0ba; text-align: center; white-space: nowrap; transition: color 0.4s;
-            letter-spacing: 0.3px;
-        }
-
+        /* Khung thông số Pin (Sạc/Xả, Áp, Dòng, Nhiệt) đặt tại giữa bên dưới (vị trí cũ của 八方來財) */
         .battery-mini-meter {
             --mini-color: #888; --mini-glow: rgba(255,255,255,0.35);
-            position: relative; z-index: 12; min-width: 96px; padding: 5px 8px 6px 8px; border-radius: 12px;
-            background: rgba(12, 18, 30, 0.78); border: 1px solid rgba(255,255,255,0.32); box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 12px var(--mini-glow);
+            position: absolute; top: 86.5%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
+            z-index: 18; min-width: 108px; padding: 6px 10px; border-radius: 12px;
+            background: rgba(12, 18, 30, 0.82); border: 1px solid rgba(255,255,255,0.32); box-shadow: 0 4px 14px rgba(0,0,0,0.35), 0 0 14px var(--mini-glow);
             overflow: hidden; pointer-events: none; color: #fff; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); margin: 0;
         }
         .battery-mini-meter::before {
@@ -186,19 +157,25 @@
         .battery-mini-meter.charge { --mini-color: #00cc66; --mini-glow: rgba(0, 204, 102, 0.45); border-color: rgba(0, 204, 102, 0.55); }
         .battery-mini-meter.discharge { --mini-color: #ff4444; --mini-glow: rgba(255, 68, 68, 0.45); border-color: rgba(255, 68, 68, 0.55); }
         .battery-mini-meter.idle { --mini-color: #a8b0ba; --mini-glow: rgba(168, 176, 186, 0.25); border-color: rgba(255,255,255,0.25); }
-        .battery-mini-row { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 5px; font-size: 9.5px; font-weight: 800; line-height: 1.25; }
+
+        #lbl-status {
+            position: relative; z-index: 1; display: block; margin: 0 0 4px 0; transform: translateZ(0); font-size: 10.5px; font-weight: 900;
+            background: transparent; padding: 0; border-radius: 0; box-shadow: none; color: #a8b0ba; text-align: center; white-space: nowrap; transition: color 0.4s;
+            letter-spacing: 0.3px;
+        }
+        .battery-mini-row { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10px; font-weight: 800; line-height: 1.3; }
         .battery-mini-row + .battery-mini-row { margin-top: 2px; }
         .battery-mini-label { color: rgba(255,255,255,0.72); font-weight: 700; }
         .battery-mini-value { color: #fff; text-shadow: 0 0 6px var(--mini-color), 0 1px 3px rgba(0,0,0,0.85); font-variant-numeric: tabular-nums; font-weight: 900; }
         @keyframes miniEnergySweep { to { transform: translateX(120%) translateZ(0); } }
 
-        /* Khung Sản Lượng PV1 & PV2 Sinh Ra (Thay vị trí cũ của khung Pin) */
+        /* Khung Sản Lượng PV1 & PV2 Sinh Ra (Nhỏ gọn, vừa vặn) */
         .pv-mini-meter {
             --pv-mini-glow: rgba(245, 158, 11, 0.45);
-            position: absolute; top: 50%; left: 18%; transform: translate(-50%, -50%) translateZ(0);
-            z-index: 25; min-width: 114px; padding: 6px 9px 7px 9px; border-radius: 14px;
-            background: rgba(12, 18, 30, 0.78); border: 1px solid rgba(245, 158, 11, 0.45);
-            box-shadow: 0 4px 14px rgba(0,0,0,0.28), 0 0 16px var(--pv-mini-glow);
+            position: absolute; top: 48%; left: 16%; transform: translate(-50%, -50%) translateZ(0);
+            z-index: 25; min-width: 92px; max-width: 98px; padding: 4px 6px 5px 6px; border-radius: 11px;
+            background: rgba(12, 18, 30, 0.82); border: 1px solid rgba(245, 158, 11, 0.45);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.28), 0 0 12px var(--pv-mini-glow);
             overflow: hidden; pointer-events: none; color: #fff; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
         }
         .pv-mini-meter::before {
@@ -208,15 +185,15 @@
         .pv-mini-meter.active { --pv-mini-glow: rgba(245, 158, 11, 0.6); border-color: rgba(245, 158, 11, 0.65); }
         .pv-mini-meter.idle { --pv-mini-glow: rgba(168, 176, 186, 0.2); border-color: rgba(255, 255, 255, 0.25); }
         .pv-mini-title {
-            position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 4px;
-            margin: 0 0 4px 0; font-size: 10.5px; font-weight: 900; color: #fbbf24;
-            text-shadow: 0 0 8px rgba(245, 158, 11, 0.6); text-align: center; white-space: nowrap; letter-spacing: 0.3px;
+            position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 3px;
+            margin: 0 0 2px 0; font-size: 9.5px; font-weight: 900; color: #fbbf24;
+            text-shadow: 0 0 8px rgba(245, 158, 11, 0.6); text-align: center; white-space: nowrap; letter-spacing: 0.2px;
         }
-        .pv-mini-row { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 10px; font-weight: 900; line-height: 1.2; }
-        .pv-mini-row + .pv-mini-row { margin-top: 2.5px; }
-        .pv-mini-label { color: #fef08a; font-weight: 800; display: inline-flex; align-items: center; gap: 3px; font-size: 9.5px; }
-        .pv-mini-val { color: #fff; text-shadow: 0 0 8px rgba(245, 158, 11, 0.8), 0 1px 3px rgba(0,0,0,0.85); font-variant-numeric: tabular-nums; font-size: 10px; font-weight: 900; }
-        .pv-mini-sub { font-size: 8.5px; color: rgba(255,255,255,0.75); font-weight: 700; font-variant-numeric: tabular-nums; }
+        .pv-mini-row { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 4px; font-size: 9px; font-weight: 900; line-height: 1.2; }
+        .pv-mini-row + .pv-mini-row { margin-top: 1.5px; }
+        .pv-mini-label { color: #fef08a; font-weight: 800; display: inline-flex; align-items: center; gap: 2px; font-size: 8.5px; }
+        .pv-mini-val { color: #fff; text-shadow: 0 0 6px rgba(245, 158, 11, 0.8), 0 1px 3px rgba(0,0,0,0.85); font-variant-numeric: tabular-nums; font-size: 9.5px; font-weight: 900; }
+        .pv-mini-sub { font-size: 7.5px; color: rgba(255,255,255,0.75); font-weight: 700; font-variant-numeric: tabular-nums; }
 
         .node h3 { font-size: 10px; color: #f6f8ff; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.2px; text-shadow: 0 1px 4px rgba(0,0,0,0.55); }
         .node .unit { font-size: 10px; color: rgba(255,255,255,0.86); font-weight: 800; }
@@ -242,7 +219,7 @@
         @keyframes batteryTempDangerBlink { 0%, 45% { opacity: 1; transform: scale(1) translateZ(0); filter: brightness(1.15); } 46%, 100% { opacity: 0.22; transform: scale(1.06) translateZ(0); filter: brightness(1.8); } }
         .battery-temp-label.temp-stale .temp-value { color: #a8b0ba; text-shadow: 0 1px 3px rgba(0,0,0,0.75); animation: none; }
         
-        .pos-load.corner-node .icon { margin: -10px auto 0 auto; transform: translate(6px, 3px) translateZ(0); }
+        .pos-load.corner-node .icon { margin: -10px auto 0 auto; transform: translateZ(0); }
         .pos-load.corner-node .img-icon { width: 78px; height: 78px; margin: -8px auto 0 auto; }
         
         .icon { font-size: 46px; line-height: 1; margin-bottom: 8px; display: inline-block; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
@@ -250,47 +227,42 @@
         .img-icon { width: 85px; height: 85px; object-fit: cover; display: block; margin: -10px auto 5px auto; filter: brightness(1.1) contrast(1.1); -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); transform: translateZ(0); }
         .pos-load .icon { filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.8)); }
 
-        /* QUẢ PIN DỰNG ĐỨNG */
-        .battery-wrapper.vertical {
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+        /* QUẢ PIN NẰM NGANG */
+        .battery-wrapper {
+            order: 2; display: flex; align-items: center; justify-content: center;
             cursor: pointer; position: relative; transition: transform 0.2s ease, filter 0.2s ease;
-            transform: translateZ(0); user-select: none; margin: 0; padding: 0;
+            transform: translateZ(0); user-select: none; margin: -6px auto 0 auto;
         }
-        .battery-wrapper.vertical:hover { transform: scale(1.06) translateZ(0); filter: drop-shadow(0 0 10px rgba(0, 204, 102, 0.65)); }
-        .battery-wrapper.vertical .battery-cap {
-            width: 16px; height: 5px; background: linear-gradient(to right, #666 0%, #eee 30%, #bbb 70%, #444 100%);
-            border-radius: 3px 3px 0 0; border: 1px solid rgba(255,255,255,0.45); border-bottom: none;
-            box-shadow: inset 0 1px 2px rgba(255,255,255,0.8); margin: 0 auto;
-        }
-        .battery-wrapper.vertical .battery-body {
-            width: 44px; height: 82px; background: linear-gradient(to right, #2a2a2a 0%, #111 35%, #222 70%, #0a0a0a 100%);
-            border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.38); position: relative; overflow: hidden;
+        .battery-wrapper:hover { transform: scale(1.06) translateZ(0); filter: drop-shadow(0 0 10px rgba(0, 204, 102, 0.65)); }
+        .battery-body {
+            width: 78px; height: 36px; background: linear-gradient(180deg, #2a2a2a 0%, #111 35%, #222 70%, #0a0a0a 100%);
+            border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.4); position: relative; overflow: hidden;
             box-shadow: 0 4px 14px rgba(0,0,0,0.55), inset 0 0 10px rgba(0,0,0,0.85); transform: translateZ(0);
         }
-        .battery-wrapper.vertical .battery-body::after {
-            content: ""; position: absolute; top: 0; left: 0; bottom: 0; width: 40%;
-            background: linear-gradient(to right, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.02) 100%);
+        .battery-body::after {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 40%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.02) 100%);
             pointer-events: none; z-index: 2;
         }
-        .battery-wrapper.vertical .battery-fill {
-            position: absolute; bottom: 0; left: 0; right: 0; width: 100%; height: 0%;
-            transition: height 0.5s ease-in-out, background 0.5s; z-index: 1;
-            border-top: 1.5px solid rgba(255,255,255,0.7); border-right: none; transform: translateZ(0);
+        .battery-cap {
+            width: 6px; height: 16px; background: linear-gradient(to right, #666 0%, #eee 30%, #bbb 70%, #444 100%);
+            border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.45); border-left: none;
+            box-shadow: inset 1px 0 2px rgba(255,255,255,0.8);
         }
-        .battery-wrapper.vertical .fill-red { background: linear-gradient(to top, #990000 0%, #ff2222 60%, #ff8888 100%); }
-        .battery-wrapper.vertical .fill-yellow { background: linear-gradient(to top, #995500 0%, #ff9900 60%, #ffee88 100%); }
-        .battery-wrapper.vertical .fill-green { background: linear-gradient(to top, #006622 0%, #00bb55 60%, #66ffaa 100%); }
-        .battery-wrapper.vertical #lbl-soc {
+        .battery-fill {
+            position: absolute; top: 0; left: 0; bottom: 0; width: 0%; height: 100%;
+            transition: width 0.5s ease-in-out, background 0.5s; z-index: 1;
+            border-right: 1.5px solid rgba(255,255,255,0.7); transform: translateZ(0);
+        }
+        .fill-red { background: linear-gradient(to right, #990000 0%, #ff2222 60%, #ff8888 100%); }
+        .fill-yellow { background: linear-gradient(to right, #995500 0%, #ff9900 60%, #ffee88 100%); }
+        .fill-green { background: linear-gradient(to right, #006622 0%, #00bb55 60%, #66ffaa 100%); }
+        #lbl-soc {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
             z-index: 3; font-size: 15px; font-weight: 900; color: #ff2a2a;
             text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6);
-            letter-spacing: 0.5px; margin: 0; white-space: nowrap;
+            letter-spacing: 0.5px; margin: 0; white-space: nowrap; pointer-events: none;
         }
-
-        .battery-wrapper:not(.vertical) { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; cursor: pointer; }
-        .battery-wrapper:not(.vertical) .battery-body { width: 72px; height: 32px; border-radius: 4px; position: relative; overflow: hidden; }
-        .battery-wrapper:not(.vertical) .battery-cap { width: 5px; height: 14px; border-radius: 0 3px 3px 0; }
-        .battery-wrapper:not(.vertical) .battery-fill { height: 100%; width: 0%; position: absolute; top: 0; left: 0; }
         
         .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
         .val-pv-style { color: #ffffff !important; text-shadow: 0 1px 0 #b45309, 0 2px 0 #92400e, 0 3px 0 #78350f, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(245, 158, 11, 0.9) !important; font-size: 18px; }
@@ -551,15 +523,14 @@
         @media (max-width: 400px) {
             #update-clock { font-size: 11px; padding: 4px 8px; }
             #lbl-status { font-size: 10px; }
-            .bpf-text { font-size: 26px; letter-spacing: 8px; }
             .image-frame { width: 120px; top: 14%; } 
             .node-center { width: 105px; height: 115px; } 
             #lbl-inv-temp { top: 70%; }
-            .battery-mini-meter { min-width: 88px; padding: 4px 6px 5px 6px; }
-            .battery-mini-row { font-size: 8.5px; }
-            .pv-mini-meter { min-width: 100px; padding: 5px 7px 6px 7px; }
-            .pos-batt.corner-node { left: 19%; min-width: 142px; }
-            .battery-wrapper.vertical .battery-body { width: 38px; height: 76px; }
+            .battery-mini-meter { min-width: 96px; padding: 4px 6px; }
+            .battery-mini-row { font-size: 9px; }
+            .pv-mini-meter { min-width: 82px; padding: 3px 5px; }
+            .pos-batt.corner-node { left: 17%; }
+            .battery-body { width: 68px; height: 32px; }
         }
         @media (min-width: 768px) {
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
@@ -607,7 +578,6 @@
         body.page-hidden .image-frame,
         body.page-hidden .node-center::after,
         body.page-hidden .bms-power-fill::after,
-        body.page-hidden .bpf-text,
         body.page-hidden .sun-core,
         body.page-hidden #solar-sun::before,
         body.page-hidden .battery-mini-meter::before,
@@ -1492,32 +1462,15 @@
                 <div id="lbl-grid-mode" class="grid-live-mode idle" style="display:none"></div>
             </div>
 
-            <!-- NODE PIN LƯU TRỮ: QUẢ PIN DỰNG ĐỨNG + KHUNG TÌNH TRẠNG (SẠC/XẢ, ÁP, DÒNG, NHIỆT ĐỘ) ĐẶT CẠNH NHAU -->
+            <!-- NODE PIN LƯU TRỮ: QUẢ PIN NẰM NGANG -->
             <div class="node pos-batt corner-node">
                 <div class="corner-power"><h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div></div>
-                
-                <div class="battery-combo-row">
-                    <!-- Quả Pin dựng đứng -->
-                    <div class="battery-wrapper vertical" onclick="window.open('https://mikasolar.com/14058648', '_blank')" title="Nhấn để xem chi tiết 2 khối Pin">
-                        <div class="battery-cap"></div>
-                        <div class="battery-body">
-                            <div class="battery-fill" id="batt-fill"></div>
-                            <div id="lbl-soc">0%</div>
-                        </div>
+                <div class="battery-wrapper" onclick="window.open('https://mikasolar.com/14058648', '_blank')" title="Nhấn để xem chi tiết 2 khối Pin">
+                    <div class="battery-body">
+                        <div class="battery-fill" id="batt-fill"></div>
+                        <div id="lbl-soc">0%</div>
                     </div>
-
-                    <!-- Khung thông số Pin: Trạng thái, Áp, Dòng, Nhiệt độ đặt cạnh pin -->
-                    <div id="battery-mini-meter" class="battery-mini-meter idle">
-                        <div id="lbl-status">Đang tải...</div>
-                        <div class="battery-mini-row"><span class="battery-mini-label">Áp</span><span class="battery-mini-value" id="mini-stat-v">-- V</span></div>
-                        <div class="battery-mini-row"><span class="battery-mini-label">Dòng</span><span class="battery-mini-value" id="mini-stat-a">-- A</span></div>
-                        <div class="battery-mini-row">
-                            <span class="battery-mini-label">Nhiệt</span>
-                            <span id="lbl-batt-temp" class="battery-temp-label temp-stale">
-                                <span class="temp-icon" style="font-size:9.5px;">🌡️</span><span id="lbl-batt-temp-value" class="temp-value">--°C</span>
-                            </span>
-                        </div>
-                    </div>
+                    <div class="battery-cap"></div>
                 </div>
             </div>
 
@@ -1526,9 +1479,20 @@
                 <div class="icon"><img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon" onerror="this.style.opacity='0'"></div>
             </div>
 
-            <div class="bpf-container"><div class="bpf-text" data-text="八方來財">八方來財</div></div>
+            <!-- KHUNG TÌNH TRẠNG PIN (SẠC/XẢ, ÁP, DÒNG, NHIỆT ĐỘ) ĐẶT TẠI GIỮA BÊN DƯỚI -->
+            <div id="battery-mini-meter" class="battery-mini-meter idle">
+                <div id="lbl-status">Đang tải...</div>
+                <div class="battery-mini-row"><span class="battery-mini-label">Áp</span><span class="battery-mini-value" id="mini-stat-v">-- V</span></div>
+                <div class="battery-mini-row"><span class="battery-mini-label">Dòng</span><span class="battery-mini-value" id="mini-stat-a">-- A</span></div>
+                <div class="battery-mini-row">
+                    <span class="battery-mini-label">Nhiệt</span>
+                    <span id="lbl-batt-temp" class="battery-temp-label temp-stale">
+                        <span class="temp-icon" style="font-size:9.5px;">🌡️</span><span id="lbl-batt-temp-value" class="temp-value">--°C</span>
+                    </span>
+                </div>
+            </div>
 
-            <!-- NÚT KẾT NỐI / ĐĂNG NHẬP CLOUD SOSEN (NHỎ GỌN DƯỚI CHỮ 八方來財) -->
+            <!-- NÚT KẾT NỐI / ĐĂNG NHẬP CLOUD SOSEN (DƯỚI KHUNG PIN) -->
             <div style="position:absolute;top:96.2%;left:50%;transform:translate(-50%,-50%);z-index:20;white-space:nowrap;">
                 <button type="button" class="portal-btn" id="btn-sosen-cloud-top" style="background:linear-gradient(135deg,#059669,#10b981);border-color:rgba(52,211,153,0.75);color:#fff;padding:2px 9px;font-size:9.5px;border-radius:999px;gap:3px;line-height:1.25;box-shadow:0 2px 6px rgba(0,0,0,0.22);opacity:0.92;" onclick="openSosenCloudModal()">☁️ Cloud Sosen: <span id="sosen-cloud-badge">Đã kết nối</span></button>
             </div>
@@ -1938,7 +1902,7 @@
         }
 
         const numberAnimState = {};
-        function animateValue(id, targetVal, formatFn, duration = 650) {
+        function animateValue(id, targetVal, formatFn, duration = 400) {
             const el = document.getElementById(id);
             if (!el) return;
             targetVal = Number(targetVal) || 0;
@@ -1963,6 +1927,19 @@
                 else { state.currentVal = targetVal; el.innerText = formatFn(targetVal); state.frameId = null; }
             }
             state.frameId = requestAnimationFrame(step);
+        }
+
+        function renderVal(id, targetVal, formatFn, isFromCache = false) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            targetVal = Number(targetVal) || 0;
+            if (isFromCache) {
+                if (numberAnimState[id] && numberAnimState[id].frameId) cancelAnimationFrame(numberAnimState[id].frameId);
+                numberAnimState[id] = { currentVal: targetVal, frameId: null };
+                el.innerText = formatFn(targetVal);
+            } else {
+                animateValue(id, targetVal, formatFn, 400);
+            }
         }
 
         function toSafeNumber(value, fallback = 0) { const number = Number(value); return Number.isFinite(number) ? number : fallback; }
@@ -2376,10 +2353,11 @@
             const roundedSoc = Math.round(soc);
 
             // XÁC ĐỊNH TRẠNG THÁI SẠC / XẢ & TỐC ĐỘ SAO BĂNG ĐIỀM ĐẠM THEO DÒNG ĐIỆN THỰC TẾ (CURRENT)
+            // Chuẩn chung toàn hệ thống: Dương (+) là Đang Xả, Âm (-) là Đang Sạc
             const signedPwr = bmsNumber(data, ['Signed_Power'], Number.isFinite(voltage) && Number.isFinite(current) ? voltage * current : NaN);
             const effectiveCurrent = Number.isFinite(current) ? current : (Number.isFinite(signedPwr) && Number.isFinite(voltage) && voltage > 0 ? signedPwr / voltage : 0);
-            const isCharging = effectiveCurrent > 0.05;
-            const isDischarging = effectiveCurrent < -0.05;
+            const isDischarging = effectiveCurrent > 0.05;
+            const isCharging = effectiveCurrent < -0.05;
             const sweepSpeed = calcBmsSweepSpeed(effectiveCurrent);
 
             // CẬP NHẬT VÒNG TRÒN THEO % CÒN LẠI & 4 NẤC MÀU
@@ -2430,7 +2408,7 @@
             bmsText(`${prefix}-t3`, bmsFormatCompact(t3, 1));
             bmsText(`${prefix}-t4`, bmsFormatCompact(t4, 1));
 
-            const packLimitW = Number.isFinite(voltage) ? voltage * (current >= 0 ? (Number.isFinite(maxCharge) ? maxCharge : 120) : (Number.isFinite(maxDischarge) ? maxDischarge : 120)) : 5200;
+            const packLimitW = Number.isFinite(voltage) ? voltage * (isCharging ? (Number.isFinite(maxCharge) ? maxCharge : 120) : (Number.isFinite(maxDischarge) ? maxDischarge : 120)) : 5200;
             bmsText(`${prefix}-power`, Number.isFinite(displayPower) ? `${displayPower.toFixed(1)}${Number.isFinite(packLimitW) && packLimitW > 0 ? ' / ' + Math.round(packLimitW) : ''}` : '--');
 
             if (powerRow) {
@@ -2456,10 +2434,6 @@
         let latestBmsCombined = { bm1: null, bm2: null };
         let lastBmsLiveUpdateMs = 0;
         let lastPcMqttLiveMs = 0;
-        // Phát hiện PC nhúng gửi dữ liệu "đóng băng" (PC vẫn chạy & gửi MQTT/heartbeat nhưng cổng RS485 đã chuyển sang cục WiFi Sosen -> số liệu cũ lặp lại mãi)
-        let pcDataSignature = '';
-        let pcDataSigChangedMs = 0;
-        const PC_FROZEN_TIMEOUT_MS = 20000;
 
         function isCloudOrBmsLiveAvailable() {
             try {
@@ -2471,20 +2445,10 @@
             return false;
         }
 
-        // Trả về true CHỈ KHI gói dữ liệu từ PC nhúng thực sự thay đổi giữa 2 lần gửi liên tiếp (tránh gói retained cũ của MQTT khóa màn hình 8-10s lúc mới mở điện thoại)
         function checkPcPacketIsLive(data) {
             if (!data) return false;
-            const sig = [data.PV_Power, data.Load_Power, data.Batt_Power, data.Batt_Voltage, data.Batt_Current, data.Batt_SOC, data.Grid_Import_Power].join('|');
-            const nowMs = Date.now();
-            if (pcDataSignature === '') {
-                pcDataSignature = sig;
-                return false; // Gói đầu tiên (thường là retained message cũ trên MQTT) chưa chứng minh PC đang đọc biến tần sống
-            }
-            if (sig !== pcDataSignature) {
-                pcDataSignature = sig;
-                pcDataSigChangedMs = nowMs;
-            }
-            return pcDataSigChangedMs > 0 && (nowMs - pcDataSigChangedMs) < PC_FROZEN_TIMEOUT_MS;
+            if (data.Inverter_Online === false || data.ESP32_Online === false) return false;
+            return true;
         }
 
         function refreshBmsPanels(isFromCache = false) {
@@ -3371,10 +3335,9 @@
                 group.style.setProperty('--c', color || '#00e5ff');
                 group.style.setProperty('--wire-speed', intensity.wireSpeed + 's');
                 const movesRight = animName === 'flowInL' || animName === 'flowOutR';
-                const currentParticles = group.getAttribute('data-particles') || '';
-                const currentDashDuration = group.getAttribute('data-dash-duration') || '';
-                const needsRefresh = !currentActive || currentAnim !== animName || currentParticles !== String(intensity.particles) || currentDashDuration !== String(intensity.dashDuration);
-                if (needsRefresh) {
+                const dirChanged = currentAnim !== animName;
+
+                if (!currentActive || dirChanged) {
                     group.setAttribute('data-anim', animName);
                     group.setAttribute('data-particles', String(intensity.particles));
                     group.setAttribute('data-dash-duration', String(intensity.dashDuration));
@@ -3384,22 +3347,61 @@
                     
                     const dashes = group.querySelectorAll('.flow-dash');
                     dashes.forEach((d, index) => { 
-                        d.style.animationName = 'none'; d.style.opacity = '0';
                         if (index >= intensity.particles) { d.style.display = 'none'; return; }
-                        d.style.display = 'block'; void d.offsetWidth;
+                        d.style.display = 'block';
                         d.style.animationName = animName;
                         d.style.animationDelay = '-' + ((index * intensity.dashDuration) / intensity.particles).toFixed(2) + 's';
-                        d.style.animationDuration = intensity.dashDuration + 's'; d.style.animationIterationCount = 'infinite'; d.style.animationTimingFunction = 'linear'; 
+                        d.style.animationDuration = intensity.dashDuration + 's'; 
+                        d.style.animationIterationCount = 'infinite'; 
+                        d.style.animationTimingFunction = 'linear'; 
                     });
 
                     const sparks = group.querySelectorAll('.flow-spark');
                     sparks.forEach((s, index) => {
-                        s.style.animationName = 'none'; s.style.opacity = '0';
                         if (index >= intensity.sparks) { s.style.display = 'none'; return; }
-                        s.style.display = 'block'; void s.offsetWidth;
+                        s.style.display = 'block';
                         s.style.animationName = movesRight ? 'sparkRight' : 'sparkLeft';
                         s.style.animationDelay = '-' + ((index * intensity.sparkDuration) / Math.max(intensity.sparks, 1)).toFixed(2) + 's';
-                        s.style.animationDuration = intensity.sparkDuration + 's'; s.style.animationIterationCount = 'infinite'; s.style.animationTimingFunction = 'linear';
+                        s.style.animationDuration = intensity.sparkDuration + 's'; 
+                        s.style.animationIterationCount = 'infinite'; 
+                        s.style.animationTimingFunction = 'linear';
+                    });
+                } else {
+                    // Cùng hướng: điều chỉnh hạt và tốc độ mượt mà, KHÔNG làm reset animation gây chớp tắt
+                    const dashes = group.querySelectorAll('.flow-dash');
+                    dashes.forEach((d, index) => {
+                        if (index >= intensity.particles) {
+                            d.style.display = 'none';
+                        } else {
+                            if (d.style.display === 'none') {
+                                d.style.display = 'block';
+                                d.style.animationName = animName;
+                                d.style.animationDelay = '-' + ((index * intensity.dashDuration) / intensity.particles).toFixed(2) + 's';
+                                d.style.animationDuration = intensity.dashDuration + 's';
+                                d.style.animationIterationCount = 'infinite';
+                                d.style.animationTimingFunction = 'linear';
+                            } else {
+                                d.style.animationDuration = intensity.dashDuration + 's';
+                            }
+                        }
+                    });
+
+                    const sparks = group.querySelectorAll('.flow-spark');
+                    sparks.forEach((s, index) => {
+                        if (index >= intensity.sparks) {
+                            s.style.display = 'none';
+                        } else {
+                            if (s.style.display === 'none') {
+                                s.style.display = 'block';
+                                s.style.animationName = movesRight ? 'sparkRight' : 'sparkLeft';
+                                s.style.animationDelay = '-' + ((index * intensity.sparkDuration) / Math.max(intensity.sparks, 1)).toFixed(2) + 's';
+                                s.style.animationDuration = intensity.sparkDuration + 's';
+                                s.style.animationIterationCount = 'infinite';
+                                s.style.animationTimingFunction = 'linear';
+                            } else {
+                                s.style.animationDuration = intensity.sparkDuration + 's';
+                            }
+                        }
                     });
                 }
             } else { 
@@ -3484,13 +3486,14 @@
         setInterval(updateDeviceStatusByTimeout, 2000);
 
         // ================= XỬ LÝ GÓI TIN LIVE (NHẬN TỪ MQTT 3S HOẶC FIREBASE FALLBACK) =================
-        function processIncomingLiveData(data, isFromCache = false) {
+        function processIncomingLiveData(data, isFromCache = false, isRecent = true) {
             if (!data) return;
             if (!isFromCache) {
                 markLiveDataReceived(Date.now());
                 setDeviceStatus('online');
                 try {
                     localStorage.setItem("last_sosen_snapshot", JSON.stringify(data));
+                    localStorage.setItem("last_sosen_snapshot_time", Date.now());
                 } catch (e) {}
             }
 
@@ -3510,7 +3513,7 @@
 
             updateBackgroundByTimeAndPv(pvInW);
             
-            animateValue('lbl-pv', pvInW, v => Math.round(v));
+            renderVal('lbl-pv', pvInW, v => Math.round(v), isFromCache);
             const elPv = document.getElementById('lbl-pv');
             if (elPv) elPv.classList.add('val-pv-style');
             updateSunLevelByPower(pvInW);
@@ -3523,8 +3526,8 @@
             const v2 = toSafeNumber(data.PV2_Voltage ?? data.V_PV2, p2 > 0 ? 374.6 : 0);
             const i2 = toSafeNumber(data.PV2_Current ?? data.I_PV2, p2 > 0 && v2 > 0 ? Number((p2 / v2).toFixed(1)) : 0);
 
-            animateValue('mini-pv1-w', p1, v => Math.round(v) + ' W');
-            animateValue('mini-pv2-w', p2, v => Math.round(v) + ' W');
+            renderVal('mini-pv1-w', p1, v => Math.round(v) + ' W', isFromCache);
+            renderVal('mini-pv2-w', p2, v => Math.round(v) + ' W', isFromCache);
             updateDOMText('mini-pv1-va', p1 > 0 ? `${v1.toFixed(0)}V | ${i1.toFixed(1)}A` : '-- V | -- A');
             updateDOMText('mini-pv2-va', p2 > 0 ? `${v2.toFixed(0)}V | ${i2.toFixed(1)}A` : '-- V | -- A');
 
@@ -3534,12 +3537,12 @@
                 pvMiniCard.classList.toggle('idle', pvInW <= 10);
             }
 
-            animateValue('lbl-load', loadInW, v => Math.round(v));
+            renderVal('lbl-load', loadInW, v => Math.round(v), isFromCache);
             const elLoad = document.getElementById('lbl-load');
             if (elLoad) elLoad.classList.add('val-load-style');
 
             const gridActiveW = gridImportW > 0 ? gridImportW : gridExportW;
-            animateValue('lbl-grid', gridActiveW, v => Math.round(v));
+            renderVal('lbl-grid', gridActiveW, v => Math.round(v), isFromCache);
 
             const elGrid = document.getElementById('lbl-grid');
             const elGridMode = document.getElementById('lbl-grid-mode');
@@ -3557,7 +3560,7 @@
                 else { elGridMode.style.display = 'none'; }
             }
 
-            animateValue('lbl-batt', Math.abs(battInW), v => Math.round(v));
+            renderVal('lbl-batt', Math.abs(battInW), v => Math.round(v), isFromCache);
             const elBatt = document.getElementById('lbl-batt');
             if (elBatt) {
                 elBatt.classList.remove('val-charge', 'val-discharge');
@@ -3570,7 +3573,7 @@
                 const tempLabel = document.getElementById('lbl-inv-temp');
                 const t = toSafeNumber(data.Inv_Temp);
                 if (tempLabel) {
-                    animateValue('lbl-inv-temp', t, v => '🌡️ ' + v.toFixed(0) + '°C');
+                    renderVal('lbl-inv-temp', t, v => '🌡️ ' + v.toFixed(0) + '°C', isFromCache);
                     if (t < 40) tempLabel.style.backgroundColor = '#00cc66'; 
                     else if (t >= 40 && t < 48) tempLabel.style.backgroundColor = '#ffaa00'; 
                     else tempLabel.style.backgroundColor = '#ff4444';
@@ -3578,13 +3581,13 @@
             }
 
             let soc = clampNumber(data.Batt_SOC, 0, 100);
-            animateValue('lbl-soc', soc, v => Math.round(v) + '%');
+            renderVal('lbl-soc', soc, v => Math.round(v) + '%', isFromCache);
 
             const battTempLabel = document.getElementById('lbl-batt-temp');
             if (battTempLabel) {
                 battTempLabel.classList.remove('temp-cool', 'temp-normal', 'temp-warm', 'temp-hot', 'temp-danger', 'temp-stale');
                 if (Number.isFinite(battTemp)) {
-                    animateValue('lbl-batt-temp-value', battTemp, v => v.toFixed(1) + '°C');
+                    renderVal('lbl-batt-temp-value', battTemp, v => v.toFixed(1) + '°C', isFromCache);
                     if (battTemp >= 43.0) battTempLabel.classList.add('temp-danger');
                     else if (battTemp >= 36.0) battTempLabel.classList.add('temp-hot');
                     else if (battTemp >= 30.0) battTempLabel.classList.add('temp-warm');
@@ -3596,8 +3599,8 @@
                 }
             }
 
-            animateValue('mini-stat-v', battVoltage, v => v.toFixed(1) + ' V');
-            animateValue('mini-stat-a', battCurrent, v => v.toFixed(1) + ' A');
+            renderVal('mini-stat-v', battVoltage, v => v.toFixed(1) + ' V', isFromCache);
+            renderVal('mini-stat-a', battCurrent, v => v.toFixed(1) + ' A', isFromCache);
             
             const miniMeter = document.getElementById('battery-mini-meter');
             if (miniMeter) {
@@ -3623,16 +3626,17 @@
             let colorTheme = soc <= 20 ? 'fill-red' : (soc <= 40 ? 'fill-yellow' : 'fill-green');
             const battFill = document.getElementById('batt-fill');
             if (battFill) { 
-                battFill.style.height = soc + '%'; 
-                battFill.style.width = '100%';
+                battFill.style.width = soc + '%'; 
+                battFill.style.height = '100%';
                 battFill.className = 'battery-fill ' + colorTheme; 
             }
 
-            if (pvInW >= 1) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
-            if (loadInW >= 1) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
-            if (battInW <= -1) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW)); else if (battInW >= 1) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); else setFlow('flow-batt', false);
+            const allowFlow = !isFromCache || isRecent;
+            if (pvInW >= 1 && allowFlow) setFlow('flow-pv', true, 'flowInL', '#ffaa00', pvInW); else setFlow('flow-pv', false);
+            if (loadInW >= 1 && allowFlow) setFlow('flow-load', true, 'flowOutR', '#0088ff', loadInW); else setFlow('flow-load', false);
+            if (battInW <= -1 && allowFlow) setFlow('flow-batt', true, 'flowOutL', '#00cc66', Math.abs(battInW)); else if (battInW >= 1 && allowFlow) setFlow('flow-batt', true, 'flowInL', '#ff4444', Math.abs(battInW)); else setFlow('flow-batt', false);
 
-            if (!isGridOn) { setFlow('flow-grid', false); }
+            if (!isGridOn || !allowFlow) { setFlow('flow-grid', false); }
             else if (gridImportW > 0) { setFlow('flow-grid', true, 'flowInR', '#ff4444', gridImportW); }
             else if (gridExportW > 0) { setFlow('flow-grid', true, 'flowOutR', '#00cc66', gridExportW); }
             else { setFlow('flow-grid', false); }
@@ -3760,7 +3764,11 @@
             const cfUrl = `${CF_WORKER_URL}/?url=${encodeURIComponent(target)}`;
 
             try {
-                const res = await fetch(cfUrl, { method: "GET", cache: "no-store" });
+                const res = await fetch(cfUrl, {
+                    method: "GET",
+                    cache: "no-store",
+                    signal: AbortSignal.timeout ? AbortSignal.timeout(3500) : undefined
+                });
                 if (!res.ok) {
                     updateDOMText('bms-updated', `Lỗi HTTP ${res.status}`);
                     return null;
@@ -3834,7 +3842,11 @@
             }
 
             const totalV  = Number(d.tbatv || 0) / 1000;
-            const currA   = Number(d.tbatc || 0) / 1000;
+            // Trong thanh ghi gốc Mika JK BMS: dòng xả mang dấu âm, dòng sạc mang dấu dương.
+            // Để đồng bộ 100% với MQTT PC nhúng và Sơ đồ Biến tần Sosen:
+            // Đổi dấu để chuẩn hóa: Dương (+) là Đang Xả, Âm (-) là Đang Sạc
+            const rawCurrA = Number(d.tbatc || 0) / 1000;
+            const currA   = -rawCurrA;
             const powerW  = Math.abs((Number(d.tbatv || 0) * Number(d.tbatc || 0)) / 1000000);
             const soh     = Number(d.sochealth || 100);
             const fullCap = Number(d.socfcc || 0) / 1000;
@@ -3913,6 +3925,7 @@
 
             const bmsPack = convertMikaToDashboardFormat(mergedRaw, devInfo);
             latestBmsCombined[devInfo.slot] = bmsPack;
+            refreshBmsPanels(false); // Cập nhật ngay khi bình này nhận xong, không phải chờ bình kia
             return true;
         }
 
@@ -3921,11 +3934,8 @@
             if (isMikaPolling || document.hidden) return;
             isMikaPolling = true;
             try {
-                // Đọc song song cả 2 bình BMS cùng lúc (nhanh gấp đôi trên 4G/điện thoại)
-                const results = await Promise.all(MIKA_DEVICES.map(dev => fetchSingleMikaDevice(dev)));
-                if (results.some(Boolean)) {
-                    refreshBmsPanels(false);
-                }
+                // Đọc song song cả 2 bình BMS cùng lúc bằng allSettled, không bị nghẽn nếu 1 bình mạng chậm
+                await Promise.allSettled(MIKA_DEVICES.map(dev => fetchSingleMikaDevice(dev)));
             } catch (e) {} finally {
                 isMikaPolling = false;
             }
@@ -3973,27 +3983,28 @@
                 username: MQTT_USER,
                 password: MQTT_PASSWORD,
                 clean: true,
-                reconnectPeriod: 2500,
-                connectTimeout: 8000,
+                reconnectPeriod: 2000,
+                connectTimeout: 5000,
                 keepalive: 20
             });
 
             mqttClient.on('connect', () => {
                 mqttClient.subscribe([MQTT_TOPIC_DATA, MQTT_TOPIC_BMS, MQTT_TOPIC_BMS1, MQTT_TOPIC_BMS2], { qos: 0 });
+                // Xóa gói retained 4220W cũ trên topic sosen/data để broker EMQX xóa sạch vĩnh viễn
+                try { mqttClient.publish(MQTT_TOPIC_DATA, '', { retain: true, qos: 0 }); } catch (e) {}
             });
 
-            mqttClient.on('message', (topic, message) => {
+            mqttClient.on('message', (topic, message, packet) => {
                 try {
                     const parsed = JSON.parse(message.toString());
                     if (topic === MQTT_TOPIC_DATA) {
-                        const pcLive = checkPcPacketIsLive(parsed);
-                        if (pcLive) {
-                            lastPcMqttLiveMs = Date.now();
-                            processIncomingLiveData(parsed, false);
-                        } else if (!isCloudOrBmsLiveAvailable()) {
-                            processIncomingLiveData(parsed, false); // Không có nguồn nào khác -> vẫn hiển thị số liệu PC
+                        // NẾU LÀ GÓI RETAINED CŨ TỪ BROKER -> BỎ QUA NGAY! KHÔNG VẼ, KHÔNG KHÓA CLOUD!
+                        if (packet && packet.retain) {
+                            return;
                         }
-                        // Ngược lại: PC gửi số liệu đóng băng -> bỏ qua, để Cloud Sosen + 2 BMS vẽ sơ đồ
+                        // Gói tin thực sự truyền qua mạng ngay lúc này (live broadcast từ PC):
+                        lastPcMqttLiveMs = Date.now();
+                        processIncomingLiveData(parsed, false);
                     } else if (topic === MQTT_TOPIC_BMS) {
                         const packs = bmsResolvePacks(parsed);
                         let changed = false;
@@ -4017,9 +4028,27 @@
 
         // ================= KHỞI ĐỘNG HỆ THỐNG =================
         document.addEventListener('DOMContentLoaded', () => {
-            const cachedData = localStorage.getItem("last_sosen_snapshot");
-            if (cachedData) {
-                try { processIncomingLiveData(JSON.parse(cachedData), true); } catch (e) {}
+            const cachedDataStr = localStorage.getItem("last_sosen_snapshot");
+            const cachedTime = Number(localStorage.getItem("last_sosen_snapshot_time") || 0);
+            const isRecentCache = (Date.now() - cachedTime < 180000); // trong vòng 3 phút
+            const curHour = new Date().getHours();
+            const isNight = (curHour >= 18 || curHour < 6);
+
+            if (cachedDataStr) {
+                try {
+                    const parsed = JSON.parse(cachedDataStr);
+                    // Nếu mở vào ban đêm (sau 18h hoặc trước 6h) mà cache lại lưu PV > 0W -> Xóa ngay PV cũ!
+                    if (isNight && parsed) {
+                        parsed.PV_Power = 0;
+                        parsed.PV1_Power = 0;
+                        parsed.PV2_Power = 0;
+                        if (parsed.Batt_Power < 0 && (parsed.Grid_Import_Power || 0) <= 10) {
+                            parsed.Batt_Power = Math.abs(parsed.Batt_Power);
+                            parsed.Batt_Status = 'Đang Xả';
+                        }
+                    }
+                    processIncomingLiveData(parsed, true, isRecentCache && !isNight);
+                } catch (e) {}
             }
 
             const cachedBms = localStorage.getItem("last_sosen_bms_snapshot");
@@ -5282,7 +5311,11 @@
                 'Accept': 'application/json',
                 'Accept-Language': 'en'
             };
-            const opts = { method: method.toUpperCase(), headers };
+            const opts = {
+                method: method.toUpperCase(),
+                headers,
+                signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined
+            };
             if (bodyData !== null && opts.method !== 'GET') {
                 if (isFormData) {
                     opts.body = bodyData;
@@ -5622,7 +5655,9 @@
             if (Date.now() - lastBmsLiveUpdateMs > 25000) return null;
 
             const activePacks = [b1, b2].filter(Boolean);
-            // Trong BMS Mika: Signed_Power > 0 và Current > 0 là Đang Sạc; còn trên Sơ đồ Biến tần: âm (-) là Đang Sạc, dương (+) là Đang Xả
+            // Chuẩn hóa 1:1 đồng nhất toàn hệ thống: Dương (+) là Đang Xả, Âm (-) là Đang Sạc
+            // Sơ đồ Biến tần Sosen: Dương (+) cũng là Đang Xả, Âm (-) cũng là Đang Sạc
+            // Do đó giữ nguyên dấu thật, TUYỆT ĐỐI KHÔNG ĐẢO DẤU (-) để tránh biến Xả thành Sạc!
             const totalBmsSignedW = activePacks.reduce((s, p) => s + toSafeNumber(p.Signed_Power, 0), 0);
             const totalBmsCurrA = activePacks.reduce((s, p) => s + toSafeNumber(p.Current, 0), 0);
             const avgVoltV = activePacks.reduce((s, p) => s + toSafeNumber(p.Total_Voltage, 53.5), 0) / activePacks.length;
@@ -5637,8 +5672,8 @@
             const maxTemp = temps.length > 0 ? Math.max(...temps) : 30.0;
 
             return {
-                invSignedBattW: -Math.round(totalBmsSignedW),
-                invBattCurrA: -Number(totalBmsCurrA.toFixed(1)),
+                invSignedBattW: Math.round(totalBmsSignedW),
+                invBattCurrA: Number(totalBmsCurrA.toFixed(1)),
                 battVoltV: Number(avgVoltV.toFixed(2)),
                 battSoc: Math.round(avgSoc),
                 battTemp: Number(maxTemp.toFixed(1))
@@ -5709,17 +5744,30 @@
 
             // 3. Nếu 2 bình BMS (CALB + GOTION) đang Online (cập nhật 2 giây/lần), hợp nhất tức thì Công suất Pin & Cân bằng Vật lý Bus Biến tần (Tải / Pin / PV / Lưới)
             let pvPowerW = cloudPvW;
+            const nowHour = new Date().getHours();
+            const isSunHours = (nowHour >= 6 && nowHour < 18);
+
+            // Ban đêm (từ 18h tối đến 06h sáng): TUYỆT ĐỐI BẰNG 0W (KHÔNG CÓ ĐIỆN MẶT TRỜI)!
+            if (!isSunHours) {
+                cloudPvW = 0;
+                pvPowerW = 0;
+                pv1P = 0;
+                pv2P = 0;
+            }
+
             if (liveBms) {
                 signedBattW = liveBms.invSignedBattW;
-                const nowHour = new Date().getHours();
-                const isSunHours = (nowHour >= 6 && nowHour < 18);
+
+                // Kiểm tra tính hợp lý vật lý: Nếu không có điện mặt trời (pv <= 10) và không có điện lưới (gridImport <= 10),
+                // thì năng lượng nuôi tải sinh hoạt BẮT BUỘC phải xả từ Pin ra (Pin không thể nào tự sạc từ không khí)!
+                if (pvPowerW <= 10 && gridImportW <= 10 && signedBattW < -30) {
+                    signedBattW = Math.abs(signedBattW);
+                }
 
                 if (signedBattW > 30) {
                     // TRƯỜNG HỢP 1: PIN ĐANG XẢ (signedBattW > 30W)
-                    // Định luật bảo toàn công suất Bus Biến tần:
                     // Nguồn cấp vào Bus = PV + Pin xả + Lưới vào
-                    // Tiêu thụ khỏi Bus = Tải tiêu thụ + Lưới đẩy
-                    // => Tải tiêu thụ thực tế = PV + Pin xả + Lưới vào - Lưới đẩy
+                    // Tải tiêu thụ thực tế = PV + Pin xả + Lưới vào - Lưới đẩy
                     const activePv = (cloudPvW > 30 && isSunHours) ? cloudPvW : 0;
                     pvPowerW = activePv;
                     if (activePv === 0) {
@@ -5727,26 +5775,31 @@
                         pv2P = 0;
                     }
                     const physicalLoadW = Math.max(0, Math.round(activePv + signedBattW + gridImportW - gridExportW));
-                    // Khi pin đang xả: Tải tiêu thụ = Pin xả + PV + Lưới vào - Lưới đẩy (nhảy tức thì mỗi 2s theo BMS, không dùng Math.max để tránh kẹt số)
-                    loadPowerW = physicalLoadW;
+                    loadPowerW = physicalLoadW > 0 ? physicalLoadW : signedBattW;
                 } else if (signedBattW < -30) {
                     // TRƯỜNG HỢP 2: PIN ĐANG SẠC (signedBattW < -30W)
-                    // Định luật bảo toàn Bus Biến tần:
-                    // PV = Tải tiêu thụ + Pin sạc (-signedBattW) - Lưới vào + Lưới đẩy
-                    const physicalPvW = Math.max(0, Math.round(loadPowerW - signedBattW - gridImportW + gridExportW));
-                    pvPowerW = Math.max(cloudPvW, physicalPvW);
-                    const strSum = pv1P + pv2P;
-                    if (strSum > 0) {
-                        const r1 = pv1P / strSum;
-                        pv1P = Math.round(pvPowerW * r1);
-                        pv2P = Math.max(0, pvPowerW - pv1P);
+                    if (isSunHours && cloudPvW > 30) {
+                        // Ban ngày có nắng: PV = Tải tiêu thụ + Pin sạc (-signedBattW) - Lưới vào + Lưới đẩy
+                        const physicalPvW = Math.max(0, Math.round(loadPowerW - signedBattW - gridImportW + gridExportW));
+                        pvPowerW = Math.max(cloudPvW, physicalPvW);
+                        const strSum = pv1P + pv2P;
+                        if (strSum > 0) {
+                            const r1 = pv1P / strSum;
+                            pv1P = Math.round(pvPowerW * r1);
+                            pv2P = Math.max(0, pvPowerW - pv1P);
+                        } else {
+                            pv1P = Math.round(pvPowerW * 0.502);
+                            pv2P = Math.max(0, pvPowerW - pv1P);
+                        }
                     } else {
-                        pv1P = Math.round(pvPowerW * 0.502);
-                        pv2P = Math.max(0, pvPowerW - pv1P);
+                        // Ban đêm hoặc không có nắng: PV TUYỆT ĐỐI BẰNG 0W!
+                        pvPowerW = 0;
+                        pv1P = 0;
+                        pv2P = 0;
                     }
                 } else {
                     // TRƯỜNG HỢP 3: PIN CHỜ (FLOAT / KHÔNG SẠC XẢ)
-                    if (cloudPvW <= 30 && !isSunHours) {
+                    if (!isSunHours || cloudPvW <= 30) {
                         pvPowerW = 0;
                         pv1P = 0;
                         pv2P = 0;
@@ -5884,6 +5937,13 @@
             const sn = sosenCloudAuth.invSn || 'S8303002425022100221';
             const gsn = sosenCloudAuth.gwSn || 'E47F24C03812';
             fastPollTickCount++;
+
+            // Khi PC MQTT đang truyền dữ liệu trực tiếp 3s/lần, giảm tần suất gọi Cloud Sosen xuống 30s/lần
+            // để tránh nghẽn mạng, tiết kiệm pin điện thoại và triệt tiêu hoàn toàn xung đột số liệu
+            if (Date.now() - lastPcMqttLiveMs <= 8000) {
+                if (fastPollTickCount % 10 !== 0) return;
+            }
+
             try {
                 // Mỗi 20 giây gửi kèm lệnh đánh thức realTimeUpdateByInv để ép cục WiFi đọc mới liên tục
                 const nowMs = Date.now();
@@ -6179,6 +6239,10 @@
                     lastCloudDetailCache = JSON.parse(cachedDetail);
                 }
             } catch (e) {}
+            // Cập nhật ngay tức thì (0ms) từ bộ nhớ đệm, không để màn hình đơ lag chờ mạng
+            if (lastCloudDetailCache) {
+                applySosenFastFlowData(lastCloudFlowCache || {});
+            }
             renderModbusTelemetryPanes();
             renderSosenSettingsPortal();
             updateModbusDebugFrame();
