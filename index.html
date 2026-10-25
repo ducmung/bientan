@@ -3349,9 +3349,10 @@
             box.classList.remove('online', 'offline', 'checking');
             box.classList.add(state);
 
-            if (state === 'online') { updateDOMText('device-status-text', 'PC ON'); } 
-            else if (state === 'offline') { updateDOMText('device-status-text', 'PC OFF'); setClockGridStatus(null); } 
-            else { updateDOMText('device-status-text', 'PC ...'); setClockGridStatus(null); }
+            const isPcMqtt = (Date.now() - lastPcMqttLiveMs <= 8000);
+            if (state === 'online') { updateDOMText('device-status-text', isPcMqtt ? 'PC ON' : 'LIVE ON'); } 
+            else if (state === 'offline') { updateDOMText('device-status-text', isPcMqtt ? 'PC OFF' : 'OFFLINE'); setClockGridStatus(null); } 
+            else { updateDOMText('device-status-text', isPcMqtt ? 'PC ...' : 'LIVE ...'); setClockGridStatus(null); }
         }
 
         function renderLastLiveReceivedTime() {
@@ -5566,7 +5567,7 @@
 
             // 2. Đọc công suất Tải (Load), Lưới (Grid) và Pin (Battery) từ customInfoMap & Flow
             let loadPowerW = toSafeNumber(
-                cm.pLoadRActive ?? cm.totalLoadPower ?? cm.upsLoadPacNew ?? mods.load_pac ?? flowObj.loadOrEpsPower ?? flowObj.upsLoadPower ?? ld?.totalPower,
+                cm.totalLoadPower ?? cm.pLoadActive ?? cm.upsLoadPacNew ?? flowObj.loadOrEpsPower ?? flowObj.upsLoadPower ?? ld?.totalPower ?? cm.pLoadRActive ?? mods.load_pac,
                 0
             );
             const vGrid = toSafeNumber(cm.vGridR ?? mods.v_r ?? gr?.vip?.[0]?.volt, 0);
@@ -5604,8 +5605,8 @@
                         pv2P = 0;
                     }
                     const physicalLoadW = Math.max(0, Math.round(activePv + signedBattW + gridImportW - gridExportW));
-                    // Tự động tính công suất tiêu thụ khớp 100% với dòng xả tức thời từ 2 pack BMS JK (2 giây/lần)
-                    loadPowerW = Math.max(loadPowerW, physicalLoadW);
+                    // Khi pin đang xả: Tải tiêu thụ = Pin xả + PV + Lưới vào - Lưới đẩy (nhảy tức thì mỗi 2s theo BMS, không dùng Math.max để tránh kẹt số)
+                    loadPowerW = physicalLoadW;
                 } else if (signedBattW < -30) {
                     // TRƯỜNG HỢP 2: PIN ĐANG SẠC (signedBattW < -30W)
                     // Định luật bảo toàn Bus Biến tần:
@@ -5629,7 +5630,9 @@
                         pv2P = 0;
                     }
                     const physicalLoadW = Math.max(0, Math.round(pvPowerW + signedBattW + gridImportW - gridExportW));
-                    loadPowerW = Math.max(loadPowerW, physicalLoadW);
+                    if (physicalLoadW > 0) {
+                        loadPowerW = physicalLoadW;
+                    }
                 }
             }
 
