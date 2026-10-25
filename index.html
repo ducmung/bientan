@@ -1429,9 +1429,9 @@
 
             <div class="bpf-container"><div class="bpf-text" data-text="八方來財">八方來財</div></div>
 
-            <!-- NÚT KẾT NỐI / ĐĂNG NHẬP CLOUD SOSEN (DƯỚI CHỮ 八方來財) -->
-            <div style="position:absolute;top:96.5%;left:50%;transform:translate(-50%,-50%);z-index:20;white-space:nowrap;">
-                <button type="button" class="portal-btn" id="btn-sosen-cloud-top" style="background:linear-gradient(135deg,#059669,#10b981);border-color:#34d399;color:#fff;" onclick="openSosenCloudModal()">☁️ Cloud Sosen: <span id="sosen-cloud-badge">Đã kết nối</span></button>
+            <!-- NÚT KẾT NỐI / ĐĂNG NHẬP CLOUD SOSEN (NHỎ GỌN DƯỚI CHỮ 八方來財) -->
+            <div style="position:absolute;top:96.2%;left:50%;transform:translate(-50%,-50%);z-index:20;white-space:nowrap;">
+                <button type="button" class="portal-btn" id="btn-sosen-cloud-top" style="background:linear-gradient(135deg,#059669,#10b981);border-color:rgba(52,211,153,0.75);color:#fff;padding:2px 9px;font-size:9.5px;border-radius:999px;gap:3px;line-height:1.25;box-shadow:0 2px 6px rgba(0,0,0,0.22);opacity:0.92;" onclick="openSosenCloudModal()">☁️ Cloud Sosen: <span id="sosen-cloud-badge">Đã kết nối</span></button>
             </div>
         </div>
 
@@ -3375,11 +3375,15 @@
 
             let rawStatus = String(data.Batt_Status || "");
             let statusLower = rawStatus.toLowerCase();
-            let displayStatus = rawStatus;
+            let displayStatus = "Chờ";
             let statusColor = '#888';
-            if (statusLower.includes("sac") || statusLower.includes("charge")) { displayStatus = "Đang Sạc"; statusColor = '#00cc66'; }
-            else if (statusLower.includes("xa") || statusLower.includes("discharge")) { displayStatus = "Đang Xả"; statusColor = '#ff4444'; }
-            else { displayStatus = "Chờ"; statusColor = '#888'; }
+            if (battInW < -1 || battCurrent < -0.2 || statusLower.includes("sac") || statusLower.includes("sạc") || statusLower.includes("charg")) {
+                displayStatus = "Đang Sạc";
+                statusColor = '#00cc66';
+            } else if (battInW > 1 || battCurrent > 0.2 || statusLower.includes("xa") || statusLower.includes("xả") || statusLower.includes("discharg")) {
+                displayStatus = "Đang Xả";
+                statusColor = '#ff4444';
+            }
             
             updateDOMText('lbl-status', displayStatus);
             if (document.getElementById('lbl-status')) document.getElementById('lbl-status').style.color = statusColor;
@@ -5518,7 +5522,7 @@
                     Batt_SOC: liveBms ? liveBms.battSoc : toSafeNumber(cm.soc ?? flowObj.soc ?? mods.soc ?? bt?.soc ?? bt?.bmsSoc, 0),
                     Batt_Temp: liveBms ? liveBms.battTemp : toSafeNumber(cm.bmsTemp ?? mods.t_bat ?? bt?.temp ?? bt?.bmsTemp, 30.0),
                     Inv_Temp: Number.isFinite(lastCloudInvTemp) ? lastCloudInvTemp : undefined,
-                    Batt_Status: signedBattW < -1 ? 'Charging' : (signedBattW > 1 ? 'Discharging' : 'Standby'),
+                    Batt_Status: signedBattW < -1 ? 'Đang Sạc' : (signedBattW > 1 ? 'Đang Xả' : 'Chờ'),
                     PV_Today: pvTodayTrue,
                     PV_Total_Lifetime: pvTotalTrue,
                     Bat_Charge_Today: batChgTodayTrue,
