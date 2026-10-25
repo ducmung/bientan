@@ -1797,7 +1797,7 @@
 
                 <div class="sosen-field-card">
                     <div class="sosen-field-label"><span>Trạng thái Kết nối Cloud Sosen (`https://pv.inteless.com`)</span></div>
-                    <pre id="sc-auth-log" style="background:#0f172a;color:#00ff72;padding:10px;border-radius:8px;font-family:monospace;font-size:11.5px;min-height:64px;white-space:pre-wrap;margin-top:4px;">✅ Đã đăng nhập sẵn tài khoản dr.ducmung@gmail.com (Đã tích xác nhận User Agreement) & đồng bộ 331 thông số cài đặt trực tiếp từ Biến tần S8303002425022100221!</pre>
+                    <pre id="sc-auth-log" style="background:#0f172a;color:#00ff72;padding:10px;border-radius:8px;font-family:monospace;font-size:11.5px;min-height:64px;white-space:pre-wrap;margin-top:4px;">✅ Đã kết nối Cloud Sosen (dr.ducmung@gmail.com) · Chế độ đọc nhanh 3s tinh gọn (1 API duy nhất, đầy đủ 100% dữ liệu vận hành)!</pre>
                 </div>
 
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -6063,17 +6063,15 @@
             if (sosenCloudAuth.access_token) {
                 // Ưu tiên số 1 (0ms): Đọc ngay 1 API nhẹ nhất (/inverter/{sn}) để cập nhật sơ đồ tức thì khi vừa mở điện thoại (< 0.5s)
                 pollSosenFastFlow5s();
-                // Giãn các tác vụ nền nặng (kích hoạt Fast Mode, đọc 12 module, đọc cài đặt) ra sau để không nghẽn băng thông 4G lúc khởi động
+                // Kích hoạt nhẹ chế độ bơm nhanh cho WiFi zin sau 800ms (không tải ngầm 331 cài đặt hay 12 API thừa để trang siêu nhẹ và nhanh)
                 setTimeout(() => triggerSosenFast5sMode(false), 800);
-                setTimeout(() => pollSosenCloudRealtime(false), 2500);
-                setTimeout(() => readAllSettingsFromCloud(), 4500);
             }
             if (!sosenFast5sTimer) {
                 sosenFast5sTimer = setInterval(() => {
                     if (!document.hidden && sosenCloudAuth.access_token) {
                         pollSosenFastFlow5s();
                     }
-                }, 3000); // Đọc nhanh mỗi 3 giây/lần khi đang mở màn hình
+                }, 3000); // Đọc nhanh mỗi 3 giây/lần (Chỉ gọi 1 API duy nhất, đủ 100% thông số trên hình)
             }
             if (!sosenFastKeepAliveTimer) {
                 sosenFastKeepAliveTimer = setInterval(() => {
@@ -6082,13 +6080,9 @@
                     }
                 }, 180000);
             }
-            if (!sosenCloudRealtimeTimer) {
-                sosenCloudRealtimeTimer = setInterval(() => {
-                    if (!document.hidden && sosenCloudAuth.access_token) {
-                        pollSosenCloudRealtime(false);
-                    }
-                }, 40000); // Đọc đầy đủ 12 API mỗi 40 giây (giảm tải server Cloud Sosen)
-            }
+            // Đã tắt bộ hẹn giờ tự động đọc 12 module (pollSosenCloudRealtime 40s) và tự động đọc 331 cài đặt ngầm.
+            // Toàn bộ thông số hiển thị trên giao diện (PV, Lưới, Tải, Pin, Nhiệt độ, Thống kê ngày, Biểu đồ)
+            // đều nằm trọn vẹn trong 1 API duy nhất /api/v1/inverter/{sn} -> web siêu mượt, không tốn mạng và không bị lag!
         }
     </script>
 </body>
