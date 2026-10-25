@@ -110,8 +110,8 @@
         .pos-grid { top: 18%; left: 84%; }
         .pos-batt { top: 82%; left: 16%; }
         .pos-load { top: 82%; left: 84%; }
-        .pos-batt.corner-node { top: 85%; left: 17%; width: 96px; }
-        .pos-load.corner-node { top: 87%; left: 81%; width: 96px; }
+        .pos-batt.corner-node { top: 85.5%; left: 13%; width: 104px; }
+        .pos-load.corner-node { top: 88.5%; left: 87%; width: 96px; }
 
         .image-frame {
             position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15;
@@ -219,8 +219,9 @@
         @keyframes batteryTempDangerBlink { 0%, 45% { opacity: 1; transform: scale(1) translateZ(0); filter: brightness(1.15); } 46%, 100% { opacity: 0.22; transform: scale(1.06) translateZ(0); filter: brightness(1.8); } }
         .battery-temp-label.temp-stale .temp-value { color: #a8b0ba; text-shadow: 0 1px 3px rgba(0,0,0,0.75); animation: none; }
         
-        .pos-load.corner-node .icon { margin: -10px auto 0 auto; transform: translateZ(0); }
-        .pos-load.corner-node .img-icon { width: 78px; height: 78px; margin: -8px auto 0 auto; }
+        .pos-load.corner-node .corner-power { order: 1; transform: translateY(-4px) translateZ(0); }
+        .pos-load.corner-node .icon { order: 2; margin: -2px auto 0 auto; transform: translateZ(0); }
+        .pos-load.corner-node .img-icon { width: 78px; height: 78px; margin: 0 auto; }
         
         .icon { font-size: 46px; line-height: 1; margin-bottom: 8px; display: inline-block; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
         .pos-grid .icon { filter: drop-shadow(0 0 10px rgba(255, 68, 68, 0.4)); }
@@ -235,8 +236,8 @@
         }
         .battery-wrapper:hover { transform: scale(1.06) translateZ(0); filter: drop-shadow(0 0 10px rgba(0, 204, 102, 0.65)); }
         .battery-body {
-            width: 78px; height: 36px; background: linear-gradient(180deg, #2a2a2a 0%, #111 35%, #222 70%, #0a0a0a 100%);
-            border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.4); position: relative; overflow: hidden;
+            width: 90px; height: 40px; background: linear-gradient(180deg, #2a2a2a 0%, #111 35%, #222 70%, #0a0a0a 100%);
+            border-radius: 7px; border: 1.5px solid rgba(255,255,255,0.4); position: relative; overflow: hidden;
             box-shadow: 0 4px 14px rgba(0,0,0,0.55), inset 0 0 10px rgba(0,0,0,0.85); transform: translateZ(0);
         }
         .battery-body::after {
@@ -245,7 +246,7 @@
             pointer-events: none; z-index: 2;
         }
         .battery-cap {
-            width: 6px; height: 16px; background: linear-gradient(to right, #666 0%, #eee 30%, #bbb 70%, #444 100%);
+            width: 7px; height: 18px; background: linear-gradient(to right, #666 0%, #eee 30%, #bbb 70%, #444 100%);
             border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.45); border-left: none;
             box-shadow: inset 1px 0 2px rgba(255,255,255,0.8);
         }
@@ -259,7 +260,7 @@
         .fill-green { background: linear-gradient(to right, #006622 0%, #00bb55 60%, #66ffaa 100%); }
         #lbl-soc {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
-            z-index: 3; font-size: 15px; font-weight: 900; color: #ff2a2a;
+            z-index: 3; font-size: 16px; font-weight: 900; color: #ff2a2a;
             text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6);
             letter-spacing: 0.5px; margin: 0; white-space: nowrap; pointer-events: none;
         }
@@ -529,8 +530,12 @@
             .battery-mini-meter { min-width: 96px; padding: 4px 6px; }
             .battery-mini-row { font-size: 9px; }
             .pv-mini-meter { min-width: 82px; padding: 3px 5px; }
-            .pos-batt.corner-node { left: 17%; }
-            .battery-body { width: 68px; height: 32px; }
+            .pos-batt.corner-node { left: 13%; width: 98px; }
+            .pos-load.corner-node { left: 87%; top: 88.5%; width: 92px; }
+            .pos-load.corner-node .img-icon { width: 72px; height: 72px; }
+            .battery-body { width: 80px; height: 36px; }
+            .battery-cap { width: 6px; height: 16px; }
+            #lbl-soc { font-size: 15px; }
         }
         @media (min-width: 768px) {
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
