@@ -5567,7 +5567,7 @@
             // 2. Đọc công suất Tải (Load), Lưới (Grid) và Pin (Battery) từ customInfoMap & Flow
             let loadPowerW = toSafeNumber(
                 cm.pLoadRActive ?? cm.totalLoadPower ?? cm.upsLoadPacNew ?? mods.load_pac ?? flowObj.loadOrEpsPower ?? flowObj.upsLoadPower ?? ld?.totalPower,
-                1100
+                0
             );
             const vGrid = toSafeNumber(cm.vGridR ?? mods.v_r ?? gr?.vip?.[0]?.volt, 0);
             const fGrid = toSafeNumber(cm.fGrid ?? mods.f_grid ?? gr?.fac, 0);
@@ -5584,16 +5584,34 @@
                 ? rawCloudBattW
                 : (flowObj.toBat ? -Math.abs(rawCloudBattW) : (flowObj.batTo ? Math.abs(rawCloudBattW) : rawCloudBattW));
 
-            // 3. Nếu 2 bình BMS (CALB + GOTION) đang Online (cập nhật 2 giây/lần), hợp nhất tức thì Công suất Pin & Cân bằng Vật lý PV = Sạc Pin + Tải!
+            // 3. Nếu 2 bình BMS (CALB + GOTION) đang Online (cập nhật 2 giây/lần), hợp nhất tức thì Công suất Pin & Cân bằng Vật lý Bus Biến tần (Tải / Pin / PV / Lưới)
             let pvPowerW = cloudPvW;
             if (liveBms) {
                 signedBattW = liveBms.invSignedBattW;
                 const nowHour = new Date().getHours();
-                const isDaytimeOrPvActive = (cloudPvW > 30) || (signedBattW < -30) || (nowHour >= 6 && nowHour < 18);
-                if (isDaytimeOrPvActive) {
-                    // Định luật bảo toàn công suất trên Bus Biến tần Sosen: PV_Power = Load_Power - Signed_Batt_Power - Grid_Import + Grid_Export
+                const isSunHours = (nowHour >= 6 && nowHour < 18);
+
+                if (signedBattW > 30) {
+                    // TRƯỜNG HỢP 1: PIN ĐANG XẢ (signedBattW > 30W)
+                    // Định luật bảo toàn công suất Bus Biến tần:
+                    // Nguồn cấp vào Bus = PV + Pin xả + Lưới vào
+                    // Tiêu thụ khỏi Bus = Tải tiêu thụ + Lưới đẩy
+                    // => Tải tiêu thụ thực tế = PV + Pin xả + Lưới vào - Lưới đẩy
+                    const activePv = (cloudPvW > 30 && isSunHours) ? cloudPvW : 0;
+                    pvPowerW = activePv;
+                    if (activePv === 0) {
+                        pv1P = 0;
+                        pv2P = 0;
+                    }
+                    const physicalLoadW = Math.max(0, Math.round(activePv + signedBattW + gridImportW - gridExportW));
+                    // Tự động tính công suất tiêu thụ khớp 100% với dòng xả tức thời từ 2 pack BMS JK (2 giây/lần)
+                    loadPowerW = Math.max(loadPowerW, physicalLoadW);
+                } else if (signedBattW < -30) {
+                    // TRƯỜNG HỢP 2: PIN ĐANG SẠC (signedBattW < -30W)
+                    // Định luật bảo toàn Bus Biến tần:
+                    // PV = Tải tiêu thụ + Pin sạc (-signedBattW) - Lưới vào + Lưới đẩy
                     const physicalPvW = Math.max(0, Math.round(loadPowerW - signedBattW - gridImportW + gridExportW));
-                    pvPowerW = physicalPvW;
+                    pvPowerW = Math.max(cloudPvW, physicalPvW);
                     const strSum = pv1P + pv2P;
                     if (strSum > 0) {
                         const r1 = pv1P / strSum;
@@ -5604,12 +5622,14 @@
                         pv2P = Math.max(0, pvPowerW - pv1P);
                     }
                 } else {
-                    pvPowerW = 0;
-                    pv1P = 0;
-                    pv2P = 0;
-                    if (signedBattW > 50) {
-                        loadPowerW = Math.max(0, Math.round(signedBattW + gridImportW - gridExportW));
+                    // TRƯỜNG HỢP 3: PIN CHỜ (FLOAT / KHÔNG SẠC XẢ)
+                    if (cloudPvW <= 30 && !isSunHours) {
+                        pvPowerW = 0;
+                        pv1P = 0;
+                        pv2P = 0;
                     }
+                    const physicalLoadW = Math.max(0, Math.round(pvPowerW + signedBattW + gridImportW - gridExportW));
+                    loadPowerW = Math.max(loadPowerW, physicalLoadW);
                 }
             }
 
