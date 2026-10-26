@@ -246,7 +246,7 @@
         #lbl-soc { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a; text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6); letter-spacing: 1px; margin: 0; }
 
         
-        .val { font-size: 16px; font-weight: 900; color: #fff; transition: none; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
+        .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
         .val-pv-style { color: #ffffff !important; text-shadow: 0 1px 0 #b45309, 0 2px 0 #92400e, 0 3px 0 #78350f, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(245, 158, 11, 0.9) !important; font-size: 18px; }
         .val-load-style { color: #ffffff !important; text-shadow: 0 1px 0 #1d4ed8, 0 2px 0 #1e40af, 0 3px 0 #1e3a8a, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(59, 130, 246, 0.9) !important; font-size: 18px; }
         .val-grid-buy-style { color: #ffffff !important; text-shadow: 0 1px 0 #be185d, 0 2px 0 #9d174d, 0 3px 0 #831843, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.9) !important; font-size: 18px; }
@@ -413,19 +413,19 @@
         /* HIỂN THỊ DÒNG CÔNG SUẤT: CHỮ "Công Suất:" ĐỨNG YÊN, CHỈ SỐ ĐỔI MÀU & NHẤP NHÁY CHẬM */
         .bms-power-row { margin-top: 7px; display: flex; align-items: baseline; gap: 4px; white-space: nowrap; overflow: hidden; }
         .bms-power-label { color: #a0aec0; font-size: 9.5px; font-weight: 800; text-transform: none; letter-spacing: 0; }
-        .bms-power-row span.power-val { color: #00ff72; font-size: 12.5px; font-weight: 900; transition: none; }
+        .bms-power-row span.power-val { color: #00ff72; font-size: 12.5px; font-weight: 900; transition: color 0.35s ease, text-shadow 0.35s ease; }
 
         /* Khi Đang Sạc: Chỉ số màu Xanh + Nhấp nháy chậm điềm đạm (2.2s) */
         .bms-power-row.charging span.power-val {
             color: #00ff72 !important;
             text-shadow: 0 0 8px rgba(0, 255, 114, 0.65);
-            animation: none;
+            animation: bmsPowerBlinkSlow 2.2s ease-in-out infinite alternate;
         }
         /* Khi Đang Xả: Chỉ số màu Đỏ + Nhấp nháy chậm điềm đạm (2.2s) */
         .bms-power-row.discharging span.power-val {
             color: #ff334d !important;
             text-shadow: 0 0 8px rgba(255, 51, 77, 0.7);
-            animation: none;
+            animation: bmsPowerBlinkSlow 2.2s ease-in-out infinite alternate;
         }
         @keyframes bmsPowerBlinkSlow {
             0% { opacity: 1; filter: brightness(1.12); }
@@ -1894,26 +1894,44 @@
         }
 
         const numberAnimState = {};
-        function animateValue(id, targetVal, formatFn, duration = 0) {
+        function animateValue(id, targetVal, formatFn, duration = 400) {
             const el = document.getElementById(id);
             if (!el) return;
             targetVal = Number(targetVal) || 0;
-            if (numberAnimState[id] && numberAnimState[id].frameId) {
-                cancelAnimationFrame(numberAnimState[id].frameId);
+            if (!numberAnimState[id]) {
+                numberAnimState[id] = { currentVal: targetVal, frameId: null };
+                el.innerText = formatFn(targetVal);
+                return;
             }
-            numberAnimState[id] = { currentVal: targetVal, frameId: null };
-            el.innerText = formatFn(targetVal);
+            const state = numberAnimState[id];
+            const startVal = state.currentVal;
+            if (Math.abs(startVal - targetVal) < 0.001) { el.innerText = formatFn(targetVal); return; }
+            if (state.frameId) cancelAnimationFrame(state.frameId);
+            const startTime = performance.now();
+            function step(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3);
+                const current = startVal + (targetVal - startVal) * ease;
+                state.currentVal = current;
+                el.innerText = formatFn(current);
+                if (progress < 1) { state.frameId = requestAnimationFrame(step); } 
+                else { state.currentVal = targetVal; el.innerText = formatFn(targetVal); state.frameId = null; }
+            }
+            state.frameId = requestAnimationFrame(step);
         }
 
         function renderVal(id, targetVal, formatFn, isFromCache = false) {
             const el = document.getElementById(id);
             if (!el) return;
             targetVal = Number(targetVal) || 0;
-            if (numberAnimState[id] && numberAnimState[id].frameId) {
-                cancelAnimationFrame(numberAnimState[id].frameId);
+            if (isFromCache) {
+                if (numberAnimState[id] && numberAnimState[id].frameId) cancelAnimationFrame(numberAnimState[id].frameId);
+                numberAnimState[id] = { currentVal: targetVal, frameId: null };
+                el.innerText = formatFn(targetVal);
+            } else {
+                animateValue(id, targetVal, formatFn, 400);
             }
-            numberAnimState[id] = { currentVal: targetVal, frameId: null };
-            el.innerText = formatFn(targetVal);
         }
 
         function toSafeNumber(value, fallback = 0) { const number = Number(value); return Number.isFinite(number) ? number : fallback; }
