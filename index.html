@@ -2806,11 +2806,27 @@
                         let itemData = daysData[`day_${dayStr}`] || {};
 
                         if (isViewingCurrentMonth && d === now.getDate() && latestDailyData) {
+                            const rawDayPv = toSafeNumber(itemData.pv);
+                            const liveDayPv = toSafeNumber(latestDailyData.PV_Today);
+                            const pvToUse = (rawDayPv > 0 && liveDayPv > 0 && rawDayPv - liveDayPv > 10) ? liveDayPv : Math.max(rawDayPv, liveDayPv);
+
+                            const rawDayLoad = toSafeNumber(itemData.load);
+                            const liveDayLoad = toSafeNumber(latestDailyData.Load_Today);
+                            const loadToUse = (rawDayLoad > 0 && liveDayLoad > 0 && rawDayLoad - liveDayLoad > 10) ? liveDayLoad : Math.max(rawDayLoad, liveDayLoad);
+
+                            const rawDayBatt = toSafeNumber(itemData.batt ?? itemData.bat ?? itemData.discharge);
+                            const liveDayBatt = toSafeNumber(latestDailyData.Bat_Discharge_Today);
+                            const battToUse = (rawDayBatt > 0 && liveDayBatt > 0 && rawDayBatt - liveDayBatt > 10) ? liveDayBatt : Math.max(rawDayBatt, liveDayBatt);
+
+                            const rawDayCharge = toSafeNumber(itemData.charge ?? itemData.battCharge ?? itemData.batCharge);
+                            const liveDayCharge = toSafeNumber(latestDailyData.Bat_Charge_Today);
+                            const chargeToUse = (rawDayCharge > 0 && liveDayCharge > 0 && rawDayCharge - liveDayCharge > 10) ? liveDayCharge : Math.max(rawDayCharge, liveDayCharge);
+
                             itemData = {
-                                pv: Math.max(toSafeNumber(itemData.pv), toSafeNumber(latestDailyData.PV_Today)),
-                                batt: Math.max(toSafeNumber(itemData.batt ?? itemData.bat ?? itemData.discharge), toSafeNumber(latestDailyData.Bat_Discharge_Today)),
-                                charge: Math.max(toSafeNumber(itemData.charge ?? itemData.battCharge ?? itemData.batCharge), toSafeNumber(latestDailyData.Bat_Charge_Today)),
-                                load: Math.max(toSafeNumber(itemData.load), toSafeNumber(latestDailyData.Load_Today))
+                                pv: pvToUse,
+                                batt: battToUse,
+                                charge: chargeToUse,
+                                load: loadToUse
                             };
                         }
 
@@ -2857,10 +2873,21 @@
 
                             if (isCurrentYear && m === curMonthNum && latestDailyData) {
                                 const curDayObj = daysData[`day_${String(curDayNum).padStart(2, '0')}`] || {};
-                                mPv += Math.max(toSafeNumber(latestDailyData.PV_Today), toSafeNumber(curDayObj.pv));
-                                mBatt += Math.max(toSafeNumber(latestDailyData.Bat_Discharge_Today), toSafeNumber(curDayObj.batt ?? curDayObj.bat));
-                                mCharge += Math.max(toSafeNumber(latestDailyData.Bat_Charge_Today), toSafeNumber(curDayObj.charge));
-                                mLoad += Math.max(toSafeNumber(latestDailyData.Load_Today), toSafeNumber(curDayObj.load));
+                                const rawPv = toSafeNumber(curDayObj.pv);
+                                const livePv = toSafeNumber(latestDailyData.PV_Today);
+                                mPv += (rawPv > 0 && livePv > 0 && rawPv - livePv > 10) ? livePv : Math.max(livePv, rawPv);
+
+                                const rawBatt = toSafeNumber(curDayObj.batt ?? curDayObj.bat);
+                                const liveBatt = toSafeNumber(latestDailyData.Bat_Discharge_Today);
+                                mBatt += (rawBatt > 0 && liveBatt > 0 && rawBatt - liveBatt > 10) ? liveBatt : Math.max(liveBatt, rawBatt);
+
+                                const rawCharge = toSafeNumber(curDayObj.charge);
+                                const liveCharge = toSafeNumber(latestDailyData.Bat_Charge_Today);
+                                mCharge += (rawCharge > 0 && liveCharge > 0 && rawCharge - liveCharge > 10) ? liveCharge : Math.max(liveCharge, rawCharge);
+
+                                const rawLoad = toSafeNumber(curDayObj.load);
+                                const liveLoad = toSafeNumber(latestDailyData.Load_Today);
+                                mLoad += (rawLoad > 0 && liveLoad > 0 && rawLoad - liveLoad > 10) ? liveLoad : Math.max(liveLoad, rawLoad);
                             }
 
                             rows.push({ label: `T${m}`, detailLabel: `Tháng ${monthStr}/${yyyy}`, pv: mPv, batt: mBatt, charge: mCharge, load: mLoad });
@@ -2895,10 +2922,21 @@
                     if (latestDailyData) {
                         if (!yearMap[curYear]) yearMap[curYear] = { pv: 0, batt: 0, charge: 0, load: 0 };
                         const todayObj = (allDailyData[curMonthKey] && allDailyData[curMonthKey][curDayKey]) || {};
-                        yearMap[curYear].pv += Math.max(toSafeNumber(latestDailyData.PV_Today), toSafeNumber(todayObj.pv));
-                        yearMap[curYear].batt += Math.max(toSafeNumber(latestDailyData.Bat_Discharge_Today), toSafeNumber(todayObj.batt ?? todayObj.bat));
-                        yearMap[curYear].charge += Math.max(toSafeNumber(latestDailyData.Bat_Charge_Today), toSafeNumber(todayObj.charge));
-                        yearMap[curYear].load += Math.max(toSafeNumber(latestDailyData.Load_Today), toSafeNumber(todayObj.load));
+                        const rawPv = toSafeNumber(todayObj.pv);
+                        const livePv = toSafeNumber(latestDailyData.PV_Today);
+                        yearMap[curYear].pv += (rawPv > 0 && livePv > 0 && rawPv - livePv > 10) ? livePv : Math.max(livePv, rawPv);
+
+                        const rawBatt = toSafeNumber(todayObj.batt ?? todayObj.bat);
+                        const liveBatt = toSafeNumber(latestDailyData.Bat_Discharge_Today);
+                        yearMap[curYear].batt += (rawBatt > 0 && liveBatt > 0 && rawBatt - liveBatt > 10) ? liveBatt : Math.max(liveBatt, rawBatt);
+
+                        const rawCharge = toSafeNumber(todayObj.charge);
+                        const liveCharge = toSafeNumber(latestDailyData.Bat_Charge_Today);
+                        yearMap[curYear].charge += (rawCharge > 0 && liveCharge > 0 && rawCharge - liveCharge > 10) ? liveCharge : Math.max(liveCharge, rawCharge);
+
+                        const rawLoad = toSafeNumber(todayObj.load);
+                        const liveLoad = toSafeNumber(latestDailyData.Load_Today);
+                        yearMap[curYear].load += (rawLoad > 0 && liveLoad > 0 && rawLoad - liveLoad > 10) ? liveLoad : Math.max(liveLoad, rawLoad);
                     }
 
                     let rows = Object.keys(yearMap).sort().map(yr => ({ label: yr, detailLabel: `Năm ${yr}`, pv: yearMap[yr].pv, batt: yearMap[yr].batt, charge: yearMap[yr].charge, load: yearMap[yr].load }));
@@ -3000,7 +3038,6 @@
                 database.ref(`/SosenSystem/History/Daily/${currentMonthKey}`).on('value', (snap) => { 
                     currentMonthHistory = snap.val() || {}; 
                     recalculateEnergy();
-                    maybeContinuousSyncToday("Live_Continuous");
                 });
             }
         }
@@ -3048,7 +3085,13 @@
             
             let curDayObj = currentMonthHistory[curDayKey];
             let savedPvToday = (curDayObj && typeof curDayObj === 'object') ? Number(curDayObj.pv || 0) : Number(curDayObj || 0);
-            let activePvForMoney = Math.max(pvToday, savedPvToday);
+            // Phục hồi tính ngày mới: Ưu tiên chỉ số thực tế hôm nay từ Biến tần (pvToday).
+            let activePvForMoney = Number(pvToday || 0);
+            if (activePvForMoney <= 0 && savedPvToday > 0 && savedPvToday < 10) {
+                activePvForMoney = savedPvToday;
+            } else if (activePvForMoney > 0 && savedPvToday > activePvForMoney && (savedPvToday - activePvForMoney < 1.0)) {
+                activePvForMoney = savedPvToday;
+            }
             pvMonthTotal += activePvForMoney;
             
             let monthMoney = calcEVN(pvMonthTotal); 
@@ -3100,11 +3143,34 @@
 
         function extractNormalizedDayRecord(src, existing = null) {
             const base = existing && typeof existing === "object" ? existing : {};
-            const pv = Math.max(toSafeNumber(base.pv), toSafeNumber(src?.pv ?? src?.PV_Today ?? src?.pv_today));
-            const load = Math.max(toSafeNumber(base.load), toSafeNumber(src?.load ?? src?.Load_Today ?? src?.load_today));
-            const batt = Math.max(toSafeNumber(base.batt), toSafeNumber(src?.batt ?? src?.bat ?? src?.Bat_Discharge_Today ?? src?.bat_discharge_today));
-            const charge = Math.max(toSafeNumber(base.charge), toSafeNumber(src?.charge ?? src?.Bat_Charge_Today ?? src?.bat_charge_today));
-            const grid = Math.max(toSafeNumber(base.grid), toSafeNumber(src?.grid ?? src?.Grid_Buy_Today ?? src?.grid_buy_today));
+            const rawPv = src?.pv ?? src?.PV_Today ?? src?.pv_today;
+            const rawLoad = src?.load ?? src?.Load_Today ?? src?.load_today;
+            const rawBatt = src?.batt ?? src?.bat ?? src?.Bat_Discharge_Today ?? src?.bat_discharge_today;
+            const rawCharge = src?.charge ?? src?.Bat_Charge_Today ?? src?.bat_charge_today;
+            const rawGrid = src?.grid ?? src?.Grid_Buy_Today ?? src?.grid_buy_today;
+
+            let pv = toSafeNumber(rawPv, toSafeNumber(base.pv, 0));
+            let load = toSafeNumber(rawLoad, toSafeNumber(base.load, 0));
+            let batt = toSafeNumber(rawBatt, toSafeNumber(base.batt, 0));
+            let charge = toSafeNumber(rawCharge, toSafeNumber(base.charge, 0));
+            let grid = toSafeNumber(rawGrid, toSafeNumber(base.grid, 0));
+
+            // Bảo vệ phục hồi ngày mới: Nếu số cũ (base) lớn hơn số mới từ biến tần trên 10 kWh (dấu hiệu rác hôm qua chưa reset), ưu tiên số mới!
+            if (toSafeNumber(base.pv) > 0 && Number.isFinite(Number(rawPv))) {
+                pv = (Number(base.pv) - Number(rawPv) > 10) ? Number(rawPv) : Math.max(toSafeNumber(base.pv), Number(rawPv));
+            }
+            if (toSafeNumber(base.load) > 0 && Number.isFinite(Number(rawLoad))) {
+                load = (Number(base.load) - Number(rawLoad) > 10) ? Number(rawLoad) : Math.max(toSafeNumber(base.load), Number(rawLoad));
+            }
+            if (toSafeNumber(base.batt) > 0 && Number.isFinite(Number(rawBatt))) {
+                batt = (Number(base.batt) - Number(rawBatt) > 10) ? Number(rawBatt) : Math.max(toSafeNumber(base.batt), Number(rawBatt));
+            }
+            if (toSafeNumber(base.charge) > 0 && Number.isFinite(Number(rawCharge))) {
+                charge = (Number(base.charge) - Number(rawCharge) > 10) ? Number(rawCharge) : Math.max(toSafeNumber(base.charge), Number(rawCharge));
+            }
+            if (toSafeNumber(base.grid) > 0 && Number.isFinite(Number(rawGrid))) {
+                grid = Math.max(toSafeNumber(base.grid), Number(rawGrid));
+            }
 
             const ltPv = Math.max(toSafeNumber(base.lt_pv), toSafeNumber(src?.lt_pv ?? src?.PV_Total_Lifetime ?? src?.PV_Total ?? src?.pv_total));
             const ltLoad = Math.max(toSafeNumber(base.lt_load), toSafeNumber(src?.lt_load ?? src?.Load_Total_Lifetime));
@@ -3130,6 +3196,7 @@
         function updateDayBestCache(dataObj, targetDate = new Date()) {
             if (!dataObj) return null;
             const meta = getDateMeta(targetDate);
+            if (dataObj.Date_Stamp && dataObj.Date_Stamp !== meta.dateStr) return null;
 
             // Phát hiện qua 00:00 đêm (Midnight Rollover): Chốt sổ ngày hôm qua trước khi chuyển sang ngày mới
             if (activeTrackingDateStr && activeTrackingDateStr !== meta.dateStr && activeDayBestRecord) {
@@ -3227,7 +3294,8 @@
                     Load_Today: best.load,
                     Bat_Discharge_Today: best.batt,
                     Bat_Charge_Today: best.charge,
-                    Grid_Buy_Today: best.grid
+                    Grid_Buy_Today: best.grid,
+                    Date_Stamp: meta.dateStr
                 };
                 if (best.lt_pv > 0) dailyEnergyPayload.PV_Total_Lifetime = best.lt_pv;
                 if (best.lt_load > 0) dailyEnergyPayload.Load_Total_Lifetime = best.lt_load;
@@ -3241,11 +3309,13 @@
         function maybeContinuousSyncToday(reason = "Live_Continuous") {
             if (!database || !latestDailyData) return;
             const now = new Date();
+            const meta = getDateMeta(now);
+            // Bảo vệ phục hồi ngày mới: Nếu snapshot đang giữ mang Date_Stamp của ngày cũ thì TUYỆT ĐỐI không chốt vào hôm nay
+            if (latestDailyData.Date_Stamp && latestDailyData.Date_Stamp !== meta.dateStr) return;
             const merged = updateDayBestCache(latestDailyData, now);
             if (!merged) return;
 
             const nowMs = Date.now();
-            const meta = getDateMeta(now);
             const fbExisting = (currentMonthKey === meta.monthKey && currentMonthHistory && currentMonthHistory[meta.dayKey]) ? currentMonthHistory[meta.dayKey] : null;
             const hasNoFirebaseRecordToday = !fbExisting || (toSafeNumber(fbExisting.pv) <= 0 && toSafeNumber(fbExisting.load) <= 0);
             const hasEnergyIncreased = fbExisting && (
@@ -3704,8 +3774,10 @@
             }
 
             if (hasEnergyUpdate) {
+                latestDailyData.Date_Stamp = getDateMeta().dateStr;
                 try {
                     localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
+                    localStorage.setItem("last_sosen_daily_snapshot_date", getDateMeta().dateStr);
                 } catch(e) {}
                 updateDayBestCache(latestDailyData, new Date());
                 recalculateEnergy();
@@ -4069,10 +4141,32 @@
             }
 
             const cachedDaily = localStorage.getItem("last_sosen_daily_snapshot");
+            const cachedDailyDate = localStorage.getItem("last_sosen_daily_snapshot_date");
+            const todayDateStr = getDateMeta().dateStr;
             if (cachedDaily) {
                 try {
-                    latestDailyData = JSON.parse(cachedDaily);
-                    recalculateEnergy();
+                    const parsedDaily = JSON.parse(cachedDaily);
+                    if (parsedDaily) {
+                        if (cachedDailyDate && cachedDailyDate !== todayDateStr) {
+                            // Bước sang ngày mới: Reset các chỉ số trong ngày về 0, giữ nguyên các chỉ số trọn đời (lifetime)
+                            latestDailyData = {
+                                ...parsedDaily,
+                                PV_Today: 0,
+                                Load_Today: 0,
+                                Bat_Discharge_Today: 0,
+                                Bat_Charge_Today: 0,
+                                Grid_Buy_Today: 0,
+                                Date_Stamp: todayDateStr
+                            };
+                            try {
+                                localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
+                                localStorage.setItem("last_sosen_daily_snapshot_date", todayDateStr);
+                            } catch (e) {}
+                        } else {
+                            latestDailyData = parsedDaily;
+                        }
+                        recalculateEnergy();
+                    }
                 } catch (e) {}
             }
 
@@ -4091,30 +4185,50 @@
                 database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
                     const val = snapshot.val();
                     if (val) {
-                        if (latestDailyData && toSafeNumber(latestDailyData.PV_Total_Lifetime) > toSafeNumber(val.PV_Total_Lifetime)) {
-                            // Nếu dữ liệu Cloud Sosen trong bộ nhớ đang mới hơn bản ghi cũ trên Firebase thì giữ giá trị lớn hơn
+                        const curTodayDateStr = getDateMeta().dateStr;
+                        const isValFromToday = (val.Date_Stamp === curTodayDateStr);
+                        const isCloudMode = (Date.now() - lastPcMqttLiveMs > 8000);
+
+                        if (!isValFromToday) {
+                            // Bản ghi Daily_Energy trên Firebase là của ngày cũ (chưa qua đồng bộ ngày mới)
+                            // Giữ lại chỉ số trọn đời (lifetime), KHÔNG dùng các chỉ số ngày cũ đè vào hôm nay!
                             latestDailyData = {
                                 ...val,
-                                PV_Today: Math.max(toSafeNumber(val.PV_Today), toSafeNumber(latestDailyData.PV_Today)),
-                                Load_Today: Math.max(toSafeNumber(val.Load_Today), toSafeNumber(latestDailyData.Load_Today)),
-                                Bat_Discharge_Today: Math.max(toSafeNumber(val.Bat_Discharge_Today), toSafeNumber(latestDailyData.Bat_Discharge_Today)),
-                                Bat_Charge_Today: Math.max(toSafeNumber(val.Bat_Charge_Today), toSafeNumber(latestDailyData.Bat_Charge_Today)),
-                                Grid_Buy_Today: Math.max(toSafeNumber(val.Grid_Buy_Today), toSafeNumber(latestDailyData.Grid_Buy_Today)),
+                                PV_Today: (latestDailyData && latestDailyData.Date_Stamp === curTodayDateStr) ? latestDailyData.PV_Today : 0,
+                                Load_Today: (latestDailyData && latestDailyData.Date_Stamp === curTodayDateStr) ? latestDailyData.Load_Today : 0,
+                                Bat_Discharge_Today: (latestDailyData && latestDailyData.Date_Stamp === curTodayDateStr) ? latestDailyData.Bat_Discharge_Today : 0,
+                                Bat_Charge_Today: (latestDailyData && latestDailyData.Date_Stamp === curTodayDateStr) ? latestDailyData.Bat_Charge_Today : 0,
+                                Grid_Buy_Today: (latestDailyData && latestDailyData.Date_Stamp === curTodayDateStr) ? latestDailyData.Grid_Buy_Today : 0,
+                                Date_Stamp: curTodayDateStr
+                            };
+                        } else if (isCloudMode && latestDailyData && latestDailyData.Date_Stamp === curTodayDateStr && toSafeNumber(latestDailyData.PV_Today) > 0) {
+                            // Đang chạy Cloud Sosen trên điện thoại/web và đã có số liệu thực tế hôm nay: Bảo lưu dữ liệu Cloud, cập nhật Lifetime
+                            latestDailyData = {
+                                ...val,
+                                PV_Today: latestDailyData.PV_Today,
+                                Load_Today: latestDailyData.Load_Today,
+                                Bat_Discharge_Today: latestDailyData.Bat_Discharge_Today,
+                                Bat_Charge_Today: latestDailyData.Bat_Charge_Today,
+                                Grid_Buy_Today: latestDailyData.Grid_Buy_Today,
                                 PV_Total_Lifetime: Math.max(toSafeNumber(val.PV_Total_Lifetime), toSafeNumber(latestDailyData.PV_Total_Lifetime)),
                                 Bat_Discharge_Total_Lifetime: Math.max(toSafeNumber(val.Bat_Discharge_Total_Lifetime), toSafeNumber(latestDailyData.Bat_Discharge_Total_Lifetime)),
-                                Bat_Charge_Total_Lifetime: Math.max(toSafeNumber(val.Bat_Charge_Total_Lifetime), toSafeNumber(latestDailyData.Bat_Charge_Total_Lifetime))
+                                Bat_Charge_Total_Lifetime: Math.max(toSafeNumber(val.Bat_Charge_Total_Lifetime), toSafeNumber(latestDailyData.Bat_Charge_Total_Lifetime)),
+                                Date_Stamp: curTodayDateStr
                             };
                         } else {
-                            latestDailyData = val;
+                            latestDailyData = {
+                                ...val,
+                                Date_Stamp: curTodayDateStr
+                            };
                         }
                         try { localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData)); } catch(e) {}
+                        localStorage.setItem("last_sosen_daily_snapshot_date", curTodayDateStr);
                         updateDayBestCache(latestDailyData, new Date());
                     }
                     checkAndSwitchMonth();
                     recalculateEnergy();
                     if (latestDailyData) {
                         updateChartTodayRealtime(latestDailyData);
-                        maybeContinuousSyncToday("Live_Continuous");
                     }
                     if (energyChart && (currentChartMode === 'month' || currentChartMode === 'year')) {
                         loadChartData();
