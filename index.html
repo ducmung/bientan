@@ -236,34 +236,36 @@
         }
         .battery-wrapper:hover { transform: scale(1.06) translateZ(0); filter: drop-shadow(0 0 10px rgba(0, 204, 102, 0.65)); }
         .battery-body {
-            width: 90px; height: 40px; background: linear-gradient(180deg, #2a2a2a 0%, #111 35%, #222 70%, #0a0a0a 100%);
-            border-radius: 7px; border: 1.5px solid rgba(255,255,255,0.4); position: relative; overflow: hidden;
+            width: 90px; height: 40px; background: linear-gradient(180deg, #222 0%, #111 50%, #0a0a0a 100%);
+            border-radius: 12px; border: 2px solid #111; position: relative; overflow: hidden;
             box-shadow: 0 4px 14px rgba(0,0,0,0.55), inset 0 0 10px rgba(0,0,0,0.85); transform: translateZ(0);
         }
         .battery-body::after {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 40%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.02) 100%);
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 42%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.02) 100%);
             pointer-events: none; z-index: 2;
         }
         .battery-cap {
-            width: 7px; height: 18px; background: linear-gradient(to right, #666 0%, #eee 30%, #bbb 70%, #444 100%);
-            border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.45); border-left: none;
-            box-shadow: inset 1px 0 2px rgba(255,255,255,0.8);
+            width: 7px; height: 18px; background: linear-gradient(180deg, #333 0%, #111 50%, #000 100%);
+            border-radius: 0 4px 4px 0; border: 1px solid #000; border-left: none;
+            box-shadow: none;
         }
         .battery-fill {
             position: absolute; top: 0; left: 0; bottom: 0; width: 0%; height: 100%;
             transition: width 0.5s ease-in-out, background 0.5s; z-index: 1;
-            border-right: 1.5px solid rgba(255,255,255,0.7); transform: translateZ(0);
+            transform: translateZ(0);
         }
-        .fill-red { background: linear-gradient(to right, #990000 0%, #ff2222 60%, #ff8888 100%); }
-        .fill-yellow { background: linear-gradient(to right, #995500 0%, #ff9900 60%, #ffee88 100%); }
-        .fill-green { background: linear-gradient(to right, #006622 0%, #00bb55 60%, #66ffaa 100%); }
+        /* PATCH 2026-10-26: fill doc theo chieu doc + bong sang nhu anh mau (xanh la chu dao khi SOC cao) */
+        .fill-red { background: linear-gradient(180deg, #ff8a8a 0%, #ff2222 45%, #990000 100%); }
+        .fill-yellow { background: linear-gradient(180deg, #ffee88 0%, #ff9900 45%, #995500 100%); }
+        .fill-green { background: linear-gradient(180deg, #b6ff5e 0%, #4dff2e 28%, #00c853 58%, #009624 100%); }
         #lbl-soc {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
-            z-index: 3; font-size: 16px; font-weight: 900; color: #ff2a2a;
+            z-index: 3; font-size: 22px; font-weight: 900; font-style: italic; color: #ff0000;
             text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6);
-            letter-spacing: 0.5px; margin: 0; white-space: nowrap; pointer-events: none;
+            letter-spacing: 0; margin: 0; white-space: nowrap; pointer-events: none;
         }
+
         
         .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
         .val-pv-style { color: #ffffff !important; text-shadow: 0 1px 0 #b45309, 0 2px 0 #92400e, 0 3px 0 #78350f, 0 4px 6px rgba(0,0,0,0.8), 0 0 12px rgba(245, 158, 11, 0.9) !important; font-size: 18px; }
@@ -538,7 +540,7 @@
             .pos-load.corner-node .img-icon { width: 72px; height: 72px; }
             .battery-body { width: 80px; height: 36px; }
             .battery-cap { width: 6px; height: 16px; }
-            #lbl-soc { font-size: 15px; }
+            #lbl-soc { font-size: 22px; }
         }
         @media (min-width: 768px) {
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
