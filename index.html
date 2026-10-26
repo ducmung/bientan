@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sosen Energy Dashboard V3.4 - Full Sync MQTT & Dual JK BMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <!-- THƯ VIỆN MQTT WEBSOCKET TRÌNH DUYỆT -->
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <!-- THƯ VIỆN RSA (JSEncrypt) ĐỂ ĐĂNG NHẬP TRỰC TIẾP CLOUD SOSEN (pv.inteless.com) -->
@@ -110,7 +110,7 @@
         .pos-grid { top: 18%; left: 84%; }
         .pos-batt { top: 82%; left: 16%; }
         .pos-load { top: 82%; left: 84%; }
-        .pos-batt.corner-node { top: 85.5%; left: 13%; width: 104px; }
+        .pos-batt.corner-node { top: 85.5%; left: 13%; width: 118px; /* PATCH 2026-10-26: nới rộng để quả pin lớn hơn vừa khung */ }
         .pos-load.corner-node { top: 88.5%; left: 87%; width: 96px; }
 
         .image-frame {
@@ -236,8 +236,8 @@
         }
         .battery-wrapper:hover { transform: scale(1.06) translateZ(0); filter: drop-shadow(0 0 10px rgba(0, 204, 102, 0.65)); }
         .battery-body {
-            width: 90px; height: 40px; background: linear-gradient(180deg, #2a2a2a 0%, #111 35%, #222 70%, #0a0a0a 100%);
-            border-radius: 7px; border: 1.5px solid rgba(255,255,255,0.4); position: relative; overflow: hidden;
+            width: 108px; height: 48px; background: linear-gradient(180deg, #2a2a2a 0%, #111 35%, #222 70%, #0a0a0a 100%);
+            border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.4); position: relative; overflow: hidden;
             box-shadow: 0 4px 14px rgba(0,0,0,0.55), inset 0 0 10px rgba(0,0,0,0.85); transform: translateZ(0);
         }
         .battery-body::after {
@@ -246,7 +246,7 @@
             pointer-events: none; z-index: 2;
         }
         .battery-cap {
-            width: 7px; height: 18px; background: linear-gradient(to right, #666 0%, #eee 30%, #bbb 70%, #444 100%);
+            width: 8px; height: 22px; background: linear-gradient(to right, #666 0%, #eee 30%, #bbb 70%, #444 100%);
             border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.45); border-left: none;
             box-shadow: inset 1px 0 2px rgba(255,255,255,0.8);
         }
@@ -260,7 +260,7 @@
         .fill-green { background: linear-gradient(to right, #006622 0%, #00bb55 60%, #66ffaa 100%); }
         #lbl-soc {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
-            z-index: 3; font-size: 16px; font-weight: 900; color: #ff2a2a;
+            z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a;
             text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6);
             letter-spacing: 0.5px; margin: 0; white-space: nowrap; pointer-events: none;
         }
@@ -299,7 +299,7 @@
         .dir-right .flow-dash::before { right: 6px; background: linear-gradient(90deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
         .dir-left .flow-dash::before { left: 6px; background: linear-gradient(270deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
         .flow-dash::after { display: none !important; }
-        .flow-spark { display: none !important; }
+        /* PATCH 2026-10-26: bo .flow-spark — luon bi display:none va sparks=0 trong getFlowIntensity */
         .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.5s; } .flow-dash:nth-child(4) { animation-delay: 1.0s; } .flow-dash:nth-child(5) { animation-delay: 1.5s; }
         @keyframes electricWireSlide { to { background-position: 44px 0, 0 0; } }
         @keyframes flowInL { 0% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
@@ -533,12 +533,12 @@
             .battery-mini-meter { min-width: 96px; padding: 4px 6px; }
             .battery-mini-row { font-size: 9px; }
             .pv-mini-meter { min-width: 82px; padding: 3px 5px; }
-            .pos-batt.corner-node { left: 13%; width: 98px; }
+            .pos-batt.corner-node { left: 13%; width: 112px; }
             .pos-load.corner-node { left: 87%; top: 88.5%; width: 92px; }
             .pos-load.corner-node .img-icon { width: 72px; height: 72px; }
-            .battery-body { width: 80px; height: 36px; }
-            .battery-cap { width: 6px; height: 16px; }
-            #lbl-soc { font-size: 15px; }
+            .battery-body { width: 96px; height: 43px; }
+            .battery-cap { width: 7px; height: 19px; }
+            #lbl-soc { font-size: 17px; }
         }
         @media (min-width: 768px) {
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
@@ -1242,7 +1242,18 @@
             .sosen-form-grid {
                 grid-template-columns: 1fr;
             }
-        }    </style>
+        }    
+        /* PATCH 2026-10-26: giam tai animation nang tren mobile / reduced-motion de chay muot hon.
+           Desktop giu nguyen hieu ung; mobile tat rainbow border + sheen + softSpin (von la background-position
+           va mask-composite chay moi frame tren 6 phan tu). */
+        @media (max-width: 620px) {
+            .diagram-panel::after, .stat-card::after, .node-center::after, .image-frame::after, #update-clock::after, #lbl-inv-temp::after { animation: none; }
+            .stat-card::before, .diagram-panel::before, .image-frame { animation: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .diagram-panel::after, .stat-card::after, .node-center::after, .image-frame::after, #update-clock::after, #lbl-inv-temp::after, .stat-card::before, .diagram-panel::before, .image-frame { animation: none !important; }
+        }
+    </style>
 </head>
 <body data-dashboard-version="V3.4 - Full Sync MQTT Live, Cloudflare Dual BMS & Firebase">
     <div class="app-container">
@@ -1257,7 +1268,6 @@
                     <span class="portal-sn-badge" style="background:rgba(0,229,255,0.16);border-color:rgba(0,229,255,0.45);color:#aef4ff;">GW: <span id="po-gw-sn">E47F24C03812</span></span>
                 </div>
                 <div class="portal-action-btns">
-                    <button type="button" class="portal-btn" id="btn-sosen-cloud-top-old" style="display:none;"></button>
                     <button type="button" class="portal-btn primary" onclick="scrollToSection('sosen-settings-panel')">⚙️ Parameters Setting (11 mục)</button>
                     <button type="button" class="portal-btn success" onclick="scrollToSection('sosen-telemetry-panel')">📡 Chỉ Số Modbus 1:1</button>
                     <button type="button" class="portal-btn" onclick="openRemoteDebugModal()">🛠️ Remote Debug (CRC16)</button>
@@ -1447,10 +1457,10 @@
 
             <div id="lbl-inv-temp">🌡️ --°C</div>
 
-            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
-            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
-            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
-            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
+            <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
+            <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
+            <div class="line line-batt"><div class="flow-group" id="flow-batt"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
+            <div class="line line-load"><div class="flow-group" id="flow-load"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span></div></div>
 
             <div class="node pos-pv">
                 <div class="solar-sun-box">
@@ -3283,7 +3293,7 @@
                         } catch (e) {}
                     }
                 }
-                localStorage.setItem("sosen_last_tracking_date", meta.dateStr);
+                try { localStorage.setItem("sosen_last_tracking_date", meta.dateStr); } catch (e) {}
             }
 
             if (!latestDailyData) return;
@@ -3999,8 +4009,8 @@
 
             mqttClient.on('connect', () => {
                 mqttClient.subscribe([MQTT_TOPIC_DATA, MQTT_TOPIC_BMS, MQTT_TOPIC_BMS1, MQTT_TOPIC_BMS2], { qos: 0 });
-                // Xóa gói retained 4220W cũ trên topic sosen/data để broker EMQX xóa sạch vĩnh viễn
-                try { mqttClient.publish(MQTT_TOPIC_DATA, '', { retain: true, qos: 0 }); } catch (e) {}
+                // PATCH 2026-10-26: khong xoa retained tren moi lan connect nua (xem ghi chu ben duoi)
+                /* PATCH 2026-10-26: bo publish retained rong — goi retained da duoc bo qua o handler 'message' (packet.retain) */
             });
 
             mqttClient.on('message', (topic, message, packet) => {
@@ -4153,8 +4163,7 @@
                                 Date_Stamp: curTodayDateStr
                             };
                         }
-                        try { localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData)); } catch(e) {}
-                        localStorage.setItem("last_sosen_daily_snapshot_date", curTodayDateStr);
+                        try { localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData)); localStorage.setItem("last_sosen_daily_snapshot_date", curTodayDateStr); } catch(e) {}
                         updateDayBestCache(latestDailyData, new Date());
                     }
                     checkAndSwitchMonth();
