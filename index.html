@@ -202,12 +202,17 @@
         .corner-power h3 { margin: 0 0 3px 0; }
         .corner-power .val { display: block; font-size: 18px; line-height: 1; }
         .corner-power .unit { display: block; line-height: 1.05; margin-top: 2px; }
+        .corner-node .battery-wrapper, .corner-node .icon { order: 2; position: relative; z-index: 11; }
+        .pos-batt.corner-node .battery-wrapper { margin: -2px auto 0 auto; transform: translate(4px, -2px) translateZ(0); }
+        .pos-batt.corner-node .battery-wrapper:hover { transform: translate(4px, -2px) scale(1.05) translateZ(0); }
+        .pos-batt.corner-node .battery-body { width: 92px; height: 40px; border-radius: 5px; }
+        .pos-batt.corner-node .battery-cap { width: 7px; height: 19px; border-radius: 0 4px 4px 0; }
+        .pos-batt.corner-node #lbl-soc { font-size: 21px; }
         
         .battery-temp-label {
-            position: relative; z-index: 13; display: inline-flex;
-            align-items: center; justify-content: flex-end; gap: 2px;
-            padding: 0; font-size: 9.5px; font-weight: 900; line-height: 1.1;
-            background: transparent; border: none; box-shadow: none; white-space: nowrap; pointer-events: none;
+            order: 3; position: relative; z-index: 13; margin-top: 1px; transform: translate(4px, -1px) translateZ(0); display: inline-flex;
+            align-items: center; justify-content: center; gap: 4px; min-width: auto; padding: 0; border-radius: 0; font-size: 11px;
+            font-weight: 900; line-height: 1.1; background: transparent; border: none; box-shadow: none; white-space: nowrap; pointer-events: none;
         }
         .battery-temp-label .temp-icon { color: rgba(255,255,255,0.82); text-shadow: 0 1px 3px rgba(0,0,0,0.75); }
         .battery-temp-label .temp-value { color: #7dffb2; text-shadow: 0 1px 3px rgba(0,0,0,0.82), 0 0 8px rgba(125,255,178,0.35); transition: color 0.35s ease, text-shadow 0.35s ease; font-variant-numeric: tabular-nums; }
@@ -228,43 +233,16 @@
         .img-icon { width: 85px; height: 85px; object-fit: cover; display: block; margin: -10px auto 5px auto; filter: brightness(1.1) contrast(1.1); -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); mask-image: radial-gradient(circle, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 95%); transform: translateZ(0); }
         .pos-load .icon { filter: drop-shadow(0 0 15px rgba(0, 136, 255, 0.8)); }
 
-        /* QUẢ PIN NẰM NGANG */
-        .battery-wrapper {
-            order: 2; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; position: relative; transition: transform 0.2s ease, filter 0.2s ease;
-            transform: translateZ(0); user-select: none; margin: -6px auto 0 auto;
-        }
-        .battery-wrapper:hover { transform: scale(1.06) translateZ(0); filter: drop-shadow(0 0 10px rgba(0, 204, 102, 0.65)); }
-        .battery-body {
-            width: 90px; height: 40px; background: linear-gradient(180deg, #222 0%, #111 50%, #0a0a0a 100%);
-            border-radius: 12px; border: 2px solid #111; position: relative; overflow: hidden;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.55), inset 0 0 10px rgba(0,0,0,0.85); transform: translateZ(0);
-        }
-        .battery-body::after {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 42%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.02) 100%);
-            pointer-events: none; z-index: 2;
-        }
-        .battery-cap {
-            width: 7px; height: 18px; background: linear-gradient(180deg, #333 0%, #111 50%, #000 100%);
-            border-radius: 0 4px 4px 0; border: 1px solid #000; border-left: none;
-            box-shadow: none;
-        }
-        .battery-fill {
-            position: absolute; top: 0; left: 0; bottom: 0; width: 0%; height: 100%;
-            transition: width 0.5s ease-in-out, background 0.5s; z-index: 1;
-            transform: translateZ(0);
-        }
-        /* PATCH 2026-10-26: fill doc theo chieu doc + bong sang nhu anh mau (xanh la chu dao khi SOC cao) */
-        .fill-red { background: linear-gradient(180deg, #ff8a8a 0%, #ff2222 45%, #990000 100%); }
-        .fill-yellow { background: linear-gradient(180deg, #ffee88 0%, #ff9900 45%, #995500 100%); }
-        .fill-green { background: linear-gradient(180deg, #b6ff5e 0%, #4dff2e 28%, #00c853 58%, #009624 100%); }
-        #lbl-soc {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
-            z-index: 3; font-size: 22px; font-weight: 900; font-style: italic; color: #ff0000;
-            text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6);
-            letter-spacing: 0; margin: 0; white-space: nowrap; pointer-events: none;
-        }
+        .battery-wrapper { display: flex; align-items: center; justify-content: center; margin: 10px auto 5px auto; position: relative; cursor: pointer; transition: transform 0.2s ease, filter 0.2s ease; transform: translateZ(0); }
+        .battery-wrapper:hover { transform: scale(1.05) translateZ(0); filter: drop-shadow(0 0 8px rgba(0, 204, 102, 0.5)); }
+        .battery-body { width: 72px; height: 32px; background: linear-gradient(to bottom, #555 0%, #111 35%, #333 70%, #000 100%); border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); border-right: 1px solid #111; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.8); transform: translateZ(0); }
+        .battery-body::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.05) 100%); pointer-events: none; z-index: 2; }
+        .battery-cap { width: 5px; height: 14px; background: linear-gradient(to bottom, #aaa 0%, #eee 30%, #999 70%, #444 100%); border-radius: 0 3px 3px 0; border: 1px solid rgba(255,255,255,0.3); border-left: none; box-shadow: inset 1px 0 3px rgba(255,255,255,0.6); }
+        .battery-fill { height: 100%; width: 0%; transition: width 0.5s ease-in-out, background 0.5s; position: absolute; top: 0; left: 0; z-index: 1; border-right: 1px solid rgba(0,0,0,0.5); transform: translateZ(0); }
+        .fill-red { background: linear-gradient(to bottom, #ff5555 0%, #ffaaaa 30%, #ff2222 70%, #aa0000 100%); }
+        .fill-yellow { background: linear-gradient(to bottom, #ffbb00 0%, #ffee88 30%, #ff9900 70%, #cc7700 100%); }
+        .fill-green { background: linear-gradient(to bottom, #00ee77 0%, #88ffbb 30%, #00bb55 70%, #007733 100%); }
+        #lbl-soc { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 3; font-size: 18px; font-weight: 900; color: #ff2a2a; text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 6px rgba(0,0,0,0.6); letter-spacing: 1px; margin: 0; }
 
         
         .val { font-size: 16px; font-weight: 900; color: #fff; transition: color 0.3s, text-shadow 0.3s; text-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(255,255,255,0.45); }
@@ -538,9 +516,6 @@
             .pos-batt.corner-node { left: 13%; width: 98px; }
             .pos-load.corner-node { left: 87%; top: 88.5%; width: 92px; }
             .pos-load.corner-node .img-icon { width: 72px; height: 72px; }
-            .battery-body { width: 80px; height: 36px; }
-            .battery-cap { width: 6px; height: 16px; }
-            #lbl-soc { font-size: 22px; }
         }
         @media (min-width: 768px) {
             .app-container { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
@@ -1449,12 +1424,12 @@
             </div>
 
             <div class="image-frame">
-                <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image" onerror="this.style.opacity='0'">
+                <img src="Gemini_Generated_Image_s4zms8s4zms8s4zm.png" alt="Weather Image" onerror="this.style.display='none'">
             </div>
 
             <!-- NODE BIẾN TẦN TRUNG TÂM -->
             <div class="node-center pos-inv">
-                <img src="68.jpg" alt="Inverter" onerror="this.style.opacity='0'">
+                <img src="68.jpg" alt="Inverter" onerror="this.style.display='none'">
             </div>
 
             <div id="lbl-inv-temp">🌡️ --°C</div>
@@ -1482,21 +1457,20 @@
                 <div id="lbl-grid-mode" class="grid-live-mode idle" style="display:none"></div>
             </div>
 
-            <!-- NODE PIN LƯU TRỮ: QUẢ PIN NẰM NGANG -->
             <div class="node pos-batt corner-node">
                 <div class="corner-power"><h3>PIN LƯU TRỮ</h3><div class="val" id="lbl-batt">0</div><div class="unit">W</div></div>
-                <div class="battery-wrapper" onclick="window.open('https://mikasolar.com/14058648', '_blank')" title="Nhấn để xem chi tiết 2 khối Pin">
-                    <div class="battery-body">
-                        <div class="battery-fill" id="batt-fill"></div>
-                        <div id="lbl-soc">0%</div>
-                    </div>
+                <div class="battery-wrapper" onclick="window.open('https://mikasolar.com/14058648', '_blank')" title="Nhấn để xem chi tiết Pin">
+                    <div class="battery-body"><div class="battery-fill" id="batt-fill"></div><div id="lbl-soc">0%</div></div>
                     <div class="battery-cap"></div>
+                </div>
+                <div id="lbl-batt-temp" class="battery-temp-label temp-stale">
+                    <span class="temp-icon">🌡️</span><span id="lbl-batt-temp-value" class="temp-value">--°C</span>
                 </div>
             </div>
 
             <div class="node pos-load corner-node">
                 <div class="corner-power"><h3>TIÊU THỤ</h3><div class="val val-load-style" id="lbl-load">0</div><div class="unit">W</div></div>
-                <div class="icon"><img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon" onerror="this.style.opacity='0'"></div>
+                <div class="icon"><img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon" onerror="this.style.display='none'"></div>
             </div>
 
             <!-- KHUNG TÌNH TRẠNG PIN (SẠC/XẢ, ÁP, DÒNG, NHIỆT ĐỘ) ĐẶT TẠI GIỮA BÊN DƯỚI -->
@@ -1839,7 +1813,7 @@
                         <div class="sosen-field-label"><span>Mật khẩu Sosen (Password)</span><span class="reg-badge">RSA-2048 Encrypted</span></div>
                         <div class="sosen-field-ctrl">
                             <input type="password" id="sc-password" class="sosen-input" value="Mungha123456789" placeholder="Nhập mật khẩu trang sosen.inteless.com..." onkeydown="if(event.key==='Enter')sosenCloudLoginFromModal()">
-                            <button type="button" class="sosen-btn-sm read" title="Hiện/Ẩn mật khẩu" onclick="const p=document.getElementById('sc-password');p.type=p.type==='password'?'text':'password';">👁️</button>
+                            <button type="button" class="sosen-btn-sm read" title="Hiện/Ẩn mật khẩu" onclick="var p=document.getElementById('sc-password');if(p)p.type=p.type==='password'?'text':'password';">👁️</button>
                             <button type="button" class="sosen-btn-sm" id="btn-sc-login" onclick="sosenCloudLoginFromModal()">🔐 Đăng nhập</button>
                         </div>
                     </div>
@@ -2543,6 +2517,10 @@
         function initChart() {
             const chartCanvas = document.getElementById('energyChart');
             if (!chartCanvas || typeof Chart === 'undefined') return;
+            if (energyChart && typeof energyChart.destroy === 'function') {
+                try { energyChart.destroy(); } catch (e) {}
+                energyChart = null;
+            }
             const ctx = chartCanvas.getContext('2d');
             energyChart = new Chart(ctx, {
                 type: 'bar',
@@ -4013,6 +3991,19 @@
                 mqttClient.subscribe([MQTT_TOPIC_DATA, MQTT_TOPIC_BMS, MQTT_TOPIC_BMS1, MQTT_TOPIC_BMS2], { qos: 0 });
                 // PATCH 2026-10-26: khong xoa retained tren moi lan connect nua (xem ghi chu ben duoi)
                 /* PATCH 2026-10-26: bo publish retained rong — goi retained da duoc bo qua o handler 'message' (packet.retain) */
+            });
+
+            mqttClient.on('error', (err) => {
+                // Bat loi de tranh uncaught WebSocket error khi mat mang hoac dong ket noi dot ngot
+                console.warn('MQTT Connection Warning:', err ? (err.message || err) : 'network issue');
+            });
+
+            mqttClient.on('offline', () => {
+                // Broker offline tam thoi
+            });
+
+            mqttClient.on('close', () => {
+                // Connection closed
             });
 
             mqttClient.on('message', (topic, message, packet) => {
@@ -5962,17 +5953,23 @@
                 sosenCloudRequest('GET', `/api/v1/inverter/172774/realTimeUpdateByStation?plantId=172774&userId=${userId}`).catch(() => {});
 
                 // 2. Ép lệnh getFlowsFast ở mức 3 giây (dataFreq: 3) và dự phòng 5 giây (dataFreq: 5)
-                let fastRes = await sosenCloudRequest('POST', `/api/v1/fast/data/freq`, {
-                    sn: sn,
-                    dataFreq: 3,
-                    identifyType: 0
-                });
-                if (!fastRes || fastRes.code !== 0) {
+                // PATCH 2026-10-26: Chi goi neu co access_token hop le va bo qua loi 500 tu Cloud Server
+                let fastRes = null;
+                try {
                     fastRes = await sosenCloudRequest('POST', `/api/v1/fast/data/freq`, {
                         sn: sn,
-                        dataFreq: 5,
+                        dataFreq: 3,
                         identifyType: 0
                     });
+                    if (!fastRes || fastRes.code !== 0) {
+                        fastRes = await sosenCloudRequest('POST', `/api/v1/fast/data/freq`, {
+                            sn: sn,
+                            dataFreq: 5,
+                            identifyType: 0
+                        });
+                    }
+                } catch (freqErr) {
+                    // Bo qua loi 500/401 tu Cloud khi chua dang nhap
                 }
 
                 if (fastRes && fastRes.code === 0) {
