@@ -289,18 +289,18 @@
         .flow-track::after { content: ''; position: absolute; left: 2%; right: 2%; top: 50%; height: 2px; transform: translateY(-50%) translateZ(0); border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,0.15), #ffffff 48%, rgba(255,255,255,0.15)); box-shadow: 0 0 7px #fff; }
         .flow-dash {
             position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; opacity: 0; z-index: 3;
-            background: radial-gradient(circle at 35% 35%, #ffffff 0 25%, var(--c) 70%, rgba(255,255,255,0) 100%);
-            box-shadow: 0 0 10px #ffffff, 0 0 16px var(--c); transform: translate(-50%, -50%) translateZ(0);
+            background: radial-gradient(circle at 35% 35%, #ffffff 0 20%, rgba(255,255,255,0.95) 21% 32%, var(--c) 48%, rgba(255,255,255,0) 74%);
+            box-shadow: 0 0 8px #fff, 0 0 14px var(--c); transform: translate(-50%, -50%) translateZ(0);
         }
         .flow-dash::before {
-            content: ''; position: absolute; top: 50%; width: 20px; height: 3.5px; border-radius: 999px; transform: translateY(-50%) translateZ(0); opacity: 0.85;
+            content: ''; position: absolute; top: 50%; width: 22px; height: 3px; border-radius: 999px;
+            transform: translateY(-50%) translateZ(0); opacity: 0.85;
         }
-        .dir-right .flow-dash::before { right: 5px; background: linear-gradient(90deg, rgba(255,255,255,0), var(--c) 65%, #ffffff); }
-        .dir-left .flow-dash::before { left: 5px; background: linear-gradient(270deg, rgba(255,255,255,0), var(--c) 65%, #ffffff); }
+        .dir-right .flow-dash::before { right: 6px; background: linear-gradient(90deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
+        .dir-left .flow-dash::before { left: 6px; background: linear-gradient(270deg, rgba(255,255,255,0), var(--c) 54%, #ffffff); }
         .flow-dash::after { display: none !important; }
         .flow-spark { display: none !important; }
-        .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.28s; } .flow-dash:nth-child(4) { animation-delay: 0.56s; } .flow-dash:nth-child(5) { animation-delay: 0.84s; } .flow-dash:nth-child(6) { animation-delay: 1.12s; } .flow-dash:nth-child(7) { animation-delay: 1.40s; } .flow-dash:nth-child(8) { animation-delay: 1.68s; }
-        .flow-spark:nth-child(9) { animation-delay: 0.12s; } .flow-spark:nth-child(10) { animation-delay: 0.38s; } .flow-spark:nth-child(11) { animation-delay: 0.72s; } .flow-spark:nth-child(12) { animation-delay: 1.02s; } .flow-spark:nth-child(13) { animation-delay: 1.34s; } .flow-spark:nth-child(14) { animation-delay: 1.66s; }
+        .flow-dash:nth-child(2) { animation-delay: 0s; } .flow-dash:nth-child(3) { animation-delay: 0.5s; } .flow-dash:nth-child(4) { animation-delay: 1.0s; } .flow-dash:nth-child(5) { animation-delay: 1.5s; }
         @keyframes electricWireSlide { to { background-position: 44px 0, 0 0; } }
         @keyframes flowInL { 0% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
         @keyframes flowOutL { 0% { left: 108%; opacity: 0; transform: translate(-50%, -50%) scale(0.45) translateZ(0); } 8%, 86% { opacity: 1; } 46% { transform: translate(-50%, -50%) scale(1.06) translateZ(0); } 100% { left: -8%; opacity: 0; transform: translate(-50%, -50%) scale(0.55) translateZ(0); } }
@@ -1925,11 +1925,6 @@
             if (state.frameId) cancelAnimationFrame(state.frameId);
             const startTime = performance.now();
             function step(now) {
-                if (!el.isConnected) {
-                    if (state.frameId) cancelAnimationFrame(state.frameId);
-                    delete numberAnimState[id];
-                    return;
-                }
                 const elapsed = now - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 const ease = 1 - Math.pow(1 - progress, 3);
@@ -2197,22 +2192,14 @@
         function bmsRead(data, keys, fallback = null) {
             if (!data || typeof data !== 'object') return fallback;
             for (const key of keys) {
-                if (data[key] !== undefined && data[key] !== null && data[key] !== '') {
+                if (Object.prototype.hasOwnProperty.call(data, key) && data[key] !== undefined && data[key] !== null && data[key] !== '') {
                     return data[key];
                 }
             }
-            if (!data._lowerMap) {
-                const map = {};
-                for (const k of Object.keys(data)) {
-                    if (k !== '_lowerMap') map[k.toLowerCase()] = data[k];
-                }
-                Object.defineProperty(data, '_lowerMap', { value: map, enumerable: false, writable: true });
-            }
-            for (const key of keys) {
-                const lk = String(key).toLowerCase();
-                const v = data._lowerMap[lk];
-                if (v !== undefined && v !== null && v !== '') {
-                    return v;
+            const lowerKeys = keys.map(key => String(key).toLowerCase());
+            for (const actualKey of Object.keys(data)) {
+                if (lowerKeys.includes(String(actualKey).toLowerCase()) && data[actualKey] !== undefined && data[actualKey] !== null && data[actualKey] !== '') {
+                    return data[actualKey];
                 }
             }
             return fallback;
@@ -2273,13 +2260,20 @@
         }
 
         function bmsCellStats(data) {
-            // ĐÃ BỎ HOÀN TOÀN DUYỆT TỪNG CELL 1..32: Đọc trực tiếp cell cao nhất & thấp nhất từ BMS trong 0ms
-            const directHigh = bmsNumber(data, ['Max_Cell_Voltage', 'Cell_Max_Voltage', 'Cell_High', 'MaxCellVoltage', 'Cell_High_V'], NaN);
-            const directLow = bmsNumber(data, ['Min_Cell_Voltage', 'Cell_Min_Voltage', 'Cell_Low', 'MinCellVoltage', 'Cell_Low_V'], NaN);
-            return {
-                high: Number.isFinite(directHigh) ? directHigh : NaN,
-                low: Number.isFinite(directLow) ? directLow : NaN
-            };
+            // Đọc trực tiếp cell cao/thấp nhất từ thanh ghi BMS / MQTT (0ms, không duyệt lặp 32 cell)
+            const directHigh = bmsNumber(data, ['Max_Cell_Voltage', 'Cell_Max_Voltage', 'Cell_High', 'MaxCellVoltage'], NaN);
+            const directLow = bmsNumber(data, ['Min_Cell_Voltage', 'Cell_Min_Voltage', 'Cell_Low', 'MinCellVoltage'], NaN);
+            if (Number.isFinite(directHigh) && Number.isFinite(directLow)) {
+                return { high: directHigh, low: directLow };
+            }
+            const arrayData = bmsRead(data, ['Cell_Voltages', 'CellVoltages', 'Cells', 'Cell_Array'], null);
+            if (Array.isArray(arrayData) && arrayData.length > 0) {
+                const voltages = arrayData.map(Number).filter(n => Number.isFinite(n) && n > 0);
+                if (voltages.length > 0) {
+                    return { high: Math.max(...voltages), low: Math.min(...voltages) };
+                }
+            }
+            return { high: Number.isFinite(directHigh) ? directHigh : NaN, low: Number.isFinite(directLow) ? directLow : NaN };
         }
 
         function bmsLooksLikePack(data) {
@@ -3321,15 +3315,14 @@
         }
 
         function getFlowIntensity(powerW) {
-            // Chuỗi năng lượng mượt mà, cố định 4 hạt ngọc cách đều nhau 25%, KHÔNG BAO GIỜ bị dồn hạt / loạn hạt
-            if (powerW === undefined || powerW === null) { return { particles: 4, dashDuration: 3.2, wireSpeed: 1.6 }; }
+            // Chuẩn hóa cố định 4 hạt ngọc cách đều nhau 25% chu kỳ dây, không gây loạn hạt
+            if (powerW === undefined || powerW === null) { return { particles: 4, sparks: 0, dashDuration: 3.0, sparkDuration: 0, wireSpeed: 1.5 }; }
             const watts = Math.abs(toSafeNumber(powerW));
-            if (watts < 1) return { particles: 0, dashDuration: 8.0, wireSpeed: 5.0 };
-            if (watts <= 800)  return { particles: 4, dashDuration: 5.6, wireSpeed: 3.2 };
-            if (watts <= 2000) return { particles: 4, dashDuration: 4.2, wireSpeed: 2.4 };
-            if (watts <= 4000) return { particles: 4, dashDuration: 3.2, wireSpeed: 1.8 };
-            if (watts <= 6000) return { particles: 4, dashDuration: 2.5, wireSpeed: 1.4 };
-            return { particles: 4, dashDuration: 2.0, wireSpeed: 1.0 };
+            if (watts < 1) return { particles: 0, sparks: 0, dashDuration: 6.0, sparkDuration: 0, wireSpeed: 4.0 };
+            if (watts <= 1000) return { particles: 4, sparks: 0, dashDuration: 5.2, sparkDuration: 0, wireSpeed: 3.2 };
+            if (watts <= 3000) return { particles: 4, sparks: 0, dashDuration: 3.6, sparkDuration: 0, wireSpeed: 2.2 };
+            if (watts <= 6000) return { particles: 4, sparks: 0, dashDuration: 2.4, sparkDuration: 0, wireSpeed: 1.4 };
+            return { particles: 4, sparks: 0, dashDuration: 1.8, sparkDuration: 0, wireSpeed: 1.0 };
         }
 
         function setFlow(groupId, isActive, animName, color, powerW) {
@@ -3343,8 +3336,8 @@
                 group.style.display = 'block';
                 group.style.setProperty('--c', color || '#00e5ff');
                 group.style.setProperty('--wire-speed', intensity.wireSpeed + 's');
-                const movesRight = (animName === 'flowInL' || animName === 'flowOutR');
-                const dirChanged = (currentAnim !== animName);
+                const movesRight = animName === 'flowInL' || animName === 'flowOutR';
+                const dirChanged = currentAnim !== animName;
 
                 if (!currentActive || dirChanged) {
                     group.setAttribute('data-anim', animName);
@@ -3359,27 +3352,59 @@
                         if (index >= intensity.particles) { d.style.display = 'none'; return; }
                         d.style.display = 'block';
                         d.style.animationName = animName;
-                        // Phân bố đều chính xác từng hạt (mỗi hạt cách nhau đúng 25% chu kỳ)
-                        d.style.animationDelay = '-' + ((index * intensity.dashDuration) / intensity.particles).toFixed(3) + 's';
+                        d.style.animationDelay = '-' + ((index * intensity.dashDuration) / intensity.particles).toFixed(2) + 's';
                         d.style.animationDuration = intensity.dashDuration + 's'; 
                         d.style.animationIterationCount = 'infinite'; 
                         d.style.animationTimingFunction = 'linear'; 
                     });
+
+                    const sparks = group.querySelectorAll('.flow-spark');
+                    sparks.forEach((s, index) => {
+                        if (index >= intensity.sparks) { s.style.display = 'none'; return; }
+                        s.style.display = 'block';
+                        s.style.animationName = movesRight ? 'sparkRight' : 'sparkLeft';
+                        s.style.animationDelay = '-' + ((index * intensity.sparkDuration) / Math.max(intensity.sparks, 1)).toFixed(2) + 's';
+                        s.style.animationDuration = intensity.sparkDuration + 's'; 
+                        s.style.animationIterationCount = 'infinite'; 
+                        s.style.animationTimingFunction = 'linear';
+                    });
                 } else {
-                    // Cùng hướng: duy trì các hạt mượt mà, chỉ cập nhật thời gian trôi nếu thay đổi đáng kể
-                    const lastDur = parseFloat(group.getAttribute('data-dash-duration') || '0');
-                    if (Math.abs(lastDur - intensity.dashDuration) >= 0.4) {
-                        group.setAttribute('data-dash-duration', String(intensity.dashDuration));
-                        const dashes = group.querySelectorAll('.flow-dash');
-                        dashes.forEach((d, index) => {
-                            if (index >= intensity.particles) {
-                                d.style.display = 'none';
-                            } else {
+                    // Cùng hướng: điều chỉnh hạt và tốc độ mượt mà, KHÔNG làm reset animation gây chớp tắt
+                    const dashes = group.querySelectorAll('.flow-dash');
+                    dashes.forEach((d, index) => {
+                        if (index >= intensity.particles) {
+                            d.style.display = 'none';
+                        } else {
+                            if (d.style.display === 'none') {
                                 d.style.display = 'block';
+                                d.style.animationName = animName;
+                                d.style.animationDelay = '-' + ((index * intensity.dashDuration) / intensity.particles).toFixed(2) + 's';
+                                d.style.animationDuration = intensity.dashDuration + 's';
+                                d.style.animationIterationCount = 'infinite';
+                                d.style.animationTimingFunction = 'linear';
+                            } else {
                                 d.style.animationDuration = intensity.dashDuration + 's';
                             }
-                        });
-                    }
+                        }
+                    });
+
+                    const sparks = group.querySelectorAll('.flow-spark');
+                    sparks.forEach((s, index) => {
+                        if (index >= intensity.sparks) {
+                            s.style.display = 'none';
+                        } else {
+                            if (s.style.display === 'none') {
+                                s.style.display = 'block';
+                                s.style.animationName = movesRight ? 'sparkRight' : 'sparkLeft';
+                                s.style.animationDelay = '-' + ((index * intensity.sparkDuration) / Math.max(intensity.sparks, 1)).toFixed(2) + 's';
+                                s.style.animationDuration = intensity.sparkDuration + 's';
+                                s.style.animationIterationCount = 'infinite';
+                                s.style.animationTimingFunction = 'linear';
+                            } else {
+                                s.style.animationDuration = intensity.sparkDuration + 's';
+                            }
+                        }
+                    });
                 }
             } else { 
                 if (currentActive) {
@@ -3792,11 +3817,6 @@
                                 } else {
                                     val = (buf[pos + 1] << 24) | (buf[pos] << 16) | (buf[pos + 3] << 8) | buf[pos + 2];
                                 }
-                                if (type === "uint32") {
-                                    val = val >>> 0;
-                                } else {
-                                    val = val | 0;
-                                }
                             }
 
                             if (val !== undefined) {
@@ -3815,23 +3835,32 @@
         }
 
         function convertMikaToDashboardFormat(d, devInfo) {
-            // ĐÃ BỎ HOÀN TOÀN DUYỆT TỪNG CELL 1..24: Tính nhanh trực tiếp từ tổng áp và độ lệch cell trong 0ms
+            // Không duyệt vòng lặp 24 cell: Đọc trực tiếp thanh ghi hoặc tính chuẩn xác từ tổng áp và độ lệch cell
             const totalV  = Number(d.tbatv || 0) / 1000;
-            const diffV   = Number(d.cellvdiff || 0) / 1000;
-            const avgCell = totalV > 20 ? (totalV / 16) : 3.39;
-            const maxCell = Number(d.cellhigh || d.maxcell || 0) > 1000 ? Number(d.cellhigh || d.maxcell) / 1000 : Number((avgCell + diffV / 2).toFixed(3));
-            const minCell = Number(d.celllow || d.mincell || 0) > 1000 ? Number(d.celllow || d.mincell) / 1000 : Number((avgCell - diffV / 2).toFixed(3));
-            const validCells = Number(d.cellcount || 16);
+            const cellDiffV = Number(d.cellvdiff || 0) / 1000;
+            let maxCell = Number(d.cellhigh || d.maxcellv || 0) / 1000;
+            let minCell = Number(d.celllow || d.mincellv || 0) / 1000;
+
+            if ((maxCell <= 1.0 || minCell <= 1.0) && totalV > 20) {
+                const avgV = totalV / 16;
+                const halfDiff = (cellDiffV > 0 && cellDiffV < 1.0) ? (cellDiffV / 2) : 0.003;
+                maxCell = Number((avgV + halfDiff).toFixed(3));
+                minCell = Number((avgV - halfDiff).toFixed(3));
+            }
+
             // Trong thanh ghi gốc Mika JK BMS: dòng xả mang dấu âm, dòng sạc mang dấu dương.
             // Để đồng bộ 100% với MQTT PC nhúng và Sơ đồ Biến tần Sosen:
             // Đổi dấu để chuẩn hóa: Dương (+) là Đang Xả, Âm (-) là Đang Sạc
-            const rawCurrA = Number(d.tbatc || 0) / 1000;
+            let rawCurrA = Number(d.tbatc || 0) / 1000;
+            // Chốt chặn bảo vệ chống lỗi tràn số nguyên 32-bit (chống tràn 4.294.967 A)
+            if (rawCurrA > 2000000) rawCurrA -= 4294967.296;
+            if (rawCurrA < -2000000) rawCurrA += 4294967.296;
             const currA   = -rawCurrA;
-            const powerW  = Math.abs((Number(d.tbatv || 0) * Number(d.tbatc || 0)) / 1000000);
-            const soh     = clampNumber(Number(d.sochealth || 100), 1, 100);
+            const powerW  = Math.abs(totalV * currA);
+            const soh     = Number(d.sochealth || 100);
             const fullCap = Number(d.socfcc || 0) / 1000;
             let remCap    = Number(d.socrc || 0) / 1000;
-            if (fullCap > 0 && remCap > fullCap) remCap = fullCap;
+            if (soh > 0 && soh < 100) remCap = (remCap * 100) / soh;
 
             const rtSec = Number(d.runtime || 0);
             const days  = Math.floor(rtSec / 86400);
@@ -3857,9 +3886,9 @@
                 Remain_Battery: Number(d.soc || 0),
                 Total_Voltage: Number(totalV.toFixed(2)),
                 Current: Number(currA.toFixed(2)),
-                Max_Cell_Voltage: minCell !== Infinity ? Number(maxCell.toFixed(3)) : 0,
-                Min_Cell_Voltage: minCell !== Infinity ? Number(minCell.toFixed(3)) : 0,
-                Cell_Voltage_Diff: Number(((d.cellvdiff || 0) / 1000).toFixed(3)),
+                Max_Cell_Voltage: minCell > 0 ? Number(maxCell.toFixed(3)) : 0,
+                Min_Cell_Voltage: minCell > 0 ? Number(minCell.toFixed(3)) : 0,
+                Cell_Voltage_Diff: Number(cellDiffV.toFixed(3)),
                 Balance_Current: Number(((d.blanc || 0) / 1000).toFixed(3)),
                 Batt_Capacity: Number(fullCap.toFixed(1)),
                 Remain_Capacity: Number(remCap.toFixed(1)),
@@ -3873,7 +3902,7 @@
                 Signed_Power: Number((totalV * currA).toFixed(1)),
                 Max_Charge_Curr: Number(d.maxchargecur || 120),
                 Max_Discharge_Curr: Number(d.maxdischargecur || 120),
-                Cell_Count: validCells || 16
+                Cell_Count: 16
             };
         }
 
@@ -3932,13 +3961,9 @@
         let mqttClient = null;
         let lastFirebaseHeartbeatVal = null;
 
-        let lastWakeupCallMs = 0;
         function ensureConnectionsAwake() {
             if (document.hidden) return;
-            const now = Date.now();
-            if (now - lastWakeupCallMs < 3000) return;
-            lastWakeupCallMs = now;
-            wakeupGraceUntilMs = now + 12000;
+            wakeupGraceUntilMs = Date.now() + 12000;
             if (mqttClient && !mqttClient.connected) {
                 try { mqttClient.reconnect(); } catch (e) {}
             }
@@ -3953,13 +3978,7 @@
         }
 
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                if (database && typeof firebase !== 'undefined' && firebase.database) {
-                    try { firebase.database().goOffline(); } catch (e) {}
-                }
-            } else {
-                ensureConnectionsAwake();
-            }
+            if (!document.hidden) ensureConnectionsAwake();
         });
         window.addEventListener('online', ensureConnectionsAwake);
         window.addEventListener('pageshow', ensureConnectionsAwake);
@@ -4180,11 +4199,10 @@
                     if (hb !== undefined && hb !== null) lastFirebaseHeartbeatVal = hb;
                 });
 
+                setInterval(() => { checkAndSwitchMonth(); }, 60000);
+                setInterval(() => { checkAutoSnapshotSchedule(); }, 20000);
+                setTimeout(() => { checkAutoSnapshotSchedule(); }, 3500);
             }
-
-            setInterval(() => { checkAndSwitchMonth(); }, 60000);
-            setInterval(() => { checkAutoSnapshotSchedule(); }, 20000);
-            setTimeout(() => { checkAutoSnapshotSchedule(); }, 3500);
 
             // Khởi tạo giao diện Chỉ số Modbus 1:1 & 11 Mục Cài đặt Setting.html 1:1
             initSosen1to1Portal();
@@ -5741,27 +5759,24 @@
                                 toSafeNumber(cm.pLoadRActive ?? flowObj.loadOrEpsPower, 0) > 0 ||
                                 toSafeNumber(cm.batPacNew ?? flowObj.battPower, 0) !== 0;
 
-            // 1. Đọc công suất PV thời gian thực: Cập nhật ngay khi PV giảm (TRIỆT TIÊU Math.max găm đỉnh cũ)
+            // 1. Đọc công suất PV từ customInfoMap (chuẩn 1:1 thanh ghi biến tần) + mảng pv[] của flow
+            const pvSumFromStrings = Array.isArray(flowObj.pv)
+                ? flowObj.pv.reduce((acc, item) => acc + toSafeNumber(item?.power, 0), 0)
+                : 0;
+            let pv1P = toSafeNumber(cm.ppv1 ?? mods.ppv1 ?? flowObj.pv?.[0]?.power, 0);
+            let pv2P = toSafeNumber(cm.ppv2 ?? mods.ppv2 ?? flowObj.pv?.[1]?.power, 0);
+            // Lấy công suất PV tức thời từ thanh ghi cm.ppv (không dùng Math.max găm đỉnh cũ)
             let cloudPvW = 0;
-            let pv1P = 0;
-            let pv2P = 0;
-
-            if (cm.ppv !== undefined && cm.ppv !== null && Number(cm.ppv) >= 0) {
+            if (cm.ppv !== undefined && cm.ppv !== null) {
                 cloudPvW = toSafeNumber(cm.ppv, 0);
-                pv1P = toSafeNumber(cm.ppv1, Math.round(cloudPvW * 0.502));
-                pv2P = Math.max(0, cloudPvW - pv1P);
-            } else if (cm.ppv1 !== undefined || cm.ppv2 !== undefined) {
-                pv1P = toSafeNumber(cm.ppv1, 0);
-                pv2P = toSafeNumber(cm.ppv2, 0);
+            } else if (pv1P > 0 || pv2P > 0) {
                 cloudPvW = pv1P + pv2P;
-            } else if (flowObj.pvPower !== undefined && flowObj.pvPower !== null && Number(flowObj.pvPower) >= 0) {
+            } else if (pvSumFromStrings > 0) {
+                cloudPvW = pvSumFromStrings;
+            } else if (flowObj.pvPower !== undefined && flowObj.pvPower !== null) {
                 cloudPvW = toSafeNumber(flowObj.pvPower, 0);
-                pv1P = toSafeNumber(flowObj.pv?.[0]?.power, Math.round(cloudPvW * 0.502));
-                pv2P = Math.max(0, cloudPvW - pv1P);
-            } else if (d?.pac !== undefined) {
+            } else if (d?.pac !== undefined && d?.pac !== null) {
                 cloudPvW = toSafeNumber(d.pac, 0);
-                pv1P = Math.round(cloudPvW * 0.502);
-                pv2P = Math.max(0, cloudPvW - pv1P);
             }
 
             // 2. Đọc công suất Tải (Load), Lưới (Grid) và Pin (Battery) từ customInfoMap & Flow
@@ -5820,21 +5835,17 @@
                     loadPowerW = physicalLoadW > 0 ? physicalLoadW : signedBattW;
                 } else if (signedBattW < -30) {
                     // TRƯỜNG HỢP 2: PIN ĐANG SẠC (signedBattW < -30W)
-                    if (isSunHours) {
-                        const batChgW = Math.abs(signedBattW);
-                        // Định luật bảo toàn công suất: PV = Tải tiêu thụ + Pin sạc - Lưới vào + Lưới đẩy
-                        const physicalPvW = Math.max(0, Math.round(loadPowerW + batChgW - gridImportW + gridExportW));
-                        
-                        // Khi không có điện lưới (Grid OFF hoặc bám tải 0W): PV phát sinh BẮT BUỘC bằng đúng Tải + Pin sạc
-                        // Không dùng Math.max(cloudPvW, physicalPvW) để tránh việc PV bị kẹt ở mức cao khi thực tế đã giảm!
+                    if (isSunHours && (cloudPvW > 30 || loadPowerW > 30)) {
+                        // Ban ngày có nắng: PV = Tải tiêu thụ + Pin sạc (-signedBattW) - Lưới vào + Lưới đẩy
+                        const physicalPvW = Math.max(0, Math.round(loadPowerW - signedBattW - gridImportW + gridExportW));
+                        // Khi hệ thống độc lập (Off-grid) hoặc Zero Export: PV tự cân bằng theo Tải + Sạc Pin
                         if (!isGridOn || (gridImportW <= 10 && gridExportW <= 10)) {
-                            pvPowerW = physicalPvW;
+                            pvPowerW = physicalPvW > 0 ? physicalPvW : cloudPvW;
                         } else {
-                            pvPowerW = cloudPvW > 30 ? cloudPvW : physicalPvW;
+                            pvPowerW = (cloudPvW > 0 && Math.abs(cloudPvW - physicalPvW) < 500) ? cloudPvW : (physicalPvW > 0 ? physicalPvW : cloudPvW);
                         }
-
                         const strSum = pv1P + pv2P;
-                        if (strSum > 0 && pvPowerW > 0) {
+                        if (strSum > 0) {
                             const r1 = pv1P / strSum;
                             pv1P = Math.round(pvPowerW * r1);
                             pv2P = Math.max(0, pvPowerW - pv1P);
@@ -6012,6 +6023,7 @@
                 }
                 if (flowRes.status === 'fulfilled' && flowRes.value?.code === 0 && flowRes.value.data) {
                     lastCloudFlowCache = flowRes.value.data;
+                    try { localStorage.setItem('last_sosen_cloud_flow_v1', JSON.stringify(flowRes.value.data)); } catch (e) {}
                 }
                 applySosenFastFlowData(lastCloudFlowCache || {});
             } catch (e) {}
