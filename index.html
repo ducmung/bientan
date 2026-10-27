@@ -3284,8 +3284,8 @@
                 }
             });
 
-            // Đồng bộ luôn nhánh /SosenSystem/Daily_Energy trên Firebase khi đọc qua Cloud Sosen (không cần PC nhúng)
-            if (isToday && (Date.now() - lastPcMqttLiveMs > 8000)) {
+            // Đồng bộ luôn nhánh /SosenSystem/Daily_Energy trên Firebase khi có số liệu hôm nay (hỗ trợ cả ESP32 lẫn Cloud)
+            if (isToday) {
                 const dailyEnergyPayload = {
                     PV_Today: best.pv,
                     Load_Today: best.load,
@@ -3523,9 +3523,9 @@
             box.classList.add(state);
 
             const isPcMqtt = (Date.now() - lastPcMqttLiveMs <= 8000);
-            if (state === 'online') { updateDOMText('device-status-text', isPcMqtt ? 'PC ON' : 'LIVE ON'); } 
-            else if (state === 'offline') { updateDOMText('device-status-text', isPcMqtt ? 'PC OFF' : 'OFFLINE'); setClockGridStatus(null); } 
-            else { updateDOMText('device-status-text', isPcMqtt ? 'PC ...' : 'LIVE ...'); setClockGridStatus(null); }
+            if (state === 'online') { updateDOMText('device-status-text', isPcMqtt ? 'ESP32 ON' : 'LIVE ON'); } 
+            else if (state === 'offline') { updateDOMText('device-status-text', isPcMqtt ? 'OFFLINE' : 'OFFLINE'); setClockGridStatus(null); } 
+            else { updateDOMText('device-status-text', isPcMqtt ? 'ESP32 ...' : 'LIVE ...'); setClockGridStatus(null); }
         }
 
         function renderLastLiveReceivedTime() {
@@ -3573,15 +3573,26 @@
             const isGridOn = (vGrid > 50) || (data.Grid_Online === true);
             setClockGridStatus(isGridOn);
 
-            const battVoltage = toSafeNumber(data.Batt_Voltage);
-            const battCurrent = toSafeNumber(data.Batt_Current);
-            const battTemp = toSafeNumber(data.Batt_Temp, NaN);
+            // Tự động hợp nhất dữ liệu từ bộ mạch Dual JK BMS nếu đang online
+            const liveBms = (typeof getLiveCombinedBmsMetrics === 'function') ? getLiveCombinedBmsMetrics() : null;
+
+            const battVoltage = (liveBms && liveBms.avgVoltV > 0) ? liveBms.avgVoltV : toSafeNumber(data.Batt_Voltage);
+            const battCurrent = (liveBms && Math.abs(liveBms.totalBmsCurrA) > 0.05) ? liveBms.totalBmsCurrA : toSafeNumber(data.Batt_Current);
+            const battTemp = (liveBms && liveBms.avgTemp > 0) ? liveBms.avgTemp : toSafeNumber(data.Batt_Temp, NaN);
 
             const pvInW = Math.max(0, Math.round(toSafeNumber(data.PV_Power)));
             const gridImportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Import_Power)));
             const gridExportW = Math.max(0, Math.round(toSafeNumber(data.Grid_Export_Power)));
-            const battInW = data.Batt_Power !== undefined ? Math.round(toSafeNumber(data.Batt_Power)) : Math.round(battVoltage * battCurrent);
-            const loadInW = Math.max(0, Math.round(toSafeNumber(data.Load_Power)));
+            
+            // Ưu tiên công suất thật từ Dual BMS, nếu không có mới lấy từ data inverter
+            const battInW = (liveBms && Math.abs(liveBms.invSignedBattW) > 1) 
+                ? liveBms.invSignedBattW 
+                : (data.Batt_Power !== undefined ? Math.round(toSafeNumber(data.Batt_Power)) : Math.round(battVoltage * battCurrent));
+            
+            // Tải nhà tự động cân bằng nếu data không có hoặc cần chuẩn hóa theo BMS
+            const loadInW = (data.Load_Power !== undefined && toSafeNumber(data.Load_Power) > 0)
+                ? Math.max(0, Math.round(toSafeNumber(data.Load_Power)))
+                : Math.max(0, Math.round(pvInW + battInW + gridImportW - gridExportW));
 
             updateBackgroundByTimeAndPv(pvInW);
             
@@ -3652,7 +3663,7 @@
                 }
             }
 
-            let soc = clampNumber(data.Batt_SOC, 0, 100);
+            let soc = (liveBms && liveBms.avgSoc > 0) ? liveBms.avgSoc : clampNumber(data.Batt_SOC, 0, 100);
             renderVal('lbl-soc', soc, v => Math.round(v) + '%', isFromCache);
 
             const battTempLabel = document.getElementById('lbl-batt-temp');
@@ -4094,11 +4105,14 @@
                 try {
                     const parsed = JSON.parse(message.toString());
                     if (topic === MQTT_TOPIC_DATA) {
-                        // NẾU LÀ GÓI RETAINED CŨ TỪ BROKER -> BỎ QUA NGAY! KHÔNG VẼ, KHÔNG KHÓA CLOUD!
+                        // NẾU LÀ GÓI RETAINED: Chỉ bỏ qua nếu là gói cũ (> 20s) hoặc đã có gói live mới
                         if (packet && packet.retain) {
-                            return;
+                            const isOld = (parsed.ts && (Date.now() - parsed.ts > 20000));
+                            if (isOld || lastPcMqttLiveMs > 0) {
+                                return;
+                            }
                         }
-                        // Gói tin thực sự truyền qua mạng ngay lúc này (live broadcast từ PC):
+                        // Gói tin truyền qua mạng ngay lúc này (live broadcast từ ESP32 / Gateway):
                         lastPcMqttLiveMs = Date.now();
                         processIncomingLiveData(parsed, false);
                     } else if (topic === MQTT_TOPIC_BMS) {
