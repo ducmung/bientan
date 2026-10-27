@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sosen Energy Dashboard V3.4 - Full Sync MQTT & Dual JK BMS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap&text=" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <!-- THƯ VIỆN MQTT WEBSOCKET TRÌNH DUYỆT -->
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="https://unpkg.com/mqtt@5.16.1/dist/mqtt.min.js"></script>
     <!-- THƯ VIỆN RSA (JSEncrypt) ĐỂ ĐĂNG NHẬP TRỰC TIẾP CLOUD SOSEN (pv.inteless.com) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
     <style>
@@ -26,7 +26,7 @@
             position: fixed;
             inset: 0;
             z-index: -2;
-            background: url('1279_High_Defination_(HDTV).jpg') no-repeat center center / cover;
+            background: #081120 url('1279_High_Defination_(HDTV).jpg') no-repeat center center / cover;
             transform: translateZ(0);
             pointer-events: none;
         }
@@ -151,8 +151,7 @@
             overflow: hidden; pointer-events: none; color: #fff; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); margin: 0;
         }
         .battery-mini-meter::before {
-            content: ""; position: absolute; inset: 0; opacity: 0.45; background: linear-gradient(90deg, transparent 0%, var(--mini-glow) 48%, transparent 100%);
-            transform: translateX(-120%) translateZ(0); animation: miniEnergySweep 2s linear infinite; pointer-events: none;
+            display: none;
         }
         .battery-mini-meter.charge { --mini-color: #00cc66; --mini-glow: rgba(0, 204, 102, 0.45); border-color: rgba(0, 204, 102, 0.55); }
         .battery-mini-meter.discharge { --mini-color: #ff4444; --mini-glow: rgba(255, 68, 68, 0.45); border-color: rgba(255, 68, 68, 0.55); }
@@ -179,8 +178,7 @@
             overflow: hidden; pointer-events: none; color: #fff; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
         }
         .pv-mini-meter::before {
-            content: ""; position: absolute; inset: 0; opacity: 0.55; background: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.4) 48%, transparent 100%);
-            transform: translateX(-120%) translateZ(0); animation: miniEnergySweep 2.2s linear infinite; pointer-events: none;
+            display: none;
         }
         .pv-mini-meter.active { --pv-mini-glow: rgba(245, 158, 11, 0.6); border-color: rgba(245, 158, 11, 0.65); }
         .pv-mini-meter.idle { --pv-mini-glow: rgba(168, 176, 186, 0.2); border-color: rgba(255, 255, 255, 0.25); }
@@ -366,7 +364,7 @@
             inset: 0;
             border-radius: 50%;
             padding: 5.5px;
-            background: conic-gradient(from 0deg, var(--ring-color) calc(var(--soc-pct) * 1%), rgba(255, 255, 255, 0.12) 0);
+            background: conic-gradient(from 180deg, var(--ring-color) calc(var(--soc-pct) * 1%), rgba(255, 255, 255, 0.12) 0);
             -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
@@ -419,13 +417,13 @@
         .bms-power-row.charging span.power-val {
             color: #00ff72 !important;
             text-shadow: 0 0 8px rgba(0, 255, 114, 0.65);
-            animation: bmsPowerBlinkSlow 2.2s ease-in-out infinite alternate;
+            animation: none;
         }
         /* Khi Đang Xả: Chỉ số màu Đỏ + Nhấp nháy chậm điềm đạm (2.2s) */
         .bms-power-row.discharging span.power-val {
             color: #ff334d !important;
             text-shadow: 0 0 8px rgba(255, 51, 77, 0.7);
-            animation: bmsPowerBlinkSlow 2.2s ease-in-out infinite alternate;
+            animation: none;
         }
         @keyframes bmsPowerBlinkSlow {
             0% { opacity: 1; filter: brightness(1.12); }
@@ -1231,7 +1229,81 @@
         @media (prefers-reduced-motion: reduce) {
             .diagram-panel::after, .stat-card::after, .node-center::after, .image-frame::after, #update-clock::after, #lbl-inv-temp::after, .stat-card::before, .diagram-panel::before, .image-frame { animation: none !important; }
         }
-    </style>
+    
+        /* SOSEN 331 SETTINGS PILLS & SEARCH ENHANCEMENTS */
+        .sosen-category-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 8px 0 12px 0;
+        }
+        .sosen-pill {
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1.5px solid #e2e8f0;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .sosen-pill:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+        .sosen-pill.active {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            border-color: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+        }
+        .sosen-cat-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #e0f2fe;
+            color: #0284c7;
+            font-size: 11px;
+            font-weight: 800;
+            margin-left: 6px;
+        }
+        .sosen-collapse-item.active .sosen-cat-badge {
+            background: rgba(255, 122, 0, 0.15);
+            color: #ea580c;
+        }
+        .sosen-search-wrap input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 9px 120px 9px 14px;
+            border-radius: 10px;
+            border: 1.5px solid #cbd5e1;
+            font-size: 12.5px;
+            font-weight: 600;
+            outline: none;
+            background: #f8fafc;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .sosen-search-wrap input:focus {
+            border-color: #0284c7;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+        .sosen-search-badge {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11.5px;
+            font-weight: 800;
+            color: #64748b;
+            pointer-events: none;
+        }
+
+</style>
 </head>
 <body data-dashboard-version="V3.4 - Full Sync MQTT Live, Cloudflare Dual BMS & Firebase">
     <div class="app-container">
@@ -1246,7 +1318,7 @@
                     <span class="portal-sn-badge" style="background:rgba(0,229,255,0.16);border-color:rgba(0,229,255,0.45);color:#aef4ff;">GW: <span id="po-gw-sn">E47F24C03812</span></span>
                 </div>
                 <div class="portal-action-btns">
-                    <button type="button" class="portal-btn primary" onclick="scrollToSection('sosen-settings-panel')">⚙️ Parameters Setting (11 mục)</button>
+                                        <a href="setting.html" class="portal-btn" style="background:linear-gradient(135deg,#0052d4,#4364f7);color:#fff;border-color:#60a5fa;text-decoration:none;display:inline-flex;align-items:center;" title="Mở trang cài đặt đầy đủ 331 thông số Sosen Inverter">⚡ Full Setting (331 mục)</a>
                     <button type="button" class="portal-btn success" onclick="scrollToSection('sosen-telemetry-panel')">📡 Chỉ Số Modbus 1:1</button>
                     <button type="button" class="portal-btn" onclick="openRemoteDebugModal()">🛠️ Remote Debug (CRC16)</button>
                     <button type="button" class="portal-btn" onclick="openPowerCorrectionModal()">📊 Power Correction</button>
@@ -1305,17 +1377,6 @@
                         <span class="top-bar-arrow">▼</span>
                     </div>
                 </button>
-
-                <button type="button" class="top-collapsible-bar settings-bar" id="bar-toggle-settings" onclick="toggleTopPortalPanel('settings')">
-                    <div class="top-bar-left">
-                        <div class="top-bar-title">⚙️ Set(S8303002425022100221) — Cài Đặt Thông Số Biến Tần 1:1</div>
-                        <div class="top-bar-sub">11 Danh Mục Cài Đặt (Regs 50000–50241) · Điều Khiển Trực Tiếp Cloud Sosen Live</div>
-                    </div>
-                    <div class="top-bar-right">
-                        <span id="bar-settings-lbl">Ấn để mở</span>
-                        <span class="top-bar-arrow">▼</span>
-                    </div>
-                </button>
             </div>
 
             <!-- KHUNG 1 (ẨN MẶC ĐỊNH, ẤN VÀO THANH 1 THÌ HIỆN NGAY TRÊN PHẦN ẢNH) -->
@@ -1363,34 +1424,8 @@
                     <!-- Populated dynamically by renderModbusTelemetryPanes() -->
                 </div>
             </div>
-
-            <!-- KHUNG 2 (ẨN MẶC ĐỊNH, ẤN VÀO THANH 2 THÌ HIỆN NGAY TRÊN PHẦN ẢNH) -->
-            <div class="stat-card settings-portal-card top-collapsible-panel" id="sosen-settings-panel">
-                <div class="settings-top-toolbar">
-                    <div>
-                        <h2 style="font-size:17px;color:#0f172a;font-weight:900;">⚙️ Set(S8303002425022100221) — Cài Đặt Thông Số Biến Tần 1:1</h2>
-                        <div style="font-size:11.5px;color:#64748b;font-weight:800;margin-top:2px;">
-                            Giao thức: <strong style="color:#d95300;">V75_1010_V1.14_001 (RS485 Modbus V1.11 Base 50000)</strong> · Điều khiển trực tiếp <strong style="color:#0284c7;">Cloud Sosen (pv.inteless.com / GW E47F24C03812)</strong> & Đồng bộ MQTT/Firebase
-                        </div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                        <button type="button" class="sosen-btn-sm read" id="btn-sosen-cloud-settings" style="background:linear-gradient(135deg,#059669,#10b981);color:#fff;" onclick="openSosenCloudModal()">🔑 Kết nối Cloud Sosen (<span id="sosen-cloud-status-sub">Đã kết nối Live</span>)</button>
-                        <button type="button" class="sosen-btn-sm read" onclick="expandAllSettings(true)">➕ Mở tất cả 11 mục</button>
-                        <button type="button" class="sosen-btn-sm read" onclick="expandAllSettings(false)">➖ Thu gọn</button>
-                        <button type="button" class="sosen-btn-sm read" onclick="readAllSettingsFromCloud()">📥 Đọc toàn bộ từ Biến tần (Read All)</button>
-                        <button type="button" class="sosen-btn-sm" onclick="saveAllSettingsToCloud()">💾 Ghi toàn bộ xuống Biến tần (Set All)</button>
-                        <button type="button" class="sosen-btn-sm" style="background:#dc2626;border-color:#dc2626;" onclick="toggleTopPortalPanel('settings')">✕ Đóng khung</button>
-                    </div>
-                </div>
-
-                <!-- 11 Categories Accordion matching Setting.html 1:1 -->
-                <div class="sosen-collapse" id="sosen-settings-accordion">
-                    <!-- Rendered dynamically by renderSosenSettingsPortal() -->
-                </div>
-            </div>
         </div>
-
-        <div class="diagram-panel">
+<div class="diagram-panel">
             <!-- KHUNG SẢN LƯỢNG PV1 & PV2 SINH RA (VỊ TRÍ CŨ CỦA KHUNG PIN) -->
             <div id="pv-mini-meter" class="pv-mini-meter idle" title="Sản lượng thực tế chuỗi PV1 & PV2">
                 <div class="pv-mini-title">☀️ CHUỖI PV</div>
@@ -1840,12 +1875,12 @@
 
                 <div class="sosen-field-card" style="background:#f8fafc;">
                     <div class="sosen-field-label">
-                        <span>Hoặc dán trực tiếp Access Token / JSON `localStorage.user` (Tùy chọn)</span>
+                        <span>Hoặc dán trực tiếp Access Token / JSON `safeStorage.user` (Tùy chọn)</span>
                         <span class="reg-badge" id="sc-token-exp-badge">Tự động gia hạn</span>
                     </div>
                     <div class="sosen-field-sub">Khi đăng nhập ở trên, Token sẽ tự động điền vào đây và đồng bộ lên Firebase để dùng chung mọi thiết bị.</div>
                     <div class="sosen-field-ctrl" style="margin-top:4px;">
-                        <input type="text" id="sc-manual-token" class="sosen-input" style="font-family:monospace;font-size:11.5px;" placeholder="Bearer eyJhbGciOi... hoặc dán nguyên chuỗi localStorage.getItem('user')">
+                        <input type="text" id="sc-manual-token" class="sosen-input" style="font-family:monospace;font-size:11.5px;" placeholder="Bearer eyJhbGciOi... hoặc dán nguyên chuỗi safeStorage.getItem('user')">
                         <button type="button" class="sosen-btn-sm read" onclick="saveManualSosenToken()">💾 Lưu Token</button>
                     </div>
                 </div>
@@ -1873,6 +1908,50 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+
+        // ================= BỘ BỌC BỘ NHỚ ĐỆM AN TOÀN (SAFE STORAGE - ZERO CRASH) =================
+        const safeStorage = {
+            _mem: {},
+            getItem(key) {
+                try {
+                    return window.localStorage ? window.safeStorage.getItem(key) : (this._mem[key] || null);
+                } catch (e) {
+                    return this._mem[key] || null;
+                }
+            },
+            setItem(key, val) {
+                const strVal = String(val);
+                this._mem[key] = strVal;
+                try {
+                    if (window.localStorage) window.safeStorage.setItem(key, strVal);
+                } catch (e) {}
+            },
+            removeItem(key) {
+                delete this._mem[key];
+                try {
+                    if (window.localStorage) window.safeStorage.removeItem(key);
+                } catch (e) {}
+            }
+        };
+
+        // Khởi tạo an toàn Firebase với cơ chế tự hồi phục
+        function initFirebase() {
+            if (database) return database;
+            try {
+                if (typeof firebase !== 'undefined' && firebase.database) {
+                    if (!firebase.apps || firebase.apps.length === 0) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+                    database = firebase.database();
+                    return database;
+                }
+            } catch (e) {
+                console.warn('Firebase init warning:', e);
+            }
+            return null;
+        }
+
+
         // ================= CẤU HÌNH MQTT WEBSOCKET RIÊNG =================
         const MQTT_WSS_URL     = "wss://ra12bb13.ala.asia-southeast1.emqxsl.com:8084/mqtt";
         const MQTT_USER        = "ducmung";
@@ -1892,7 +1971,6 @@
             if (!firebase.apps || firebase.apps.length === 0) { firebase.initializeApp(firebaseConfig); }
             database = firebase.database();
         }
-
         const numberAnimState = {};
         function animateValue(id, targetVal, formatFn, duration = 400) {
             const el = document.getElementById(id);
@@ -1972,7 +2050,7 @@
                 sunAnimationFrameId = null;
                 ctx.clearRect(0, 0, size, size);
                 const activeRaysCount = sunRayCounts[currentSunLevel] || 0;
-                if (document.hidden || activeRaysCount <= 0) return;
+                if (document.hidden || activeRaysCount <= 0 || currentSunLevel === 0) return;
                 const time = now * 0.001;
                 for (let i = 0; i < activeRaysCount; i++) {
                     const ray = rays[i];
@@ -2086,14 +2164,14 @@
 
             // 1. Vẽ đuôi sao băng vuốt nhọn từ đầu tròn về mũi kim mờ dần
             if (Math.abs(spanDeg) > 0.3) {
-                const steps = 38;
+                const steps = 14;
                 for (let i = 1; i <= steps; i++) {
                     const t0 = (i - 1) / steps;
                     const t1 = i / steps;
                     const deg0 = tailDeg + spanDeg * t0;
                     const deg1 = tailDeg + spanDeg * t1;
-                    const a0 = (-90 + deg0) * Math.PI / 180;
-                    const a1 = (-90 + deg1) * Math.PI / 180;
+                    const a0 = (90 + deg0) * Math.PI / 180;
+                    const a1 = (90 + deg1) * Math.PI / 180;
                     const ccw = !isCharge;
 
                     // Lớp hào quang màu bên ngoài đuôi sao băng (vuốt thon dần)
@@ -2115,7 +2193,7 @@
             }
 
             // 2. Vẽ đầu sao băng (nhân cầu tròn rực sáng + quầng sáng tỏa mềm)
-            const headRad = (-90 + headDeg) * Math.PI / 180;
+            const headRad = (90 + headDeg) * Math.PI / 180;
             const hx = cx + Math.cos(headRad) * r;
             const hy = cy + Math.sin(headRad) * r;
 
@@ -2455,7 +2533,7 @@
             }
             try {
                 if ((latestBmsCombined.bm1 && latestBmsCombined.bm1.Online) || (latestBmsCombined.bm2 && latestBmsCombined.bm2.Online)) {
-                    localStorage.setItem("last_sosen_bms_snapshot", JSON.stringify(latestBmsCombined));
+                    safeStorage.setItem("last_sosen_bms_snapshot", JSON.stringify(latestBmsCombined));
                 }
             } catch (e) {}
         }
@@ -2514,7 +2592,11 @@
 
         function initChart() {
             const chartCanvas = document.getElementById('energyChart');
-            if (!chartCanvas || typeof Chart === 'undefined') return;
+            if (!chartCanvas) return;
+            if (typeof Chart === 'undefined') {
+                setTimeout(() => { if (typeof Chart !== 'undefined' && !energyChart) initChart(); }, 800);
+                return;
+            }
             if (energyChart && typeof energyChart.destroy === 'function') {
                 try { energyChart.destroy(); } catch (e) {}
                 energyChart = null;
@@ -2644,9 +2726,9 @@
                         // TRƯỜNG HỢP: Ngày d hoàn toàn không mở web/điện thoại lần nào (curPv == 0 && curLoad == 0)
                         if (curPv <= 0 && curLoad <= 0) {
                             let recoveredRecord = null;
-                            const rawCached = localStorage.getItem("sosen_cache_" + pastDateStr) || 
-                                              localStorage.getItem("sosen_history_backup_" + pastDateStr) ||
-                                              localStorage.getItem("sosen_snapshot_" + pastDateStr);
+                            const rawCached = safeStorage.getItem("sosen_cache_" + pastDateStr) || 
+                                              safeStorage.getItem("sosen_history_backup_" + pastDateStr) ||
+                                              safeStorage.getItem("sosen_snapshot_" + pastDateStr);
 
                             if (rawCached) {
                                 try {
@@ -2711,7 +2793,7 @@
                                 daysData[dayKey] = recoveredRecord;
                                 if (currentMonthKey === monthKey) currentMonthHistory[dayKey] = recoveredRecord;
                                 database.ref(`/SosenSystem/History/Daily/${monthKey}/${dayKey}`).update(recoveredRecord);
-                                try { localStorage.setItem("sosen_cache_" + pastDateStr, JSON.stringify(recoveredRecord)); } catch(e) {}
+                                try { safeStorage.setItem("sosen_cache_" + pastDateStr, JSON.stringify(recoveredRecord)); } catch(e) {}
                             }
                         }
                     }
@@ -3126,7 +3208,7 @@
 
             let cachedBest = null;
             try {
-                const raw = localStorage.getItem("sosen_cache_" + meta.dateStr);
+                const raw = safeStorage.getItem("sosen_cache_" + meta.dateStr);
                 if (raw) cachedBest = JSON.parse(raw);
             } catch (e) {}
 
@@ -3136,11 +3218,11 @@
             if (merged.pv > 0 || merged.load > 0 || merged.batt > 0 || merged.charge > 0) {
                 activeDayBestRecord = merged;
                 try {
-                    localStorage.setItem("sosen_cache_" + meta.dateStr, JSON.stringify({
+                    safeStorage.setItem("sosen_cache_" + meta.dateStr, JSON.stringify({
                         ...merged,
                         savedAt: new Date().toLocaleTimeString("vi-VN")
                     }));
-                    localStorage.setItem("sosen_last_tracking_date", meta.dateStr);
+                    safeStorage.setItem("sosen_last_tracking_date", meta.dateStr);
                 } catch (e) {}
             }
             return merged;
@@ -3158,7 +3240,7 @@
 
             let cachedForDate = null;
             try {
-                const raw = localStorage.getItem("sosen_cache_" + meta.dateStr);
+                const raw = safeStorage.getItem("sosen_cache_" + meta.dateStr);
                 if (raw) cachedForDate = JSON.parse(raw);
             } catch (e) {}
 
@@ -3196,8 +3278,8 @@
                         currentMonthHistory[meta.dayKey] = record;
                     }
                     try {
-                        localStorage.setItem("sosen_saved_" + meta.dateStr, "true");
-                        localStorage.setItem("sosen_cache_" + meta.dateStr, JSON.stringify(record));
+                        safeStorage.setItem("sosen_saved_" + meta.dateStr, "true");
+                        safeStorage.setItem("sosen_cache_" + meta.dateStr, JSON.stringify(record));
                     } catch(e) {}
                 }
             });
@@ -3254,11 +3336,11 @@
             const meta = getDateMeta(now);
 
             // Kiểm tra nếu vừa bước qua ngày mới (00:00) mà ngày hôm qua chưa được chốt lần cuối
-            const lastTrackedDate = localStorage.getItem("sosen_last_tracking_date");
+            const lastTrackedDate = safeStorage.getItem("sosen_last_tracking_date");
             if (lastTrackedDate && lastTrackedDate !== meta.dateStr) {
-                const isPrevFinalized = localStorage.getItem("sosen_rollover_done_" + lastTrackedDate);
+                const isPrevFinalized = safeStorage.getItem("sosen_rollover_done_" + lastTrackedDate);
                 if (!isPrevFinalized && !isSnapshotSaving) {
-                    const rawPrev = localStorage.getItem("sosen_cache_" + lastTrackedDate);
+                    const rawPrev = safeStorage.getItem("sosen_cache_" + lastTrackedDate);
                     if (rawPrev) {
                         try {
                             const prevParsed = JSON.parse(rawPrev);
@@ -3266,12 +3348,12 @@
                             if (parts.length === 3) {
                                 const prevDateObj = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 23, 59, 55);
                                 commitDaySnapshotToFirebase(prevDateObj, "Midnight_Rollover", prevParsed, true);
-                                localStorage.setItem("sosen_rollover_done_" + lastTrackedDate, "true");
+                                safeStorage.setItem("sosen_rollover_done_" + lastTrackedDate, "true");
                             }
                         } catch (e) {}
                     }
                 }
-                try { localStorage.setItem("sosen_last_tracking_date", meta.dateStr); } catch (e) {}
+                try { safeStorage.setItem("sosen_last_tracking_date", meta.dateStr); } catch (e) {}
             }
 
             if (!latestDailyData) return;
@@ -3280,9 +3362,9 @@
             // Lớp chốt sổ cuối ngày (23:50 - 23:59)
             if (curHour === 23 && curMin >= 50) {
                 const finalSlotKey = `sosen_midnight_final_${meta.dateStr}_${curMin >= 56 ? '2' : '1'}`;
-                if (!localStorage.getItem(finalSlotKey) && !isSnapshotSaving) {
+                if (!safeStorage.getItem(finalSlotKey) && !isSnapshotSaving) {
                     commitDaySnapshotToFirebase(now, "Final_23h50", merged, true);
-                    try { localStorage.setItem(finalSlotKey, "true"); } catch (e) {}
+                    try { safeStorage.setItem(finalSlotKey, "true"); } catch (e) {}
                 }
                 return;
             }
@@ -3291,9 +3373,9 @@
             if (curHour >= 18 && curHour <= 23) {
                 const slot15m = Math.floor(curMin / 15);
                 const eveningSlotKey = `sosen_evening_${meta.dateStr}_${curHour}_${slot15m}`;
-                if (!localStorage.getItem(eveningSlotKey) && !isSnapshotSaving) {
+                if (!safeStorage.getItem(eveningSlotKey) && !isSnapshotSaving) {
                     commitDaySnapshotToFirebase(now, "Evening_Safe", merged, false);
-                    try { localStorage.setItem(eveningSlotKey, "true"); } catch (e) {}
+                    try { safeStorage.setItem(eveningSlotKey, "true"); } catch (e) {}
                     return;
                 }
             }
@@ -3482,8 +3564,8 @@
                 markLiveDataReceived(Date.now());
                 setDeviceStatus('online');
                 try {
-                    localStorage.setItem("last_sosen_snapshot", JSON.stringify(data));
-                    localStorage.setItem("last_sosen_snapshot_time", Date.now());
+                    safeStorage.setItem("last_sosen_snapshot", JSON.stringify(data));
+                    safeStorage.setItem("last_sosen_snapshot_time", Date.now());
                 } catch (e) {}
             }
 
@@ -3691,8 +3773,8 @@
             if (hasEnergyUpdate) {
                 latestDailyData.Date_Stamp = getDateMeta().dateStr;
                 try {
-                    localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
-                    localStorage.setItem("last_sosen_daily_snapshot_date", getDateMeta().dateStr);
+                    safeStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
+                    safeStorage.setItem("last_sosen_daily_snapshot_date", getDateMeta().dateStr);
                 } catch(e) {}
                 updateDayBestCache(latestDailyData, new Date());
                 recalculateEnergy();
@@ -3740,7 +3822,7 @@
 
         let mikaConfigCache = {};
         try {
-            const savedCfg = localStorage.getItem("mika_registers_cfg_cache");
+            const savedCfg = safeStorage.getItem("mika_registers_cfg_cache");
             if (savedCfg) mikaConfigCache = JSON.parse(savedCfg) || {};
         } catch (e) {}
 
@@ -3899,7 +3981,7 @@
                 const cfg = await mikaFetchGetJson(`/api/config?device_id=${encodeURIComponent(devInfo.id)}`);
                 if (cfg && Array.isArray(cfg.registers) && cfg.registers.length > 0) {
                     mikaConfigCache[devInfo.id] = cfg.registers;
-                    try { localStorage.setItem("mika_registers_cfg_cache", JSON.stringify(mikaConfigCache)); } catch (e) {}
+                    try { safeStorage.setItem("mika_registers_cfg_cache", JSON.stringify(mikaConfigCache)); } catch (e) {}
                 } else {
                     return false;
                 }
@@ -3973,7 +4055,11 @@
         window.addEventListener('focus', ensureConnectionsAwake);
 
         function initMQTT() {
-            if (typeof mqtt === 'undefined') return;
+            if (mqttClient && mqttClient.connected) return;
+            if (typeof mqtt === 'undefined') {
+                setTimeout(() => { if (typeof mqtt !== 'undefined' && (!mqttClient || !mqttClient.connected)) initMQTT(); }, 800);
+                return;
+            }
 
             mqttClient = mqtt.connect(MQTT_WSS_URL, {
                 clientId: MQTT_CLIENT_ID,
@@ -4038,8 +4124,8 @@
 
         // ================= KHỞI ĐỘNG HỆ THỐNG =================
         document.addEventListener('DOMContentLoaded', () => {
-            const cachedDataStr = localStorage.getItem("last_sosen_snapshot");
-            const cachedTime = Number(localStorage.getItem("last_sosen_snapshot_time") || 0);
+            const cachedDataStr = safeStorage.getItem("last_sosen_snapshot");
+            const cachedTime = Number(safeStorage.getItem("last_sosen_snapshot_time") || 0);
             const isRecentCache = (Date.now() - cachedTime < 180000); // trong vòng 3 phút
             const curHour = new Date().getHours();
             const isNight = (curHour >= 18 || curHour < 6);
@@ -4061,7 +4147,7 @@
                 } catch (e) {}
             }
 
-            const cachedBms = localStorage.getItem("last_sosen_bms_snapshot");
+            const cachedBms = safeStorage.getItem("last_sosen_bms_snapshot");
             if (cachedBms) {
                 try {
                     const parsedBms = JSON.parse(cachedBms);
@@ -4073,8 +4159,8 @@
                 } catch (e) {}
             }
 
-            const cachedDaily = localStorage.getItem("last_sosen_daily_snapshot");
-            const cachedDailyDate = localStorage.getItem("last_sosen_daily_snapshot_date");
+            const cachedDaily = safeStorage.getItem("last_sosen_daily_snapshot");
+            const cachedDailyDate = safeStorage.getItem("last_sosen_daily_snapshot_date");
             const todayDateStr = getDateMeta().dateStr;
             if (cachedDaily) {
                 try {
@@ -4092,8 +4178,8 @@
                                 Date_Stamp: todayDateStr
                             };
                             try {
-                                localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
-                                localStorage.setItem("last_sosen_daily_snapshot_date", todayDateStr);
+                                safeStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
+                                safeStorage.setItem("last_sosen_daily_snapshot_date", todayDateStr);
                             } catch (e) {}
                         } else {
                             latestDailyData = parsedDaily;
@@ -4154,7 +4240,7 @@
                                 Date_Stamp: curTodayDateStr
                             };
                         }
-                        try { localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData)); localStorage.setItem("last_sosen_daily_snapshot_date", curTodayDateStr); } catch(e) {}
+                        try { safeStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData)); safeStorage.setItem("last_sosen_daily_snapshot_date", curTodayDateStr); } catch(e) {}
                         updateDayBestCache(latestDailyData, new Date());
                     }
                     checkAndSwitchMonth();
@@ -4635,423 +4721,9 @@
             }
         }
 
-        // ---------------- 2. CẤU HÌNH 11 DANH MỤC SETTING.HTML 1:1 (HOLDING REGISTERS 50000 - 50204) ----------------
-        const SOSEN_SETTINGS_SCHEMA = [
-            {
-                id: 'cat-1-power',
-                title: '1. Power On/Off (Bật/Tắt Nguồn Biến Tần — Regs 50031–50032)',
-                fields: [
-                    { key: 'enOrDisEnable', reg: 50031, label: 'Power On/Off (Điều khiển Bật/Tắt máy)', type: 'select', def: '1', options: [['0', '0 - Off (Tắt máy)'], ['1', '1 - On (Bật máy)']] },
-                    { key: 'powerOnAuto', reg: 50032, label: 'Auto Power On Enable (Tự động khởi động)', type: 'select', def: '1', options: [['0', '0 - Disable (Tắt)'], ['1', '1 - Enable (Bật)']] }
-                ]
-            },
-            {
-                id: 'cat-2-usermode',
-                title: '2. User Mode (Chế Độ Người Dùng — Regs 50033, 50038–50040, 50056)',
-                hasTouTables: false,
-                fields: [
-                    { key: 'modeSetting', reg: 50056, label: 'Mode Setting (Chế độ vận hành năng lượng)', type: 'select', def: '0', options: [
-                        ['0', '0 - Self Use (Tự dùng ưu tiên tải)'],
-                        ['1', '1 - TOU Balance (Kinh tế cân bằng TOU)'],
-                        ['2', '2 - TOU Eco (Tiết kiệm TOU Eco)'],
-                        ['3', '3 - Backup Only / Backup Power (Dự phòng khẩn cấp)'],
-                        ['4', '4 - Grid Priority (Ưu tiên phát lên lưới)']
-                    ]},
-                    { key: 'connectedGridMaxSOC', reg: 50038, label: 'On-Grid Bat Stop SOC (SOC dừng xả khi có lưới)', type: 'number', min: 10, max: 100, step: 1, unit: '%', def: 15, sub: 'Range: [10, 100] %' },
-                    { key: 'offGridMaxSOC', reg: 50039, label: 'Off-Grid Bat Stop SOC (SOC dừng xả khi mất lưới)', type: 'number', min: 10, max: 100, step: 1, unit: '%', def: 10, sub: 'Range: [10, 100] %' },
-                    { key: 'chargeMaxSoc', reg: 50040, label: 'Charge Max SOC (SOC sạc tối đa)', type: 'number', min: 10, max: 100, step: 1, unit: '%', def: 100, sub: 'Range: [10, 100] %' },
-                    { key: 'gridChgBatEnable', reg: 50033, label: 'Peak Shaving / Grid Charge Bat Enable (Sạc Pin từ lưới / Cắt đỉnh)', type: 'select', def: '0', options: [['0', '0 - Disable (Tắt)'], ['1', '1 - Enable (Bật)']] }
-                ]
-            },
-            {
-                id: 'cat-3-opconfig',
-                title: '3. Operation Config (Cấu Hình Vận Hành & Bám Tải — Regs 50034–50037, 50041, 50197–50198)',
-                fields: [
-                    { key: 'gridMaxPChg', reg: 50034, label: 'Grid Output Max Power (Công suất phát lưới tối đa)', type: 'number', min: 0, max: 800.0, step: 0.1, unit: 'kW', def: 8.0, sub: 'Range: [0.0, 800.0] kW' },
-                    { key: 'inputActPwrLimit', reg: 50197, label: 'Input Active Power Limit (Giới hạn công suất mua lưới)', type: 'number', min: 0, max: 800.0, step: 0.1, unit: 'kW', def: 8.0, sub: 'Range: [0.0, 800.0] kW' },
-                    { key: 'gridMaxAppPower', reg: 50198, label: 'Grid Output Max Apparent (Công suất biểu kiến lưới tối đa)', type: 'number', min: 0, max: 800.0, step: 0.1, unit: 'kVA', def: 8.0, sub: 'Range: [0.0, 800.0] kVA' },
-                    { key: 'antiCounterCurr', reg: 50036, label: 'Export Limitation Enable (Chống phát ngược / Bám tải)', type: 'select', def: '1', options: [['0', '0 - Disable (Cho phép đẩy lưới)'], ['1', '1 - Enable (Bật chống phát ngược / Zero Export)']] },
-                    { key: 'gridPMaxCounterCurr', reg: 50037, label: 'Max Export Power (Công suất đẩy lưới tối đa cho phép)', type: 'number', min: 0, max: 800.0, step: 0.01, unit: 'kW', def: 0.0, sub: 'Range: [0.0, 800.0] kW' },
-                    { key: 'gridPowerCompensation', reg: 50048, label: 'Grid Power Compensation (Bù công suất phía lưới)', type: 'number', min: -1000, max: 1000, step: 1, unit: 'W', def: 0, sub: 'Range: [-1000, 1000] W' },
-                    { key: 'gridStartChgDelay', reg: 50035, label: 'Start Charging Delay Grid Connection (Trễ sạc sau hòa lưới)', type: 'number', min: 0, max: 600, step: 1, unit: 'Min', def: 5, sub: 'Range: [0, 600] Min' },
-                    { key: 'gridChgSlowUpTime', reg: 50041, label: 'Grid Charging Delay Time (Thời gian tăng dòng sạc lưới mềm)', type: 'number', min: 0, max: 1000, step: 1, unit: 'S', def: 30, sub: 'Range: [0, 1000] S' }
-                ]
-            },
-            {
-                id: 'cat-4-generator',
-                title: '4. Generator Control (Điều Khiển Cổng Máy Phát / Smart Load / AC Coupling — Regs 50111–50118)',
-                fields: [
-                    { key: 'genConnectedToGridPort', reg: 50110, label: 'Gen Connected to Grid Port (Đấu máy phát vào cổng Grid)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'genSetting', reg: 50111, label: 'Generator Port Setting (Chức năng cổng GEN)', type: 'select', def: '0', options: [
-                        ['0', '0 - Disable (Tắt)'],
-                        ['1', '1 - Generator (Máy phát điện Diesel)'],
-                        ['2', '2 - Smart Load (Phụ tải thông minh)'],
-                        ['3', '3 - AC Coupling (Ghép nối hòa lưới AC)']
-                    ]},
-                    { key: 'genRatePower', reg: 50112, label: 'Gen Warm Time (Thời gian làm nóng máy phát)', type: 'number', min: 0, max: 1000, step: 1, unit: 'S', def: 60, sub: 'Range: [0, 1000] S' },
-                    { key: 'genStartSoc', reg: 50113, label: 'Start Gen SOC (SOC khởi động máy phát)', type: 'number', min: 0, max: 100, step: 1, unit: '%', def: 20, sub: 'Range: [0, 100] %' },
-                    { key: 'genStopSoc', reg: 50114, label: 'Stop Gen SOC (SOC dừng máy phát)', type: 'number', min: 0, max: 100, step: 1, unit: '%', def: 90, sub: 'Range: [0, 100] %' },
-                    { key: 'genMaxPower', reg: 50115, label: 'Gen Max Charge Power (Công suất sạc tối đa từ Gen)', type: 'number', min: 0, max: 800.0, step: 0.1, unit: 'kW', def: 8.0, sub: 'Range: [0.0, 800.0] kW' },
-                    { key: 'genMaxRunTime', reg: 50116, label: 'Gen Max Running Time (Thời gian chạy tối đa của Gen)', type: 'number', min: 0, max: 1440, step: 1, unit: 'min', def: 720, sub: 'Range: [0, 1440] min' },
-                    { key: 'genCoolTime', reg: 50117, label: 'Gen Cooling Time (Thời gian làm mát máy phát)', type: 'number', min: 0, max: 1440, step: 1, unit: 'min', def: 10, sub: 'Range: [0, 1440] min' },
-                    { key: 'genStartStopTest', reg: 50118, label: 'Start Gen Test (Chạy thử máy phát)', type: 'select', def: '0', options: [['0', '0 - Off (Tắt)'], ['1', '1 - On (Bật thử)']] },
-                    { key: 'smartloadStartSoc', reg: 50119, label: 'Smartload Start SOC (SOC bật Smart Load)', type: 'number', min: 0, max: 100, step: 1, unit: '%', def: 95, sub: 'Range: [0, 100] %' },
-                    { key: 'smartloadStopSoc', reg: 50120, label: 'Smartload Stop SOC (SOC tắt Smart Load)', type: 'number', min: 0, max: 100, step: 1, unit: '%', def: 80, sub: 'Range: [0, 100] %' },
-                    { key: 'acCouplingStartSoc', reg: 50121, label: 'AC Coupling Start SOC (SOC bật AC Coupling)', type: 'number', min: 0, max: 100, step: 1, unit: '%', def: 50, sub: 'Range: [0, 100] %' },
-                    { key: 'acCouplingStopSoc', reg: 50122, label: 'AC Coupling Stop SOC (SOC dừng AC Coupling)', type: 'number', min: 0, max: 100, step: 1, unit: '%', def: 98, sub: 'Range: [0, 100] %' }
-                ]
-            },
-            {
-                id: 'cat-5-other',
-                title: '5. Other Setting (Cài Đặt Khác, Khôi Phục Gốc & Thời Gian Hệ Thống — Regs 50001, 50009, 50014–50018, 50161–50166)',
-                fields: [
-                    { key: 'resetFactory', reg: 50001, label: 'Factory Restore (Khôi phục cài đặt gốc)', type: 'select', def: '0', options: [['0', '0 - Invalid (Không)'], ['1', '1 - Restore Factory (Khôi phục gốc)']] },
-                    { key: 'historyClear', reg: 50015, label: 'Record Clear (Xóa lịch sử thống kê năng lượng)', type: 'select', def: '0', options: [['0', '0 - Invalid (Không)'], ['1', '1 - Clear Record (Xóa lịch sử)']] },
-                    { key: 'batActiveEnable', reg: 50009, label: 'Battery Active (Kích hoạt ngủ đông Pin)', type: 'select', def: '0', options: [['0', '0 - Disable (Tắt)'], ['1', '1 - Enable (Kích hoạt Pin)']] },
-                    { key: 'clearArcPullWarn', reg: 50016, label: 'AFCI Alarm Clear (Xóa cảnh báo hồ quang AFCI)', type: 'select', def: '0', options: [['0', '0 - Invalid'], ['1', '1 - Clear AFCI Alarm']] },
-                    { key: 'remoteRestart', reg: 50014, label: 'Remote Restart (Khởi động lại biến tần từ xa)', type: 'select', def: '0', options: [['0', '0 - Invalid'], ['1', '1 - Restart Inverter']] },
-                    { key: 'gridParamsProtectRec', reg: 50018, label: 'Grid Protection Parameters Reset (Reset bảo vệ lưới)', type: 'select', def: '0', options: [['0', '0 - Invalid'], ['1', '1 - Reset Grid Protect']] },
-                    { key: 'sysTimeYear', reg: 50161, label: 'System Time — Year (Năm)', type: 'number', min: 2000, max: 2099, step: 1, unit: 'Year', def: new Date().getFullYear(), sub: 'Reg 50161 [2000, 2099]' },
-                    { key: 'sysTimeMonth', reg: 50162, label: 'System Time — Month (Tháng)', type: 'number', min: 1, max: 12, step: 1, unit: 'Month', def: new Date().getMonth() + 1, sub: 'Reg 50162 [1, 12]' },
-                    { key: 'sysTimeDay', reg: 50163, label: 'System Time — Day (Ngày)', type: 'number', min: 1, max: 31, step: 1, unit: 'Day', def: new Date().getDate(), sub: 'Reg 50163 [1, 31]' },
-                    { key: 'sysTimeHour', reg: 50164, label: 'System Time — Hour (Giờ)', type: 'number', min: 0, max: 23, step: 1, unit: 'Hour', def: new Date().getHours(), sub: 'Reg 50164 [0, 23]' },
-                    { key: 'sysTimeMinute', reg: 50165, label: 'System Time — Minute (Phút)', type: 'number', min: 0, max: 59, step: 1, unit: 'Min', def: new Date().getMinutes(), sub: 'Reg 50165 [0, 59]' },
-                    { key: 'sysTimeSecond', reg: 50166, label: 'System Time — Second (Giây)', type: 'number', min: 0, max: 59, step: 1, unit: 'Sec', def: new Date().getSeconds(), sub: 'Reg 50166 [0, 59]' }
-                ]
-            },
-            {
-                id: 'cat-6-peripheral',
-                title: '6. Peripheral Configuration (Cấu Hình Ngoại Vi: Tiêu Chuẩn Lưới, CT/Meter, Giao Thức Pin, MPPT — Regs 50131–50146)',
-                fields: [
-                    { key: 'nationalStandard', reg: 50131, label: 'Grid Standard Type (Tiêu chuẩn lưới quốc gia - Phụ lục 3)', type: 'select', def: '2', options: [
-                        ['0', '00 - China (NB/T 32004)'],
-                        ['1', '01 - Germany (VDE-AR-N 4105)'],
-                        ['2', '02 - Europe General (EN50549)'],
-                        ['3', '03 - Australia (AS/NZS 4777.2)'],
-                        ['4', '04 - New Zealand'],
-                        ['5', '05 - UK G98'],
-                        ['6', '06 - UK G99'],
-                        ['7', '07 - Belgium (C10/11)'],
-                        ['8', '08 - South Africa (NRS 097-2-1)'],
-                        ['9', '09 - Thailand MEA'],
-                        ['10', '10 - Thailand PEA'],
-                        ['11', '11 - France (VDE 0126-1-1)'],
-                        ['12', '12 - Poland'],
-                        ['13', '13 - Italy (CEI 0-21)'],
-                        ['14', '14 - Spain (UNE 217002)'],
-                        ['15', '15 - Austria (TOR Erzeuger)'],
-                        ['16', '16 - Netherlands']
-                    ]},
-                    { key: 'vGridRate', reg: 50132, label: 'Grid Rate Volt (Điện áp lưới định mức)', type: 'select', def: '0', options: [['0', '0 - 220 V'], ['1', '1 - 230 V'], ['2', '2 - 240 V']] },
-                    { key: 'fGridRate', reg: 50133, label: 'Grid Rate Frequency (Tần số lưới định mức)', type: 'select', def: '0', options: [['0', '0 - 50 Hz'], ['1', '1 - 60 Hz']] },
-                    { key: 'meterSensorType', reg: 50134, label: 'Meter Sensor Type (Cảm biến đo đếm bám tải)', type: 'select', def: '1', options: [['0', '0 - None (Không dùng)'], ['1', '1 - CT (Biến dòng ngoài)'], ['2', '2 - Smart Meter (Đồng hồ thông minh)']] },
-                    { key: 'exCTRatio', reg: 50135, label: 'External CT Ratio (Tỷ số biến dòng CT ngoài)', type: 'number', min: 50, max: 6000, step: 1, unit: ':1', def: 2000, sub: 'Range: [50, 6000]' },
-                    { key: 'meterAddr', reg: 50136, label: 'Meter Address (Địa chỉ Modbus đồng hồ)', type: 'number', min: 1, max: 247, step: 1, unit: 'ID', def: 1, sub: 'Range: [1, 247]' },
-                    { key: 'meterProtocolManu', reg: 50137, label: 'Meter Manufacturer (Hãng đồng hồ đo)', type: 'select', def: '0', options: [['0', '0 - CHNT (Chint)'], ['1', '1 - YADA']] },
-                    { key: 'batProtocolManu', reg: 50138, label: 'Battery Protocol (Giao thức BMS Pin - Phụ lục 4)', type: 'select', def: '2', options: [
-                        ['0', '000 - None (Không giao tiếp BMS)'],
-                        ['1', '001 - B_BOX_LV (BYD)'],
-                        ['2', '002 - PYLON LV (Pylontech / JK BMS CAN/RS485)'],
-                        ['3', '003 - Dyness LV'],
-                        ['4', '004 - Uhome LV'],
-                        ['5', '005 - UZ Energy LV'],
-                        ['6', '006 - CFE LV'],
-                        ['7', '007 - GENIXGREEN LV'],
-                        ['8', '008 - LithiumValley LV'],
-                        ['9', '009 - HY LV'],
-                        ['10', '010 - LV Protocol 1'],
-                        ['11', '011 - LV Protocol 2'],
-                        ['12', '012 - LV Protocol 3'],
-                        ['13', '013 - LV Protocol 4'],
-                        ['14', '014 - LV Protocol 5']
-                    ]},
-                    { key: 'batCommuMode', reg: 50139, label: 'Battery Communication Type (Chuẩn giao tiếp Pin)', type: 'select', def: '1', options: [['0', '0 - RS485'], ['1', '1 - CAN']] },
-                    { key: 'batType', reg: 50140, label: 'Battery Type (Loại ắc quy / Pin)', type: 'select', def: '0', options: [['0', '0 - Li-ion (Pin Lithium)'], ['1', '1 - Lead-acid (Ắc quy chì)'], ['2', '2 - DC Source (Nguồn DC)'], ['3', '3 - None (Không dùng Pin)']] },
-                    { key: 'mpptCtrlMode', reg: 50141, label: 'MPPT Control Mode (Chế độ điều khiển MPPT)', type: 'select', def: '1', options: [['0', '0 - CVT (Điện áp không đổi)'], ['1', '1 - MPPT (Dò điểm công suất cực đại)']] },
-                    { key: 'mpptMode', reg: 50142, label: 'MPPT Parallel Mode (Chế độ ghép song song MPPT)', type: 'select', def: '0', options: [['0', '0 - Independent (Độc lập)'], ['1', '1 - Parallel (Song song)']] },
-                    { key: 'mpptNum', reg: 50143, label: 'MPPT Quantity (Số lượng MPPT)', type: 'number', min: 1, max: 4, step: 1, unit: 'MPPT', def: 2, sub: 'Range: [1, 4]' },
-                    { key: 'mpptPower', reg: 50144, label: 'MPPT Power (Công suất giới hạn MPPT)', type: 'number', min: 0, max: 12000, step: 100, unit: 'W', def: 10400, sub: 'Range: [0, 12000] W' },
-                    { key: 'mpptStepSize', reg: 50145, label: 'MPPT Disturbed Step Size (Bước nhảy dò MPPT)', type: 'number', min: 2, max: 20, step: 1, unit: 'V/s', def: 5, sub: 'Range: [2, 20] V/s' },
-                    { key: 'cvtVolt', reg: 50146, label: 'CVT Volt (Điện áp đặt chế độ CVT)', type: 'number', min: 200, max: 450, step: 1, unit: 'V', def: 360, sub: 'Range: [200, 450] V' }
-                ]
-            },
-            {
-                id: 'cat-7-switch',
-                title: '7. Switch Config (Cấu Hình Công Tắc Chức Năng & Bảo Vệ — Regs 50000, 50002–50013, 50017, 50033)',
-                fields: [
-                    { key: 'drmEnable', reg: 50000, label: 'DRM Enable (Chức năng điều khiển DRM)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'arcPullDetection', reg: 50002, label: 'AFCI Enable (Phát hiện hồ quang điện DC AFCI)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'batWarnEnable', reg: 50003, label: 'Battery Warning Enable (Bật cảnh báo Pin)', type: 'select', def: '1', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'mainsExcEnable', reg: 50004, label: 'Grid Abnormal Warning Enable (Cảnh báo bất thường lưới)', type: 'select', def: '1', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'outCtrlModeEnable', reg: 50005, label: 'External Control Mode Enable (Điều khiển ngoài)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'islandEnable', reg: 50006, label: 'Active Island Enable (Chống cô lập chủ động Anti-Islanding)', type: 'select', def: '1', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'antiPidFunEnable', reg: 50007, label: 'Preventive PID Enable (Chống suy giảm PID tấm pin)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'batTempCompensateEnable', reg: 50008, label: 'Battery Temp Compensation Enable (Bù nhiệt độ ắc quy)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'insulationImpedanceEnable', reg: 50010, label: 'Insulation Detection Enable (Kiểm tra cách điện ISO)', type: 'select', def: '1', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'iAliternatEnable', reg: 50011, label: 'Leakage Detection Enable (Bảo vệ dòng rò GFCI)', type: 'select', def: '1', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'relayTestEnable', reg: 50012, label: 'Relay Self-Check Enable (Tự kiểm tra Rơ-le)', type: 'select', def: '1', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'deviceLock', reg: 50013, label: 'Device Lock (Khóa thiết bị từ xa)', type: 'select', def: '0', options: [['0', '0 - Unlock (Mở khóa)'], ['1', '1 - Lock (Khóa)']] },
-                    { key: 'epsEnable', reg: 50017, label: 'EPS Enable (Chức năng nguồn dự phòng EPS Off-Grid)', type: 'select', def: '1', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'weakGridEnable', reg: 50019, label: 'Grid Adaptability Enable (Thích ứng lưới điện yếu)', type: 'select', def: '1', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'penRelayEnable', reg: 50020, label: 'PE-N Relay Enable (Đóng rơ-le nối đất N-PE khi Off-Grid)', type: 'select', def: '1', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'bypassEnable', reg: 50021, label: 'Bypass Enable (Chuyển mạch Bypass)', type: 'select', def: '1', options: [['0', '0 - Disable'], ['1', '1 - Enable']] }
-                ]
-            },
-            {
-                id: 'cat-8-bat',
-                title: '8. Bat Setting (Cài Đặt Thông Số Điện Áp, Dòng Sạc/Xả & Bảo Vệ Pin — Regs 50167–50179)',
-                fields: [
-                    { key: 'batLinkNum', reg: 50167, label: 'Number Of Batteries In Parallel (Số bình Pin song song)', type: 'number', min: 1, max: 3, step: 1, unit: 'pack', def: 2, sub: 'Range: [1, 3]' },
-                    { key: 'batCapacitySetting', reg: 50168, label: 'Battery Capacity Setting (Tổng dung lượng Pin)', type: 'number', min: 0, max: 1000, step: 1, unit: 'Ah', def: 560, sub: 'Range: [0, 1000] Ah' },
-                    { key: 'disChgStopVolt', reg: 50169, label: 'Battery Discharge Stop Volt (Điện áp dừng xả)', type: 'number', min: 35.0, max: 50.0, step: 0.1, unit: 'V', def: 46.0, sub: 'Range: [35.0, 50.0] V' },
-                    { key: 'chgRatio', reg: 50170, label: 'Charge Rate (Tỷ lệ dòng sạc C-rate)', type: 'number', min: 0, max: 1.00, step: 0.01, unit: 'C', def: 0.25, sub: 'Range: [0.00, 1.00] C' },
-                    { key: 'balanceChgVolt', reg: 50171, label: 'Absorb Voltage (Điện áp sạc hấp thụ / cân bằng)', type: 'number', min: 45.0, max: 65.0, step: 0.1, unit: 'V', def: 56.0, sub: 'Range: [45.0, 65.0] V' },
-                    { key: 'floatChgVolt', reg: 50172, label: 'Floating Charging Voltage (Điện áp sạc thả nổi)', type: 'number', min: 45.0, max: 65.0, step: 0.1, unit: 'V', def: 54.4, sub: 'Range: [45.0, 65.0] V' },
-                    { key: 'batOVPoint', reg: 50173, label: 'Battery Over Voltage Protect Point (Ngưỡng bảo vệ quá áp Pin)', type: 'number', min: 45.0, max: 65.0, step: 0.1, unit: 'V', def: 58.0, sub: 'Range: [45.0, 65.0] V' },
-                    { key: 'batLVPoint', reg: 50174, label: 'Battery Under Voltage Protect Point (Ngưỡng bảo vệ thấp áp Pin)', type: 'number', min: 35.0, max: 50.0, step: 0.1, unit: 'V', def: 44.0, sub: 'Range: [35.0, 50.0] V' },
-                    { key: 'batMaxChgCurr', reg: 50175, label: 'Battery Max Charge Current (Dòng sạc tối đa)', type: 'number', min: 0.0, max: 200.0, step: 0.1, unit: 'A', def: 120.0, sub: 'Range: [0.0, 200.0] A' },
-                    { key: 'batMaxDischgCurr', reg: 50176, label: 'Battery Max Discharge Current (Dòng xả tối đa)', type: 'number', min: 0.0, max: 200.0, step: 0.1, unit: 'A', def: 150.0, sub: 'Range: [0.0, 200.0] A' },
-                    { key: 'batMaxChgPower', reg: 50177, label: 'Battery Max Charge Power (Công suất sạc Pin tối đa)', type: 'number', min: 0, max: 10000, step: 50, unit: 'W', def: 6500, sub: 'Range: [0, 10000] W' },
-                    { key: 'batMaxDischgPower', reg: 50178, label: 'Battery Max Discharge Power (Công suất xả Pin tối đa)', type: 'number', min: 0, max: 10000, step: 50, unit: 'W', def: 8000, sub: 'Range: [0, 10000] W' },
-                    { key: 'batTempRatio', reg: 50179, label: 'Battery Temperature Compensation (Hệ số bù nhiệt)', type: 'number', min: 0, max: 65535, step: 1, unit: 'mV/°C/2V', def: 0, sub: 'Range: [0, 65535]' }
-                ]
-            },
-            {
-                id: 'cat-9-basic',
-                title: '9. Basic Configuration (Cấu Hình Cơ Bản, Hệ Số Công Suất & Phục Hồi Hòa Lưới — Regs 50191–50196)',
-                fields: [
-                    { key: 'powerFactor', reg: 50191, label: 'Power Factor (Hệ số công suất PF)', type: 'number', min: -1.00, max: 1.00, step: 0.01, unit: 'PF', def: 1.00, sub: 'Range: [-1.00, -0.80] & [0.80, 1.00]' },
-                    { key: 'grid10MinVolt', reg: 50192, label: '10min Grid Voltage Point (Ngưỡng áp lưới TB 10 phút)', type: 'number', min: 100.0, max: 135.0, step: 0.1, unit: '%', def: 110.0, sub: 'Range: [100.0, 135.0] %' },
-                    { key: 'gridConnRecoveryTime', reg: 50193, label: 'Power-on Grid Connection Recovery Time (Thời gian chờ hòa lưới)', type: 'number', min: 5, max: 1000, step: 1, unit: 's', def: 60, sub: 'Range: [5, 1000] s' },
-                    { key: 'activeSoftStartRate', reg: 50194, label: 'Power-on Active Power Recovery Rate (Tốc độ tăng công suất khởi động mềm)', type: 'number', min: 1, max: 1000, step: 1, unit: '%/min', def: 100, sub: 'Range: [1, 1000] %/min' },
-                    { key: 'faultActPwrRcvRate', reg: 50195, label: 'Fault Active Power Recovery Rate (Tốc độ phục hồi CS sau lỗi)', type: 'number', min: 1, max: 1000, step: 1, unit: '%/min', def: 100, sub: 'Range: [1, 1000] %/min' },
-                    { key: 'faultGridReconTime', reg: 50196, label: 'Fault Grid Reconnection Time (Thời gian kết nối lại lưới sau lỗi)', type: 'number', min: 5, max: 1000, step: 1, unit: 's', def: 60, sub: 'Range: [5, 1000] s' }
-                ]
-            },
-            {
-                id: 'cat-10-gridprotect',
-                title: '10. Grid Protect (Bảo Vệ Điện Áp / Tần Số Lưới Cấp I–III, L/HVRT, P-U, P-F, Q-U)',
-                fields: [
-                    { key: 'gridOVoltPoint1', reg: 50210, label: 'Grid Over Volt I (Bảo vệ quá áp lưới cấp I)', type: 'number', min: 100.0, max: 135.0, step: 0.1, unit: '%Un (253V)', def: 115.0, sub: 'Range: [100.0, 135.0] %Un (Default 253.0V)' },
-                    { key: 'gridOVoltTime1', reg: 50211, label: 'Grid Over Volt I Protect Time (Thời gian cắt quá áp I)', type: 'number', min: 20, max: 60000, step: 10, unit: 'ms', def: 1000, sub: 'Range: [20, 60000] ms' },
-                    { key: 'gridOVoltPoint2', reg: 50212, label: 'Grid Over Volt II (Bảo vệ quá áp lưới cấp II)', type: 'number', min: 100.0, max: 135.0, step: 0.1, unit: '%Un (264V)', def: 120.0, sub: 'Range: [100.0, 135.0] %Un (Default 264.0V)' },
-                    { key: 'gridOVoltTime2', reg: 50213, label: 'Grid Over Volt II Protect Time (Thời gian cắt quá áp II)', type: 'number', min: 20, max: 60000, step: 10, unit: 'ms', def: 200, sub: 'Range: [20, 60000] ms' },
-                    { key: 'gridOVoltRestorePoint', reg: 50214, label: 'Grid Over Volt Restore Point (Ngưỡng phục hồi quá áp)', type: 'number', min: 100.0, max: 135.0, step: 0.1, unit: '%Un', def: 112.0, sub: 'Range: [100.0, 135.0] %Un' },
-                    { key: 'gridUVoltPoint1', reg: 50215, label: 'Grid Under Volt I (Bảo vệ thấp áp lưới cấp I)', type: 'number', min: 0.0, max: 100.0, step: 0.1, unit: '%Un (187V)', def: 85.0, sub: 'Range: [0.0, 100.0] %Un (Default 187.0V)' },
-                    { key: 'gridUVoltTime1', reg: 50216, label: 'Grid Under Volt I Protect Time (Thời gian cắt thấp áp I)', type: 'number', min: 20, max: 60000, step: 10, unit: 'ms', def: 1500, sub: 'Range: [20, 60000] ms' },
-                    { key: 'gridUVoltPoint2', reg: 50217, label: 'Grid Under Volt II (Bảo vệ thấp áp lưới cấp II)', type: 'number', min: 0.0, max: 100.0, step: 0.1, unit: '%Un (154V)', def: 70.0, sub: 'Range: [0.0, 100.0] %Un (Default 154.0V)' },
-                    { key: 'gridUVoltTime2', reg: 50218, label: 'Grid Under Volt II Protect Time (Thời gian cắt thấp áp II)', type: 'number', min: 20, max: 60000, step: 10, unit: 'ms', def: 200, sub: 'Range: [20, 60000] ms' },
-                    { key: 'gridUVoltPoint3', reg: 50219, label: 'Grid Under Volt III (Bảo vệ thấp áp lưới cấp III)', type: 'number', min: 0.0, max: 100.0, step: 0.1, unit: '%Un', def: 50.0, sub: 'Range: [0.0, 100.0] %Un' },
-                    { key: 'gridUVoltTime3', reg: 50220, label: 'Grid Under Volt III Protect Time (Thời gian cắt thấp áp III)', type: 'number', min: 20, max: 60000, step: 10, unit: 'ms', def: 100, sub: 'Range: [20, 60000] ms' },
-                    { key: 'gridUVoltRestorePoint', reg: 50221, label: 'Grid Under Volt Restore Point (Ngưỡng phục hồi thấp áp)', type: 'number', min: 0.0, max: 100.0, step: 0.1, unit: '%Un', def: 88.0, sub: 'Range: [0.0, 100.0] %Un' },
-                    { key: 'gridOFreqPoint1', reg: 50222, label: 'Grid Over Freq I (Bảo vệ quá tần số cấp I)', type: 'number', min: 50.0, max: 65.0, step: 0.01, unit: 'Hz', def: 51.50, sub: 'Range: [50.00, 65.00] Hz' },
-                    { key: 'gridOFreqTime1', reg: 50223, label: 'Grid Over Freq I Protect Time (Thời gian cắt quá tần I)', type: 'number', min: 20, max: 60000, step: 10, unit: 'ms', def: 500, sub: 'Range: [20, 60000] ms' },
-                    { key: 'gridOFreqPoint2', reg: 50224, label: 'Grid Over Freq II (Bảo vệ quá tần số cấp II)', type: 'number', min: 50.0, max: 65.0, step: 0.01, unit: 'Hz', def: 52.00, sub: 'Range: [50.00, 65.00] Hz' },
-                    { key: 'gridOFreqTime2', reg: 50225, label: 'Grid Over Freq II Protect Time (Thời gian cắt quá tần II)', type: 'number', min: 20, max: 60000, step: 10, unit: 'ms', def: 200, sub: 'Range: [20, 60000] ms' },
-                    { key: 'gridOFreqRestorePoint', reg: 50226, label: 'Grid Over Freq Restore Point (Ngưỡng phục hồi quá tần)', type: 'number', min: 50.0, max: 65.0, step: 0.01, unit: 'Hz', def: 50.20, sub: 'Range: [50.00, 65.00] Hz' },
-                    { key: 'gridUFreqPoint1', reg: 50227, label: 'Grid Under Freq I (Bảo vệ thấp tần số cấp I)', type: 'number', min: 45.0, max: 60.0, step: 0.01, unit: 'Hz', def: 48.00, sub: 'Range: [45.00, 60.00] Hz' },
-                    { key: 'gridUFreqTime1', reg: 50228, label: 'Grid Under Freq I Protect Time (Thời gian cắt thấp tần I)', type: 'number', min: 20, max: 60000, step: 10, unit: 'ms', def: 500, sub: 'Range: [20, 60000] ms' },
-                    { key: 'gridUFreqPoint2', reg: 50229, label: 'Grid Under Freq II (Bảo vệ thấp tần số cấp II)', type: 'number', min: 45.0, max: 60.0, step: 0.01, unit: 'Hz', def: 47.50, sub: 'Range: [45.00, 60.00] Hz' },
-                    { key: 'gridUFreqTime2', reg: 50230, label: 'Grid Under Freq II Protect Time (Thời gian cắt thấp tần II)', type: 'number', min: 20, max: 60000, step: 10, unit: 'ms', def: 200, sub: 'Range: [20, 60000] ms' },
-                    { key: 'gridUFreqRestorePoint', reg: 50231, label: 'Grid Under Freq Restore Point (Ngưỡng phục hồi thấp tần)', type: 'number', min: 45.0, max: 60.0, step: 0.01, unit: 'Hz', def: 49.80, sub: 'Range: [45.00, 60.00] Hz' },
-                    { key: 'insImpProtectVal', reg: 50232, label: 'Insulation Impedance Protect Point (Ngưỡng cách điện ISO)', type: 'number', min: 10, max: 2000, step: 1, unit: 'kΩ', def: 100, sub: 'Range: [10, 2000] kΩ' },
-                    { key: 'pvUVoltPoint', reg: 50233, label: 'PV Under Volt Protect Point (Ngưỡng thấp áp PV)', type: 'number', min: 80.0, max: 550.0, step: 0.1, unit: 'V', def: 90.0, sub: 'Range: [80.0, 550.0] V' },
-                    { key: 'pvStartPoint', reg: 50234, label: 'PV Start Volt Point (Điện áp khởi động PV)', type: 'number', min: 80.0, max: 550.0, step: 0.1, unit: 'V', def: 100.0, sub: 'Range: [80.0, 550.0] V' },
-                    { key: 'pvOVlotPoint', reg: 50235, label: 'PV Over Volt Protect Point (Ngưỡng quá áp PV)', type: 'number', min: 80.0, max: 600.0, step: 0.1, unit: 'V', def: 550.0, sub: 'Range: [80.0, 600.0] V' },
-                    { key: 'lhvrtMode', reg: 50236, label: 'L/HVRT Mode (Vượt sự cố sụt/quá áp lưới)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'hfrtMode', reg: 50237, label: 'L/HFRT Mode (Vượt sự cố tần số lưới)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Enable']] },
-                    { key: 'puMode', reg: 50238, label: 'P(U) Mode (Điều chỉnh công suất theo điện áp)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Linear'], ['2', '2 - Hysteresis']] },
-                    { key: 'pfMode', reg: 50239, label: 'P(f) Mode (Giảm công suất khi quá tần số)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Linear'], ['2', '2 - Hysteresis']] },
-                    { key: 'quMode', reg: 50240, label: 'Q(U) Mode (Điều chỉnh CS phản kháng theo áp)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Linear'], ['2', '2 - Hysteresis']] },
-                    { key: 'spfMode', reg: 50241, label: 'SPF Mode (Điều khiển hệ số công suất SPF)', type: 'select', def: '0', options: [['0', '0 - Disable'], ['1', '1 - Enable']] }
-                ]
-            },
-            {
-                id: 'cat-11-parallel',
-                title: '11. Parallel Setting (Cấu Hình Ghép Song Song Nhiều Máy & Hợp Pha — Regs 50042–50047)',
-                fields: [
-                    { key: 'parallelType', reg: 50042, label: 'Parallel Type (Chế độ ghép song song)', type: 'select', def: '0', options: [
-                        ['0', '0 - Single (Chạy đơn độc lập)'],
-                        ['1', '1 - Parallel Master (Máy chủ song song)'],
-                        ['2', '2 - Parallel Slave (Máy tớ song song)']
-                    ]},
-                    { key: 'parallelNum', reg: 50043, label: 'Parallel Number (Tổng số máy ghép song song)', type: 'number', min: 2, max: 16, step: 1, unit: 'máy', def: 2, sub: 'Range: [2, 16]' },
-                    { key: 'parallelAddr', reg: 50044, label: 'Parallel Address (Địa chỉ máy song song)', type: 'number', min: 1, max: 16, step: 1, unit: 'ID', def: 1, sub: 'Range: [1, 16]' },
-                    { key: 'parallelBatEnable', reg: 50045, label: 'Shared Battery (Dùng chung tổ Pin)', type: 'select', def: '1', options: [['0', '0 - Disable (Pin riêng)'], ['1', '1 - Enable (Dùng chung Pin)']] },
-                    { key: 'groupThreePhaseEnable', reg: 50046, label: 'Combined Three Phase (Ghép thành hệ thống 3 pha)', type: 'select', def: '0', options: [['0', '0 - Disable (1 Pha)'], ['1', '1 - Enable (Ghép 3 Pha)']] },
-                    { key: 'localPhase', reg: 50047, label: 'Local Phase (Pha của máy hiện tại)', type: 'select', def: '0', options: [
-                        ['0', '0 - Phase A (Pha A / R)'],
-                        ['1', '1 - Phase B (Pha B / S)'],
-                        ['2', '2 - Phase C (Pha C / T)']
-                    ]}
-                ]
-            }
-        ];
+        // [ĐÃ TỐI ƯU: Đã lược bỏ 331 thông số cài đặt holding registers để tối ưu tốc độ & bộ nhớ]
 
-        const DEFAULT_TOU_PERIODS = [
-            { start: '00:00', end: '04:00', type: '2', gridChg: '0', curr: 60, soc: 20 },
-            { start: '04:00', end: '09:30', type: '1', gridChg: '0', curr: 80, soc: 20 },
-            { start: '09:30', end: '11:30', type: '0', gridChg: '0', curr: 100, soc: 15 },
-            { start: '11:30', end: '17:00', type: '1', gridChg: '0', curr: 100, soc: 20 },
-            { start: '17:00', end: '20:00', type: '0', gridChg: '0', curr: 120, soc: 15 },
-            { start: '20:00', end: '22:00', type: '1', gridChg: '0', curr: 80, soc: 20 },
-            { start: '22:00', end: '24:00', type: '2', gridChg: '0', curr: 60, soc: 20 },
-            { start: '00:00', end: '00:00', type: '1', gridChg: '0', curr: 50, soc: 20 },
-            { start: '00:00', end: '00:00', type: '1', gridChg: '0', curr: 50, soc: 20 },
-            { start: '00:00', end: '00:00', type: '1', gridChg: '0', curr: 50, soc: 20 }
-        ];
-
-        let sosenSettingsState = {};
-
-        function loadSavedSosenSettings() {
-            try {
-                const raw = localStorage.getItem('sosen_1to1_settings_state');
-                if (raw) sosenSettingsState = JSON.parse(raw) || {};
-            } catch (e) {}
-            if (!Array.isArray(sosenSettingsState.workdayTou) || sosenSettingsState.workdayTou.length !== 10) {
-                sosenSettingsState.workdayTou = JSON.parse(JSON.stringify(DEFAULT_TOU_PERIODS));
-            }
-            if (!Array.isArray(sosenSettingsState.nonworkdayTou) || sosenSettingsState.nonworkdayTou.length !== 10) {
-                sosenSettingsState.nonworkdayTou = JSON.parse(JSON.stringify(DEFAULT_TOU_PERIODS));
-            }
-        }
-
-        function buildTouTableHtml(prefix, title, baseReg, rows) {
-            let h = `<div class="telemetry-section-title" style="margin-top:14px;"><span>${title} (Regs ${baseReg}–${baseReg + 19})</span></div>`;
-            h += `<div class="tou-table-wrap"><table class="tou-table"><thead><tr>
-                <th>Khung #</th><th>Thanh ghi</th><th>Giờ Bắt Đầu</th><th>Giờ Kết Thúc</th><th>Loại Biểu Giá / Chế Độ (Run Type)</th><th>Sạc Lưới</th><th>Dòng Max (A)</th><th>Stop SOC (%)</th>
-            </tr></thead><tbody>`;
-            for (let i = 0; i < 10; i++) {
-                const r = rows[i] || DEFAULT_TOU_PERIODS[i];
-                const reg1 = baseReg + i * 2;
-                const reg2 = reg1 + 1;
-                h += `<tr>
-                    <td>#${i + 1}</td>
-                    <td><span class="reg-badge">${reg1}-${reg2}</span></td>
-                    <td><input type="time" id="${prefix}-start-${i}" value="${r.start}"></td>
-                    <td><input type="time" id="${prefix}-end-${i}" value="${r.end === '24:00' ? '23:59' : r.end}"></td>
-                    <td>
-                        <select id="${prefix}-type-${i}">
-                            <option value="0" ${r.type === '0' ? 'selected' : ''}>0 - Peak Price (Giờ Cao Điểm / Ưu tiên Xả)</option>
-                            <option value="1" ${r.type === '1' ? 'selected' : ''}>1 - Flat Price (Giờ Bình Thường / Tự dùng)</option>
-                            <option value="2" ${r.type === '2' ? 'selected' : ''}>2 - Valley Price (Giờ Thấp Điểm / Sạc)</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select id="${prefix}-grid-${i}">
-                            <option value="0" ${r.gridChg === '0' ? 'selected' : ''}>0 - Off</option>
-                            <option value="1" ${r.gridChg === '1' ? 'selected' : ''}>1 - On</option>
-                        </select>
-                    </td>
-                    <td><input type="number" id="${prefix}-curr-${i}" min="0" max="200" style="width:68px;" value="${r.curr}"></td>
-                    <td><input type="number" id="${prefix}-soc-${i}" min="10" max="100" style="width:64px;" value="${r.soc}"></td>
-                </tr>`;
-            }
-            h += `</tbody></table></div>`;
-            return h;
-        }
-
-        function renderSosenSettingsPortal() {
-            loadSavedSosenSettings();
-            const acc = document.getElementById('sosen-settings-accordion');
-            if (!acc) return;
-            let html = '';
-
-            SOSEN_SETTINGS_SCHEMA.forEach((cat, idx) => {
-                const isOpen = idx < 2; // Mở sẵn Power On/Off và User Mode
-                html += `<div class="sosen-collapse-item ${isOpen ? 'active' : ''}" id="${cat.id}">
-                    <button type="button" class="sosen-collapse-header" onclick="toggleSosenCollapse('${cat.id}')">
-                        <span>${cat.title}</span>
-                        <span class="sosen-collapse-arrow">▶</span>
-                    </button>
-                    <div class="sosen-collapse-body">
-                        <div class="sosen-cat-actions">
-                            ${cat.id === 'cat-5-other' ? `<button type="button" class="sosen-btn-sm read" onclick="syncSystemTimeFields()">🕒 Lấy giờ điện thoại/máy tính hiện tại</button>` : ''}
-                            <button type="button" class="sosen-btn-sm read" onclick="readCategorySettings('${cat.id}')">📥 Read (Đọc mục này)</button>
-                            <button type="button" class="sosen-btn-sm" onclick="saveCategorySettings('${cat.id}')">📤 Set (Ghi xuống Biến tần)</button>
-                        </div>
-                        <div class="sosen-form-grid">`;
-
-                cat.fields.forEach(f => {
-                    const curVal = sosenSettingsState[f.key] !== undefined ? sosenSettingsState[f.key] : f.def;
-                    html += `<div class="sosen-field-card">
-                        <div class="sosen-field-label">
-                            <span>${f.label}</span>
-                            <span class="reg-badge">${f.reg}</span>
-                        </div>
-                        ${f.sub ? `<div class="sosen-field-sub">${f.sub}</div>` : ''}
-                        <div class="sosen-field-ctrl">`;
-                    if (f.type === 'select') {
-                        html += `<select class="sosen-select" id="set-${f.key}" data-reg="${f.reg}">`;
-                        f.options.forEach(opt => {
-                            const sel = String(curVal) === String(opt[0]) ? 'selected' : '';
-                            html += `<option value="${opt[0]}" ${sel}>${opt[1]}</option>`;
-                        });
-                        html += `</select>`;
-                    } else {
-                        html += `<input type="number" class="sosen-input" id="set-${f.key}" data-reg="${f.reg}" value="${curVal}" ${f.min !== undefined ? `min="${f.min}"` : ''} ${f.max !== undefined ? `max="${f.max}"` : ''} ${f.step !== undefined ? `step="${f.step}"` : ''}>`;
-                        if (f.unit) html += `<span class="sosen-unit">${f.unit}</span>`;
-                    }
-                    html += `<button type="button" class="sosen-btn-sm" onclick="setSingleField('${f.key}', ${f.reg}, '${f.label.replace(/'/g, '')}')">Set</button>
-                        </div>
-                    </div>`;
-                });
-
-                html += `</div>`;
-                if (cat.hasTouTables) {
-                    html += buildTouTableHtml('tou-wd', '🕒 Workday TOU Time — Khung Giờ Ngày Làm Việc', 50058, sosenSettingsState.workdayTou);
-                    html += buildTouTableHtml('tou-nw', '🕒 Nonworkday TOU Time — Khung Giờ Ngày Nghỉ', 50079, sosenSettingsState.nonworkdayTou);
-                }
-                html += `</div></div>`;
-            });
-
-            acc.innerHTML = html;
-        }
-
-        function toggleSosenCollapse(id) {
-            const el = document.getElementById(id);
-            if (el) el.classList.toggle('active');
-        }
-
-        function expandAllSettings(open) {
-            document.querySelectorAll('.sosen-collapse-item').forEach(el => {
-                el.classList.toggle('active', !!open);
-            });
-        }
-
-        function syncSystemTimeFields() {
-            const now = new Date();
-            const map = {
-                sysTimeYear: now.getFullYear(),
-                sysTimeMonth: now.getMonth() + 1,
-                sysTimeDay: now.getDate(),
-                sysTimeHour: now.getHours(),
-                sysTimeMinute: now.getMinutes(),
-                sysTimeSecond: now.getSeconds()
-            };
-            Object.keys(map).forEach(k => {
-                const el = document.getElementById('set-' + k);
-                if (el) el.value = map[k];
-            });
-            showSosenToast('🕒 Đã đồng bộ giờ hệ thống hiện tại vào ô cài đặt (Regs 50161–50166)!');
-        }
-
-        function collectTouRows(prefix) {
-            const arr = [];
-            for (let i = 0; i < 10; i++) {
-                arr.push({
-                    start: (document.getElementById(`${prefix}-start-${i}`) || {}).value || '00:00',
-                    end: (document.getElementById(`${prefix}-end-${i}`) || {}).value || '00:00',
-                    type: (document.getElementById(`${prefix}-type-${i}`) || {}).value || '1',
-                    gridChg: (document.getElementById(`${prefix}-grid-${i}`) || {}).value || '0',
-                    curr: Number((document.getElementById(`${prefix}-curr-${i}`) || {}).value || 60),
-                    soc: Number((document.getElementById(`${prefix}-soc-${i}`) || {}).value || 20)
-                });
-            }
-            return arr;
-        }
-
-        // =================================================================================================
+                // =================================================================================================
         // 2B. KẾT NỐI ĐIỀU KHIỂN TRỰC TIẾP CLOUD SOSEN (https://pv.inteless.com / Gateway E47F24C03812)
         // =================================================================================================
         const SOSEN_CLOUD_BASE_URL = "https://pv.inteless.com";
@@ -5066,7 +4738,6 @@
         };
         let sosenCloudRealtimeTimer = null;
 
-        // Hàm băm MD5 chuẩn RFC 1321 để ký tham số sign cho API /anonymous/publicKey của pv.inteless.com
         function md5Hex(string) {
             function rotateLeft(lValue, iShiftBits) { return (lValue << iShiftBits) | (lValue >>> (32 - iShiftBits)); }
             function addUnsigned(lX, lY) {
@@ -5155,7 +4826,7 @@
 
         function loadSosenCloudAuth() {
             try {
-                const raw = localStorage.getItem('sosen_cloud_auth_v1');
+                const raw = safeStorage.getItem('sosen_cloud_auth_v1');
                 if (raw) {
                     const parsed = JSON.parse(raw);
                     if (parsed && typeof parsed === 'object') {
@@ -5169,7 +4840,7 @@
         function persistSosenCloudAuth(syncToFirebase = true) {
             sosenCloudAuth.updatedAt = Date.now();
             try {
-                localStorage.setItem('sosen_cloud_auth_v1', JSON.stringify(sosenCloudAuth));
+                safeStorage.setItem('sosen_cloud_auth_v1', JSON.stringify(sosenCloudAuth));
             } catch (e) {}
             if (syncToFirebase && database && sosenCloudAuth.access_token) {
                 database.ref('/SosenSystem/CloudAuth').set(sosenCloudAuth);
@@ -5316,7 +4987,7 @@
                 appendSosenCloudLog(`✅ Đăng nhập Cloud Sosen thành công! Token đã lưu & đồng bộ. Đang đọc thông số biến tần ${sosenCloudAuth.invSn}...`);
                 showSosenToast('🎉 Đã kết nối trực tiếp Cloud Sosen (pv.inteless.com) thành công!');
 
-                await readAllSettingsFromCloud();
+                await pollSosenFastFlow5s();
                 await pollSosenCloudRealtime(true);
             } catch (err) {
                 appendSosenCloudLog(`❌ Lỗi đăng nhập Cloud Sosen: ${err.message || err}`);
@@ -5326,10 +4997,13 @@
             }
         }
 
+        let sosenRefreshPromise = null;
         async function sosenCloudRefreshToken() {
-            if (!sosenCloudAuth.refresh_token) return false;
-            try {
-                const res = await fetch(`${SOSEN_CLOUD_BASE_URL}/oauth/token/new`, {
+            if (sosenRefreshPromise) return sosenRefreshPromise;
+            sosenRefreshPromise = (async () => {
+                if (!sosenCloudAuth.refresh_token) return false;
+                try {
+                    const res = await fetch(`${SOSEN_CLOUD_BASE_URL}/oauth/token/new`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json;charset=UTF-8',
@@ -5349,8 +5023,10 @@
                     persistSosenCloudAuth(true);
                     return true;
                 }
-            } catch (e) {}
-            return false;
+                } catch (e) {}
+                return false;
+            })().finally(() => { sosenRefreshPromise = null; });
+            return sosenRefreshPromise;
         }
 
         async function sosenCloudRequest(method, path, bodyData = null, isFormData = false, retried = false) {
@@ -5396,286 +5072,7 @@
             return json;
         }
 
-        // Chuyển đổi dữ liệu TOU trả về từ Cloud Sosen (time1Start..time10Start, period1MaxCurrent..period10StopSoc) sang bảng giao diện
-        function applyCloudSettingsToState(cloudData) {
-            if (!cloudData || typeof cloudData !== 'object') return;
-            Object.keys(cloudData).forEach(k => {
-                if (cloudData[k] !== null && cloudData[k] !== undefined && cloudData[k] !== '') {
-                    sosenSettingsState[k] = cloudData[k];
-                }
-            });
-
-            // Đồng bộ Workday TOU (time1Start..time10Start, time1WorkMode..time10WorkMode, period1MaxCurrent..period10StopSoc)
-            if (cloudData.time1Start !== undefined || cloudData.time1WorkMode !== undefined) {
-                const wdRows = [];
-                for (let i = 0; i < 10; i++) {
-                    const idx = i + 1;
-                    const start = cloudData[`time${idx}Start`] || (sosenSettingsState.workdayTou?.[i]?.start) || '00:00';
-                    const nextStart = idx < 10 ? (cloudData[`time${idx + 1}Start`] || '23:59') : '23:59';
-                    const type = String(cloudData[`time${idx}WorkMode`] ?? (sosenSettingsState.workdayTou?.[i]?.type ?? '1'));
-                    const curr = toSafeNumber(cloudData[`period${idx}MaxCurrent`], sosenSettingsState.workdayTou?.[i]?.curr ?? 60);
-                    const soc = toSafeNumber(cloudData[`period${idx}StopSoc`], sosenSettingsState.workdayTou?.[i]?.soc ?? 20);
-                    const gridChg = String(cloudData.gridCharge ?? cloudData.gridChgBatEnable ?? (sosenSettingsState.workdayTou?.[i]?.gridChg ?? '0'));
-                    wdRows.push({ start, end: nextStart, type, gridChg, curr, soc });
-                }
-                sosenSettingsState.workdayTou = wdRows;
-            }
-
-            // Đồng bộ Nonworkday TOU (nTime1Start..nTime10Start, nTime1WorkMode..nTime10WorkMode)
-            if (cloudData.nTime1Start !== undefined || cloudData.nTime1WorkMode !== undefined) {
-                const nwRows = [];
-                for (let i = 0; i < 10; i++) {
-                    const idx = i + 1;
-                    const start = cloudData[`nTime${idx}Start`] || (sosenSettingsState.nonworkdayTou?.[i]?.start) || '00:00';
-                    const nextStart = idx < 10 ? (cloudData[`nTime${idx + 1}Start`] || '23:59') : '23:59';
-                    const type = String(cloudData[`nTime${idx}WorkMode`] ?? (sosenSettingsState.nonworkdayTou?.[i]?.type ?? '1'));
-                    const curr = toSafeNumber(cloudData[`period${idx}MaxCurrent`], sosenSettingsState.nonworkdayTou?.[i]?.curr ?? 60);
-                    const soc = toSafeNumber(cloudData[`period${idx}StopSoc`], sosenSettingsState.nonworkdayTou?.[i]?.soc ?? 20);
-                    const gridChg = String(cloudData.gridCharge ?? cloudData.gridChgBatEnable ?? (sosenSettingsState.nonworkdayTou?.[i]?.gridChg ?? '0'));
-                    nwRows.push({ start, end: nextStart, type, gridChg, curr, soc });
-                }
-                sosenSettingsState.nonworkdayTou = nwRows;
-            }
-
-            // Cập nhật hiển thị Mode Setting trên bảng Telemetry (Reg 40003)
-            if (cloudData.modeSetting !== undefined) {
-                const modes = ['0 - Self Use (Tự dùng)', '1 - TOU Balance', '2 - TOU Eco', '3 - Backup Power', '4 - Grid Priority'];
-                updateDOMText('rt-40003', modes[Number(cloudData.modeSetting)] || String(cloudData.modeSetting));
-            }
-        }
-
-        function buildTouCloudPayload() {
-            const wd = collectTouRows('tou-wd');
-            const nw = collectTouRows('tou-nw');
-            sosenSettingsState.workdayTou = wd;
-            sosenSettingsState.nonworkdayTou = nw;
-            const out = {};
-            for (let i = 0; i < 10; i++) {
-                const idx = i + 1;
-                out[`time${idx}Start`] = wd[i].start || '00:00';
-                out[`time${idx}WorkMode`] = String(wd[i].type ?? '1');
-                out[`period${idx}MaxCurrent`] = String(wd[i].curr ?? 60);
-                out[`period${idx}StopSoc`] = String(wd[i].soc ?? 20);
-                out[`nTime${idx}Start`] = nw[i].start || '00:00';
-                out[`nTime${idx}WorkMode`] = String(nw[i].type ?? '1');
-            }
-            return out;
-        }
-
-        async function setSingleField(key, reg, label) {
-            const el = document.getElementById('set-' + key);
-            if (!el) return;
-            const val = el.value;
-            sosenSettingsState[key] = val;
-            try { localStorage.setItem('sosen_1to1_settings_state', JSON.stringify(sosenSettingsState)); } catch (e) {}
-
-            await sendSingleHoldingReg(reg, val, label, key);
-        }
-
-        async function sendSingleHoldingReg(reg, val, label, key = '') {
-            const sn = sosenCloudAuth.invSn || 'S8303002425022100221';
-            const fieldKey = key || ('reg_' + reg);
-            const payload = {
-                cmd: 'write_single_register',
-                func: 6,
-                reg: Number(reg),
-                key: fieldKey,
-                value: isNaN(Number(val)) ? val : Number(val),
-                label: label,
-                sn: sn,
-                ts: Date.now()
-            };
-
-            // 1. Đồng bộ tức thì qua MQTT & Firebase
-            if (mqttClient && mqttClient.connected) {
-                mqttClient.publish('sosen/command', JSON.stringify(payload));
-                mqttClient.publish('sosen/setting', JSON.stringify(payload));
-            }
-            if (database) {
-                database.ref('/SosenSystem/Settings/' + fieldKey).set(payload.value);
-                database.ref('/SosenSystem/RemoteCommand').set(payload);
-            }
-            if (Number(reg) === 50056) {
-                const modes = ['0 - Self Use (Tự dùng)', '1 - TOU Balance', '2 - TOU Eco', '3 - Backup Power', '4 - Grid Priority'];
-                updateDOMText('rt-40003', modes[Number(val)] || String(val));
-            }
-
-            // 2. Gửi trực tiếp xuống Biến tần qua Cloud Sosen (pv.inteless.com -> Gateway E47F24C03812)
-            if (sosenCloudAuth.access_token && key) {
-                showSosenToast(`⏳ Đang ghi [${reg}] ${label} = ${val} xuống Biến tần qua Cloud Sosen...`);
-                try {
-                    const cloudBody = { sn: sn, [key]: String(val) };
-                    let res = await sosenCloudRequest('POST', `/api/v1/common/setting/${sn}/single/set`, cloudBody);
-                    if (!res || res.code !== 0) {
-                        // Fallback sang /once/set cho các trường thuộc biểu mẫu danh mục
-                        res = await sosenCloudRequest('POST', `/api/v1/common/setting/${sn}/once/set`, cloudBody);
-                    }
-                    if (res && res.code === 0) {
-                        appendSosenCloudLog(`✅ Set [${reg}] ${key} = ${val} -> Thành công (code: 0)`);
-                        showSosenToast(`✅ Đã ghi trực tiếp xuống Biến tần [${reg}] ${label} = ${val}!`);
-                        return;
-                    } else {
-                        const errMsg = res?.msg || JSON.stringify(res);
-                        appendSosenCloudLog(`⚠️ Phản hồi từ Cloud Sosen khi ghi ${key}: ${errMsg}`);
-                        showSosenToast(`⚠️ Cloud Sosen phản hồi: ${errMsg}`);
-                        return;
-                    }
-                } catch (err) {
-                    appendSosenCloudLog(`❌ Lỗi gọi Cloud Sosen khi ghi ${key}: ${err.message || err}`);
-                }
-            } else if (!sosenCloudAuth.access_token) {
-                showSosenToast(`💾 Đã lưu [${reg}] = ${val} (Bấm "☁️ Cloud Sosen" để đăng nhập điều khiển thẳng Biến tần)`);
-                openSosenCloudModal();
-                return;
-            }
-            showSosenToast(`✅ Đã ghi thanh ghi [${reg}] ${label} = ${val}`);
-        }
-
-        async function saveCategorySettings(catId) {
-            const cat = SOSEN_SETTINGS_SCHEMA.find(c => c.id === catId);
-            if (!cat) return;
-            const sn = sosenCloudAuth.invSn || 'S8303002425022100221';
-            const batch = {};
-            const cloudPayload = { sn: sn };
-
-            cat.fields.forEach(f => {
-                const el = document.getElementById('set-' + f.key);
-                if (el) {
-                    sosenSettingsState[f.key] = el.value;
-                    batch[f.key] = isNaN(Number(el.value)) ? el.value : Number(el.value);
-                    cloudPayload[f.key] = String(el.value);
-                }
-            });
-
-            if (cat.hasTouTables) {
-                const touCloud = buildTouCloudPayload();
-                batch.workdayTou = sosenSettingsState.workdayTou;
-                batch.nonworkdayTou = sosenSettingsState.nonworkdayTou;
-                Object.assign(cloudPayload, touCloud);
-            }
-
-            try { localStorage.setItem('sosen_1to1_settings_state', JSON.stringify(sosenSettingsState)); } catch (e) {}
-            if (mqttClient && mqttClient.connected) {
-                mqttClient.publish('sosen/setting', JSON.stringify({ cmd: 'write_category', category: catId, data: batch, ts: Date.now() }));
-            }
-            if (database) {
-                database.ref('/SosenSystem/Settings').update(batch);
-            }
-
-            if (sosenCloudAuth.access_token) {
-                const shortTitle = cat.title.split('(')[0].trim();
-                showSosenToast(`⏳ Đang ghi danh mục "${shortTitle}" xuống Biến tần qua Cloud Sosen...`);
-                try {
-                    const res = await sosenCloudRequest('POST', `/api/v1/common/setting/${sn}/once/set`, cloudPayload);
-                    if (res && res.code === 0) {
-                        appendSosenCloudLog(`✅ Đã ghi danh mục ${shortTitle} xuống biến tần ${sn} thành công!`);
-                        showSosenToast(`✅ Biến tần đã nhận cài đặt danh mục "${shortTitle}"!`);
-                        return;
-                    } else {
-                        const msg = res?.msg || JSON.stringify(res);
-                        appendSosenCloudLog(`⚠️ Cloud Sosen phản hồi danh mục ${shortTitle}: ${msg}`);
-                        showSosenToast(`⚠️ Cloud Sosen phản hồi: ${msg}`);
-                        return;
-                    }
-                } catch (err) {
-                    appendSosenCloudLog(`❌ Lỗi ghi danh mục ${catId}: ${err.message || err}`);
-                }
-            } else {
-                openSosenCloudModal();
-            }
-            showSosenToast(`💾 Đã lưu & đồng bộ danh mục "${cat.title.split('(')[0].trim()}"!`);
-        }
-
-        async function readCategorySettings(catId) {
-            const sn = sosenCloudAuth.invSn || 'S8303002425022100221';
-            if (sosenCloudAuth.access_token) {
-                showSosenToast(`⏳ Đang đọc thông số trực tiếp từ Biến tần ${sn} qua Cloud Sosen...`);
-                try {
-                    const res = await sosenCloudRequest('GET', `/api/v1/common/setting/${sn}/read`);
-                    if (res && res.code === 0 && res.data) {
-                        applyCloudSettingsToState(res.data);
-                        try { localStorage.setItem('sosen_1to1_settings_state', JSON.stringify(sosenSettingsState)); } catch (e) {}
-                        if (database) database.ref('/SosenSystem/Settings').update(sosenSettingsState);
-                        renderSosenSettingsPortal();
-                        appendSosenCloudLog(`✅ Đã đọc ${Object.keys(res.data).length} thông số cài đặt trực tiếp từ biến tần ${sn}!`);
-                        showSosenToast(`📥 Đã đọc trực tiếp ${Object.keys(res.data).length} thông số từ Biến tần ${sn}!`);
-                        return;
-                    } else {
-                        appendSosenCloudLog(`⚠️ Phản hồi đọc cài đặt từ Cloud Sosen: ${res?.msg || JSON.stringify(res)}`);
-                    }
-                } catch (err) {
-                    appendSosenCloudLog(`❌ Lỗi đọc cài đặt từ Cloud Sosen: ${err.message || err}`);
-                }
-            }
-
-            if (database) {
-                database.ref('/SosenSystem/Settings').once('value', snap => {
-                    const val = snap.val();
-                    if (val && typeof val === 'object') {
-                        Object.assign(sosenSettingsState, val);
-                        try { localStorage.setItem('sosen_1to1_settings_state', JSON.stringify(sosenSettingsState)); } catch (e) {}
-                        renderSosenSettingsPortal();
-                    }
-                });
-            }
-            if (!sosenCloudAuth.access_token) {
-                showSosenToast('🔑 Hãy đăng nhập Cloud Sosen để đọc trực tiếp từ Biến tần!');
-                openSosenCloudModal();
-            } else {
-                showSosenToast('📥 Đã đọc thông số cài đặt từ bộ nhớ đồng bộ!');
-            }
-        }
-
-        function readAllSettingsFromCloud() {
-            return readCategorySettings('all');
-        }
-
-        async function saveAllSettingsToCloud() {
-            const sn = sosenCloudAuth.invSn || 'S8303002425022100221';
-            const cloudPayload = { sn: sn };
-            SOSEN_SETTINGS_SCHEMA.forEach(cat => {
-                cat.fields.forEach(f => {
-                    const el = document.getElementById('set-' + f.key);
-                    if (el) {
-                        sosenSettingsState[f.key] = el.value;
-                        cloudPayload[f.key] = String(el.value);
-                    }
-                });
-            });
-            const touCloud = buildTouCloudPayload();
-            Object.assign(cloudPayload, touCloud);
-
-            try { localStorage.setItem('sosen_1to1_settings_state', JSON.stringify(sosenSettingsState)); } catch (e) {}
-            if (database) {
-                database.ref('/SosenSystem/Settings').update(sosenSettingsState);
-            }
-            if (mqttClient && mqttClient.connected) {
-                mqttClient.publish('sosen/setting', JSON.stringify({ cmd: 'write_all', data: sosenSettingsState, ts: Date.now() }));
-            }
-
-            if (sosenCloudAuth.access_token) {
-                showSosenToast(`⏳ Đang gửi toàn bộ cài đặt xuống Biến tần ${sn} qua Cloud Sosen...`);
-                try {
-                    const res = await sosenCloudRequest('POST', `/api/v1/common/setting/${sn}/once/set`, cloudPayload);
-                    if (res && res.code === 0) {
-                        appendSosenCloudLog(`✅ Đã ghi toàn bộ cài đặt xuống biến tần ${sn} thành công!`);
-                        showSosenToast(`✅ Đã ghi toàn bộ cài đặt xuống Biến tần ${sn} thành công!`);
-                        return;
-                    } else {
-                        showSosenToast(`⚠️ Cloud Sosen phản hồi: ${res?.msg || JSON.stringify(res)}`);
-                        return;
-                    }
-                } catch (err) {
-                    appendSosenCloudLog(`❌ Lỗi Set All Cloud Sosen: ${err.message || err}`);
-                }
-            } else {
-                openSosenCloudModal();
-            }
-            showSosenToast('💾 Đã lưu & gửi toàn bộ 11 danh mục cài đặt lên MQTT & Firebase!');
-        }
-
-        // ---------------- 2C. ĐỌC CHỈ SỐ THỜI GIAN THỰC TRỰC TIẾP TỪ CLOUD SOSEN (ÉP ĐỌC 3 GIÂY/LẦN + ĐẦY ĐỦ 100% MODULES) ----------------
-        let sosenFastFlowSse = null;
+        // [ĐÃ TỐI ƯU: Đã lược bỏ các hàm ghi cấu hình 331 cài đặt]
         let sosenFast5sTimer = null;
         let sosenFastKeepAliveTimer = null;
         let lastCloudDetailCache = null;
@@ -5938,7 +5335,7 @@
             }
         }
 
-        // Kích hoạt chế độ bơm dữ liệu nhanh 3 giây/lần (dataFreq = 3 & 5) trên Gateway E47F24C03812 + mở kênh SSE EventSource
+        // Kích hoạt đánh thức WiFi Gateway E47F24C03812 đọc RS485 và làm mới Live Polling 3s
         async function triggerSosenFast5sMode(manualRefresh = false) {
             if (!sosenCloudAuth.access_token) return;
             const sn = sosenCloudAuth.invSn || 'S8303002425022100221';
@@ -5946,62 +5343,21 @@
             const userId = '157769';
 
             try {
-                // 1. Gửi lệnh songsenEquieFlow đánh thức cục WiFi E47F24C03812 đọc RS485 tức thì
+                // Đánh thức cục WiFi E47F24C03812 đọc mới thanh ghi RS485
                 sosenCloudRequest('GET', `/api/v1/inverter/${gsn}/realTimeUpdateByInv?gsn=${gsn}&userId=${userId}`).catch(() => {});
                 sosenCloudRequest('GET', `/api/v1/inverter/172774/realTimeUpdateByStation?plantId=172774&userId=${userId}`).catch(() => {});
-
-                // 2. Ép lệnh getFlowsFast ở mức 3 giây (dataFreq: 3) và dự phòng 5 giây (dataFreq: 5)
-                // PATCH 2026-10-26: Chi goi neu co access_token hop le va bo qua loi 500 tu Cloud Server
-                let fastRes = null;
-                try {
-                    fastRes = await sosenCloudRequest('POST', `/api/v1/fast/data/freq`, {
-                        sn: sn,
-                        dataFreq: 3,
-                        identifyType: 0
-                    });
-                    if (!fastRes || fastRes.code !== 0) {
-                        fastRes = await sosenCloudRequest('POST', `/api/v1/fast/data/freq`, {
-                            sn: sn,
-                            dataFreq: 5,
-                            identifyType: 0
-                        });
-                    }
-                } catch (freqErr) {
-                    // Bo qua loi 500/401 tu Cloud khi chua dang nhap
-                }
-
-                if (fastRes && fastRes.code === 0) {
-                    appendSosenCloudLog(`⚡ Đã kích hoạt chế độ bơm nhanh 3s/lần cho biến tần ${sn}!`);
-                }
-
-                // 3. Mở luồng đẩy trực tiếp SSE EventSource (/api/inverter/{sn}/flow) từ server hãng
-                if (window.EventSource && (!sosenFastFlowSse || sosenFastFlowSse.readyState === 2)) {
-                    try {
-                        if (sosenFastFlowSse) sosenFastFlowSse.close();
-                        const sseUrl = `${SOSEN_CLOUD_BASE_URL}/api/inverter/${sn}/flow`;
-                        sosenFastFlowSse = new EventSource(sseUrl);
-                        sosenFastFlowSse.onmessage = (ev) => {
-                            try {
-                                const parsed = JSON.parse(ev.data);
-                                applySosenFastFlowData(parsed?.data || parsed);
-                            } catch (err) {}
-                        };
-                        sosenFastFlowSse.onerror = () => {
-                            if (sosenFastFlowSse) {
-                                sosenFastFlowSse.close();
-                                sosenFastFlowSse = null;
-                            }
-                        };
-                    } catch (e) {}
-                }
+                // Kích hoạt ngay một lượt đọc nhanh
+                pollSosenFastFlow5s();
             } catch (e) {}
         }
 
         // Vòng lặp 3 giây/lần CHỈ đọc 1 API /api/v1/inverter/{sn} (customInfoMap 120+ thanh ghi) + đánh thức cục WiFi zin mỗi 20 giây
         let fastPollTickCount = 0;
         let lastWifiWakeupMs = 0;
+        let isSosenPolling = false;
         async function pollSosenFastFlow5s() {
-            if (!sosenCloudAuth.access_token || document.hidden) return;
+            if (isSosenPolling || !sosenCloudAuth.access_token || document.hidden) return;
+            isSosenPolling = true;
             const sn = sosenCloudAuth.invSn || 'S8303002425022100221';
             const gsn = sosenCloudAuth.gwSn || 'E47F24C03812';
             fastPollTickCount++;
@@ -6025,14 +5381,16 @@
                 ]);
                 if (detailRes.status === 'fulfilled' && detailRes.value?.code === 0 && detailRes.value.data) {
                     lastCloudDetailCache = detailRes.value.data;
-                    try { localStorage.setItem('last_sosen_cloud_detail_v1', JSON.stringify(detailRes.value.data)); } catch (e) {}
+                    try { safeStorage.setItem('last_sosen_cloud_detail_v1', JSON.stringify(detailRes.value.data)); } catch (e) {}
                 }
                 if (flowRes.status === 'fulfilled' && flowRes.value?.code === 0 && flowRes.value.data) {
                     lastCloudFlowCache = flowRes.value.data;
-                    try { localStorage.setItem('last_sosen_cloud_flow_v1', JSON.stringify(flowRes.value.data)); } catch (e) {}
+                    try { safeStorage.setItem('last_sosen_cloud_flow_v1', JSON.stringify(flowRes.value.data)); } catch (e) {}
                 }
                 applySosenFastFlowData(lastCloudFlowCache || {});
-            } catch (e) {}
+            } catch (e) {} finally {
+                isSosenPolling = false;
+            }
         }
 
         async function pollSosenCloudRealtime(showToast = false) {
@@ -6309,33 +5667,30 @@
         function initSosen1to1Portal() {
             loadSosenCloudAuth();
             try {
-                const cachedDetail = localStorage.getItem('last_sosen_cloud_detail_v1');
+                const cachedDetail = safeStorage.getItem('last_sosen_cloud_detail_v1');
                 if (cachedDetail && !lastCloudDetailCache) {
                     lastCloudDetailCache = JSON.parse(cachedDetail);
                 }
+                const cachedFlow = safeStorage.getItem('last_sosen_cloud_flow_v1');
+                if (cachedFlow && !lastCloudFlowCache) {
+                    lastCloudFlowCache = JSON.parse(cachedFlow);
+                }
             } catch (e) {}
             // Cập nhật ngay tức thì (0ms) từ bộ nhớ đệm, không để màn hình đơ lag chờ mạng
-            if (lastCloudDetailCache) {
+            if (lastCloudDetailCache || lastCloudFlowCache) {
                 applySosenFastFlowData(lastCloudFlowCache || {});
             }
             renderModbusTelemetryPanes();
-            renderSosenSettingsPortal();
             updateModbusDebugFrame();
+            initFirebase();
             if (database) {
-                database.ref('/SosenSystem/Settings').on('value', snap => {
-                    const val = snap.val();
-                    if (val && typeof val === 'object') {
-                        Object.assign(sosenSettingsState, val);
-                        try { localStorage.setItem('sosen_1to1_settings_state', JSON.stringify(sosenSettingsState)); } catch (e) {}
-                    }
-                });
                 // Tự động đồng bộ Token Cloud Sosen giữa các thiết bị (PC & Điện thoại) và gọi đọc ngay tức thì
                 database.ref('/SosenSystem/CloudAuth').on('value', snap => {
                     const val = snap.val();
                     if (val && val.access_token && (!sosenCloudAuth.updatedAt || val.updatedAt > sosenCloudAuth.updatedAt)) {
                         const hadTokenBefore = Boolean(sosenCloudAuth.access_token);
                         Object.assign(sosenCloudAuth, val);
-                        try { localStorage.setItem('sosen_cloud_auth_v1', JSON.stringify(sosenCloudAuth)); } catch (e) {}
+                        safeStorage.setItem('sosen_cloud_auth_v1', JSON.stringify(sosenCloudAuth));
                         updateSosenCloudUiBadge();
                         if (!hadTokenBefore) {
                             pollSosenFastFlow5s();
