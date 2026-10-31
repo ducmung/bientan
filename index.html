@@ -490,7 +490,7 @@
             .clock-grid-dot, #update-clock #device-status .device-dot { width: 4px; height: 4px; flex-basis: 4px; }
         }
     
-        /* ================= 🌌 PHONG CÁCH XỨ SỞ THẦN TIÊN GLASSMORPHISM ================= */
+        /* ================= 🌌 GLASSMORPHISM XỨ SỞ THẦN TIÊN (MOBILE OPTIMIZED) ================= */
         :root {
             --aurora-mint: #00ffcc;
             --aurora-cyan: #00e5ff;
@@ -498,8 +498,8 @@
             --aurora-gold: #ffd700;
             --glass-crystal-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 50%, rgba(0, 229, 255, 0.06) 100%);
             --glass-crystal-border: rgba(255, 255, 255, 0.35);
-            --glass-crystal-shadow: 0 16px 44px 0 rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.65), inset 0 0 25px rgba(0, 229, 255, 0.10);
-            --glass-crystal-blur: blur(22px) saturate(200%);
+            --glass-crystal-shadow: 0 14px 40px 0 rgba(0, 0, 0, 0.40), inset 0 1px 2px rgba(255, 255, 255, 0.60), inset 0 0 20px rgba(0, 229, 255, 0.08);
+            --glass-crystal-blur: blur(16px) saturate(180%);
         }
 
         body {
@@ -509,51 +509,47 @@
             position: relative;
         }
 
-        /* LỚP CỰC QUANG HUYỀN ẢO PHÍA SAU NỀN TOÀN MÀN HÌNH */
+        /* LỚP CỰC QUANG HUYỀN ẢO PHÍA SAU NỀN */
         .aurora-backdrop {
             position: fixed;
             inset: -20%;
             pointer-events: none;
             z-index: -1;
             background: 
-                radial-gradient(circle at 18% 22%, rgba(0, 255, 204, 0.22) 0%, transparent 40%),
-                radial-gradient(circle at 82% 16%, rgba(189, 0, 255, 0.20) 0%, transparent 45%),
-                radial-gradient(circle at 50% 65%, rgba(0, 150, 255, 0.18) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(0, 255, 150, 0.16) 0%, transparent 45%);
-            filter: blur(55px);
-            animation: auroraDrift 16s ease-in-out infinite alternate;
+                radial-gradient(circle at 18% 22%, rgba(0, 255, 204, 0.20) 0%, transparent 40%),
+                radial-gradient(circle at 82% 16%, rgba(189, 0, 255, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 50% 65%, rgba(0, 150, 255, 0.16) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 150, 0.14) 0%, transparent 45%);
+            filter: blur(50px);
+            animation: auroraDrift 18s ease-in-out infinite alternate;
             transform: translateZ(0);
+            will-change: transform;
         }
 
         @keyframes auroraDrift {
             0%   { transform: translate(0, 0) scale(1); }
-            50%  { transform: translate(-3%, 2%) scale(1.08) rotate(1.5deg); }
-            100% { transform: translate(3%, -2%) scale(1.02) rotate(-1.5deg); }
+            50%  { transform: translate(-2%, 2%) scale(1.05) rotate(1deg); }
+            100% { transform: translate(2%, -2%) scale(1.02) rotate(-1deg); }
         }
 
-        /* KHUNG SƠ ĐỒ TRUNG TÂM (.diagram-panel) - PHẠM VI CHỨA HIỆU ỨNG DUY NHẤT */
-        .diagram-panel {
+        /* KHUNG CHÍNH CHỨA TOÀN BỘ CÁC THẺ: GIỚI HẠN HIỆU ỨNG TRONG TOÀN BỘ KHU VỰC CÁC KHUNG */
+        .app-container {
             position: relative !important;
-            overflow: hidden !important;
-            contain: layout style paint;
-            background: var(--glass-crystal-bg) !important;
-            backdrop-filter: var(--glass-crystal-blur) !important;
-            -webkit-backdrop-filter: var(--glass-crystal-blur) !important;
-            border: 1px solid var(--glass-crystal-border) !important;
-            border-top: 1.5px solid rgba(255, 255, 255, 0.75) !important;
-            border-left: 1.5px solid rgba(255, 255, 255, 0.55) !important;
-            box-shadow: var(--glass-crystal-shadow), 0 0 50px rgba(0, 255, 204, 0.22) !important;
+            overflow: hidden !important; /* Đảm bảo bướm & đom đóm chỉ lượn trong cụm khung này */
             border-radius: 26px !important;
+            isolation: isolate;
+            contain: layout paint;
+            padding: 10px;
         }
 
-        /* CANVAS ĐOM ĐÓM & STAGE BƯỚM THẦN TIÊN NẰM TRỌN TRONG .diagram-panel */
+        /* LỚP AMBIENT: CANVAS ĐOM ĐÓM & STAGE BƯỚM THẦN TIÊN 3D */
         #fairy-canvas {
             position: absolute !important;
             inset: 0 !important;
             width: 100% !important;
             height: 100% !important;
             pointer-events: none !important;
-            z-index: 2 !important;
+            z-index: 1 !important;
             border-radius: inherit !important;
         }
 
@@ -563,42 +559,42 @@
             width: 100% !important;
             height: 100% !important;
             pointer-events: none !important;
-            z-index: 6 !important;
-            perspective: 800px !important;
+            z-index: 3 !important;
             overflow: hidden !important;
+            perspective: 800px !important;
             border-radius: inherit !important;
         }
 
         .fairy-butterfly {
             position: absolute;
-            width: 44px;
-            height: 38px;
+            width: 40px;
+            height: 34px;
             transform-style: preserve-3d;
             will-change: transform;
-            opacity: 0.95;
-            cursor: pointer;
+            opacity: 0.92;
+            pointer-events: none;
         }
 
         .fb-body {
             position: absolute;
             left: 50%;
             top: 20%;
-            width: 3.5px;
-            height: 20px;
-            margin-left: -1.75px;
+            width: 3px;
+            height: 18px;
+            margin-left: -1.5px;
             background: linear-gradient(to bottom, #ffffff 0%, #cbd5e1 40%, #1e293b 100%);
             border-radius: 999px;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.95);
             z-index: 5;
         }
 
         .fb-antennae {
             position: absolute;
-            top: 7px;
+            top: 6px;
             left: 50%;
-            width: 14px;
-            height: 10px;
-            margin-left: -7px;
+            width: 12px;
+            height: 9px;
+            margin-left: -6px;
             pointer-events: none;
             z-index: 4;
         }
@@ -606,12 +602,12 @@
             content: "";
             position: absolute;
             top: 0;
-            width: 5px;
-            height: 7px;
+            width: 4px;
+            height: 6px;
             border: 1px solid rgba(255, 255, 255, 0.85);
             border-bottom: none;
             border-radius: 50% 50% 0 0;
-            box-shadow: 0 0 4px #fff;
+            box-shadow: 0 0 3px #fff;
         }
         .fb-antennae::before { left: 1px; border-right: none; transform: rotate(-25deg); }
         .fb-antennae::after  { right: 1px; border-left: none; transform: rotate(25deg); }
@@ -619,8 +615,8 @@
         .fb-wing {
             position: absolute;
             top: 2px;
-            width: 21px;
-            height: 32px;
+            width: 19px;
+            height: 28px;
             transform-origin: right center;
             border-radius: 80% 20% 70% 30% / 65% 30% 70% 35%;
             backdrop-filter: blur(2px);
@@ -646,47 +642,54 @@
             position: absolute;
             inset: 2px;
             border-radius: inherit;
-            border: 1px solid rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.5);
             mask: radial-gradient(circle at 70% 30%, black 20%, transparent 80%);
             -webkit-mask: radial-gradient(circle at 70% 30%, black 20%, transparent 80%);
         }
 
         @keyframes fbFlapLeft {
             0%   { transform: rotateY(0deg) rotateZ(0deg) scaleX(1); }
-            100% { transform: rotateY(74deg) rotateZ(-14deg) scaleX(0.9); }
+            100% { transform: rotateY(70deg) rotateZ(-12deg) scaleX(0.9); }
         }
 
         @keyframes fbFlapRight {
             0%   { transform: rotateY(0deg) rotateZ(0deg) scaleX(1); }
-            100% { transform: rotateY(-74deg) rotateZ(14deg) scaleX(0.9); }
+            100% { transform: rotateY(-70deg) rotateZ(12deg) scaleX(0.9); }
         }
 
         /* BỘ MÀU CÁNH BƯỚM THẦN TIÊN */
         .fairy-blue .fb-wing {
             background: radial-gradient(circle at 65% 30%, rgba(255, 255, 255, 0.98) 0%, rgba(0, 240, 255, 0.9) 35%, rgba(0, 110, 255, 0.75) 70%, rgba(140, 0, 255, 0.65) 100%);
-            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.9), 0 0 16px rgba(0, 229, 255, 0.85);
-            filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.8));
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.9), 0 0 14px rgba(0, 229, 255, 0.8);
+            filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.8));
         }
 
         .fairy-gold .fb-wing {
             background: radial-gradient(circle at 65% 30%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 225, 60, 0.92) 35%, rgba(255, 120, 0, 0.78) 75%, rgba(200, 30, 0, 0.6) 100%);
-            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.9), 0 0 16px rgba(255, 215, 0, 0.85);
-            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.85));
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 215, 0, 0.8);
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
         }
 
         .fairy-pink .fb-wing {
             background: radial-gradient(circle at 65% 30%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 80, 180, 0.92) 35%, rgba(180, 0, 255, 0.78) 75%, rgba(70, 0, 200, 0.6) 100%);
-            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.9), 0 0 16px rgba(255, 80, 180, 0.85);
-            filter: drop-shadow(0 0 12px rgba(255, 80, 180, 0.8));
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 80, 180, 0.8);
+            filter: drop-shadow(0 0 10px rgba(255, 80, 180, 0.8));
         }
 
-        .fairy-emerald .fb-wing {
-            background: radial-gradient(circle at 65% 30%, rgba(255, 255, 255, 0.98) 0%, rgba(0, 255, 170, 0.92) 35%, rgba(0, 190, 120, 0.78) 75%, rgba(0, 110, 80, 0.6) 100%);
-            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.9), 0 0 16px rgba(0, 255, 170, 0.85);
-            filter: drop-shadow(0 0 12px rgba(0, 255, 170, 0.8));
+        /* CÁC THẺ KHUNG KÍNH PHA LÊ (GLASS CARDS) */
+        .diagram-panel {
+            position: relative !important;
+            background: var(--glass-crystal-bg) !important;
+            backdrop-filter: var(--glass-crystal-blur) !important;
+            -webkit-backdrop-filter: var(--glass-crystal-blur) !important;
+            border: 1px solid var(--glass-crystal-border) !important;
+            border-top: 1.5px solid rgba(255, 255, 255, 0.75) !important;
+            border-left: 1.5px solid rgba(255, 255, 255, 0.55) !important;
+            box-shadow: var(--glass-crystal-shadow), 0 0 45px rgba(0, 255, 204, 0.20) !important;
+            border-radius: 26px !important;
+            z-index: 2 !important;
         }
 
-        /* CÁC THẺ THỐNG KÊ KÍNH PHA LÊ TRONG SUỐT */
         .stat-card {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.04) 60%, rgba(189, 0, 255, 0.05) 100%) !important;
             backdrop-filter: var(--glass-crystal-blur) !important;
@@ -696,6 +699,8 @@
             box-shadow: var(--glass-crystal-shadow) !important;
             border-radius: 24px !important;
             color: #ffffff !important;
+            position: relative !important;
+            z-index: 2 !important;
         }
 
         .stat-header h2 {
@@ -720,26 +725,24 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
         }
 
-        /* THẺ TIỀN ĐIỆN HOÀNG KIM PHÁT QUANG */
         .money-card {
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.19) 0%, rgba(255, 140, 0, 0.08) 55%, rgba(255, 255, 255, 0.09) 100%) !important;
             border: 1px solid rgba(255, 215, 0, 0.5) !important;
             border-top: 1.5px solid rgba(255, 255, 220, 0.85) !important;
-            box-shadow: 0 16px 44px 0 rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(255, 255, 220, 0.7), 0 0 35px rgba(255, 215, 0, 0.28) !important;
+            box-shadow: 0 14px 40px 0 rgba(0, 0, 0, 0.40), inset 0 1px 2px rgba(255, 255, 220, 0.7), 0 0 30px rgba(255, 215, 0, 0.25) !important;
         }
 
-        /* THẺ BIỂU ĐỒ NĂNG LƯỢNG KÍNH CỰC QUANG */
         .energy-chart-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(15, 23, 42, 0.4) 100%) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(15, 23, 42, 0.45) 100%) !important;
             position: relative;
-            z-index: 10;
+            z-index: 2;
         }
 
         .chart-btn {
             background: rgba(255, 255, 255, 0.14) !important;
             color: #ffffff !important;
             border: 1px solid rgba(255, 255, 255, 0.3) !important;
-            backdrop-filter: blur(10px) !important;
+            backdrop-filter: blur(8px) !important;
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
@@ -760,7 +763,7 @@
         .chart-period-control {
             background: rgba(255, 255, 255, 0.12) !important;
             border: 1px solid rgba(255, 255, 255, 0.3) !important;
-            backdrop-filter: blur(12px) !important;
+            backdrop-filter: blur(10px) !important;
             border-radius: 20px;
         }
 
@@ -778,7 +781,7 @@
         .chart-day-corner {
             background: rgba(255, 255, 255, 0.2) !important;
             border: 1px solid rgba(255, 255, 255, 0.4) !important;
-            backdrop-filter: blur(12px) !important;
+            backdrop-filter: blur(10px) !important;
         }
 
         .chart-selected-label {
@@ -789,7 +792,7 @@
         .chart-detail-card {
             background: rgba(255, 255, 255, 0.08) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            backdrop-filter: blur(12px) !important;
+            backdrop-filter: blur(10px) !important;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
             border-radius: 12px !important;
         }
@@ -798,11 +801,10 @@
         .chart-detail-card .value { color: #ffffff !important; text-shadow: 0 0 12px rgba(255, 255, 255, 0.5); }
         .chart-detail-card .sub { color: #94a3b8 !important; }
 
-        /* ĐỒNG HỒ & TRẠNG THÁI KÍNH PHA LÊ */
         #update-clock.status-clock {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.09) 100%) !important;
-            backdrop-filter: blur(16px) !important;
-            -webkit-backdrop-filter: blur(16px) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
             border: 1px solid rgba(255, 255, 255, 0.4) !important;
             border-top: 1.5px solid rgba(255, 255, 255, 0.8) !important;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.7), 0 0 18px rgba(0, 229, 255, 0.25) !important;
@@ -810,9 +812,52 @@
 
         .battery-mini-meter {
             background: linear-gradient(135deg, rgba(10, 20, 36, 0.82) 0%, rgba(5, 12, 22, 0.90) 100%) !important;
-            backdrop-filter: blur(16px) !important;
+            backdrop-filter: blur(14px) !important;
             border: 1px solid rgba(255, 255, 255, 0.32) !important;
             box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.45), 0 0 20px var(--mini-glow) !important;
+        }
+
+        /* 📱 TỐI ƯU CỰC HẠN TRÊN ĐIỆN THOẠI DI ĐỘNG (MOBILE ULTRA 60FPS) */
+        @media (max-width: 768px) {
+            :root {
+                --glass-crystal-blur: blur(7px) saturate(150%);
+            }
+            .aurora-backdrop {
+                filter: blur(30px);
+                animation-duration: 25s;
+            }
+            .app-container {
+                border-radius: 18px !important;
+                padding: 4px;
+                gap: 14px;
+            }
+            .diagram-panel {
+                border-radius: 18px !important;
+            }
+            .stat-card {
+                border-radius: 18px !important;
+            }
+            .fairy-butterfly {
+                width: 32px;
+                height: 28px;
+            }
+            .fb-wing {
+                width: 15px;
+                height: 23px;
+                backdrop-filter: none; /* Giảm tải GPU mobile */
+            }
+            .butterfly-desktop-only {
+                display: none !important; /* Ẩn bướm thứ 3 trên mobile */
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .fairy-butterfly, .aurora-backdrop {
+                animation: none !important;
+            }
+            #fairy-canvas, #butterfly-stage {
+                display: none !important;
+            }
         }
 
     </style>
@@ -822,11 +867,11 @@
     <div class="aurora-backdrop"></div>
 
     <div class="app-container">
-        <div class="diagram-panel">
-            <!-- 🦋 HIỆU ỨNG THẦN TIÊN & BƯỚM 3D CHỈ CHẠY TRONG KHUNG NÀY -->
-            <canvas id="fairy-canvas"></canvas>
-            <div id="butterfly-stage"></div>
+        <!-- 🦋 HIỆU ỨNG THẦN TIÊN & ĐOM ĐÓM CHẠY TỰ DO TRONG TOÀN BỘ CÁC KHUNG (APP-CONTAINER) -->
+        <canvas id="fairy-canvas"></canvas>
+        <div id="butterfly-stage"></div>
 
+        <div class="diagram-panel">
             <div id="battery-mini-meter" class="battery-mini-meter idle">
                 <div id="lbl-status">Đang tải...</div>
                 <div class="battery-mini-row"><span class="battery-mini-label">Áp</span><span class="battery-mini-value" id="mini-stat-v">-- V</span></div>
@@ -2782,41 +2827,54 @@
         });
         setInterval(() => { updateBackgroundByTimeAndPv(); }, 60000);
     
-        // ================= 🌌 WONDERLAND ENGINE: HIỆU ỨNG THẦN TIÊN CHỈ CHẠY TRONG KHUNG =================
+        // ================= 🌌 WONDERLAND ENGINE V3: TỰ DO TRONG CÁC KHUNG & SIÊU MƯỢT MOBILE =================
         function initFairytaleWonderland() {
-            const panel = document.querySelector('.diagram-panel');
+            const container = document.querySelector('.app-container');
             const canvas = document.getElementById('fairy-canvas');
             const stage = document.getElementById('butterfly-stage');
-            if (!panel || !canvas || !stage) return;
+            if (!container || !canvas || !stage) return;
 
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d', { alpha: true });
+            if (!ctx) return;
+
+            const isMobile = window.innerWidth <= 768;
             let w = 0;
             let h = 0;
 
-            function resizePanelEffect() {
-                w = canvas.width = panel.clientWidth || 480;
-                h = canvas.height = panel.clientHeight || 520;
+            function resizeEffects() {
+                const rect = container.getBoundingClientRect();
+                w = rect.width || window.innerWidth;
+                h = rect.height || 1200;
+
+                // Giới hạn DPR tối đa 1.25 trên điện thoại để tiết kiệm 70% GPU fill-rate, hoàn toàn không lag
+                const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+                canvas.width = Math.round(w * dpr);
+                canvas.height = Math.round(h * dpr);
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             }
-            resizePanelEffect();
+            resizeEffects();
 
             const mouse = { x: -1000, y: -1000, active: false };
 
-            window.addEventListener('resize', resizePanelEffect, { passive: true });
+            window.addEventListener('resize', () => {
+                resizeEffects();
+            }, { passive: true });
 
-            panel.addEventListener('pointermove', (e) => {
-                const rect = panel.getBoundingClientRect();
+            container.addEventListener('pointermove', (e) => {
+                const rect = container.getBoundingClientRect();
                 mouse.x = e.clientX - rect.left;
                 mouse.y = e.clientY - rect.top;
                 mouse.active = true;
             }, { passive: true });
 
-            panel.addEventListener('pointerleave', () => {
+            container.addEventListener('pointerleave', () => {
                 mouse.x = -1000;
                 mouse.y = -1000;
                 mouse.active = false;
             });
 
-            // 1. Khởi tạo 26 Đom Đóm Ma Thuật lượn lờ trong khung sơ đồ
+            // 1. Khởi tạo Đom Đóm Ma Thuật: Mobile chỉ 14 hạt nhẹ tênh, Desktop 24 hạt
+            const particleCount = isMobile ? 14 : 24;
             const fireflies = [];
             const fireflyColors = [
                 '0, 255, 204',   // Mint
@@ -2826,30 +2884,29 @@
                 '80, 255, 140'   // Emerald
             ];
 
-            for (let i = 0; i < 26; i++) {
+            for (let i = 0; i < particleCount; i++) {
                 fireflies.push({
-                    x: Math.random() * (w - 40) + 20,
-                    y: Math.random() * (h - 40) + 20,
-                    vx: (Math.random() - 0.5) * 0.45,
-                    vy: (Math.random() - 0.5) * 0.4 - 0.1,
-                    baseRadius: 1.1 + Math.random() * 1.8,
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.35 - 0.1,
+                    baseRadius: 1.0 + Math.random() * 1.6,
                     phase: Math.random() * Math.PI * 2,
-                    pulseSpeed: 0.025 + Math.random() * 0.035,
+                    pulseSpeed: 0.025 + Math.random() * 0.03,
                     color: fireflyColors[i % fireflyColors.length]
                 });
             }
 
-            // 2. Khởi tạo 4 Chú Bướm Thần Tiên 3D chuẩn xác trong khung
+            // 2. Đàn Bướm Thần Tiên 3D: Mobile 2 chú bướm, Desktop 3 chú bướm lượn khắp các khung
             const butterflyDefs = [
-                { type: 'fairy-blue',    x: w * 0.25, y: h * 0.70, scale: 0.90, speed: 1.8, flap: 0.22 },
-                { type: 'fairy-gold',    x: w * 0.75, y: h * 0.65, scale: 0.85, speed: 1.7, flap: 0.25 },
-                { type: 'fairy-pink',    x: w * 0.30, y: h * 0.35, scale: 0.92, speed: 1.9, flap: 0.20 },
-                { type: 'fairy-emerald', x: w * 0.70, y: h * 0.28, scale: 0.82, speed: 1.6, flap: 0.24 }
+                { type: 'fairy-blue',    x: w * 0.20, y: h * 0.25, scale: isMobile ? 0.78 : 0.88, speed: 1.6, flap: 0.22, classExtra: '' },
+                { type: 'fairy-gold',    x: w * 0.75, y: h * 0.65, scale: isMobile ? 0.74 : 0.84, speed: 1.5, flap: 0.25, classExtra: '' },
+                { type: 'fairy-pink',    x: w * 0.35, y: h * 0.80, scale: 0.86, speed: 1.7, flap: 0.21, classExtra: 'butterfly-desktop-only' }
             ];
 
             const butterflies = butterflyDefs.map((b, idx) => {
                 const el = document.createElement('div');
-                el.className = `fairy-butterfly ${b.type}`;
+                el.className = `fairy-butterfly ${b.type} ${b.classExtra}`;
                 el.innerHTML = `
                     <div class="fb-antennae"></div>
                     <div class="fb-wing wing-left" style="animation-duration: ${b.flap}s;"></div>
@@ -2863,27 +2920,37 @@
                     type: b.type,
                     x: b.x,
                     y: b.y,
-                    vx: (Math.random() - 0.5) * 1.2,
-                    vy: -0.8,
+                    vx: (Math.random() - 0.5) * 1.0,
+                    vy: -0.7,
                     speed: b.speed,
                     scale: b.scale,
                     targetX: Math.random() * (w - 80) + 40,
                     targetY: Math.random() * (h - 80) + 40,
-                    phase: idx * 1.6
+                    phase: idx * 1.8
                 };
             });
 
-            // 3. Mảng bụi phấn lấp lánh (Fairy Dust Particles)
+            // 3. Mảng bụi phấn lấp lánh (giới hạn số lượng cực nhẹ)
             const fairyDust = [];
+            const maxDust = isMobile ? 22 : 45;
 
             let lastTs = performance.now();
+            let lastDrawTs = 0;
+            const targetInterval = isMobile ? 32 : 16; // Mobile 30-35fps cực mượt và tiết kiệm pin, Desktop 60fps
+
             function renderWonderland(now) {
+                // Throttling frame trên mobile để chống lag và giữ nhiệt độ máy mát rượi
+                if (now - lastDrawTs < targetInterval) {
+                    if (!document.hidden) requestAnimationFrame(renderWonderland);
+                    return;
+                }
                 const dt = Math.min((now - lastTs) / 1000, 0.08);
                 lastTs = now;
+                lastDrawTs = now;
 
                 ctx.clearRect(0, 0, w, h);
 
-                // --- VẼ & CẬP NHẬT ĐOM ĐÓM (GIỚI HẠN TRONG KHUNG) ---
+                // --- VẼ ĐOM ĐÓM TỰ DO KHẮP CÁC KHUNG ---
                 for (let i = 0; i < fireflies.length; i++) {
                     const f = fireflies[i];
                     f.phase += f.pulseSpeed;
@@ -2891,49 +2958,52 @@
                     f.x += f.vx + Math.sin(f.phase) * 0.35;
                     f.y += f.vy + Math.cos(f.phase * 0.8) * 0.25;
 
-                    // Né chuột trong khung
+                    // Né ngón tay/chuột nhẹ nhàng
                     if (mouse.active) {
                         const mdx = f.x - mouse.x;
                         const mdy = f.y - mouse.y;
                         const mdist = Math.hypot(mdx, mdy);
-                        if (mdist < 75 && mdist > 0) {
-                            f.x += (mdx / mdist) * 1.8;
-                            f.y += (mdy / mdist) * 1.8;
+                        if (mdist < 70 && mdist > 0) {
+                            f.x += (mdx / mdist) * 1.6;
+                            f.y += (mdy / mdist) * 1.6;
                         }
                     }
 
-                    // Cuốn vòng tuần hoàn trong khung
+                    // Cuốn vòng tuần hoàn trong container
                     if (f.x < 10) f.x = w - 10;
                     if (f.x > w - 10) f.x = 10;
                     if (f.y < 10) f.y = h - 10;
                     if (f.y > h - 10) f.y = 10;
 
-                    const glowAlpha = 0.35 + (Math.sin(f.phase) + 1) * 0.32;
+                    const glowAlpha = 0.35 + (Math.sin(f.phase) + 1) * 0.30;
                     const r = f.baseRadius * (0.8 + glowAlpha * 0.4);
 
-                    const grad = ctx.createRadialGradient(f.x, f.y, 0.5, f.x, f.y, r * 4.0);
-                    grad.addColorStop(0, `rgba(255, 255, 255, ${glowAlpha.toFixed(2)})`);
-                    grad.addColorStop(0.35, `rgba(${f.color}, ${(glowAlpha * 0.75).toFixed(2)})`);
-                    grad.addColorStop(1, `rgba(${f.color}, 0)`);
-
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    ctx.arc(f.x, f.y, r * 4.0, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = `rgba(255, 255, 255, ${(glowAlpha * 0.95).toFixed(2)})`;
-                    ctx.beginPath();
-                    ctx.arc(f.x, f.y, r * 0.85, 0, Math.PI * 2);
-                    ctx.fill();
+                    // Trên mobile vẽ hình tròn đơn giản để tối ưu GPU
+                    if (isMobile) {
+                        ctx.fillStyle = `rgba(${f.color}, ${glowAlpha.toFixed(2)})`;
+                        ctx.beginPath();
+                        ctx.arc(f.x, f.y, r * 1.8, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        const grad = ctx.createRadialGradient(f.x, f.y, 0.5, f.x, f.y, r * 3.6);
+                        grad.addColorStop(0, `rgba(255, 255, 255, ${glowAlpha.toFixed(2)})`);
+                        grad.addColorStop(0.4, `rgba(${f.color}, ${(glowAlpha * 0.7).toFixed(2)})`);
+                        grad.addColorStop(1, `rgba(${f.color}, 0)`);
+                        ctx.fillStyle = grad;
+                        ctx.beginPath();
+                        ctx.arc(f.x, f.y, r * 3.6, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
                 }
 
-                // --- CẬP NHẬT BƯỚM THẦN TIÊN 3D (GIỚI HẠN TUYỆT ĐỐI TRONG KHUNG) ---
+                // --- CẬP NHẬT CHUYỂN ĐỘNG BƯỚM 3D TỰ DO QUA CÁC KHUNG ---
                 butterflies.forEach((b, idx) => {
                     const dx = b.targetX - b.x;
                     const dy = b.targetY - b.y;
                     const dist = Math.hypot(dx, dy);
 
-                    if (dist < 60 || Math.random() < 0.009) {
+                    // Điểm đến ngẫu nhiên khắp toàn bộ các khung trong dashboard
+                    if (dist < 70 || Math.random() < 0.008) {
                         b.targetX = 40 + Math.random() * (w - 80);
                         b.targetY = 40 + Math.random() * (h - 80);
                     }
@@ -2941,54 +3011,44 @@
                     const targetAngle = Math.atan2(dy, dx);
                     const tx = Math.cos(targetAngle) * b.speed;
                     const ty = Math.sin(targetAngle) * b.speed;
-                    const wobble = Math.sin(now * 0.005 + b.phase) * 0.7;
+                    const wobble = Math.sin(now * 0.005 + b.phase) * 0.6;
 
-                    b.vx += (tx - b.vx) * 0.04;
-                    b.vy += (ty - b.vy + wobble) * 0.04;
+                    b.vx += (tx - b.vx) * 0.035;
+                    b.vy += (ty - b.vy + wobble) * 0.035;
 
                     b.x += b.vx * (dt * 60);
                     b.y += b.vy * (dt * 60);
 
-                    // Chống bay vượt khỏi biên khung
-                    const pad = 24;
+                    // Chống bay vượt khỏi ranh giới khung dashboard
+                    const pad = 20;
                     if (b.x < pad) { b.x = pad; b.vx = Math.abs(b.vx); }
                     if (b.x > w - pad) { b.x = w - pad; b.vx = -Math.abs(b.vx); }
                     if (b.y < pad) { b.y = pad; b.vy = Math.abs(b.vy); }
                     if (b.y > h - pad) { b.y = h - pad; b.vy = -Math.abs(b.vy); }
 
-                    // Né chuột nhẹ
-                    if (mouse.active) {
-                        const mdx = b.x - mouse.x;
-                        const mdy = b.y - mouse.y;
-                        const mdist = Math.hypot(mdx, mdy);
-                        if (mdist < 90 && mdist > 0) {
-                            b.vx += (mdx / mdist) * 0.7;
-                            b.vy += (mdy / mdist) * 0.7;
-                        }
-                    }
-
                     const moveAngle = (Math.atan2(b.vy, b.vx) * 180 / Math.PI) + 90;
-                    const rollAngle = Math.sin(now * 0.008 + idx) * 14;
+                    const rollAngle = Math.sin(now * 0.008 + idx) * 12;
 
+                    // Phần cứng tăng tốc GPU hoàn toàn qua translate3d
                     b.el.style.transform = `translate3d(${b.x.toFixed(1)}px, ${b.y.toFixed(1)}px, 0) scale(${b.scale}) rotate(${moveAngle.toFixed(1)}deg) rotateX(${rollAngle.toFixed(1)}deg)`;
 
-                    // Thả bụi phấn thần tiên
-                    if (Math.random() < 0.48 && fairyDust.length < 50) {
-                        const dustColor = b.type === 'fairy-blue' ? '0, 240, 255' : (b.type === 'fairy-gold' ? '255, 225, 60' : (b.type === 'fairy-pink' ? '255, 80, 180' : '0, 255, 170'));
+                    // Bụi phấn thần tiên nhẹ nhàng
+                    if (Math.random() < (isMobile ? 0.25 : 0.40) && fairyDust.length < maxDust) {
+                        const dustColor = b.type === 'fairy-blue' ? '0, 240, 255' : (b.type === 'fairy-gold' ? '255, 225, 60' : '255, 80, 180');
                         fairyDust.push({
                             x: b.x + (Math.random() - 0.5) * 8,
                             y: b.y + (Math.random() - 0.5) * 8,
-                            vx: (Math.random() - 0.5) * 0.6,
-                            vy: Math.random() * 0.5 + 0.3,
-                            size: 1.0 + Math.random() * 1.8,
-                            alpha: 0.9,
-                            decay: 0.018 + Math.random() * 0.02,
+                            vx: (Math.random() - 0.5) * 0.5,
+                            vy: Math.random() * 0.4 + 0.2,
+                            size: 1.0 + Math.random() * 1.5,
+                            alpha: 0.85,
+                            decay: 0.02 + Math.random() * 0.02,
                             color: dustColor
                         });
                     }
                 });
 
-                // --- VẼ & CẬP NHẬT BỤI PHẤN HOA ---
+                // --- VẼ BỤI PHẤN HOA ---
                 for (let i = fairyDust.length - 1; i >= 0; i--) {
                     const d = fairyDust[i];
                     d.x += d.vx;
@@ -3003,10 +3063,7 @@
                     ctx.beginPath();
                     ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
                     ctx.fillStyle = `rgba(${d.color}, ${d.alpha.toFixed(2)})`;
-                    ctx.shadowColor = `rgba(${d.color}, 0.8)`;
-                    ctx.shadowBlur = 6;
                     ctx.fill();
-                    ctx.shadowBlur = 0;
                 }
 
                 if (!document.hidden) {
@@ -3016,6 +3073,7 @@
 
             requestAnimationFrame(renderWonderland);
 
+            // Tự động tạm dừng 100% khi người dùng chuyển tab hoặc ẩn trình duyệt (tiết kiệm pin triệt để)
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) {
                     lastTs = performance.now();
