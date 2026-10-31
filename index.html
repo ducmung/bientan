@@ -490,7 +490,7 @@
             .clock-grid-dot, #update-clock #device-status .device-dot { width: 4px; height: 4px; flex-basis: 4px; }
         }
     
-        /* ================= 🌌 GLASSMORPHISM CLEAN & STRICTLY CONFINED TO FRAMES (V5) ================= */
+        /* ================= 🌌 GLASSMORPHISM COMPANION VIEWPORT ENGINE (V6) ================= */
         :root {
             --aurora-mint: #00ffcc;
             --aurora-cyan: #00e5ff;
@@ -541,26 +541,30 @@
             transform: translateZ(0);
         }
 
-        /* 🔒 KHUNG CHÍNH .app-container: CÔ LẬP TUYỆT ĐỐI HIỆU ỨNG TRONG NÀY */
+        /* KHUNG CHÍNH .app-container */
         .app-container {
             position: relative !important;
-            overflow: hidden !important; /* Đảm bảo KHÔNG MỘT HẠT BỤI NÀO lọt ra ngoài vùng đen */
-            border-radius: 26px !important;
-            contain: paint layout;
-            isolation: isolate;
+            z-index: 1;
             max-width: 1000px;
             margin: 0 auto;
         }
 
-        /* CANVAS ĐOM ĐÓM & STAGE BƯỚM NẰM CHÍNH XÁC TRONG .app-container */
+        /* 🦋 LỚP PHỦ COMPANION VIEWPORT: CHỈ CHIẾM ĐÚNG VÙNG .app-container ĐANG HIỆN TRÊN MÀN HÌNH */
+        #wonderland-companion-layer {
+            position: fixed !important;
+            pointer-events: none !important;
+            z-index: 25 !important;
+            overflow: hidden !important;
+            border-radius: 20px !important;
+            contain: strict;
+        }
+
         #fairy-canvas {
             position: absolute !important;
             inset: 0 !important;
             width: 100% !important;
             height: 100% !important;
             pointer-events: none !important;
-            z-index: 10 !important;
-            border-radius: inherit !important;
         }
 
         #butterfly-stage {
@@ -569,10 +573,8 @@
             width: 100% !important;
             height: 100% !important;
             pointer-events: none !important;
-            z-index: 12 !important;
             overflow: hidden !important;
             perspective: 800px !important;
-            border-radius: inherit !important;
         }
 
         .fairy-butterfly {
@@ -665,7 +667,7 @@
             100% { transform: rotateY(-68deg) rotateZ(12deg) scaleX(0.9); }
         }
 
-        /* 3 MÀU BƯỚM THẦN TIÊN TUYỆT ĐẸP */
+        /* 3 MÀU BƯỚM THẦN TIÊN */
         .fairy-blue .fb-wing {
             background: radial-gradient(circle at 65% 30%, rgba(255, 255, 255, 0.98) 0%, rgba(0, 240, 255, 0.9) 35%, rgba(0, 110, 255, 0.75) 70%, rgba(140, 0, 255, 0.65) 100%);
             box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.9), 0 0 14px rgba(0, 229, 255, 0.8);
@@ -681,7 +683,7 @@
             box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 80, 180, 0.8);
         }
 
-        /* CÁC THẺ KHUNG KÍNH PHA LÊ TINH KHIẾT */
+        /* KHUNG KÍNH PHA LÊ SẠCH SẼ */
         .diagram-panel {
             background: var(--glass-card-bg) !important;
             backdrop-filter: var(--glass-blur) !important;
@@ -827,20 +829,22 @@
 
         @media (prefers-reduced-motion: reduce) {
             .fairy-butterfly { animation: none !important; }
-            #fairy-canvas, #butterfly-stage { display: none !important; }
+            #wonderland-companion-layer { display: none !important; }
         }
 
     </style>
 </head>
 <body data-dashboard-version="V3.4 - Full Sync MQTT Live, Cloudflare Dual BMS & Firebase">
+    <!-- 🦋 LỚP PHỦ COMPANION: BƯỚM VÀ ĐOM ĐÓM TỰ ĐỘNG BAY THEO MÀN HÌNH CUỘN, 100% TRONG KHUNG -->
+    <div id="wonderland-companion-layer" aria-hidden="true">
+        <canvas id="fairy-canvas"></canvas>
+        <div id="butterfly-stage"></div>
+    </div>
+
     <!-- 🌌 LỚP NỀN CỰC QUANG TĨNH TỐI ƯU SIÊU NHẸ -->
     <div class="aurora-backdrop"></div>
 
     <div class="app-container">
-        <!-- 🦋 3 CHÚ BƯỚM VÀ CÁC HẠT ĐOM ĐÓM NẰM TRỌN VẸN 100% BÊN TRONG CỤM KHUNG (.app-container) -->
-        <canvas id="fairy-canvas"></canvas>
-        <div id="butterfly-stage"></div>
-
         <div class="diagram-panel">
             <div id="battery-mini-meter" class="battery-mini-meter idle">
                 <div id="lbl-status">Đang tải...</div>
@@ -2797,45 +2801,75 @@
         });
         setInterval(() => { updateBackgroundByTimeAndPv(); }, 60000);
     
-        // ================= 🌌 WONDERLAND ENGINE V5: CÔ LẬP 100% TRONG KHUNG, 0% RÒ RỈ RA NGOÀI =================
+        // ================= 🌌 WONDERLAND ENGINE V6: ĐÀN BƯỚM & HẠT TỤ HỘI BAY THEO TẦM MẮT CUỘN =================
         function initFairytaleWonderland() {
             const container = document.querySelector('.app-container');
+            const layer = document.getElementById('wonderland-companion-layer');
             const canvas = document.getElementById('fairy-canvas');
             const stage = document.getElementById('butterfly-stage');
-            if (!container || !canvas || !stage) return;
+            if (!container || !layer || !canvas || !stage) return;
 
             const ctx = canvas.getContext('2d', { alpha: true });
             if (!ctx) return;
 
             const isMobile = window.innerWidth <= 768;
-            let w = 0;
-            let h = 0;
+            let bounds = { left: 0, top: 0, width: 0, height: 0 };
+            let lastScrollY = window.scrollY;
+            let scrollImpulse = 0;
 
-            function updateBounds() {
-                w = canvas.width = container.clientWidth || 800;
-                h = canvas.height = container.clientHeight || 1200;
+            // 🎯 THUẬT TOÁN GIAO CẮT CHUẨN XÁC: Chỉ chiếm đúng phần .app-container đang hiện trên màn hình
+            function updateCompanionBounds() {
+                const r = container.getBoundingClientRect();
+                const left = Math.max(0, r.left);
+                const top = Math.max(0, r.top);
+                const right = Math.min(window.innerWidth, r.right);
+                const bottom = Math.min(window.innerHeight, r.bottom);
+
+                const width = Math.max(0, right - left);
+                const height = Math.max(0, bottom - top);
+
+                bounds = { left, top, width, height };
+
+                layer.style.left = `${left}px`;
+                layer.style.top = `${top}px`;
+                layer.style.width = `${width}px`;
+                layer.style.height = `${height}px`;
+
+                // Cập nhật canvas resolution đúng với phần giao cắt
+                if (canvas.width !== Math.round(width) || canvas.height !== Math.round(height)) {
+                    canvas.width = Math.round(width);
+                    canvas.height = Math.round(height);
+                }
             }
-            updateBounds();
+            updateCompanionBounds();
 
-            window.addEventListener('resize', updateBounds, { passive: true });
+            window.addEventListener('scroll', () => {
+                const currentY = window.scrollY;
+                // Tạo lực quán tính kéo nhẹ khi cuộn để hạt và bướm bồng bềnh lượn theo
+                scrollImpulse = Math.max(-1.5, Math.min(1.5, (currentY - lastScrollY) / 30));
+                lastScrollY = currentY;
+                updateCompanionBounds();
+            }, { passive: true });
+
+            window.addEventListener('resize', updateCompanionBounds, { passive: true });
 
             const mouse = { x: -1000, y: -1000, active: false };
 
-            container.addEventListener('pointermove', (e) => {
-                const rect = container.getBoundingClientRect();
+            layer.addEventListener('pointermove', (e) => {
+                const rect = layer.getBoundingClientRect();
                 mouse.x = e.clientX - rect.left;
                 mouse.y = e.clientY - rect.top;
                 mouse.active = true;
             }, { passive: true });
 
-            container.addEventListener('pointerleave', () => {
+            layer.addEventListener('pointerleave', () => {
                 mouse.x = -1000;
                 mouse.y = -1000;
                 mouse.active = false;
             });
 
-            // 1. TĂNG HẠT ĐOM ĐÓM ĐẸP MẮT (Mobile: 22 hạt, Desktop: 34 hạt) NẰM TRỌN TRONG KHUNG
-            const particleCount = isMobile ? 22 : 34;
+            // 1. TẠO BẦY ĐOM ĐÓM TỤ HỘI (Mobile: 20 hạt, Desktop: 30 hạt) - TẬP TRUNG TOÀN BỘ VÀO KHUNG NHÌN
+            const particleCount = isMobile ? 20 : 30;
             const fireflies = [];
             const fireflyColors = [
                 '0, 255, 204',   // Mint
@@ -2847,10 +2881,10 @@
 
             for (let i = 0; i < particleCount; i++) {
                 fireflies.push({
-                    x: Math.random() * (w - 30) + 15,
-                    y: Math.random() * (h - 30) + 15,
-                    vx: (Math.random() - 0.5) * 0.42,
-                    vy: (Math.random() - 0.5) * 0.38 - 0.1,
+                    x: Math.random() * (bounds.width || 400),
+                    y: Math.random() * (bounds.height || 600),
+                    vx: (Math.random() - 0.5) * 0.45,
+                    vy: (Math.random() - 0.5) * 0.35 - 0.1,
                     baseRadius: 1.1 + Math.random() * 1.5,
                     phase: Math.random() * Math.PI * 2,
                     pulseSpeed: 0.025 + Math.random() * 0.035,
@@ -2858,11 +2892,11 @@
                 });
             }
 
-            // 2. ĐÚNG 3 CHÚ BƯỚM THẦN TIÊN PHÂN BỔ ĐỀU CÁC TẦNG KHUNG (TOP, MIDDLE, BOTTOM)
+            // 2. 3 CHÚ BƯỚM THẦN TIÊN LƯỢN ĐỒNG HÀNH NGAY TRONG TẦM MẮT
             const butterflyDefs = [
-                { type: 'fairy-blue', startX: w * 0.25, startY: h * 0.18, minY: 0.05, maxY: 0.38, scale: isMobile ? 0.78 : 0.88, speed: 1.6, flap: 0.22 },
-                { type: 'fairy-gold', startX: w * 0.75, startY: h * 0.50, minY: 0.35, maxY: 0.68, scale: isMobile ? 0.74 : 0.84, speed: 1.5, flap: 0.25 },
-                { type: 'fairy-pink', startX: w * 0.40, startY: h * 0.80, minY: 0.65, maxY: 0.95, scale: isMobile ? 0.76 : 0.86, speed: 1.7, flap: 0.20 }
+                { type: 'fairy-blue', startRelX: 0.25, startRelY: 0.35, scale: isMobile ? 0.78 : 0.88, speed: 1.7, flap: 0.22 },
+                { type: 'fairy-gold', startRelX: 0.75, startRelY: 0.55, scale: isMobile ? 0.74 : 0.84, speed: 1.5, flap: 0.25 },
+                { type: 'fairy-pink', startRelX: 0.45, startRelY: 0.75, scale: isMobile ? 0.76 : 0.86, speed: 1.6, flap: 0.20 }
             ];
 
             const butterflies = butterflyDefs.map((b, idx) => {
@@ -2879,23 +2913,21 @@
                 return {
                     el,
                     type: b.type,
-                    x: b.startX,
-                    y: b.startY,
-                    minY: b.minY,
-                    maxY: b.maxY,
+                    x: (bounds.width || 400) * b.startRelX,
+                    y: (bounds.height || 600) * b.startRelY,
                     vx: (Math.random() - 0.5) * 1.0,
-                    vy: -0.7,
+                    vy: -0.6,
                     speed: b.speed,
                     scale: b.scale,
-                    targetX: Math.random() * (w - 80) + 40,
-                    targetY: (b.minY + Math.random() * (b.maxY - b.minY)) * h,
+                    targetX: Math.random() * Math.max(100, bounds.width - 80) + 40,
+                    targetY: Math.random() * Math.max(100, bounds.height - 80) + 40,
                     phase: idx * 1.8
                 };
             });
 
             // 3. Mảng bụi phấn lấp lánh (Fairy Dust Particles)
             const fairyDust = [];
-            const maxDust = isMobile ? 28 : 50;
+            const maxDust = isMobile ? 26 : 48;
 
             let lastTs = performance.now();
             let lastDrawTs = 0;
@@ -2910,31 +2942,41 @@
                 lastTs = now;
                 lastDrawTs = now;
 
-                ctx.clearRect(0, 0, w, h);
+                // Tắt dần lực quán tính sau khi dừng cuộn
+                scrollImpulse *= Math.pow(0.08, dt);
 
-                // --- VẼ ĐOM ĐÓM CHỈ TRONG KHUNG ---
+                const bw = bounds.width;
+                const bh = bounds.height;
+                if (bw <= 0 || bh <= 0) {
+                    if (!document.hidden) requestAnimationFrame(renderWonderland);
+                    return;
+                }
+
+                ctx.clearRect(0, 0, bw, bh);
+
+                // --- VẼ & CẬP NHẬT ĐOM ĐÓM TẬP HỢP TRONG MÀN HÌNH ---
                 for (let i = 0; i < fireflies.length; i++) {
                     const f = fireflies[i];
                     f.phase += f.pulseSpeed;
 
                     f.x += f.vx + Math.sin(f.phase) * 0.35;
-                    f.y += f.vy + Math.cos(f.phase * 0.8) * 0.25;
+                    f.y += f.vy + Math.cos(f.phase * 0.8) * 0.25 - scrollImpulse * 8;
 
                     if (mouse.active) {
                         const mdx = f.x - mouse.x;
                         const mdy = f.y - mouse.y;
                         const mdist = Math.hypot(mdx, mdy);
-                        if (mdist < 75 && mdist > 0) {
+                        if (mdist < 70 && mdist > 0) {
                             f.x += (mdx / mdist) * 1.5;
                             f.y += (mdy / mdist) * 1.5;
                         }
                     }
 
-                    // Khóa tuần hoàn chặt chẽ trong khung [10, w - 10] và [10, h - 10]
-                    if (f.x < 10) f.x = w - 10;
-                    if (f.x > w - 10) f.x = 10;
-                    if (f.y < 10) f.y = h - 10;
-                    if (f.y > h - 10) f.y = 10;
+                    // Tuần hoàn mượt trong tầm nhìn hiện tại
+                    if (f.x < 10) f.x = bw - 10;
+                    if (f.x > bw - 10) f.x = 10;
+                    if (f.y < 10) f.y = bh - 10;
+                    if (f.y > bh - 10) f.y = 10;
 
                     const glowAlpha = 0.32 + (Math.sin(f.phase) + 1) * 0.32;
                     const r = f.baseRadius * (0.8 + glowAlpha * 0.4);
@@ -2952,15 +2994,15 @@
                     ctx.fill();
                 }
 
-                // --- CẬP NHẬT 3 BƯỚM 3D TRONG CÁC PHÂN ĐOẠN KHUNG ---
+                // --- CẬP NHẬT 3 BƯỚM 3D ĐỒNG HÀNH THEO MÀN HÌNH ---
                 butterflies.forEach((b, idx) => {
                     const dx = b.targetX - b.x;
                     const dy = b.targetY - b.y;
                     const dist = Math.hypot(dx, dy);
 
                     if (dist < 60 || Math.random() < 0.009) {
-                        b.targetX = 40 + Math.random() * (w - 80);
-                        b.targetY = (b.minY + Math.random() * (b.maxY - b.minY)) * h;
+                        b.targetX = 40 + Math.random() * Math.max(50, bw - 80);
+                        b.targetY = 40 + Math.random() * Math.max(50, bh - 80);
                     }
 
                     const targetAngle = Math.atan2(dy, dx);
@@ -2972,17 +3014,16 @@
                     b.vy += (ty - b.vy + wobble) * 0.035;
 
                     b.x += b.vx * (dt * 60);
-                    b.y += b.vy * (dt * 60);
+                    b.y += (b.vy - scrollImpulse * 12) * (dt * 60);
 
-                    // Khóa biên trong khung
+                    // Khóa biên trong tầm nhìn khung
                     const padX = 20;
-                    const padMinY = b.minY * h + 10;
-                    const padMaxY = b.maxY * h - 10;
+                    const padY = 20;
 
                     if (b.x < padX) { b.x = padX; b.vx = Math.abs(b.vx); }
-                    if (b.x > w - padX) { b.x = w - padX; b.vx = -Math.abs(b.vx); }
-                    if (b.y < padMinY) { b.y = padMinY; b.vy = Math.abs(b.vy); }
-                    if (b.y > padMaxY) { b.y = padMaxY; b.vy = -Math.abs(b.vy); }
+                    if (b.x > bw - padX) { b.x = bw - padX; b.vx = -Math.abs(b.vx); }
+                    if (b.y < padY) { b.y = padY; b.vy = Math.abs(b.vy); }
+                    if (b.y > bh - padY) { b.y = bh - padY; b.vy = -Math.abs(b.vy); }
 
                     const moveAngle = (Math.atan2(b.vy, b.vx) * 180 / Math.PI) + 90;
                     const rollAngle = Math.sin(now * 0.008 + idx) * 12;
@@ -3009,10 +3050,10 @@
                 for (let i = fairyDust.length - 1; i >= 0; i--) {
                     const d = fairyDust[i];
                     d.x += d.vx;
-                    d.y += d.vy;
+                    d.y += d.vy - scrollImpulse * 6;
                     d.alpha -= d.decay;
 
-                    if (d.alpha <= 0) {
+                    if (d.alpha <= 0 || d.x < 0 || d.x > bw || d.y < 0 || d.y > bh) {
                         fairyDust.splice(i, 1);
                         continue;
                     }
@@ -3033,6 +3074,7 @@
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) {
                     lastTs = performance.now();
+                    updateCompanionBounds();
                     requestAnimationFrame(renderWonderland);
                 }
             });
