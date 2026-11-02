@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sosen Energy Dashboard V3.4 - Full Sync MQTT & Dual JK BMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- THƯ VIỆN MQTT WEBSOCKET TRÌNH DUYỆT -->
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <!-- THƯ VIỆN BẬT DEFER TRÁNH CHẶN RENDER 2 BMS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
 
@@ -1059,6 +1059,95 @@
                     </section>
                 </div>
             </div>
+
+            <!-- ⚡ HYDRATION ĐỒNG BỘ 0MS CHO 2 BMS TỪ CACHE (HIỂN THỊ TỨC THÌ KHI MỞ TRANG) -->
+            <script>
+            (function hydrateBmsInstant() {
+                try {
+                    var raw = localStorage.getItem("last_sosen_bms_snapshot");
+                    if (!raw) return;
+                    var snap = JSON.parse(raw);
+                    if (!snap) return;
+
+                    ['bm1', 'bm2'].forEach(function(prefix) {
+                        var d = snap[prefix];
+                        if (!d) return;
+                        var card = document.getElementById(prefix + '-card');
+                        if (card) {
+                            card.classList.remove('offline');
+                            if (d.Online === false) card.classList.add('offline');
+                        }
+
+                        function setTxt(id, val) {
+                            var el = document.getElementById(prefix + '-' + id);
+                            if (el && val !== undefined && val !== null) el.textContent = val;
+                        }
+
+                        var devName = d.Device_Name || (prefix === 'bm1' ? 'CALB' : 'GOTION');
+                        setTxt('name', devName);
+                        setTxt('online', d.Online === false ? 'OFF' : 'ON');
+
+                        var soc = Number(d.Remain_Battery);
+                        if (!isNaN(soc) && isFinite(soc)) {
+                            var roundedSoc = Math.round(soc);
+                            setTxt('soc', roundedSoc + '%');
+                            var ring = card ? card.querySelector('.bms-soc-ring') : null;
+                            if (ring) {
+                                ring.style.setProperty('--soc-pct', roundedSoc);
+                                ring.className = 'bms-soc-ring ' + (roundedSoc <= 25 ? 'soc-lvl-1' : roundedSoc <= 50 ? 'soc-lvl-2' : roundedSoc <= 80 ? 'soc-lvl-3' : 'soc-lvl-4');
+                            }
+                        }
+
+                        if (d.Total_Voltage !== undefined && !isNaN(Number(d.Total_Voltage))) setTxt('voltage', Number(d.Total_Voltage).toFixed(2) + ' V');
+                        if (d.Current !== undefined && !isNaN(Number(d.Current))) setTxt('current', Number(d.Current).toFixed(2) + ' A');
+                        if (d.Runtime_Text) setTxt('runtime', d.Runtime_Text);
+                        if (d.Cycle_Count !== undefined && !isNaN(Number(d.Cycle_Count))) setTxt('cycle-top', Math.round(d.Cycle_Count));
+                        if (d.Max_Cell_Voltage !== undefined && !isNaN(Number(d.Max_Cell_Voltage))) setTxt('cell-high', Number(d.Max_Cell_Voltage).toFixed(3));
+                        if (d.Min_Cell_Voltage !== undefined && !isNaN(Number(d.Min_Cell_Voltage))) setTxt('cell-low', Number(d.Min_Cell_Voltage).toFixed(3));
+                        if (d.Cell_Voltage_Diff !== undefined && !isNaN(Number(d.Cell_Voltage_Diff))) setTxt('cell-diff', Number(d.Cell_Voltage_Diff).toFixed(3));
+                        if (d.Balance_Current !== undefined && !isNaN(Number(d.Balance_Current))) setTxt('balance-current', Number(d.Balance_Current).toFixed(3));
+                        if (d.Batt_Capacity !== undefined && !isNaN(Number(d.Batt_Capacity))) setTxt('capacity', Number(d.Batt_Capacity).toFixed(1));
+                        if (d.Remain_Capacity !== undefined && !isNaN(Number(d.Remain_Capacity))) setTxt('remain', Number(d.Remain_Capacity).toFixed(1));
+                        if (d.MOS_Temp !== undefined && !isNaN(Number(d.MOS_Temp))) setTxt('mos-temp', Number(d.MOS_Temp).toFixed(1));
+                        if (d.Battery_Health !== undefined && !isNaN(Number(d.Battery_Health))) setTxt('health', Math.round(d.Battery_Health));
+                        if (d.Battery_T1 !== undefined && !isNaN(Number(d.Battery_T1))) setTxt('t1', Number(d.Battery_T1).toFixed(1));
+                        if (d.Battery_T2 !== undefined && !isNaN(Number(d.Battery_T2))) setTxt('t2', Number(d.Battery_T2).toFixed(1));
+                        if (d.Battery_T3 !== undefined && !isNaN(Number(d.Battery_T3))) setTxt('t3', Number(d.Battery_T3).toFixed(1));
+                        if (d.Battery_T4 !== undefined && !isNaN(Number(d.Battery_T4))) setTxt('t4', Number(d.Battery_T4).toFixed(1));
+
+                        function setFlag(flagId, val) {
+                            var el = document.getElementById(prefix + '-' + flagId);
+                            if (!el) return;
+                            var on = (val === true || val === 1 || String(val).toLowerCase() === 'on');
+                            el.textContent = on ? 'ON' : 'OFF';
+                            el.className = 'bms-flag-value ' + (on ? 'on' : 'off');
+                        }
+                        setFlag('charge-state', d.Charge);
+                        setFlag('discharge-state', d.Discharge);
+                        setFlag('balance-state', d.Balance);
+
+                        var curr = Number(d.Current);
+                        var volt = Number(d.Total_Voltage);
+                        var isCharging = !isNaN(curr) && curr > 0.05;
+                        var isDischarging = !isNaN(curr) && curr < -0.05;
+                        var pRow = card ? card.querySelector('.bms-power-row') : null;
+                        if (pRow) {
+                            pRow.className = 'bms-power-row' + (isCharging ? ' charging' : (isDischarging ? ' discharging' : ''));
+                        }
+                        var pVal = d.Battery_Power !== undefined ? Number(d.Battery_Power) : (!isNaN(volt) && !isNaN(curr) ? Math.abs(volt * curr) : NaN);
+                        if (!isNaN(pVal)) {
+                            var maxLimit = volt * (curr >= 0 ? (d.Max_Charge_Curr || 120) : (d.Max_Discharge_Curr || 120));
+                            setTxt('power', pVal.toFixed(1) + (maxLimit > 0 ? ' / ' + Math.round(maxLimit) : ''));
+                            var fill = document.getElementById(prefix + '-power-fill');
+                            if (fill && maxLimit > 0) {
+                                fill.style.width = Math.min(100, Math.max(0, (pVal / maxLimit) * 100)).toFixed(1) + '%';
+                                fill.classList.toggle('discharging', isDischarging);
+                            }
+                        }
+                    });
+                } catch(e) {}
+            })();
+            </script>
 
             <!-- 3. QUY ĐỔI TIỀN ĐIỆN -->
             <div class="stat-card money-card">
@@ -2710,15 +2799,17 @@
             if (isMikaPolling || document.hidden) return;
             isMikaPolling = true;
             try {
-                let anyOk = false;
-                for (const dev of MIKA_DEVICES) {
+                // Polling song song 2 bình BMS: Bình nào về trước hiển thị ngay lập tức, không đợi bình kia
+                await Promise.allSettled(MIKA_DEVICES.map(async (dev) => {
                     const ok = await fetchSingleMikaDevice(dev);
-                    if (ok) anyOk = true;
-                }
-
-                if (anyOk) {
-                    refreshBmsPanels();
-                }
+                    if (ok && latestBmsCombined[dev.slot]) {
+                        updateBmsPanel(dev.slot, latestBmsCombined[dev.slot]);
+                        updateDOMText('bms-updated', new Date().toLocaleTimeString('vi-VN', { hour12: false }));
+                        try {
+                            localStorage.setItem("last_sosen_bms_snapshot", JSON.stringify(latestBmsCombined));
+                        } catch (e) {}
+                    }
+                }));
             } catch (e) {} finally {
                 isMikaPolling = false;
             }
@@ -2809,13 +2900,11 @@
             initChart();
             initMQTT();
 
-            // Khởi chạy đồng bộ 2 BMS qua Cloudflare Worker (2 giây/lần)
+            // Khởi chạy đồng bộ 2 BMS qua Cloudflare Worker ngay lập tức 0ms không độ trễ
             triggerBothMikaDevices();
-            setTimeout(() => {
-                pollBothMikaSolarBms();
-                setInterval(pollBothMikaSolarBms, 2000);
-                setInterval(triggerBothMikaDevices, 25000);
-            }, 600);
+            pollBothMikaSolarBms();
+            setInterval(pollBothMikaSolarBms, 2000);
+            setInterval(triggerBothMikaDevices, 25000);
 
             if (database) {
                 database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
