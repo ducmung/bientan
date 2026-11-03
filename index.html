@@ -107,9 +107,9 @@
         .node { position: absolute; transform: translate(-50%, -50%) translateZ(0); background: transparent; border: none; padding: 10px 4px; text-align: center; width: 90px; z-index: 10; }
         .pos-pv { top: 15%; left: 12%; }
         .pos-grid { top: 18%; left: 84%; }
-        .pos-batt { top: 82%; left: 16%; }
+        .pos-batt { top: 82%; left: 10%; }
         .pos-load { top: 82%; left: 84%; }
-        .pos-batt.corner-node { top: 84%; left: 15%; width: 118px; }
+        .pos-batt.corner-node { top: 84%; left: 10%; width: 118px; }
         .pos-load.corner-node { top: 86%; left: 88%; }
 
         .image-frame {
@@ -273,8 +273,8 @@
 
         /* 2. Thân trụ pin 3D viền kim loại Chrome & vách kính bóng bẩy */
         .pos-batt.corner-node .battery-body {
-            width: 48px;
-            height: 76px;
+            width: 50px;
+            height: 92px;
             border-radius: 9px;
             background: linear-gradient(90deg, #11141a 0%, #1c232f 14%, rgba(255, 255, 255, 0.08) 32%, #141a24 60%, #0a0d14 100%);
             border: 1.5px solid rgba(160, 175, 195, 0.6);
@@ -346,7 +346,7 @@
         /* 6. Phần trăm pin trắng tinh, nổi bật, sang trọng như ảnh mẫu */
         .pos-batt.corner-node #lbl-soc {
             position: absolute;
-            top: 50%;
+            top: 38%;
             left: 50%;
             transform: translate(-50%, -50%) translateZ(0);
             z-index: 4;
@@ -366,6 +366,44 @@
             margin: 0;
             white-space: nowrap;
             pointer-events: none;
+        }
+
+        /* Nhiệt độ pin nằm bên trong đáy quả pin, số được bao ngoài bởi màu xanh da trời */
+        .pos-batt.corner-node .battery-temp-label {
+            position: absolute;
+            top: 70%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(0);
+            z-index: 4;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            font-size: 11px;
+            font-weight: 900;
+            line-height: 1;
+            margin: 0;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .pos-batt.corner-node .battery-temp-label .temp-value {
+            font-size: 11px;
+            font-weight: 900;
+            -webkit-text-stroke: 1px #00d2ff;
+            paint-order: stroke fill;
+            text-shadow:
+                -1px -1px 0 #00d2ff,
+                 1px -1px 0 #00d2ff,
+                -1px  1px 0 #00d2ff,
+                 1px  1px 0 #00d2ff,
+                 0 0 6px rgba(0, 210, 255, 0.85),
+                 0 2px 3px rgba(0, 0, 0, 0.95);
+            letter-spacing: 0.3px;
+        }
+
+        .pos-batt.corner-node .battery-temp-label .temp-icon {
+            display: none !important;
         }
         
         .battery-temp-label {
@@ -1118,10 +1156,10 @@
                         <div class="battery-glass-shine"></div>
                         <div class="battery-rim-bottom"></div>
                         <div id="lbl-soc">0%</div>
+                        <div id="lbl-batt-temp" class="battery-temp-label temp-stale">
+                            <span id="lbl-batt-temp-value" class="temp-value">--°C</span>
+                        </div>
                     </div>
-                </div>
-                <div id="lbl-batt-temp" class="battery-temp-label temp-stale">
-                    <span class="temp-icon">🌡️</span><span id="lbl-batt-temp-value" class="temp-value">--°C</span>
                 </div>
             </div>
 
