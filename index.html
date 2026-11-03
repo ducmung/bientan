@@ -129,21 +129,21 @@
         .node-center img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; transform: translateZ(0); }
 
         #lbl-inv-temp {
-            position: absolute; top: 69%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
-            font-size: 14px; font-weight: 900; background: #00cc66; color: #fff;
-            padding: 4px 16px; border-radius: 20px; z-index: 20; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
+            position: absolute; top: 5px; right: 6px;
+            font-size: 11px; font-weight: 900; background: transparent !important; color: #00a854;
+            padding: 0; border-radius: 0; box-shadow: none !important; white-space: nowrap;
+            z-index: 20; transition: color 0.5s ease;
         }
         
-        .bpf-container {
-            position: absolute; top: 76.5%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
-            z-index: 15; text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 3px; pointer-events: none;
+                .bpf-container {
+            position: absolute; top: 68.5%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
+            z-index: 15; text-align: center; width: 100%; pointer-events: none;
         }
         .bpf-text {
-            font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 26px; font-weight: 900; letter-spacing: 11px;
+            font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 30px; font-weight: 900; letter-spacing: 14px;
             position: relative; display: inline-block; background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
             -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.55));
-            animation: goldPulse 2.6s ease-in-out infinite alternate; margin-left: 11px;
+            animation: goldPulse 2.6s ease-in-out infinite alternate; margin-left: 14px;
         }
         @keyframes goldPulse { from { opacity: 0.88; transform: translateZ(0); } to { opacity: 1; transform: translateY(-1px) translateZ(0); } }
         .bpf-text::after {
@@ -151,26 +151,27 @@
             text-shadow: 1px 1px 0 #ff0000, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 0 #660000, 5px 5px 0 #330000, 6px 6px 12px rgba(255, 0, 0, 0.8);
         }
 
-        /* WIDGET AI THỜI TIẾT & BỨC XẠ MẶT TRỜI NÚI MÓNG - ĐẠI ĐỒNG (THU GỌN 224PX, KHÔNG CHÈN PIN/NHÀ) */
+        /* WIDGET AI THỜI TIẾT & BỨC XẠ MẶT TRỜI NÚI MÓNG - ĐẠI ĐỒNG (SÁT DƯỚI KHUNG, KHÔNG CHÈN PIN & NHÀ) */
         .ai-weather-card {
-            pointer-events: auto; cursor: pointer; width: 224px; max-width: 90%; padding: 6px 9px 7px 9px; border-radius: 13px;
+            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%) translateZ(0);
+            pointer-events: auto; cursor: pointer; width: 200px; max-width: 58%; padding: 4px 8px 5px 8px; border-radius: 12px;
             background: linear-gradient(135deg, rgba(14, 23, 40, 0.88) 0%, rgba(6, 12, 22, 0.94) 100%);
             border: 1px solid rgba(0, 229, 255, 0.38); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55), inset 0 0 10px rgba(0, 229, 255, 0.08);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform 0.2s ease, border-color 0.3s ease; text-align: left;
-            margin-top: 1px;
+            z-index: 15;
         }
-        .ai-weather-card:hover { transform: scale(1.03); border-color: rgba(0, 255, 180, 0.7); box-shadow: 0 6px 18px rgba(0, 229, 255, 0.25); }
-        .ai-weather-top { display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; font-weight: 800; line-height: 1.15; color: #e2e8f0; gap: 4px; }
-        .ai-loc-tag { color: #ffd700; text-shadow: 0 0 6px rgba(255, 215, 0, 0.4); white-space: nowrap; font-size: 9px; }
-        .ai-weather-cond { color: #00e5ff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; text-align: center; font-size: 9.5px; }
-        .ai-temp-tag { color: #fff; background: rgba(255, 255, 255, 0.14); padding: 1px 5px; border-radius: 7px; font-size: 9px; white-space: nowrap; }
-        .ai-predict-row { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; font-size: 10px; font-weight: 900; line-height: 1.2; white-space: nowrap; }
-        .ai-predict-label { color: #cbd5e1; font-size: 9.5px; }
-        .ai-predict-val { color: #00ff72; font-size: 12.5px; text-shadow: 0 0 8px rgba(0, 255, 114, 0.6); }
-        .ai-ratio-badge { font-size: 8.5px; padding: 1.5px 5px; border-radius: 5px; background: rgba(0, 255, 114, 0.16); color: #00ff72; border: 1px solid rgba(0, 255, 114, 0.35); }
-        .ai-bar-track { width: 100%; height: 3.5px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); margin-top: 4px; overflow: hidden; }
+        .ai-weather-card:hover { transform: translateX(-50%) scale(1.03); border-color: rgba(0, 255, 180, 0.7); box-shadow: 0 6px 18px rgba(0, 229, 255, 0.25); }
+        .ai-weather-top { display: flex; align-items: center; justify-content: space-between; font-size: 9px; font-weight: 800; line-height: 1.15; color: #e2e8f0; gap: 3px; }
+        .ai-loc-tag { color: #ffd700; text-shadow: 0 0 6px rgba(255, 215, 0, 0.4); white-space: nowrap; font-size: 8.5px; }
+        .ai-weather-cond { color: #00e5ff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; text-align: center; font-size: 9px; }
+        .ai-temp-tag { color: #fff; background: rgba(255, 255, 255, 0.14); padding: 1px 4px; border-radius: 6px; font-size: 8.5px; white-space: nowrap; }
+        .ai-predict-row { display: flex; align-items: center; justify-content: space-between; margin-top: 3px; font-size: 9.5px; font-weight: 900; line-height: 1.2; white-space: nowrap; }
+        .ai-predict-label { color: #cbd5e1; font-size: 9px; }
+        .ai-predict-val { color: #00ff72; font-size: 11.5px; text-shadow: 0 0 8px rgba(0, 255, 114, 0.6); }
+        .ai-ratio-badge { font-size: 8px; padding: 1px 4px; border-radius: 5px; background: rgba(0, 255, 114, 0.16); color: #00ff72; border: 1px solid rgba(0, 255, 114, 0.35); }
+        .ai-bar-track { width: 100%; height: 3px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); margin-top: 3px; overflow: hidden; }
         .ai-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #ff8c00, #ffd700, #00ff72); box-shadow: 0 0 8px #00ff72; transition: width 0.8s ease-in-out; }
-        .ai-hint-click { font-size: 7.5px; color: rgba(255, 255, 255, 0.55); text-align: center; margin-top: 2.5px; letter-spacing: 0.2px; text-transform: uppercase; }
+        .ai-hint-click { font-size: 7px; color: rgba(255, 255, 255, 0.55); text-align: center; margin-top: 2px; letter-spacing: 0.2px; text-transform: uppercase; }
 
         /* MODAL POPUP CHI TIẾT AI IOT & MACHINE LEARNING */
         .ai-modal-overlay {
@@ -201,7 +202,7 @@
         .ai-forecast-7d { margin-top: 6px; border-top: 1px dashed rgba(255, 255, 255, 0.12); padding-top: 8px; }
         .ai-day-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 10.5px; }
         .ai-day-row:nth-child(even) { background: rgba(255, 255, 255, 0.03); }
-
+        
         .line { position: absolute; height: 26px; margin-top: -13px; background: transparent; width: 44%; z-index: 1; transform: translateZ(0); pointer-events: none; }
         .line-pv { top: 18%; left: 16%; transform-origin: left center; transform: rotate(38deg) translateZ(0); }
         .line-grid { top: 18%; right: 16%; transform-origin: right center; transform: rotate(-38deg) translateZ(0); }
@@ -961,9 +962,8 @@
             <!-- NODE BIẾN TẦN TRUNG TÂM -->
             <div class="node-center pos-inv">
                 <img src="68.jpg" alt="Inverter" onerror="this.style.opacity='0'">
+                <div id="lbl-inv-temp">🌡️ --°C</div>
             </div>
-
-            <div id="lbl-inv-temp">🌡️ --°C</div>
 
             <div class="line line-pv"><div class="flow-group" id="flow-pv"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
             <div class="line line-grid"><div class="flow-group" id="flow-grid"><div class="flow-track"></div><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-dash"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span><span class="flow-spark"></span></div></div>
@@ -1004,25 +1004,24 @@
                 <div class="icon"><img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon" onerror="this.style.opacity='0'"></div>
             </div>
 
-            <div class="bpf-container">
-                <div class="bpf-text" data-text="八方來財">八方來財</div>
-                <!-- AI THỜI TIẾT & DỰ BÁO SẢN LƯỢNG PV NÚI MÓNG - ĐẠI ĐỒNG (THU GỌN 224PX, KHÔNG CHÈN PIN/NHÀ) -->
-                <div class="ai-weather-card" id="ai-weather-box" title="Nhấn để xem mô hình AI & dự báo chi tiết" onclick="toggleAiSolarModal(true)">
-                    <div class="ai-weather-top">
-                        <span class="ai-loc-tag">📍 Núi Móng</span>
-                        <span class="ai-weather-cond" id="ai-weather-text">⏳ Đang dự báo...</span>
-                        <span class="ai-temp-tag" id="ai-weather-temp">--°C</span>
-                    </div>
-                    <div class="ai-predict-row">
-                        <span class="ai-predict-label">⚡ Dự kiến:</span>
-                        <span class="ai-predict-val" id="ai-predict-val">-- kWh</span>
-                        <span class="ai-ratio-badge" id="ai-predict-ratio">--%</span>
-                    </div>
-                    <div class="ai-bar-track">
-                        <div class="ai-bar-fill" id="ai-bar-fill" style="width: 0%;"></div>
-                    </div>
-                    <div class="ai-hint-click">🔍 Chạm xem phân tích AI IoT & 7 ngày</div>
+            <div class="bpf-container"><div class="bpf-text" data-text="八方來財">八方來財</div></div>
+
+            <!-- AI THỜI TIẾT & DỰ BÁO SẢN LƯỢNG PV NÚI MÓNG - ĐẠI ĐỒNG (SÁT DƯỚI KHUNG, KHÔNG CHÈN PIN & NHÀ) -->
+            <div class="ai-weather-card" id="ai-weather-box" title="Nhấn để xem mô hình AI & dự báo chi tiết" onclick="toggleAiSolarModal(true)">
+                <div class="ai-weather-top">
+                    <span class="ai-loc-tag">📍 Núi Móng</span>
+                    <span class="ai-weather-cond" id="ai-weather-text">⏳ Đang dự báo...</span>
+                    <span class="ai-temp-tag" id="ai-weather-temp">--°C</span>
                 </div>
+                <div class="ai-predict-row">
+                    <span class="ai-predict-label">⚡ Dự kiến:</span>
+                    <span class="ai-predict-val" id="ai-predict-val">-- kWh</span>
+                    <span class="ai-ratio-badge" id="ai-predict-ratio">--%</span>
+                </div>
+                <div class="ai-bar-track">
+                    <div class="ai-bar-fill" id="ai-bar-fill" style="width: 0%;"></div>
+                </div>
+                <div class="ai-hint-click">🔍 Chạm xem phân tích AI & 7 ngày</div>
             </div>
         </div>
 
@@ -2547,9 +2546,10 @@
                 const t = toSafeNumber(data.Inv_Temp);
                 if (tempLabel) {
                     animateValue('lbl-inv-temp', t, v => '🌡️ ' + v.toFixed(0) + '°C');
-                    if (t < 40) tempLabel.style.backgroundColor = '#00cc66'; 
-                    else if (t >= 40 && t < 48) tempLabel.style.backgroundColor = '#ffaa00'; 
-                    else tempLabel.style.backgroundColor = '#ff4444';
+                    tempLabel.style.backgroundColor = 'transparent';
+                    if (t < 40) tempLabel.style.color = '#00a854'; 
+                    else if (t >= 40 && t < 48) tempLabel.style.color = '#ff8c00'; 
+                    else tempLabel.style.color = '#ff3333';
                 }
             }
 
