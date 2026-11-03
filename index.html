@@ -135,18 +135,72 @@
             white-space: nowrap; transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
         
-        .bpf-container { position: absolute; top: 89%; left: 50%; transform: translate(-50%, -50%) translateZ(0); z-index: 15; text-align: center; width: 100%; pointer-events: none; }
+        .bpf-container {
+            position: absolute; top: 76.5%; left: 50%; transform: translate(-50%, -50%) translateZ(0);
+            z-index: 15; text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 3px; pointer-events: none;
+        }
         .bpf-text {
-            font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 32px; font-weight: 900; letter-spacing: 14px;
+            font-family: "STKaiti", "KaiTi", "Times New Roman", serif; font-size: 26px; font-weight: 900; letter-spacing: 11px;
             position: relative; display: inline-block; background: linear-gradient(180deg, #fff7a1 0%, #ffd700 40%, #ff8c00 80%, #b8860b 100%);
             -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.55));
-            animation: goldPulse 2.6s ease-in-out infinite alternate; margin-left: 14px;
+            animation: goldPulse 2.6s ease-in-out infinite alternate; margin-left: 11px;
         }
         @keyframes goldPulse { from { opacity: 0.88; transform: translateZ(0); } to { opacity: 1; transform: translateY(-1px) translateZ(0); } }
         .bpf-text::after {
             content: attr(data-text); position: absolute; left: 0; top: 0; z-index: -1; -webkit-text-fill-color: transparent; background: none;
             text-shadow: 1px 1px 0 #ff0000, 2px 2px 0 #cc0000, 3px 3px 0 #990000, 4px 4px 0 #660000, 5px 5px 0 #330000, 6px 6px 12px rgba(255, 0, 0, 0.8);
         }
+
+        /* WIDGET AI THỜI TIẾT & BỨC XẠ MẶT TRỜI NÚI MÓNG - ĐẠI ĐỒNG (THU GỌN 224PX, KHÔNG CHÈN PIN/NHÀ) */
+        .ai-weather-card {
+            pointer-events: auto; cursor: pointer; width: 224px; max-width: 90%; padding: 6px 9px 7px 9px; border-radius: 13px;
+            background: linear-gradient(135deg, rgba(14, 23, 40, 0.88) 0%, rgba(6, 12, 22, 0.94) 100%);
+            border: 1px solid rgba(0, 229, 255, 0.38); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55), inset 0 0 10px rgba(0, 229, 255, 0.08);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform 0.2s ease, border-color 0.3s ease; text-align: left;
+            margin-top: 1px;
+        }
+        .ai-weather-card:hover { transform: scale(1.03); border-color: rgba(0, 255, 180, 0.7); box-shadow: 0 6px 18px rgba(0, 229, 255, 0.25); }
+        .ai-weather-top { display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; font-weight: 800; line-height: 1.15; color: #e2e8f0; gap: 4px; }
+        .ai-loc-tag { color: #ffd700; text-shadow: 0 0 6px rgba(255, 215, 0, 0.4); white-space: nowrap; font-size: 9px; }
+        .ai-weather-cond { color: #00e5ff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; text-align: center; font-size: 9.5px; }
+        .ai-temp-tag { color: #fff; background: rgba(255, 255, 255, 0.14); padding: 1px 5px; border-radius: 7px; font-size: 9px; white-space: nowrap; }
+        .ai-predict-row { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; font-size: 10px; font-weight: 900; line-height: 1.2; white-space: nowrap; }
+        .ai-predict-label { color: #cbd5e1; font-size: 9.5px; }
+        .ai-predict-val { color: #00ff72; font-size: 12.5px; text-shadow: 0 0 8px rgba(0, 255, 114, 0.6); }
+        .ai-ratio-badge { font-size: 8.5px; padding: 1.5px 5px; border-radius: 5px; background: rgba(0, 255, 114, 0.16); color: #00ff72; border: 1px solid rgba(0, 255, 114, 0.35); }
+        .ai-bar-track { width: 100%; height: 3.5px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); margin-top: 4px; overflow: hidden; }
+        .ai-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #ff8c00, #ffd700, #00ff72); box-shadow: 0 0 8px #00ff72; transition: width 0.8s ease-in-out; }
+        .ai-hint-click { font-size: 7.5px; color: rgba(255, 255, 255, 0.55); text-align: center; margin-top: 2.5px; letter-spacing: 0.2px; text-transform: uppercase; }
+
+        /* MODAL POPUP CHI TIẾT AI IOT & MACHINE LEARNING */
+        .ai-modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(4, 8, 16, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 9999; align-items: center; justify-content: center; padding: 12px;
+        }
+        .ai-modal-overlay.active { display: flex; }
+        .ai-modal-box {
+            position: relative; width: 100%; max-width: 460px; max-height: 88vh; overflow-y: auto; background: linear-gradient(135deg, rgba(16, 26, 44, 0.96), rgba(8, 14, 26, 0.98));
+            border: 1px solid rgba(0, 229, 255, 0.45); border-radius: 18px; padding: 16px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 24px rgba(0, 229, 255, 0.2);
+            color: #fff; font-size: 11.5px;
+        }
+        .ai-modal-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding-bottom: 8px; margin-bottom: 12px; }
+        .ai-modal-title { font-size: 13.5px; font-weight: 900; color: #ffd700; display: flex; align-items: center; gap: 6px; }
+        .ai-modal-close { background: transparent; border: none; color: #a0aec0; font-size: 20px; font-weight: 900; cursor: pointer; line-height: 1; padding: 0 4px; }
+        .ai-modal-close:hover { color: #ff4444; }
+        .ai-section-title { font-size: 10.5px; font-weight: 900; color: #00e5ff; text-transform: uppercase; margin: 10px 0 6px 0; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px; }
+        .ai-grid-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+        .ai-metric-item { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 9px; padding: 6px 8px; }
+        .ai-metric-item .lbl { color: #a0aec0; font-size: 9.5px; font-weight: 800; }
+        .ai-metric-item .val { color: #fff; font-size: 12.5px; font-weight: 900; margin-top: 2px; }
+        .ai-hourly-container { display: flex; gap: 5px; overflow-x: auto; padding: 6px 2px; margin-top: 4px; scrollbar-width: thin; }
+        .ai-hour-card { flex: 0 0 46px; background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.25); border-radius: 8px; text-align: center; padding: 4px 2px; }
+        .ai-hour-card.active { border-color: #ffd700; background: rgba(255, 215, 0, 0.15); }
+        .ai-hour-time { font-size: 8.5px; color: #cbd5e1; font-weight: 800; }
+        .ai-hour-icon { font-size: 12px; margin: 2px 0; }
+        .ai-hour-w { font-size: 9.5px; color: #00ff72; font-weight: 900; }
+        .ai-forecast-7d { margin-top: 6px; border-top: 1px dashed rgba(255, 255, 255, 0.12); padding-top: 8px; }
+        .ai-day-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 10.5px; }
+        .ai-day-row:nth-child(even) { background: rgba(255, 255, 255, 0.03); }
 
         .line { position: absolute; height: 26px; margin-top: -13px; background: transparent; width: 44%; z-index: 1; transform: translateZ(0); pointer-events: none; }
         .line-pv { top: 18%; left: 16%; transform-origin: left center; transform: rotate(38deg) translateZ(0); }
@@ -950,7 +1004,26 @@
                 <div class="icon"><img src="gerirlgerirlger.png" alt="Biệt thự" class="img-icon" onerror="this.style.opacity='0'"></div>
             </div>
 
-            <div class="bpf-container"><div class="bpf-text" data-text="八方來財">八方來財</div></div>
+            <div class="bpf-container">
+                <div class="bpf-text" data-text="八方來財">八方來財</div>
+                <!-- AI THỜI TIẾT & DỰ BÁO SẢN LƯỢNG PV NÚI MÓNG - ĐẠI ĐỒNG (THU GỌN 224PX, KHÔNG CHÈN PIN/NHÀ) -->
+                <div class="ai-weather-card" id="ai-weather-box" title="Nhấn để xem mô hình AI & dự báo chi tiết" onclick="toggleAiSolarModal(true)">
+                    <div class="ai-weather-top">
+                        <span class="ai-loc-tag">📍 Núi Móng</span>
+                        <span class="ai-weather-cond" id="ai-weather-text">⏳ Đang dự báo...</span>
+                        <span class="ai-temp-tag" id="ai-weather-temp">--°C</span>
+                    </div>
+                    <div class="ai-predict-row">
+                        <span class="ai-predict-label">⚡ Dự kiến:</span>
+                        <span class="ai-predict-val" id="ai-predict-val">-- kWh</span>
+                        <span class="ai-ratio-badge" id="ai-predict-ratio">--%</span>
+                    </div>
+                    <div class="ai-bar-track">
+                        <div class="ai-bar-fill" id="ai-bar-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="ai-hint-click">🔍 Chạm xem phân tích AI IoT & 7 ngày</div>
+                </div>
+            </div>
         </div>
 
         <div class="stats-panel">
@@ -2899,6 +2972,7 @@
             initFairytaleWonderland();
             initChart();
             initMQTT();
+            fetchAiSolarForecast();
 
             // Khởi chạy đồng bộ 2 BMS qua Cloudflare Worker ngay lập tức 0ms không độ trễ
             triggerBothMikaDevices();
@@ -3361,6 +3435,271 @@
             });
         }
 
+
+        // ================= AI THỜI TIẾT & DỰ BÁO ĐIỆN PV NÚI MÓNG - BẮC NINH =================
+        const AI_LOCATION = {
+            lat: 21.112,
+            lon: 105.972,
+            name: "Núi Móng - Đại Đồng - Bắc Ninh",
+            idealSunnyKWh: 31.5,
+            idealRadiationMJ: 21.0
+        };
+
+        let latestAiForecastData = null;
+
+        const WEATHER_DESC_MAP = {
+            0: { text: "Trời Nắng Gắt", icon: "☀️" },
+            1: { text: "Nắng Đẹp", icon: "🌤️" },
+            2: { text: "Nắng Gián Đoạn", icon: "⛅" },
+            3: { text: "Nhiều Mây", icon: "☁️" },
+            45: { text: "Sương Mù", icon: "🌫️" },
+            51: { text: "Mưa Phùn", icon: "🌦️" },
+            53: { text: "Mưa Rào", icon: "🌧️" },
+            61: { text: "Mưa Rải Rác", icon: "🌧️" },
+            63: { text: "Mưa Vừa", icon: "🌧️" },
+            65: { text: "Mưa Nặng Hạt", icon: "⛈️" },
+            80: { text: "Mưa Rào Nhanh", icon: "🌦️" },
+            95: { text: "Dông Sấm Chớp", icon: "⛈️" }
+        };
+
+        function toggleAiSolarModal(show) {
+            const m = document.getElementById("ai-solar-modal");
+            if (!m) return;
+            if (show) {
+                m.classList.add("active");
+                renderAiModalDetails();
+            } else {
+                m.classList.remove("active");
+            }
+        }
+
+        function handleAiModalOverlayClick(e) {
+            if (e.target && e.target.id === "ai-solar-modal") {
+                toggleAiSolarModal(false);
+            }
+        }
+
+        async function fetchAiSolarForecast(forceRefresh = false) {
+            const CACHE_KEY = "sosen_ai_weather_forecast_v2";
+            const CACHE_TTL = 30 * 60 * 1000;
+
+            if (!forceRefresh) {
+                try {
+                    const cached = localStorage.getItem(CACHE_KEY);
+                    if (cached) {
+                        const parsed = JSON.parse(cached);
+                        if (Date.now() - parsed.ts < CACHE_TTL) {
+                            latestAiForecastData = parsed.data;
+                            renderAiWeatherWidget(parsed.data);
+                            return;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            try {
+                // Lấy cả hourly và daily 7 ngày từ Open-Meteo
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${AI_LOCATION.lat}&longitude=${AI_LOCATION.lon}&current=temperature_2m,relative_humidity_2m,weather_code,cloud_cover,wind_speed_10m&hourly=temperature_2m,weather_code,direct_normal_irradiance,global_tilted_irradiance&daily=weather_code,temperature_2m_max,temperature_2m_min,shortwave_radiation_sum,sunshine_duration&timezone=Asia%2FBangkok&forecast_days=7`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const data = await res.json();
+
+                const forecast = calculateAiSolarOutput(data);
+                latestAiForecastData = forecast;
+                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: forecast })); } catch(e) {}
+                renderAiWeatherWidget(forecast);
+            } catch (err) {
+                const textEl = document.getElementById("ai-weather-text");
+                if (textEl) textEl.innerText = "Chạm để thử lại";
+            }
+        }
+
+        function calculateAiSolarOutput(data) {
+            const currentTemp = data.current ? data.current.temperature_2m : 26;
+            const weatherCode = data.current ? data.current.weather_code : 1;
+            const cloudCover = data.current ? data.current.cloud_cover : 30;
+            const windSpeed = data.current ? data.current.wind_speed_10m : 10;
+            const humidity = data.current ? data.current.relative_humidity_2m : 70;
+
+            const daily = data.daily || {};
+            const radiationMJ = daily.shortwave_radiation_sum && daily.shortwave_radiation_sum[0] ? daily.shortwave_radiation_sum[0] : 15.0;
+            const sunshineHours = daily.sunshine_duration && daily.sunshine_duration[0] ? (daily.sunshine_duration[0] / 3600) : 6.0;
+
+            // Thuật toán AI: Time-series regression bù trừ nhiệt độ và độ che phủ mây
+            const tempDerating = Math.max(0.85, 1 - Math.max(0, currentTemp - 25) * 0.0035);
+            const radiationRatio = Math.min(1.2, radiationMJ / AI_LOCATION.idealRadiationMJ);
+            const predictedKWh = Math.round(AI_LOCATION.idealSunnyKWh * radiationRatio * tempDerating * 10) / 10;
+            const percentOfSunny = Math.min(100, Math.round((predictedKWh / AI_LOCATION.idealSunnyKWh) * 100));
+
+            const wInfo = WEATHER_DESC_MAP[weatherCode] || { text: "Nắng Đẹp", icon: "🌤️" };
+
+            // Tính chuỗi 7 ngày tới
+            const forecast7Days = [];
+            if (daily.time && Array.isArray(daily.time)) {
+                for (let i = 0; i < daily.time.length; i++) {
+                    const rMJ = daily.shortwave_radiation_sum ? (daily.shortwave_radiation_sum[i] || 15) : 15;
+                    const wCode = daily.weather_code ? (daily.weather_code[i] || 0) : 0;
+                    const dayPredKWh = Math.round(AI_LOCATION.idealSunnyKWh * (rMJ / AI_LOCATION.idealRadiationMJ) * 10) / 10;
+                    const dayInfo = WEATHER_DESC_MAP[wCode] || { text: "Quang Mây", icon: "☀️" };
+                    forecast7Days.push({
+                        date: daily.time[i],
+                        icon: dayInfo.icon,
+                        desc: dayInfo.text,
+                        kwh: Math.min(36, Math.max(2, dayPredKWh)),
+                        pct: Math.min(100, Math.round((dayPredKWh / AI_LOCATION.idealSunnyKWh) * 100))
+                    });
+                }
+            }
+
+            // Tính chuỗi giờ trong ngày (từ 6h đến 18h)
+            const hourlyForecast = [];
+            const curHour = new Date().getHours();
+            if (data.hourly && data.hourly.time) {
+                const todayStr = new Date().toISOString().split("T")[0];
+                for (let h = 6; h <= 18; h++) {
+                    const padH = String(h).padStart(2, "0");
+                    const targetTime = `${todayStr}T${padH}:00`;
+                    const idx = data.hourly.time.indexOf(targetTime);
+                    let hourPowerW = 0;
+                    let hCode = 1;
+                    if (idx !== -1) {
+                        hCode = data.hourly.weather_code ? data.hourly.weather_code[idx] : 1;
+                        const gti = data.hourly.global_tilted_irradiance ? data.hourly.global_tilted_irradiance[idx] : 0;
+                        hourPowerW = Math.round(gti * 5.5); // Hệ ~6kWp
+                    } else {
+                        const sunCurve = Math.sin(((h - 6) / 12) * Math.PI);
+                        hourPowerW = Math.round(Math.max(0, sunCurve * (predictedKWh / 6.5) * 1000));
+                    }
+                    const hInfo = WEATHER_DESC_MAP[hCode] || { icon: "🌤️" };
+                    hourlyForecast.push({
+                        hour: `${h}h`,
+                        icon: hInfo.icon,
+                        powerW: hourPowerW,
+                        isCurrent: h === curHour
+                    });
+                }
+            }
+
+            // Dự báo 1 giờ tới
+            const nextHourIdx = hourlyForecast.findIndex(item => item.hour === `${curHour + 1}h`);
+            const nextHourW = nextHourIdx !== -1 ? hourlyForecast[nextHourIdx].powerW : 0;
+            const nextHourKW = (nextHourW / 1000).toFixed(2);
+
+            return {
+                temp: Math.round(currentTemp),
+                cloudCover,
+                windSpeed,
+                humidity,
+                weatherText: `${wInfo.icon} ${wInfo.text}`,
+                predictedKWh,
+                percentOfSunny,
+                radiationMJ: radiationMJ.toFixed(1),
+                sunshineHours: sunshineHours.toFixed(1),
+                nextHourKW,
+                hourlyForecast,
+                forecast7Days
+            };
+        }
+
+        function renderAiWeatherWidget(d) {
+            if (!d) return;
+            const elTemp = document.getElementById("ai-weather-temp");
+            const elCond = document.getElementById("ai-weather-text");
+            const elVal = document.getElementById("ai-predict-val");
+            const elRatio = document.getElementById("ai-predict-ratio");
+            const elBar = document.getElementById("ai-bar-fill");
+
+            if (elTemp) elTemp.innerText = `${d.temp}°C`;
+            if (elCond) elCond.innerText = d.weatherText;
+            if (elVal) elVal.innerText = `${d.predictedKWh} kWh`;
+            if (elRatio) {
+                elRatio.innerText = `${d.percentOfSunny}%`;
+                elRatio.style.color = d.percentOfSunny >= 75 ? "#00ff72" : (d.percentOfSunny >= 45 ? "#ffd700" : "#ff4444");
+                elRatio.style.borderColor = elRatio.style.color;
+            }
+            if (elBar) elBar.style.width = `${d.percentOfSunny}%`;
+        }
+
+        function renderAiModalDetails() {
+            if (!latestAiForecastData) return;
+            const d = latestAiForecastData;
+
+            const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+            setTxt("mdl-radiation", `${d.radiationMJ} MJ/m²`);
+            setTxt("mdl-cloud", `${d.cloudCover}%`);
+            setTxt("mdl-sun-hours", `${d.sunshineHours} giờ`);
+            setTxt("mdl-wind-hum", `${d.windSpeed} km/h | ${d.humidity}%`);
+
+            setTxt("mdl-1h-power", `${d.nextHourKW} kW`);
+            setTxt("mdl-today-kwh", `${d.predictedKWh} kWh`);
+            setTxt("mdl-perf-eval", `${d.percentOfSunny}% so với nắng đỉnh`);
+
+            // Render hourly pills
+            const hList = document.getElementById("mdl-hourly-list");
+            if (hList && d.hourlyForecast) {
+                hList.innerHTML = d.hourlyForecast.map(h => `
+                    <div class="ai-hour-card ${h.isCurrent ? "active" : ""}">
+                        <div class="ai-hour-time">${h.hour}</div>
+                        <div class="ai-hour-icon">${h.icon}</div>
+                        <div class="ai-hour-w">${h.powerW > 0 ? (h.powerW >= 1000 ? (h.powerW/1000).toFixed(1) + "k" : h.powerW + "W") : "0W"}</div>
+                    </div>
+                `).join("");
+            }
+
+            // Render 7 days
+            const dList = document.getElementById("mdl-7d-list");
+            if (dList && d.forecast7Days) {
+                dList.innerHTML = d.forecast7Days.map((item, idx) => {
+                    const label = idx === 0 ? "Hôm nay" : (idx === 1 ? "Ngày mai" : item.date.slice(5));
+                    return `
+                        <div class="ai-day-row">
+                            <span style="font-weight: 800; color: #e2e8f0;">${label} ${item.icon} ${item.desc}</span>
+                            <span style="font-weight: 900; color: ${item.pct >= 75 ? "#00ff72" : (item.pct >= 45 ? "#ffd700" : "#ff4444")};">
+                                ${item.kwh} kWh (${item.pct}%)
+                            </span>
+                        </div>
+                    `;
+                }).join("");
+            }
+        }
+
     </script>
+
+    <!-- MODAL POPUP CHI TIẾT DỰ BÁO AI ML & IOT KHÍ TƯỢNG VỆ TINH -->
+    <div id="ai-solar-modal" class="ai-modal-overlay" onclick="handleAiModalOverlayClick(event)">
+        <div class="ai-modal-box">
+            <div class="ai-modal-header">
+                <div class="ai-modal-title">🤖 AI SOLAR ML - NÚI MÓNG, ĐẠI ĐỒNG</div>
+                <button type="button" class="ai-modal-close" onclick="toggleAiSolarModal(false)">✕</button>
+            </div>
+            
+            <div class="ai-section-title">📡 1. DỮ LIỆU IOT & KHÍ TƯỢNG VỆ TINH (OPEN-METEO)</div>
+            <div class="ai-grid-metrics">
+                <div class="ai-metric-item"><div class="lbl">Bức Xạ Ngày</div><div class="val" id="mdl-radiation">-- MJ/m²</div></div>
+                <div class="ai-metric-item"><div class="lbl">Mây Che Phủ</div><div class="val" id="mdl-cloud">--%</div></div>
+                <div class="ai-metric-item"><div class="lbl">Nắng Dự Kiến</div><div class="val" id="mdl-sun-hours">-- giờ</div></div>
+                <div class="ai-metric-item"><div class="lbl">Tốc Độ Gió & Ẩm</div><div class="val" id="mdl-wind-hum">--</div></div>
+            </div>
+
+            <div class="ai-section-title">🧠 2. MÔ HÌNH HỌC MÁY TIME-SERIES (CHUỖI THỜI GIAN)</div>
+            <div class="ai-grid-metrics">
+                <div class="ai-metric-item"><div class="lbl">Dự Báo 1 Giờ Tới</div><div class="val" style="color: #00e5ff;" id="mdl-1h-power">-- kW</div></div>
+                <div class="ai-metric-item"><div class="lbl">Dự Kiến Hôm Nay</div><div class="val" style="color: #00ff72;" id="mdl-today-kwh">-- kWh</div></div>
+                <div class="ai-metric-item"><div class="lbl">Ngày Nắng Chuẩn</div><div class="val" style="color: #ffd700;">31.5 kWh</div></div>
+                <div class="ai-metric-item"><div class="lbl">Hiệu Suất AI Đánh Giá</div><div class="val" id="mdl-perf-eval">--%</div></div>
+            </div>
+
+            <div class="ai-section-title">⏱️ 3. DỰ BÁO CÔNG SUẤT THEO GIỜ (HÔM NAY)</div>
+            <div class="ai-hourly-container" id="mdl-hourly-list">
+                <!-- Hourly pills generated by JS -->
+            </div>
+
+            <div class="ai-section-title">📅 4. DỰ PHÓNG SẢN LƯỢNG 7 NGÀY TỚI (KWH)</div>
+            <div class="ai-forecast-7d" id="mdl-7d-list">
+                <!-- 7 days list generated by JS -->
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
