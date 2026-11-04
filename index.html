@@ -2709,7 +2709,7 @@
                 const tempLabel = document.getElementById('lbl-inv-temp');
                 const t = toSafeNumber(data.Inv_Temp);
                 if (tempLabel) {
-                    animateValue('lbl-inv-temp', t, v => '🌡️ ' + v.toFixed(0) + '°C');
+                    animateValue('lbl-inv-temp', t, v =>  v.toFixed(0) + '°C');
                     tempLabel.style.backgroundColor = 'transparent';
                     if (t < 40) tempLabel.style.color = '#00a854'; 
                     else if (t >= 40 && t < 48) tempLabel.style.color = '#ff8c00'; 
