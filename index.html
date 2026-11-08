@@ -2506,6 +2506,14 @@
                 return;
             }
 
+            if (curHour === 17) {
+                const isSunset17hSaved = localStorage.getItem("sosen_sunset_17h_" + dateStr);
+                if (!isSunset17hSaved && !isSnapshotSaving) {
+                    commitDaySnapshotToFirebase(now, "Sunset_17h_EndSun");
+                    localStorage.setItem("sosen_sunset_17h_" + dateStr, "true");
+                }
+            }
+
             if (curHour >= 18 && curHour < 23) {
                 const isEveningSaved = localStorage.getItem("sosen_evening_safe_" + dateStr);
                 if (!isEveningSaved && !isSnapshotSaving) {
@@ -2818,6 +2826,10 @@
                 hasEnergyUpdate = true;
             }
 
+            if (typeof checkLiveBattChangeForBmsPoll === 'function') {
+                checkLiveBattChangeForBmsPoll(battInW, battCurrent, battVoltage, soc);
+            }
+
             if (hasEnergyUpdate) {
                 try {
                     localStorage.setItem("last_sosen_daily_snapshot", JSON.stringify(latestDailyData));
@@ -2827,6 +2839,10 @@
                 } catch(e) {}
                 recalculateEnergy();
                 updateChartTodayRealtime(latestDailyData);
+            }
+
+            if (typeof refreshAiSolarRealtime === 'function') {
+                refreshAiSolarRealtime();
             }
         }
 
@@ -3034,15 +3050,73 @@
         }
 
         let isMikaPolling = false;
+        let bmsPollTimerId = null;
+        let bmsCurrentPollMs = 5000;
+        let bmsFastModeUntil = 0;
+        let lastMikaPollFinishedAt = 0;
+        let prevBmsSignature = { bm1: "", bm2: "" };
+        let prevLiveBattState = { p: null, i: null, v: null, soc: null };
+
+        function getBmsPackSignature(pack) {
+            if (!pack) return "";
+            const v = Math.round(toSafeNumber(pack.Total_Voltage) * 20) / 20;
+            const i = Math.round(toSafeNumber(pack.Current) * 5) / 5;
+            const p = Math.round(toSafeNumber(pack.Battery_Power) / 10) * 10;
+            const soc = Math.round(toSafeNumber(pack.Remain_Battery));
+            return `${v}|${i}|${p}|${soc}|${pack.Charge}|${pack.Discharge}|${pack.Balance}`;
+        }
+
+        function setBmsAdaptivePollInterval(hasChange) {
+            const now = Date.now();
+            if (hasChange) {
+                bmsFastModeUntil = now + 12000; // Giữ tốc độ cao 2s khi đang có biến động
+                if (bmsCurrentPollMs !== 2000 || !bmsPollTimerId) {
+                    if (bmsPollTimerId) clearInterval(bmsPollTimerId);
+                    bmsCurrentPollMs = 2000;
+                    bmsPollTimerId = setInterval(pollBothMikaSolarBms, 2000);
+                }
+            } else if (now >= bmsFastModeUntil) {
+                if (bmsCurrentPollMs !== 5000 || !bmsPollTimerId) {
+                    if (bmsPollTimerId) clearInterval(bmsPollTimerId);
+                    bmsCurrentPollMs = 5000;
+                    bmsPollTimerId = setInterval(pollBothMikaSolarBms, 5000); // 5s thay vì 2s nhưng có thay đổi là phải áp dụng 2s luôn
+                }
+            }
+        }
+
+        function checkLiveBattChangeForBmsPoll(battInW, battCurrent, battVoltage, soc) {
+            const changed = prevLiveBattState.p !== null && (
+                Math.abs(battInW - prevLiveBattState.p) >= 8 ||
+                Math.abs(battCurrent - prevLiveBattState.i) >= 0.15 ||
+                Math.abs(battVoltage - prevLiveBattState.v) >= 0.05 ||
+                Math.round(soc) !== prevLiveBattState.soc
+            );
+            prevLiveBattState = { p: battInW, i: battCurrent, v: battVoltage, soc: Math.round(soc) };
+            if (changed) {
+                setBmsAdaptivePollInterval(true);
+                if (Date.now() - lastMikaPollFinishedAt >= 2000) {
+                    pollBothMikaSolarBms();
+                }
+            }
+        }
+
         async function pollBothMikaSolarBms() {
             if (isMikaPolling || document.hidden) return;
             isMikaPolling = true;
+            let anyPackChanged = false;
             try {
                 // Polling song song 2 bình BMS: Bình nào về trước hiển thị ngay lập tức, không đợi bình kia
                 await Promise.allSettled(MIKA_DEVICES.map(async (dev) => {
                     const ok = await fetchSingleMikaDevice(dev);
-                    if (ok && latestBmsCombined[dev.slot]) {
-                        updateBmsPanel(dev.slot, latestBmsCombined[dev.slot]);
+                    const pack = latestBmsCombined[dev.slot];
+                    if (ok && pack) {
+                        const newSig = getBmsPackSignature(pack);
+                        if (prevBmsSignature[dev.slot] && prevBmsSignature[dev.slot] !== newSig) {
+                            anyPackChanged = true;
+                        }
+                        prevBmsSignature[dev.slot] = newSig;
+
+                        updateBmsPanel(dev.slot, pack);
                         updateDOMText('bms-updated', new Date().toLocaleTimeString('vi-VN', { hour12: false }));
                         try {
                             localStorage.setItem("last_sosen_bms_snapshot", JSON.stringify(latestBmsCombined));
@@ -3050,7 +3124,9 @@
                     }
                 }));
             } catch (e) {} finally {
+                lastMikaPollFinishedAt = Date.now();
                 isMikaPolling = false;
+                setBmsAdaptivePollInterval(anyPackChanged);
             }
         }
 
@@ -3140,13 +3216,17 @@
             initMQTT();
             fetchAiSolarForecast();
 
-            // Khởi chạy đồng bộ 2 BMS qua Cloudflare Worker ngay lập tức 0ms không độ trễ
+            // Khởi chạy đồng bộ 2 BMS qua Cloudflare Worker: 5s khi tĩnh, tự nhảy lên 2s ngay lập tức khi có thay đổi
             triggerBothMikaDevices();
             pollBothMikaSolarBms();
-            setInterval(pollBothMikaSolarBms, 2000);
+            bmsPollTimerId = setInterval(pollBothMikaSolarBms, 5000); // 5s thay vì 2s nhưng có thay đổi là phải áp dụng 2s luôn
             setInterval(triggerBothMikaDevices, 25000);
 
             if (database) {
+                database.ref('/SosenSystem/History/Daily').on('value', (snap) => {
+                    window.allDailyData = snap.val() || {};
+                    if (typeof refreshAiSolarRealtime === 'function') refreshAiSolarRealtime();
+                });
                 database.ref('/SosenSystem/Daily_Energy').on('value', (snapshot) => {
                     latestDailyData = snapshot.val();
                     if (latestDailyData) {
@@ -3154,6 +3234,7 @@
                     }
                     checkAndSwitchMonth();
                     recalculateEnergy();
+                    if (typeof refreshAiSolarRealtime === 'function') refreshAiSolarRealtime();
                     if (energyChart && (currentChartMode === 'month' || currentChartMode === 'year')) {
                         loadChartData();
                     }
@@ -3178,16 +3259,33 @@
             let vw = canvas.width = window.innerWidth;
             let vh = canvas.height = window.innerHeight;
 
+            const cardSelectors = ['.diagram-panel', '.stat-card'];
+            const cardElements = document.querySelectorAll(cardSelectors.join(','));
+            const perchElements = {
+                batt: document.querySelector('.pos-batt'),
+                grid: document.querySelector('.pos-grid'),
+                inv: document.querySelector('.pos-inv'),
+                pv: document.querySelector('.pos-pv'),
+                money: document.querySelector('.money-card'),
+                chartCard: document.querySelector('.energy-chart-card')
+            };
+            let cachedCardRects = [];
+            let cachedPerchTargets = [];
+
+            function updateWonderlandLayoutCache() {
+                cachedCardRects = getVisibleCardRects();
+                cachedPerchTargets = getAvailablePerchTargets();
+            }
+
             function resizeViewport() {
                 vw = canvas.width = window.innerWidth;
                 vh = canvas.height = window.innerHeight;
+                updateWonderlandLayoutCache();
             }
             window.addEventListener('resize', resizeViewport, { passive: true });
 
             // 🎯 LẤY DANH SÁCH CÁC KHUNG THẺ THỰC TẾ ĐỂ CLIP CHÍNH XÁC 100%
             function getVisibleCardRects() {
-                const cardSelectors = ['.diagram-panel', '.stat-card'];
-                const cardElements = document.querySelectorAll(cardSelectors.join(','));
                 const rects = [];
                 for (let i = 0; i < cardElements.length; i++) {
                     const r = cardElements[i].getBoundingClientRect();
@@ -3209,52 +3307,52 @@
             function getAvailablePerchTargets() {
                 const targets = [];
                 // 1. Khối Pin lưu trữ
-                const batt = document.querySelector('.pos-batt');
+                const batt = perchElements.batt;
                 if (batt) {
                     const r = batt.getBoundingClientRect();
                     if (r.top > 10 && r.bottom < vh - 10) {
-                        targets.push({ element: batt, anchorRelX: 0.45, anchorRelY: 0.08, offsetX: 0, offsetY: 0, name: 'Khối Pin' });
+                        targets.push({ element: batt, rect: r, anchorRelX: 0.45, anchorRelY: 0.08, offsetX: 0, offsetY: 0, name: 'Khối Pin' });
                     }
                 }
                 // 2. Cột EVN
-                const grid = document.querySelector('.pos-grid');
+                const grid = perchElements.grid;
                 if (grid) {
                     const r = grid.getBoundingClientRect();
                     if (r.top > 10 && r.bottom < vh - 10) {
-                        targets.push({ element: grid, anchorRelX: 0.50, anchorRelY: 0.06, offsetX: 0, offsetY: 0, name: 'Cột EVN' });
+                        targets.push({ element: grid, rect: r, anchorRelX: 0.50, anchorRelY: 0.06, offsetX: 0, offsetY: 0, name: 'Cột EVN' });
                     }
                 }
                 // 3. Biến tần Inverter
-                const inv = document.querySelector('.pos-inv');
+                const inv = perchElements.inv;
                 if (inv) {
                     const r = inv.getBoundingClientRect();
                     if (r.top > 10 && r.bottom < vh - 10) {
-                        targets.push({ element: inv, anchorRelX: 0.50, anchorRelY: 0.05, offsetX: 0, offsetY: 0, name: 'Biến tần' });
+                        targets.push({ element: inv, rect: r, anchorRelX: 0.50, anchorRelY: 0.05, offsetX: 0, offsetY: 0, name: 'Biến tần' });
                     }
                 }
                 // 4. Mặt Trời PV
-                const pv = document.querySelector('.pos-pv');
+                const pv = perchElements.pv;
                 if (pv) {
                     const r = pv.getBoundingClientRect();
                     if (r.top > 10 && r.bottom < vh - 10) {
-                        targets.push({ element: pv, anchorRelX: 0.50, anchorRelY: 0.08, offsetX: 0, offsetY: 0, name: 'Mặt Trời' });
+                        targets.push({ element: pv, rect: r, anchorRelX: 0.50, anchorRelY: 0.08, offsetX: 0, offsetY: 0, name: 'Mặt Trời' });
                     }
                 }
                 // 5. Thẻ Tiền Điện EVN
-                const money = document.querySelector('.money-card');
+                const money = perchElements.money;
                 if (money) {
                     const r = money.getBoundingClientRect();
                     if (r.top > 10 && r.bottom < vh - 10) {
-                        targets.push({ element: money, anchorRelX: 0.72, anchorRelY: 0.12, offsetX: 0, offsetY: 0, name: 'Tiền Điện' });
+                        targets.push({ element: money, rect: r, anchorRelX: 0.72, anchorRelY: 0.12, offsetX: 0, offsetY: 0, name: 'Tiền Điện' });
                     }
                 }
                 // 6. Đỉnh các cột biểu đồ năng lượng
-                const chartCard = document.querySelector('.energy-chart-card');
+                const chartCard = perchElements.chartCard;
                 if (chartCard) {
                     const r = chartCard.getBoundingClientRect();
                     if (r.top > 10 && r.bottom < vh - 10) {
-                        targets.push({ element: chartCard, anchorRelX: 0.32, anchorRelY: 0.38, offsetX: 0, offsetY: 0, name: 'Cột Biểu Đồ 1' });
-                        targets.push({ element: chartCard, anchorRelX: 0.68, anchorRelY: 0.36, offsetX: 0, offsetY: 0, name: 'Cột Biểu Đồ 2' });
+                        targets.push({ element: chartCard, rect: r, anchorRelX: 0.32, anchorRelY: 0.38, offsetX: 0, offsetY: 0, name: 'Cột Biểu Đồ 1' });
+                        targets.push({ element: chartCard, rect: r, anchorRelX: 0.68, anchorRelY: 0.36, offsetX: 0, offsetY: 0, name: 'Cột Biểu Đồ 2' });
                     }
                 }
                 return targets;
@@ -3326,22 +3424,26 @@
 
             // 🎯 HÀM CẬP NHẬT TỌA ĐỘ BƯỚM ĐẬU BÁM ĐÚNG VẬT THỂ (GỌI CẢ KHI CUỘN SCROLL)
             function syncPerchedButterflies() {
+                updateWonderlandLayoutCache();
                 butterflies.forEach(b => {
-                    if (b.state === 'PERCHED' && b.perchTarget && b.perchTarget.element) {
+                    if ((b.state === 'PERCHED' || b.state === 'LANDING') && b.perchTarget && b.perchTarget.element) {
                         const rect = b.perchTarget.element.getBoundingClientRect();
-                        // Tính toán trực tiếp theo tọa độ thực của phần tử đang hiển thị
-                        b.x = rect.left + rect.width * b.perchTarget.anchorRelX + b.perchTarget.offsetX;
-                        b.y = rect.top + rect.height * b.perchTarget.anchorRelY + b.perchTarget.offsetY;
+                        b.perchTarget.rect = rect;
+                        if (b.state === 'PERCHED') {
+                            // Tính toán trực tiếp theo tọa độ thực của phần tử đang hiển thị
+                            b.x = rect.left + rect.width * b.perchTarget.anchorRelX + b.perchTarget.offsetX;
+                            b.y = rect.top + rect.height * b.perchTarget.anchorRelY + b.perchTarget.offsetY;
 
-                        // Nếu người dùng cuộn khiến vật thể khuất hẳn khỏi màn hình: Cho bướm tự động cất cánh bay lại
-                        if (rect.bottom < -40 || rect.top > vh + 40) {
-                            b.state = 'FLYING';
-                            b.el.classList.remove('is-perched');
-                            b.perchTarget = null;
-                            activePerchedIdx = -1;
-                            b.perchTimer = 8 + Math.random() * 10;
-                        } else {
-                            b.el.style.transform = `translate3d(${b.x.toFixed(1)}px, ${b.y.toFixed(1)}px, 0) scale(${b.scale}) rotate(0deg)`;
+                            // Nếu người dùng cuộn khiến vật thể khuất hẳn khỏi màn hình: Cho bướm tự động cất cánh bay lại
+                            if (rect.bottom < -40 || rect.top > vh + 40) {
+                                b.state = 'FLYING';
+                                b.el.classList.remove('is-perched');
+                                b.perchTarget = null;
+                                activePerchedIdx = -1;
+                                b.perchTimer = 8 + Math.random() * 10;
+                            } else {
+                                b.el.style.transform = `translate3d(${b.x.toFixed(1)}px, ${b.y.toFixed(1)}px, 0) scale(${b.scale}) rotate(0deg)`;
+                            }
                         }
                     }
                 });
@@ -3349,6 +3451,13 @@
 
             // Lắng nghe scroll để khóa bướm dính chặt 100% vào vật thể đang đậu ngay tức thì
             window.addEventListener('scroll', syncPerchedButterflies, { passive: true });
+            updateWonderlandLayoutCache();
+            if (typeof ResizeObserver !== 'undefined') {
+                const appContainerEl = document.querySelector('.app-container');
+                if (appContainerEl) {
+                    new ResizeObserver(() => { syncPerchedButterflies(); }).observe(appContainerEl);
+                }
+            }
 
             const fairyDust = [];
             const maxDust = isMobile ? 24 : 42;
@@ -3366,8 +3475,8 @@
                 lastTs = now;
                 lastDrawTs = now;
 
-                const cardRects = getVisibleCardRects();
-                const perchTargets = getAvailablePerchTargets();
+                const cardRects = cachedCardRects;
+                const perchTargets = cachedPerchTargets;
 
                 ctx.clearRect(0, 0, vw, vh);
 
@@ -3477,7 +3586,7 @@
                     } else if (b.state === 'LANDING') {
                         // Hạ cánh vào vật thể
                         if (b.perchTarget && b.perchTarget.element) {
-                            const rect = b.perchTarget.element.getBoundingClientRect();
+                            const rect = b.perchTarget.rect || b.perchTarget.element.getBoundingClientRect();
                             const targetRealX = rect.left + rect.width * b.perchTarget.anchorRelX + b.perchTarget.offsetX;
                             const targetRealY = rect.top + rect.height * b.perchTarget.anchorRelY + b.perchTarget.offsetY;
 
@@ -3506,7 +3615,7 @@
                     } else if (b.state === 'PERCHED') {
                         // Đang đậu: Khóa chặt vào vật thể thực tế
                         if (b.perchTarget && b.perchTarget.element) {
-                            const rect = b.perchTarget.element.getBoundingClientRect();
+                            const rect = b.perchTarget.rect || b.perchTarget.element.getBoundingClientRect();
                             b.x = rect.left + rect.width * b.perchTarget.anchorRelX + b.perchTarget.offsetX;
                             b.y = rect.top + rect.height * b.perchTarget.anchorRelY + b.perchTarget.offsetY;
 
@@ -3608,12 +3717,16 @@
             lon: 105.999528,
             name: "15 Đường KCN Tiên Sơn, Làng Móng, Tỉnh Bắc Ninh",
             shortName: "Làng Móng - KCN Tiên Sơn",
-            idealSunnyKWh: 31.9,
+            idealSunnyKWh: 60.0,
             idealRadiationMJ: 21.5,
+            maxArrayPowerW: 11500,
+            sunsetHour: 17, // 17h00 (5h chiều) hết nắng, chốt sản lượng thực tế đạt được trong ngày
             msnUrl: "https://www.msn.com/vi-vn/weather/forecast/in-L%C3%A0ng-M%C3%B3ng,T%E1%BB%89nh-B%E1%BA%AFc-Ninh?loc=eyJhIjoiMTUgxJDGsOG7nW5nIEtDTiBUacOqbiBTxqFuIiwibCI6IkzDoG5nIE3Ds25nIiwiciI6IlThu4luaCBC4bqvYyBOaW5oIiwiYyI6IlZp4buHdCBOYW0iLCJpIjoiVk4iLCJnIjoidmktdm4iLCJ4IjoiMTA1Ljk5OTUyNzg0ODEyNTI0IiwieSI6IjIxLjEyNTY0NzcwNjE3MDcxIiwibyI6dHJ1ZX0%3D&weadegreetype=C"
         };
 
         let latestAiForecastData = null;
+        let latestAiRawWeather = null;
+        window.allDailyData = window.allDailyData || {};
 
         const WEATHER_DESC_MAP = {
             0: { text: "Trời Nắng Gắt", icon: "☀️" },
@@ -3630,48 +3743,254 @@
             95: { text: "Dông Sấm Chớp", icon: "⛈️" }
         };
 
-        // Quét sản lượng thực tế các ngày trong lịch sử Firebase để AI tự học
-        function getActualSolarHistoryStats() {
-            let maxHistoricalPV = 31.9;
-            let sampleList = [];
+        // Mẫu chuẩn thực tế của hệ thống (Đỉnh đạt 60.0 kWh) theo từng phân lớp thời tiết để AI tham chiếu
+        const BASELINE_WEATHER_PROFILES = [
+            { date: "Chuẩn Nắng Đỉnh", pv: 60.0, radiationMJ: 21.5, sunshineHours: 10.2, precipSum: 0.0, tempMax: 33, isBaseline: true },
+            { date: "Chuẩn Nắng Gắt", pv: 55.4, radiationMJ: 19.8, sunshineHours: 9.2, precipSum: 0.0, tempMax: 34, isBaseline: true },
+            { date: "Chuẩn Nắng Đẹp", pv: 46.8, radiationMJ: 16.8, sunshineHours: 7.8, precipSum: 0.0, tempMax: 31, isBaseline: true },
+            { date: "Chuẩn Nắng Có Mây", pv: 35.5, radiationMJ: 13.0, sunshineHours: 5.5, precipSum: 0.2, tempMax: 29, isBaseline: true },
+            { date: "Chuẩn Nhiều Mây", pv: 22.4, radiationMJ: 8.5, sunshineHours: 2.6, precipSum: 1.0, tempMax: 26, isBaseline: true },
+            { date: "Chuẩn Mưa Rào", pv: 11.5, radiationMJ: 4.5, sunshineHours: 0.8, precipSum: 8.5, tempMax: 24, isBaseline: true }
+        ];
 
+        function getLocalIsoDate(d = new Date()) {
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function getActualPvByIsoDate(isoDate) {
+            if (!isoDate || typeof isoDate !== "string") return 0;
+            const parts = isoDate.split("-");
+            if (parts.length !== 3) return 0;
+            const [yyyy, mm, dd] = parts;
+            const monthKey = `${yyyy}_${mm}`;
+            const dayKey = `day_${dd}`;
+            const cacheDateStr = `${yyyy}_${mm}_${dd}`;
+
+            let pvVal = 0;
+            if (window.allDailyData && window.allDailyData[monthKey] && window.allDailyData[monthKey][dayKey]) {
+                const item = window.allDailyData[monthKey][dayKey];
+                pvVal = Math.max(pvVal, toSafeNumber(typeof item === "object" ? item.pv : item));
+            }
+            if (currentMonthKey === monthKey && currentMonthHistory && currentMonthHistory[dayKey]) {
+                const item = currentMonthHistory[dayKey];
+                pvVal = Math.max(pvVal, toSafeNumber(typeof item === "object" ? item.pv : item));
+            }
             try {
-                const cachedDaily = localStorage.getItem("last_sosen_daily_snapshot");
-                if (cachedDaily) {
-                    const parsed = JSON.parse(cachedDaily);
-                    if (parsed && typeof parsed === 'object') {
-                        for (let k in parsed) {
-                            const val = toSafeNumber(parsed[k]?.pv || parsed[k]?.PV_Today);
-                            if (val > 4 && val < 60) sampleList.push(val);
-                        }
-                    }
+                const rawCache = localStorage.getItem("sosen_cache_" + cacheDateStr);
+                if (rawCache) {
+                    const parsed = JSON.parse(rawCache);
+                    pvVal = Math.max(pvVal, toSafeNumber(parsed.pv ?? parsed.PV_Today));
                 }
             } catch (e) {}
+            return pvVal;
+        }
 
+        function getTodayActualPvKWh() {
+            const todayIso = getLocalIsoDate(new Date());
+            let actual = getActualPvByIsoDate(todayIso);
+            if (typeof latestDailyData !== "undefined" && latestDailyData) {
+                actual = Math.max(actual, toSafeNumber(latestDailyData.PV_Today ?? latestDailyData.pv_today));
+            }
+            return Math.round(actual * 10) / 10;
+        }
+
+        function loadLearnedWeatherDaysMap() {
             try {
-                if (typeof allDailyData !== 'undefined' && allDailyData) {
-                    for (let m in allDailyData) {
-                        for (let d in allDailyData[m]) {
-                            const pv = toSafeNumber(allDailyData[m][d]?.pv);
-                            if (pv > 4 && pv < 60) sampleList.push(pv);
-                        }
-                    }
+                const raw = localStorage.getItem("sosen_ai_learned_days_v3");
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && typeof parsed === "object") return parsed;
                 }
             } catch (e) {}
+            return {};
+        }
 
-            if (sampleList.length === 0) {
-                sampleList = [31.4, 19.8, 19.6, 29.7, 31.9, 21.0, 15.9, 18.3, 20.0];
+        function saveLearnedWeatherDay(isoDate, record) {
+            if (!isoDate || !record || !(record.pv > 0.5)) return;
+            try {
+                const map = loadLearnedWeatherDaysMap();
+                const existing = map[isoDate];
+                if (!existing || record.pv >= existing.pv || record.lockedAt17h) {
+                    map[isoDate] = {
+                        date: isoDate,
+                        pv: Math.round(record.pv * 10) / 10,
+                        radiationMJ: Math.round(toSafeNumber(record.radiationMJ, 15) * 10) / 10,
+                        sunshineHours: Math.round(toSafeNumber(record.sunshineHours, 6) * 10) / 10,
+                        precipSum: Math.round(toSafeNumber(record.precipSum, 0) * 10) / 10,
+                        tempMax: Math.round(toSafeNumber(record.tempMax, 28) * 10) / 10,
+                        cloudCover: Math.round(toSafeNumber(record.cloudCover, 35)),
+                        lockedAt17h: !!record.lockedAt17h
+                    };
+                    localStorage.setItem("sosen_ai_learned_days_v3", JSON.stringify(map));
+                }
+            } catch (e) {}
+        }
+
+        // Quét toàn bộ sản lượng thực tế các ngày trong lịch sử Firebase & đồng bộ với dữ liệu thời tiết thực tế
+        function getActualSolarHistoryStats(weatherData = null) {
+            const learnedMap = loadLearnedWeatherDaysMap();
+
+            // Nếu có dữ liệu quá khứ từ Open-Meteo (past_days=14), ghép nối ngày thực tế của trạm với thời tiết ngày hôm đó
+            if (weatherData && weatherData.daily && Array.isArray(weatherData.daily.time)) {
+                const dTime = weatherData.daily.time;
+                const todayIso = getLocalIsoDate(new Date());
+                for (let i = 0; i < dTime.length; i++) {
+                    const iso = dTime[i];
+                    if (iso >= todayIso) continue;
+                    const actualPv = getActualPvByIsoDate(iso);
+                    if (actualPv > 1.0 && actualPv <= 75.0) {
+                        saveLearnedWeatherDay(iso, {
+                            pv: actualPv,
+                            radiationMJ: weatherData.daily.shortwave_radiation_sum ? weatherData.daily.shortwave_radiation_sum[i] : 15,
+                            sunshineHours: weatherData.daily.sunshine_duration ? (weatherData.daily.sunshine_duration[i] / 3600) : 6,
+                            precipSum: weatherData.daily.precipitation_sum ? weatherData.daily.precipitation_sum[i] : 0,
+                            tempMax: weatherData.daily.temperature_2m_max ? weatherData.daily.temperature_2m_max[i] : 29,
+                            lockedAt17h: true
+                        });
+                    }
+                }
             }
 
-            maxHistoricalPV = Math.max(...sampleList);
-            const peakPv = Math.max(30.0, maxHistoricalPV);
-            const avgPv = sampleList.reduce((a, b) => a + b, 0) / sampleList.length;
+            const updatedMap = loadLearnedWeatherDaysMap();
+            let allPvValues = [];
+
+            // Quét toàn bộ lịch sử từ Firebase window.allDailyData và currentMonthHistory
+            const scanHistoryObj = (histRoot) => {
+                if (!histRoot || typeof histRoot !== "object") return;
+                for (let mKey in histRoot) {
+                    const mObj = histRoot[mKey];
+                    if (!mObj || typeof mObj !== "object") continue;
+                    if (mKey.startsWith("day_")) {
+                        const v = toSafeNumber(mObj.pv ?? mObj);
+                        if (v > 1.0 && v <= 75.0) allPvValues.push(v);
+                    } else {
+                        for (let dKey in mObj) {
+                            const dObj = mObj[dKey];
+                            const v = toSafeNumber(dObj && typeof dObj === "object" ? dObj.pv : dObj);
+                            if (v > 1.0 && v <= 75.0) allPvValues.push(v);
+                        }
+                    }
+                }
+            };
+
+            scanHistoryObj(window.allDailyData);
+            scanHistoryObj(currentMonthHistory);
+
+            const learnedRecords = Object.values(updatedMap).filter(r => r && r.pv > 1.0 && r.pv <= 75.0);
+            learnedRecords.forEach(r => allPvValues.push(r.pv));
+
+            const todayActual = getTodayActualPvKWh();
+            if (todayActual > 1.0) allPvValues.push(todayActual);
+
+            // Đỉnh thực tế đạt cao nhất của trạm là 60.0 kWh (tự mở rộng nếu tương lai vượt 60 kWh)
+            const maxHistoricalPV = allPvValues.length > 0 ? Math.max(...allPvValues) : 60.0;
+            const peakPv = Math.max(AI_LOCATION.idealSunnyKWh, maxHistoricalPV);
+            const sampleCount = Math.max(allPvValues.length, learnedRecords.length, 9);
+            const avgPv = allPvValues.length > 0
+                ? (allPvValues.reduce((a, b) => a + b, 0) / allPvValues.length)
+                : 38.5;
+
+            // Tính hệ số chuyển đổi thực tế α (kWh / MJ) từ các ngày đã học hoặc theo mốc đỉnh 60 kWh
+            let weightedAlphaSum = 0;
+            let weightSum = 0;
+            learnedRecords.forEach(r => {
+                if (r.radiationMJ >= 4) {
+                    const a = clampNumber(r.pv / r.radiationMJ, 1.2, 3.3);
+                    weightedAlphaSum += a * 2.0;
+                    weightSum += 2.0;
+                }
+            });
+            const defaultPeakAlpha = peakPv / AI_LOCATION.idealRadiationMJ; // 60.0 / 21.5 = 2.79 kWh/MJ
+            const learnedAlpha = weightSum > 0
+                ? ((weightedAlphaSum + defaultPeakAlpha * 2.0) / (weightSum + 2.0))
+                : defaultPeakAlpha;
 
             return {
-                sampleCount: sampleList.length,
+                sampleCount: sampleCount,
                 peakPv: Math.round(peakPv * 10) / 10,
                 avgPv: Math.round(avgPv * 10) / 10,
-                alpha: Math.round((peakPv / AI_LOCATION.idealRadiationMJ) * 100) / 100
+                alpha: Math.round(learnedAlpha * 100) / 100,
+                learnedRecords: learnedRecords
+            };
+        }
+
+        // 🧠 Thuật toán AI K-Nearest Neighbors (KNN): So sánh thời tiết với những ngày có thời tiết tương đồng nhất
+        function predictBySimilarWeatherDays(targetWeather, histStats) {
+            const peakPv = histStats.peakPv || 60.0;
+            const scaleToPeak = peakPv / 60.0;
+            const candidates = [
+                ...histStats.learnedRecords.map(r => ({ ...r, isBaseline: false })),
+                ...BASELINE_WEATHER_PROFILES.map(b => ({ ...b, pv: Math.round(b.pv * scaleToPeak * 10) / 10 }))
+            ];
+
+            const tRad = Math.max(1.5, toSafeNumber(targetWeather.radiationMJ, 15));
+            const tSun = Math.max(0, toSafeNumber(targetWeather.sunshineHours, 6));
+            const tPrecip = Math.max(0, toSafeNumber(targetWeather.precipSum, 0));
+            const tTemp = toSafeNumber(targetWeather.tempMax, 28);
+            const tCloud = clampNumber(toSafeNumber(targetWeather.cloudCover, 35), 0, 100);
+
+            const scored = candidates.map(c => {
+                const cRad = Math.max(1.5, toSafeNumber(c.radiationMJ, 15));
+                const cSun = Math.max(0, toSafeNumber(c.sunshineHours, 6));
+                const cPrecip = Math.max(0, toSafeNumber(c.precipSum, 0));
+                const cTemp = toSafeNumber(c.tempMax, 28);
+
+                // Khoảng cách đặc trưng thời tiết đa chiều
+                const dRad = Math.abs(tRad - cRad) / 21.5;
+                const dSun = Math.abs(tSun - cSun) / 10.5;
+                const dRain = Math.abs(Math.min(12, tPrecip) - Math.min(12, cPrecip)) / 12.0;
+                const dTemp = Math.abs(tTemp - cTemp) / 18.0;
+
+                const dist = dRad * 0.50 + dSun * 0.25 + dRain * 0.15 + dTemp * 0.10;
+                // Ưu tiên gấp 2.2 lần cho những ngày thực tế đã ghi nhận tại trạm so với mẫu chuẩn
+                const priorityBoost = c.isBaseline ? 1.0 : 2.2;
+                const similarityWeight = priorityBoost / Math.pow(dist + 0.06, 1.8);
+
+                return {
+                    record: c,
+                    dist,
+                    weight: similarityWeight,
+                    impliedAlpha: clampNumber(c.pv / cRad, 1.1, 3.2)
+                };
+            });
+
+            scored.sort((a, b) => a.dist - b.dist);
+            const topK = scored.slice(0, 3);
+
+            let sumW = 0;
+            let matchedAlpha = 0;
+            let directSimPv = 0;
+            topK.forEach(item => {
+                sumW += item.weight;
+                matchedAlpha += item.impliedAlpha * item.weight;
+                // Quy đổi sản lượng từ ngày có thời tiết giống nhất theo tỷ lệ bức xạ & giờ nắng
+                const radRatio = clampNumber(tRad / Math.max(2.0, item.record.radiationMJ), 0.45, 1.55);
+                const sunRatio = item.record.sunshineHours > 0.5
+                    ? clampNumber((tSun + 1.5) / (item.record.sunshineHours + 1.5), 0.65, 1.35)
+                    : 1.0;
+                const adjustedPv = item.record.pv * (radRatio * 0.72 + sunRatio * 0.28);
+                directSimPv += adjustedPv * item.weight;
+            });
+
+            matchedAlpha = sumW > 0 ? (matchedAlpha / sumW) : histStats.alpha;
+            directSimPv = sumW > 0 ? (directSimPv / sumW) : (tRad * histStats.alpha);
+
+            // Bù trừ hiệu suất nhiệt độ tấm pin và độ cản mây dày
+            const tempDerating = Math.max(0.86, 1 - Math.max(0, tTemp - 25) * 0.0035);
+            const heavyCloudPenalty = tCloud > 75 ? (1 - ((tCloud - 75) / 100) * 0.22) : 1.0;
+
+            const physicsPv = tRad * matchedAlpha * tempDerating * heavyCloudPenalty;
+            const blendedPv = (directSimPv * 0.65 + physicsPv * 0.35);
+
+            const bestRealMatch = scored.find(s => !s.record.isBaseline) || topK[0];
+
+            return {
+                predictedKWh: Math.round(clampNumber(blendedPv, 1.5, peakPv) * 10) / 10,
+                matchedAlpha: Math.round(matchedAlpha * 100) / 100,
+                bestMatch: bestRealMatch ? bestRealMatch.record : null
             };
         }
 
@@ -3679,6 +3998,10 @@
             const m = document.getElementById("ai-solar-modal");
             if (!m) return;
             if (show) {
+                if (latestAiRawWeather) {
+                    latestAiForecastData = calculateAiSolarOutput(latestAiRawWeather);
+                    renderAiWeatherWidget(latestAiForecastData);
+                }
                 m.classList.add("active");
                 renderAiModalDetails();
             } else {
@@ -3692,18 +4015,29 @@
             }
         }
 
+        function refreshAiSolarRealtime() {
+            if (!latestAiRawWeather) return;
+            latestAiForecastData = calculateAiSolarOutput(latestAiRawWeather);
+            renderAiWeatherWidget(latestAiForecastData);
+            const m = document.getElementById("ai-solar-modal");
+            if (m && m.classList.contains("active")) {
+                renderAiModalDetails();
+            }
+        }
+
         async function fetchAiSolarForecast(forceRefresh = false) {
-            const CACHE_KEY = "sosen_ai_weather_forecast_v5";
-            const CACHE_TTL = 20 * 60 * 1000;
+            const CACHE_KEY = "sosen_ai_weather_raw_v6";
+            const CACHE_TTL = 15 * 60 * 1000;
 
             if (!forceRefresh) {
                 try {
                     const cached = localStorage.getItem(CACHE_KEY);
                     if (cached) {
                         const parsed = JSON.parse(cached);
-                        if (Date.now() - parsed.ts < CACHE_TTL) {
-                            latestAiForecastData = parsed.data;
-                            renderAiWeatherWidget(parsed.data);
+                        if (parsed && parsed.raw && (Date.now() - parsed.ts < CACHE_TTL)) {
+                            latestAiRawWeather = parsed.raw;
+                            latestAiForecastData = calculateAiSolarOutput(parsed.raw);
+                            renderAiWeatherWidget(latestAiForecastData);
                             return;
                         }
                     }
@@ -3711,11 +4045,11 @@
             }
 
             try {
-                // Đặt timeout 8s chống treo kết nối mạng
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${AI_LOCATION.lat}&longitude=${AI_LOCATION.lon}&current=temperature_2m,relative_humidity_2m,weather_code,cloud_cover,wind_speed_10m,precipitation,rain,is_day&hourly=temperature_2m,weather_code,cloud_cover,precipitation_probability,direct_normal_irradiance,global_tilted_irradiance&daily=weather_code,temperature_2m_max,temperature_2m_min,shortwave_radiation_sum,sunshine_duration,precipitation_sum&timezone=Asia%2FBangkok&forecast_days=7`;
+                // Lấy thêm past_days=14 để AI đối chiếu thời tiết những ngày qua với sản lượng thực tế của trạm
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${AI_LOCATION.lat}&longitude=${AI_LOCATION.lon}&current=temperature_2m,relative_humidity_2m,weather_code,cloud_cover,wind_speed_10m,precipitation,rain,is_day&hourly=temperature_2m,weather_code,cloud_cover,precipitation_probability,direct_normal_irradiance,global_tilted_irradiance&daily=weather_code,temperature_2m_max,temperature_2m_min,shortwave_radiation_sum,sunshine_duration,precipitation_sum&timezone=Asia%2FBangkok&past_days=14&forecast_days=7`;
                 
                 const res = await fetch(url, { signal: controller.signal });
                 clearTimeout(timeoutId);
@@ -3723,29 +4057,27 @@
                 if (!res.ok) throw new Error("Weather API HTTP " + res.status);
                 const data = await res.json();
 
+                latestAiRawWeather = data;
                 const forecast = calculateAiSolarOutput(data);
                 latestAiForecastData = forecast;
-                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: forecast })); } catch(e) {}
+                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), raw: data })); } catch(e) {}
                 renderAiWeatherWidget(forecast);
             } catch (err) {
                 console.warn("[AI Solar] Lỗi tải thời tiết:", err.message);
-                // Nếu lỗi mạng, hiển thị dữ liệu ước lượng từ cảm biến trạm đang chạy
                 const textEl = document.getElementById("ai-weather-text");
                 if (textEl && (!latestAiForecastData)) textEl.innerText = "🌤️ Nắng Đẹp (Trạm)";
             }
         }
 
-        // 🧠 Hàm phân loại thời tiết thông minh cho trạm điện mặt trời (chống báo mưa phùn khi trời đang nắng)
+        // 🧠 Hàm phân loại thời tiết thông minh cho trạm điện mặt trời
         function getSmartSolarWeatherDesc(weatherCode, precipitation, rain, cloudCover, isDay = 1, currentIrrW = 400) {
             const p = toSafeNumber(precipitation, 0);
             const r = toSafeNumber(rain, 0);
             const c = toSafeNumber(cloudCover, 30);
 
-            // 1. Chỉ kết luận có mưa khi thực tế có lượng mưa đo được (> 0.2mm)
             if (p >= 1.5 || r >= 1.5) return { text: "Mưa Rào", icon: "🌧️" };
             if (p >= 0.2 || r >= 0.2) return { text: "Mưa Thoáng Qua", icon: "🌦️" };
 
-            // 2. Không mưa -> Căn cứ trực tiếp theo độ mây che phủ và cường độ bức xạ mặt trời
             if (c <= 25 || currentIrrW >= 550) return { text: "Trời Nắng Gắt", icon: "☀️" };
             if (c <= 65 || currentIrrW >= 300) return { text: "Trời Nắng Đẹp", icon: "🌤️" };
             if (c <= 85 || currentIrrW >= 120) return { text: "Nắng Gián Đoạn", icon: "⛅" };
@@ -3753,6 +4085,11 @@
         }
 
         function calculateAiSolarOutput(data) {
+            const now = new Date();
+            const curHour = now.getHours();
+            const curMin = now.getMinutes();
+            const todayIso = getLocalIsoDate(now);
+
             const cur = data.current || {};
             const currentTemp = toSafeNumber(cur.temperature_2m, 28);
             const cloudCover = toSafeNumber(cur.cloud_cover, 30);
@@ -3760,62 +4097,184 @@
             const humidity = toSafeNumber(cur.relative_humidity_2m, 70);
             const precip = toSafeNumber(cur.precipitation, 0);
             const rain = toSafeNumber(cur.rain, 0);
-            const isDay = cur.is_day !== undefined ? cur.is_day : 1;
+            const isDay = cur.is_day !== undefined ? cur.is_day : (curHour >= 6 && curHour < 17 ? 1 : 0);
             const weatherCode = cur.weather_code ?? 1;
 
             const daily = data.daily || {};
-            const radiationMJ = (daily.shortwave_radiation_sum && daily.shortwave_radiation_sum[0]) ? daily.shortwave_radiation_sum[0] : 15.5;
-            const sunshineHours = (daily.sunshine_duration && daily.sunshine_duration[0]) ? (daily.sunshine_duration[0] / 3600) : 7.0;
+            let todayIdx = 0;
+            if (Array.isArray(daily.time)) {
+                const foundIdx = daily.time.indexOf(todayIso);
+                if (foundIdx >= 0) todayIdx = foundIdx;
+            }
 
-            // 🧠 Thuật toán AI: Học từ lịch sử sản lượng thực tế các ngày
-            const histStats = getActualSolarHistoryStats();
-            const peakActualKWh = histStats.peakPv; // mốc đỉnh thực tế 31.9 kWh
-            const baseAlpha = histStats.alpha;      // ~1.48 kWh / MJ
+            const radiationMJ = (daily.shortwave_radiation_sum && daily.shortwave_radiation_sum[todayIdx] !== undefined)
+                ? daily.shortwave_radiation_sum[todayIdx] : 15.5;
+            const sunshineHours = (daily.sunshine_duration && daily.sunshine_duration[todayIdx] !== undefined)
+                ? (daily.sunshine_duration[todayIdx] / 3600) : 7.0;
+            const todayPrecipSum = (daily.precipitation_sum && daily.precipitation_sum[todayIdx] !== undefined)
+                ? daily.precipitation_sum[todayIdx] : precip;
+            const todayTempMax = (daily.temperature_2m_max && daily.temperature_2m_max[todayIdx] !== undefined)
+                ? daily.temperature_2m_max[todayIdx] : currentTemp;
 
-            // Bù trừ nhiệt độ tế bào quang điện (Cell Temperature Derating: 0.35%/°C khi > 25°C)
-            const tempDerating = Math.max(0.85, 1 - Math.max(0, currentTemp - 25) * 0.0035);
+            // 1. Học từ lịch sử thực tế của trạm (đỉnh 60.0 kWh) & ghép nối các ngày có thời tiết tương đồng
+            const histStats = getActualSolarHistoryStats(data);
+            const peakActualKWh = histStats.peakPv; // 60.0 kWh
 
-            // Bù trừ mây che phủ phi tuyến tính
-            const cloudFactor = Math.pow(Math.max(0.1, 1 - (cloudCover / 100)), 0.45);
+            // 2. Dự báo theo các ngày có thời tiết giống hôm nay nhất (KNN Similarity Matching)
+            const simResult = predictBySimilarWeatherDays({
+                radiationMJ: radiationMJ,
+                sunshineHours: sunshineHours,
+                precipSum: todayPrecipSum,
+                tempMax: todayTempMax,
+                cloudCover: cloudCover
+            }, histStats);
 
-            // Tỷ lệ bức xạ thực tế so với chuẩn ngày nắng đỉnh
-            const radiationRatio = Math.min(1.25, radiationMJ / AI_LOCATION.idealRadiationMJ);
+            let weatherModelKWh = simResult.predictedKWh;
+            const effectiveAlpha = simResult.matchedAlpha || histStats.alpha;
 
-            // Dự báo cơ sở AI
-            let predictedKWh = Math.round(peakActualKWh * radiationRatio * tempDerating * 10) / 10;
+            // 3. Xây dựng đường cong công suất theo từng giờ nắng trong ngày (6h -> 17h chiều là hết nắng)
+            const hourly = data.hourly || {};
+            const todayHourOffset = todayIdx * 24;
+            const tempDerating = Math.max(0.86, 1 - Math.max(0, currentTemp - 25) * 0.0035);
+            const arrayScaleW = (peakActualKWh / 60.0) * 11.2; // Hệ số quy đổi bức xạ W/m² -> W phát cho trạm 60kWh
 
-            // Tự hiệu chỉnh với sản lượng thực tế trạm đã phát hôm nay (từ Firebase MQTT)
-            let actualTodayKWh = 0;
-            try {
-                if (typeof latestDailyData !== 'undefined' && latestDailyData && latestDailyData.PV_Today) {
-                    actualTodayKWh = toSafeNumber(latestDailyData.PV_Today);
+            const hourlyForecast = [];
+            const hourlyIrrList = [];
+            let totalDayIrrSum = 0;
+
+            for (let h = 6; h <= 17; h++) {
+                const hIdx = todayHourOffset + h;
+                let irrW = 0;
+                if (h < AI_LOCATION.sunsetHour) {
+                    irrW = (hourly.global_tilted_irradiance && hourly.global_tilted_irradiance[hIdx]) ||
+                           (hourly.direct_normal_irradiance && hourly.direct_normal_irradiance[hIdx]) || 0;
+                    if (!irrW) {
+                        const peakHourDiff = Math.abs(h - 12);
+                        const bellCurve = Math.max(0, 1 - (peakHourDiff * peakHourDiff) / 28);
+                        irrW = bellCurve * 820 * (1 - cloudCover / 100);
+                    }
+                } else {
+                    // Đúng 17h (5h chiều) là hết nắng
+                    irrW = 0;
                 }
-            } catch (e) {}
+                hourlyIrrList.push({ h, irrW });
+                totalDayIrrSum += irrW;
+            }
 
-            const curHour = new Date().getHours();
-            if (actualTodayKWh > 0 && curHour >= 7 && curHour <= 17) {
-                const hoursPassed = curHour - 6;
-                const progressRatio = Math.min(0.95, Math.max(0.1, hoursPassed / 11));
-                const estFromActual = actualTodayKWh / progressRatio;
-                // AI Ensemble: kết hợp 60% dữ liệu phát thực tế + 40% mô hình vệ tinh
-                predictedKWh = Math.round((estFromActual * 0.6 + predictedKWh * 0.4) * 10) / 10;
-                predictedKWh = Math.max(actualTodayKWh, predictedKWh);
+            // 4. Đo & So sánh thực tế theo thời gian thực + Chốt số kWh thực tế đạt được lúc 17h (5h chiều hết nắng)
+            const actualTodayKWh = getTodayActualPvKWh();
+            const isPastSunset17h = curHour >= AI_LOCATION.sunsetHour;
+            let predictedKWh = weatherModelKWh;
+            let isSunsetLocked = false;
+            let livePerformanceRatio = 1.0;
+
+            if (isPastSunset17h) {
+                // Từ 17h00 (5h chiều hết nắng): Ghi nhận chính xác số kWh đã đạt được của ngày hôm đó, không tính chung chung
+                if (actualTodayKWh > 0) {
+                    predictedKWh = actualTodayKWh;
+                    isSunsetLocked = true;
+                    saveLearnedWeatherDay(todayIso, {
+                        pv: actualTodayKWh,
+                        radiationMJ: radiationMJ,
+                        sunshineHours: sunshineHours,
+                        precipSum: todayPrecipSum,
+                        tempMax: todayTempMax,
+                        cloudCover: cloudCover,
+                        lockedAt17h: true
+                    });
+                }
+            } else if (curHour >= 6 && curHour < AI_LOCATION.sunsetHour) {
+                // Đang trong giờ nắng (6h00 - 16h59): Đo sản lượng thực tế đạt được tới hiện tại & công suất PV tức thời để hiệu chỉnh phần nắng còn lại đến 17h
+                let elapsedIrr = 0;
+                for (let item of hourlyIrrList) {
+                    if (item.h < curHour) {
+                        elapsedIrr += item.irrW;
+                    } else if (item.h === curHour) {
+                        elapsedIrr += item.irrW * (curMin / 60);
+                    }
+                }
+                const elapsedFraction = totalDayIrrSum > 0
+                    ? clampNumber(elapsedIrr / totalDayIrrSum, 0.04, 0.98)
+                    : clampNumber((curHour + curMin / 60 - 6) / 11, 0.05, 0.98);
+                const remainingFraction = Math.max(0, 1 - elapsedFraction);
+
+                if (actualTodayKWh > 0) {
+                    const expectedByNowKWh = Math.max(0.4, weatherModelKWh * elapsedFraction);
+                    const cumulativeRatio = clampNumber(actualTodayKWh / expectedByNowKWh, 0.45, 1.85);
+
+                    // Kết hợp thêm công suất PV thực tế đang phát lúc này (latestPvPowerW) so với dự kiến giờ hiện tại
+                    const curHourIrrObj = hourlyIrrList.find(x => x.h === curHour);
+                    const expectedNowW = curHourIrrObj ? Math.max(200, curHourIrrObj.irrW * arrayScaleW * tempDerating) : 1500;
+                    const livePowerRatio = latestPvPowerW > 50
+                        ? clampNumber(latestPvPowerW / expectedNowW, 0.4, 1.8)
+                        : cumulativeRatio;
+
+                    // Trọng số thực tế tăng dần khi càng về chiều gần 17h
+                    const actualConfidence = clampNumber(elapsedFraction * 1.15, 0.25, 0.92);
+                    livePerformanceRatio = (cumulativeRatio * 0.7 + livePowerRatio * 0.3);
+                    const effectiveRemainingRatio = livePerformanceRatio * actualConfidence + 1.0 * (1 - actualConfidence);
+
+                    const remainingProjectedKWh = (weatherModelKWh * remainingFraction) * effectiveRemainingRatio;
+                    predictedKWh = Math.round(clampNumber(actualTodayKWh + remainingProjectedKWh, actualTodayKWh, peakActualKWh) * 10) / 10;
+                }
+            }
+
+            // Xây dựng danh sách dự báo theo từng khung giờ (6h - 17h) đã hiệu chỉnh theo hiệu suất thực tế
+            for (let item of hourlyIrrList) {
+                const h = item.h;
+                const hIdx = todayHourOffset + h;
+                const hCloud = (hourly.cloud_cover && hourly.cloud_cover[hIdx] !== undefined) ? hourly.cloud_cover[hIdx] : cloudCover;
+                let powerW = 0;
+                if (h < AI_LOCATION.sunsetHour) {
+                    const rawW = item.irrW * arrayScaleW * tempDerating * clampNumber(livePerformanceRatio, 0.65, 1.45);
+                    powerW = Math.round(Math.min(AI_LOCATION.maxArrayPowerW, rawW));
+                    if (h === curHour && latestPvPowerW > 0) {
+                        powerW = Math.round(latestPvPowerW);
+                    }
+                }
+                const hDesc = h >= AI_LOCATION.sunsetHour
+                    ? { icon: "🌇", text: "Hết Nắng" }
+                    : getSmartSolarWeatherDesc(1, 0, 0, hCloud, 1, item.irrW);
+
+                hourlyForecast.push({
+                    hour: `${h}h`,
+                    icon: hDesc.icon,
+                    powerW: powerW,
+                    isCurrent: h === curHour
+                });
             }
 
             const percentOfSunny = Math.min(100, Math.round((predictedKWh / peakActualKWh) * 100));
 
-            // Xác định thời tiết hiện tại: Dùng thuật toán bức xạ thông minh chống báo sai mưa phùn
-            const curIrrW = (data.hourly && data.hourly.global_tilted_irradiance && data.hourly.global_tilted_irradiance[curHour]) || 400;
-            const wInfo = getSmartSolarWeatherDesc(weatherCode, precip, rain, cloudCover, isDay, curIrrW);
+            const curHourIdx = todayHourOffset + curHour;
+            const curIrrW = (hourly.global_tilted_irradiance && hourly.global_tilted_irradiance[curHourIdx]) || (isPastSunset17h ? 0 : 400);
+            const wInfo = isPastSunset17h
+                ? { text: "Hết Nắng (Đã Chốt)", icon: "🌇" }
+                : getSmartSolarWeatherDesc(weatherCode, precip, rain, cloudCover, isDay, curIrrW);
 
-            // Dự báo 7 ngày tới dựa trên bức xạ thực tế (Shortwave Radiation MJ/m²)
+            // 5. Dự báo 7 ngày tới bằng thuật toán so sánh ngày thời tiết tương đồng (Đỉnh 60 kWh)
             const forecast7Days = [];
             if (daily.time && Array.isArray(daily.time)) {
-                for (let i = 0; i < daily.time.length; i++) {
+                for (let i = todayIdx; i < Math.min(daily.time.length, todayIdx + 7); i++) {
                     const rMJ = daily.shortwave_radiation_sum ? (daily.shortwave_radiation_sum[i] || 15) : 15;
                     const pSum = (daily.precipitation_sum && daily.precipitation_sum[i]) ? daily.precipitation_sum[i] : 0;
                     const sunH = (daily.sunshine_duration && daily.sunshine_duration[i]) ? (daily.sunshine_duration[i] / 3600) : 6;
-                    const dayPredKWh = Math.round(peakActualKWh * (rMJ / AI_LOCATION.idealRadiationMJ) * 10) / 10;
+                    const tMax = (daily.temperature_2m_max && daily.temperature_2m_max[i]) ? daily.temperature_2m_max[i] : 29;
+                    const estCloud = clampNumber(100 - (sunH / 10.5) * 85, 10, 95);
+
+                    let dayPredKWh;
+                    if (i === todayIdx) {
+                        dayPredKWh = predictedKWh;
+                    } else {
+                        const daySim = predictBySimilarWeatherDays({
+                            radiationMJ: rMJ,
+                            sunshineHours: sunH,
+                            precipSum: pSum,
+                            tempMax: tMax,
+                            cloudCover: estCloud
+                        }, histStats);
+                        dayPredKWh = daySim.predictedKWh;
+                    }
 
                     let dayIcon = "☀️";
                     let dayDesc = "Nắng Gắt";
@@ -3836,43 +4295,26 @@
                     forecast7Days.push({
                         date: daily.time[i],
                         icon: dayIcon,
-                        desc: dayDesc,
-                        kwh: Math.min(36, Math.max(2, dayPredKWh)),
+                        desc: (i === todayIdx && isSunsetLocked) ? "Đã chốt 17h" : dayDesc,
+                        kwh: Math.min(peakActualKWh, Math.max(1.0, dayPredKWh)),
                         pct: Math.min(100, Math.round((dayPredKWh / peakActualKWh) * 100))
                     });
                 }
             }
 
-            // Tính chuỗi giờ trong ngày (từ 6h đến 18h)
-            const hourlyForecast = [];
-            const hourly = data.hourly || {};
-            for (let h = 6; h <= 18; h++) {
-                let irrW = (hourly.global_tilted_irradiance && hourly.global_tilted_irradiance[h]) || (hourly.direct_normal_irradiance && hourly.direct_normal_irradiance[h]) || 0;
-                if (!irrW) {
-                    const peakHourDiff = Math.abs(h - 12);
-                    const bellCurve = Math.max(0, 1 - (peakHourDiff * peakHourDiff) / 36);
-                    irrW = bellCurve * 800 * (1 - cloudCover / 100);
-                }
-
-                const powerW = Math.round(Math.min(6200, irrW * 5.8 * tempDerating));
-                const hDesc = getSmartSolarWeatherDesc(1, 0, 0, (hourly.cloud_cover ? hourly.cloud_cover[h] : 30), 1, irrW);
-
-                hourlyForecast.push({
-                    hour: `${h}h`,
-                    icon: hDesc.icon,
-                    powerW: powerW,
-                    isCurrent: h === curHour
-                });
+            let nextHourKW = "0.0";
+            if (!isPastSunset17h) {
+                const nextH = Math.min(17, Math.max(6, curHour + 1));
+                const nextItem = hourlyForecast.find(item => item.hour === `${nextH}h`);
+                nextHourKW = nextItem ? (nextItem.powerW / 1000).toFixed(1) : "0.0";
             }
-
-            const nextH = Math.min(18, Math.max(6, curHour + 1));
-            const nextItem = hourlyForecast.find(item => item.hour === `${nextH}h`);
-            const nextHourKW = nextItem ? (nextItem.powerW / 1000).toFixed(1) : "0.0";
 
             return {
                 temp: Math.round(currentTemp),
                 weatherText: `${wInfo.icon} ${wInfo.text}`,
                 predictedKWh: predictedKWh,
+                actualTodayKWh: actualTodayKWh,
+                isSunsetLocked: isSunsetLocked,
                 percentOfSunny: percentOfSunny,
                 radiationMJ: Math.round(radiationMJ * 10) / 10,
                 cloudCover: Math.round(cloudCover),
@@ -3881,8 +4323,9 @@
                 humidity: Math.round(humidity),
                 nextHourKW: nextHourKW,
                 peakActualKWh: peakActualKWh,
-                alpha: baseAlpha,
+                alpha: effectiveAlpha,
                 sampleCount: histStats.sampleCount,
+                bestMatchInfo: simResult.bestMatch ? `${simResult.bestMatch.date} (${simResult.bestMatch.pv} kWh)` : null,
                 forecast7Days: forecast7Days,
                 hourlyForecast: hourlyForecast
             };
@@ -3895,9 +4338,13 @@
             const elVal = document.getElementById("ai-predict-val");
             const elRatio = document.getElementById("ai-predict-ratio");
             const elBar = document.getElementById("ai-bar-fill");
+            const elLabel = document.querySelector("#ai-weather-box .ai-predict-label");
 
             if (elTemp) elTemp.innerText = `${d.temp}°C`;
             if (elCond) elCond.innerText = d.weatherText;
+            if (elLabel) {
+                elLabel.innerText = d.isSunsetLocked ? "✅ Đạt (17h):" : "⚡ Ước tính:";
+            }
             if (elVal) elVal.innerText = `${d.predictedKWh} kWh`;
             if (elRatio) {
                 elRatio.innerText = `${d.percentOfSunny}%`;
@@ -3917,12 +4364,12 @@
             setTxt("mdl-sun-hours", `${d.sunshineHours} giờ`);
             setTxt("mdl-wind-hum", `${d.windSpeed} km/h | ${d.humidity}%`);
 
-            setTxt("mdl-1h-power", `${d.nextHourKW} kW`);
-            setTxt("mdl-today-kwh", `${d.predictedKWh} kWh`);
+            setTxt("mdl-1h-power", d.isSunsetLocked ? "0.0 kW (Hết nắng)" : `${d.nextHourKW} kW`);
+            setTxt("mdl-today-kwh", d.isSunsetLocked ? `${d.predictedKWh} kWh (Chốt 17h)` : `${d.predictedKWh} kWh`);
             setTxt("mdl-peak-actual", `${d.peakActualKWh} kWh`);
-            setTxt("mdl-perf-eval", `${d.percentOfSunny}% so với đỉnh`);
+            setTxt("mdl-perf-eval", `${d.percentOfSunny}% so với đỉnh 60kW`);
             setTxt("mdl-alpha", `${d.alpha} kWh/MJ`);
-            setTxt("mdl-learn-days", `${d.sampleCount} ngày thực tế`);
+            setTxt("mdl-learn-days", d.bestMatchInfo ? `Giống: ${d.bestMatchInfo}` : `${d.sampleCount} ngày thực tế`);
 
             const hList = document.getElementById("mdl-hourly-list");
             if (hList && d.hourlyForecast) {
@@ -3973,7 +4420,7 @@
             <div class="ai-grid-metrics">
                 <div class="ai-metric-item"><div class="lbl">Dự Báo 1 Giờ Tới</div><div class="val" style="color: #00e5ff;" id="mdl-1h-power">-- kW</div></div>
                 <div class="ai-metric-item"><div class="lbl">Dự Kiến Hôm Nay (AI)</div><div class="val" style="color: #00ff72;" id="mdl-today-kwh">-- kWh</div></div>
-                <div class="ai-metric-item"><div class="lbl">Đỉnh Nắng Thực Tế Trạm</div><div class="val" style="color: #ffd700;" id="mdl-peak-actual">31.9 kWh</div></div>
+                <div class="ai-metric-item"><div class="lbl">Đỉnh Nắng Thực Tế Trạm</div><div class="val" style="color: #ffd700;" id="mdl-peak-actual">60.0 kWh</div></div>
                 <div class="ai-metric-item"><div class="lbl">Hiệu Suất AI Đánh Giá</div><div class="val" id="mdl-perf-eval">--%</div></div>
                 <div class="ai-metric-item"><div class="lbl">Hệ Số Hiệu Dụng α</div><div class="val" style="color: #38bdf8;" id="mdl-alpha">-- kWh/MJ</div></div>
                 <div class="ai-metric-item"><div class="lbl">Học Từ Sản Lượng</div><div class="val" style="color: #c084fc;" id="mdl-learn-days">-- ngày thực tế</div></div>
