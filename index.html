@@ -1140,12 +1140,13 @@
                 <h3>MẶT TRỜI</h3><div class="val val-pv-style" id="lbl-pv">0</div><div class="unit">W</div>
             </div>
 
-            <div class="node pos-grid">
+            <div class="node pos-grid" onclick="toggleEvnModal(true)" title="Nhấn để xem số điện & lịch ngừng điện EVN">
                 <div class="icon">🗼</div>
                 <h3>LƯỚI EVN</h3>
                 <div class="val" id="lbl-grid">0</div>
                 <div class="unit">W</div>
                 <div id="lbl-grid-mode" class="grid-live-mode idle" style="display:none"></div>
+                <div id="evn-grid-badge" class="evn-grid-badge">EVN: đang tải...</div>
             </div>
 
             <div class="node pos-batt corner-node">
@@ -2665,6 +2666,7 @@
             const vGrid = toSafeNumber(data.V_Grid);
             const isGridOn = (vGrid > 50) || (data.Grid_Online === true);
             setClockGridStatus(isGridOn);
+            if (window.evnSetLiveGrid) window.evnSetLiveGrid(isGridOn, vGrid);
 
             const battVoltage = toSafeNumber(data.Batt_Voltage);
             const battCurrent = toSafeNumber(data.Batt_Current);
@@ -4439,6 +4441,441 @@
 
         </div>
     </div>
+
+
+    <!-- ================= EVN CSKH DIRECT - BÁO SỐ ĐIỆN & TÌNH TRẠNG LƯỚI TRỰC TIẾP ================= -->
+    <style>
+        .pos-grid { cursor: pointer; }
+        .evn-grid-badge { margin: 3px auto 0; max-width: 122px; padding: 2px 5px; border-radius: 8px; font-size: 8.5px; font-weight: 900; line-height: 1.25; text-align: center; background: rgba(0, 0, 0, 0.52); border: 1px solid rgba(255, 255, 255, 0.22); color: #94a3b8; white-space: normal; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9); }
+        .evn-grid-badge .sub { display: block; font-size: 8px; font-weight: 800; color: #e2e8f0; opacity: 0.92; }
+        .evn-grid-badge.ok { color: #00ff72; border-color: rgba(0, 255, 114, 0.45); }
+        .evn-grid-badge.plan { color: #ffd700; border-color: rgba(255, 215, 0, 0.5); }
+        .evn-grid-badge.soon { color: #ff9f1c; border-color: rgba(255, 159, 28, 0.65); animation: evnBlink 1.4s ease-in-out infinite; }
+        .evn-grid-badge.off { color: #ff5b6e; border-color: rgba(255, 68, 68, 0.75); animation: evnBlink 1s ease-in-out infinite; }
+        @keyframes evnBlink { 50% { opacity: 0.55; } }
+        .evn-status-banner { border-radius: 10px; padding: 8px 10px; font-weight: 900; font-size: 12px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.06); }
+        .evn-status-banner.ok { color: #00ff72; border-color: rgba(0, 255, 114, 0.45); background: rgba(0, 255, 114, 0.08); }
+        .evn-status-banner.plan { color: #ffd700; border-color: rgba(255, 215, 0, 0.5); background: rgba(255, 215, 0, 0.08); }
+        .evn-status-banner.soon { color: #ff9f1c; border-color: rgba(255, 159, 28, 0.6); background: rgba(255, 159, 28, 0.1); }
+        .evn-status-banner.off { color: #ff5b6e; border-color: rgba(255, 68, 68, 0.7); background: rgba(255, 68, 68, 0.12); }
+        .evn-status-banner .sub { display: block; color: #cbd5e1; font-size: 10px; font-weight: 700; margin-top: 2px; }
+        .evn-cust-card { background: rgba(0, 229, 255, 0.06); border: 1px solid rgba(0, 229, 255, 0.25); border-radius: 9px; padding: 6px 8px; margin-top: 6px; font-size: 10px; color: #cbd5e1; line-height: 1.45; }
+        .evn-cust-card b { color: #ffd700; }
+        .evn-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .evn-table th, .evn-table td { padding: 5px 6px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: right; }
+        .evn-table th:first-child, .evn-table td:first-child { text-align: left; color: #a0aec0; font-weight: 800; }
+        .evn-table th { color: #00e5ff; font-size: 9.5px; text-transform: uppercase; }
+        .evn-table td { font-weight: 900; }
+        .evn-pill-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-bottom: 6px; }
+        .evn-pill { border-radius: 8px; padding: 5px 6px; text-align: center; font-size: 9.5px; font-weight: 900; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); color: #94a3b8; }
+        .evn-pill .st { display: block; font-size: 11px; margin-top: 2px; }
+        .evn-pill.on-plan { color: #ffd700; border-color: rgba(255, 215, 0, 0.5); background: rgba(255, 215, 0, 0.1); }
+        .evn-pill.on-soon { color: #ff9f1c; border-color: rgba(255, 159, 28, 0.65); background: rgba(255, 159, 28, 0.14); }
+        .evn-pill.on-active { color: #ff5b6e; border-color: rgba(255, 68, 68, 0.75); background: rgba(255, 68, 68, 0.16); }
+        .evn-outage-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 9px; padding: 8px; line-height: 1.55; }
+        .evn-outage-box b { color: #a0aec0; font-weight: 800; }
+        .evn-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; font-size: 9.5px; color: #94a3b8; }
+        .evn-btn { background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.45); color: #00e5ff; border-radius: 8px; padding: 5px 9px; font-size: 10.5px; font-weight: 900; cursor: pointer; }
+        .evn-btn:hover { background: rgba(0, 229, 255, 0.25); }
+        .evn-btn:disabled { opacity: 0.5; cursor: default; }
+        .evn-settings { display: none; margin-top: 10px; gap: 6px; flex-direction: column; }
+        .evn-settings.show { display: flex; }
+        .evn-settings input { background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 7px; color: #fff; padding: 6px 8px; font-size: 11px; }
+    </style>
+
+    <div id="evn-modal" class="ai-modal-overlay" onclick="if (event.target.id === 'evn-modal') toggleEvnModal(false)">
+        <div class="ai-modal-box">
+            <div class="ai-modal-header">
+                <div class="ai-modal-title">🗼 LƯỚI EVN - SỐ ĐIỆN &amp; LỊCH NGỪNG ĐIỆN</div>
+                <button type="button" class="ai-modal-close" onclick="toggleEvnModal(false)">✕</button>
+            </div>
+            <div id="evn-modal-body"></div>
+            <div class="evn-settings" id="evn-settings">
+                <input id="evn-set-user" type="text" placeholder="Tài khoản / SĐT EVN CSKH (VD: 0946089298)">
+                <input id="evn-set-pass" type="password" placeholder="Mật khẩu EVN CSKH">
+                <input id="evn-set-worker" type="url" placeholder="URL Worker Proxy (mặc định dùng mika-proxy)">
+                <button type="button" class="evn-btn" onclick="evnSaveSettings()">💾 Lưu tài khoản &amp; đồng bộ ngay</button>
+            </div>
+            <div class="evn-footer">
+                <span id="evn-conn-text">Đang tải dữ liệu EVN...</span>
+                <span>
+                    <button type="button" class="evn-btn" id="evn-refresh-btn" onclick="evnRefreshNow(true)">🔄 Cập nhật EVN</button>
+                    <button type="button" class="evn-btn" onclick="document.getElementById('evn-settings').classList.toggle('show')" title="Cấu hình tài khoản EVN">⚙️</button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+
+        // ================= CẤU HÌNH TÀI KHOẢN EVN CSKH TRỰC TIẾP =================
+        const EVN_DIRECT_CONFIG = {
+            username:   '0946089298',
+            password:   'Mungha8586@',
+            workerUrl:  'https://mika-proxy.dr-ducmung.workers.dev',
+            localUrl:   'http://127.0.0.1:8787',
+            firebasePath: 'SosenSystem/EVN_CSKH',
+            firebaseUrl:  'https://sosen-inverter-default-rtdb.asia-southeast1.firebasedatabase.app/SosenSystem/EVN_CSKH.json'
+        };
+
+        const state = {
+            data: null,
+            source: '',
+            connText: '⏳ Đang đồng bộ EVN CSKH...',
+            busy: false
+        };
+        const live = { on: null, vGrid: null, buyToday: null };
+
+        const getUser = () => (localStorage.getItem('evn_cskh_user') || EVN_DIRECT_CONFIG.username || '').trim();
+        const getPass = () => (localStorage.getItem('evn_cskh_pass') || EVN_DIRECT_CONFIG.password || '');
+        const getWorker = () => (localStorage.getItem('evn_cskh_worker') || EVN_DIRECT_CONFIG.workerUrl || '').trim().replace(/\/+$/, '');
+
+        // ---------- Định dạng ----------
+        const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
+        const fmtNum = (v, d = 2) => (!isNum(v) ? '--' : v.toLocaleString('vi-VN', { maximumFractionDigits: d }));
+        const fmtKwh = (v, note) => (!isNum(v) ? (note || 'Chưa chốt') : fmtNum(v, 2) + ' kWh');
+        const fmtVnd = (v) => (!isNum(v) ? '--' : Math.round(v).toLocaleString('vi-VN') + ' đ');
+        const ts = (v) => { const t = v ? Date.parse(v) : NaN; return Number.isFinite(t) ? t : null; };
+        const fmtHm = (t) => (t === null ? '--:--' : new Date(t).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }));
+        const fmtDt = (t) => (t === null ? '--' : new Date(t).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }));
+        const fmtDay = (t) => (t === null ? '--' : new Date(t).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }));
+        function fmtLeft(ms) {
+            const m = Math.max(0, Math.round(ms / 60000));
+            const h = Math.floor(m / 60);
+            return h > 0 ? h + 'h' + String(m % 60).padStart(2, '0') : m + ' phút';
+        }
+
+        // ---------- Tính Binary Sensor Lịch ngừng điện ----------
+        function computeOutageSensors() {
+            const now = Date.now();
+            const list = (state.data && Array.isArray(state.data.outages)) ? state.data.outages : [];
+            const valid = list.map((o) => {
+                const s = ts(o.start), e = ts(o.end);
+                const hrs = isNum(o.hours) ? o.hours : (s !== null && e !== null && e > s ? Math.round((e - s) / 36000) / 100 : null);
+                return s !== null ? { start: s, end: e, area: o.area || '', reason: o.reason || '', hours: hrs } : null;
+            }).filter((o) => o && (o.end === null || o.end >= now)).sort((a, b) => a.start - b.start);
+
+            const activeItem = valid.find((o) => o.start <= now && (o.end === null || now <= o.end)) || null;
+            const nextItem = valid.find((o) => o.start > now) || activeItem || null;
+            const soonItem = valid.find((o) => o.start > now && (o.start - now) <= 24 * 3600 * 1000) || null;
+
+            return {
+                now,
+                count: valid.length,
+                outage_scheduled: valid.length > 0,
+                outage_active: activeItem !== null,
+                outage_soon: soonItem !== null,
+                current: activeItem,
+                next: nextItem
+            };
+        }
+
+        function gridStatus() {
+            const o = computeOutageSensors();
+            const d = state.data;
+            if (o.outage_active && o.current) {
+                return { cls: 'off', text: '⛔ ĐANG CẮT ĐIỆN (EVN)', sub: 'Cấp lại ~' + fmtHm(o.current.end) };
+            }
+            if (o.outage_soon && o.next) {
+                return { cls: 'soon', text: '⏰ CẮT ĐIỆN SAU ' + fmtLeft(o.next.start - o.now), sub: fmtHm(o.next.start) + ' → ' + fmtHm(o.next.end) };
+            }
+            if (o.outage_scheduled && o.next) {
+                return { cls: 'plan', text: '📅 CÓ LỊCH CẮT ĐIỆN', sub: fmtDay(o.next.start) + ' ' + fmtHm(o.next.start) };
+            }
+            if (live.on === false && live.hasRealSignal) {
+                return { cls: 'off', text: '⚠️ MẤT ĐIỆN LƯỚI', sub: 'Inverter báo mất áp lưới' };
+            }
+            if (!d) {
+                return { cls: '', text: 'EVN: đang tải...', sub: '' };
+            }
+            const idxVal = d.index && d.index.provisional ? d.index.provisional.value : null;
+            const todayKwh = d.daily && d.daily.today && isNum(d.daily.today.kwh)
+                ? d.daily.today.kwh
+                : (d.month && isNum(d.month.kwh) ? d.month.kwh : null);
+            const subTxt = isNum(idxVal)
+                ? ('CS: ' + fmtNum(idxVal, 2) + (isNum(todayKwh) ? ' · Tháng ' + fmtNum(todayKwh, 2) + ' kWh' : ''))
+                : 'Không có lịch cắt';
+            return { cls: 'ok', text: '✅ LƯỚI ỔN ĐỊNH', sub: subTxt };
+        }
+
+        // ---------- Render Badge & Popup ----------
+        function renderBadge() {
+            const el = document.getElementById('evn-grid-badge');
+            if (!el) return;
+            const g = gridStatus();
+            el.className = 'evn-grid-badge ' + g.cls;
+            el.innerHTML = esc(g.text) + (g.sub ? '<span class="sub">' + esc(g.sub) + '</span>' : '');
+        }
+
+        function renderModal() {
+            const body = document.getElementById('evn-modal-body');
+            const modal = document.getElementById('evn-modal');
+            if (!body || !modal || !modal.classList.contains('active')) return;
+
+            const d = state.data;
+            const g = gridStatus();
+            const o = computeOutageSensors();
+            const liveText = live.on === null
+                ? 'Inverter: đang đợi gói MQTT'
+                : (live.on ? '🟢 Lưới thực tế: Online' : '🔴 Lưới thực tế: Mất áp') + (isNum(live.vGrid) && live.vGrid > 0 ? ' · ' + fmtNum(live.vGrid, 1) + ' V' : '');
+
+            const metric = (lbl, val, color, sub) =>
+                '<div class="ai-metric-item"><div class="lbl">' + lbl + '</div><div class="val"' + (color ? ' style="color:' + color + '"' : '') + '>' + esc(val) + '</div>' +
+                (sub ? '<div style="font-size:9px;color:#94a3b8;margin-top:1px">' + esc(sub) + '</div>' : '') + '</div>';
+
+            if (!d) {
+                body.innerHTML = '<div class="evn-status-banner">' + esc(state.connText) + '<span class="sub">' + esc(liveText) + '</span></div>';
+                return;
+            }
+
+            const cust = d.customer || {};
+            const daily = d.daily || {};
+            const idx = d.index || {};
+            const month = d.month || {};
+            const inv = d.invoices || {};
+            const periods = Array.isArray(d.periods) ? d.periods : [];
+
+            const d0 = daily.today || {};
+            const d1 = daily.yesterday || {};
+            const d2 = daily.two_days_ago || {};
+            const todayVal = isNum(d0.kwh)
+                ? fmtKwh(d0.kwh)
+                : (isNum(live.buyToday) && live.buyToday > 0 ? fmtNum(live.buyToday, 2) + ' kWh (Inverter)' : 'Chưa chốt (00:55 mai)');
+
+            const prov = idx.provisional || {};
+            const prevCyc = idx.previous_cycle_final || {};
+            const latestRead = idx.latest_reading || {};
+            const deltaIdx = isNum(idx.delta_provisional) ? ('+' + fmtNum(idx.delta_provisional, 2) + ' kWh so kỳ trước') : '';
+
+            const targetOutage = o.current || o.next;
+
+            body.innerHTML =
+                '<div class="evn-status-banner ' + g.cls + '">' + esc(g.text) +
+                    '<span class="sub">' + esc(g.sub || '') + ' · ' + esc(liveText) + '</span>' +
+                '</div>' +
+
+                (cust.code
+                    ? '<div class="evn-cust-card">👤 <b>' + esc(cust.name || cust.code) + '</b> · Mã KH: <b>' + esc(cust.code) + '</b> · Công tơ: <b>' + esc(cust.meter_serial || '--') + '</b><br>📍 ' + esc(cust.unit ? cust.unit + ' — ' : '') + esc(cust.address || '') + '</div>'
+                    : '') +
+
+                '<div class="ai-section-title">⚡ 1. SENSOR CHI TIẾT — TIÊU THỤ NGÀY (EVN)</div>' +
+                '<div class="ai-grid-metrics">' +
+                    metric('Tiêu thụ hôm nay (' + (d0.date || 'Hôm nay') + ')', todayVal, '#00e5ff', isNum(d0.kwh) ? 'Đã chốt EVN' : 'EVN chốt sau 00:50 ngày kế') +
+                    metric('Tiêu thụ hôm qua (' + (d1.date || '--') + ')', fmtKwh(d1.kwh), '#00ff72') +
+                    metric('Tiêu thụ hôm kia (' + (d2.date || '--') + ')', fmtKwh(d2.kwh)) +
+                    metric('Tạm tính tháng ' + (month.label || 'này'), fmtVnd(month.estimated_cost), '#ffaa00', isNum(month.kwh) ? ('Sản lượng tạm tính: ' + fmtNum(month.kwh, 2) + ' kWh') : '') +
+                '</div>' +
+
+                '<div class="ai-section-title">📟 2. CHỈ SỐ CÔNG TƠ (TẠM CHỐT &amp; CUỐI KỲ TRƯỚC)</div>' +
+                '<div class="ai-grid-metrics">' +
+                    metric('Chỉ số tạm chốt', fmtNum(prov.value, 2), '#ffd700', (prov.at ? 'Lúc ' + prov.at : '') + (deltaIdx ? ' · ' + deltaIdx : '')) +
+                    metric('Chỉ số cuối kỳ trước', fmtNum(prevCyc.value, 2), '#38bdf8', (prevCyc.period ? 'Kỳ ' + prevCyc.period : '') + (prevCyc.date ? ' · ' + prevCyc.date : '')) +
+                    metric('Chỉ số ghi gần nhất', fmtNum(latestRead.value, 2), null, (latestRead.date || '--') + (latestRead.kind ? ' (' + latestRead.kind + ')' : '')) +
+                    metric('Hệ số nhân công tơ', fmtNum(idx.multiplier ?? 1, 0), null, 'Điểm đo: ' + (cust.point || '--')) +
+                '</div>' +
+
+                '<div class="ai-section-title">🧾 3. TIỀN &amp; ĐIỆN NĂNG 3 KỲ GẦN NHẤT + HÓA ĐƠN NĂM NAY</div>' +
+                '<table class="evn-table"><tr><th>Kỳ hóa đơn</th><th>Chỉ số (Cũ → Mới)</th><th>Điện năng</th><th>Tiền điện</th></tr>' +
+                periods.map((p) => {
+                    const idxRange = (isNum(p.old_index) && isNum(p.new_index)) ? (fmtNum(p.old_index, 0) + ' → ' + fmtNum(p.new_index, 0)) : (p.provisional ? 'Đang chạy' : '--');
+                    const kwhTxt = isNum(p.kwh) ? (fmtNum(p.kwh, 2) + ' kWh' + (p.provisional ? ' *' : '')) : '--';
+                    const amtTxt = isNum(p.amount) ? fmtVnd(p.amount) : (p.provisional && isNum(month.estimated_cost) ? ('~' + fmtVnd(month.estimated_cost)) : 'Chưa phát hành');
+                    return '<tr><td>' + esc((p.title ? p.title + ' (' + p.label + ')' : p.label)) + '</td><td>' + esc(idxRange) + '</td><td>' + esc(kwhTxt) + '</td><td style="color:#ffaa00">' + esc(amtTxt) + '</td></tr>';
+                }).join('') +
+                '</table>' +
+                '<div class="ai-grid-metrics" style="margin-top:6px">' +
+                    metric('Hóa đơn năm ' + (inv.year || new Date().getFullYear()), fmtVnd(inv.year_total), '#00ff72', (inv.year_count ?? 0) + ' hóa đơn đã phát hành') +
+                    metric('Hóa đơn gần nhất' + (inv.latest && inv.latest.label ? ' (' + inv.latest.label + ')' : ''), inv.latest ? fmtVnd(inv.latest.amount) : '--', '#ffd700', inv.latest ? ((inv.latest.status || '') + (inv.latest.paid_at ? ' · ' + inv.latest.paid_at : '')) : '') +
+                    metric('Tiền còn nợ', fmtVnd(inv.outstanding_amount ?? 0), (inv.outstanding_amount > 0) ? '#ff5b6e' : '#00ff72', 'Số HĐ chưa thanh toán: ' + (inv.outstanding_count ?? 0)) +
+                    metric('Kênh thanh toán', (inv.latest && inv.latest.channel) || '--', null, (inv.latest && inv.latest.due) ? ('Hạn TT: ' + inv.latest.due) : '') +
+                '</div>' +
+
+                '<div class="ai-section-title">🚧 4. LỊCH NGỪNG ĐIỆN (BINARY SENSOR &amp; CHI TIẾT)</div>' +
+                '<div class="evn-pill-row">' +
+                    '<div class="evn-pill ' + (o.outage_scheduled ? 'on-plan' : '') + '">Lịch sắp tới<span class="st">' + (o.outage_scheduled ? '🟡 BẬT (ON)' : '⚪ KHÔNG (OFF)') + '</span></div>' +
+                    '<div class="evn-pill ' + (o.outage_active ? 'on-active' : '') + '">Đang diễn ra<span class="st">' + (o.outage_active ? '🔴 ĐANG CẮT' : '🟢 KHÔNG (OFF)') + '</span></div>' +
+                    '<div class="evn-pill ' + (o.outage_soon ? 'on-soon' : '') + '">Sắp cắt ≤24h<span class="st">' + (o.outage_soon ? '🟠 CẢNH BÁO' : '⚪ KHÔNG (OFF)') + '</span></div>' +
+                '</div>' +
+                (targetOutage
+                    ? '<div class="evn-outage-box">' +
+                        '<div><b>Thời gian:</b> ' + fmtDt(targetOutage.start) + ' → ' + fmtDt(targetOutage.end) + '</div>' +
+                        '<div><b>Số giờ mất điện:</b> ' + (isNum(targetOutage.hours) ? fmtNum(targetOutage.hours, 1) + ' giờ' : '--') + '</div>' +
+                        '<div><b>Khu vực:</b> ' + esc(targetOutage.area || '--') + '</div>' +
+                        '<div><b>Lý do:</b> ' + esc(targetOutage.reason || '--') + '</div>' +
+                        '<div><b>Tổng số lịch cắt:</b> ' + o.count + '</div>' +
+                      '</div>'
+                    : '<div class="evn-outage-box">✅ Không có lịch ngừng cấp điện trong 14 ngày tới (Tổng số lịch: 0).</div>') +
+
+                '<div class="evn-footer" style="margin-top:8px"><span>Đồng bộ lúc: ' + fmtDt(ts(d.fetched_at)) + '</span><span>Nguồn: ' + esc(state.source || 'EVN CSKH') + '</span></div>';
+        }
+
+        function renderAll() {
+            renderBadge();
+            renderModal();
+            const c = document.getElementById('evn-conn-text');
+            if (c) c.textContent = state.connText;
+            const b = document.getElementById('evn-refresh-btn');
+            if (b) b.disabled = state.busy;
+        }
+
+        function applyData(data, sourceLabel) {
+            if (!data || !data.ok) return false;
+            state.data = data;
+            state.source = sourceLabel;
+            state.connText = '🟢 EVN CSKH (' + (data.customer && data.customer.code ? data.customer.code : 'Đã đồng bộ') + ') · ' + sourceLabel;
+            try { localStorage.setItem('evn_cskh_snapshot_v2', JSON.stringify(data)); } catch (e) {}
+            renderAll();
+            return true;
+        }
+
+        function saveToFirebase(data) {
+            try {
+                if (typeof database !== 'undefined' && database) {
+                    database.ref(EVN_DIRECT_CONFIG.firebasePath).set(data).catch(() => {});
+                } else {
+                    fetch(EVN_DIRECT_CONFIG.firebaseUrl, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    }).catch(() => {});
+                }
+            } catch (e) {}
+        }
+
+        async function tryWorkerSync(endpoint, label, forceRefresh) {
+            const u = getUser(), p = getPass();
+            if (!endpoint || !u || !p) return false;
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 5000);
+            try {
+                const url = endpoint + '/?evn=1' + (forceRefresh ? '&refresh=1' : '') + '&_t=' + Date.now();
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p, refresh: !!forceRefresh }),
+                    signal: ctrl.signal
+                });
+                clearTimeout(timer);
+                if (!res.ok) return false;
+                const j = await res.json();
+                if (j && j.ok && j.customer) {
+                    applyData(j, label);
+                    saveToFirebase(j);
+                    return true;
+                }
+            } catch (e) {
+                clearTimeout(timer);
+            }
+            return false;
+        }
+
+        async function tryFirebaseLoad() {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 4500);
+            try {
+                const res = await fetch(EVN_DIRECT_CONFIG.firebaseUrl + '?_t=' + Date.now(), { cache: 'no-store', signal: ctrl.signal });
+                clearTimeout(timer);
+                if (!res.ok) return false;
+                const j = await res.json();
+                if (j && j.ok && j.customer) {
+                    return applyData(j, 'Firebase Cloud');
+                }
+            } catch (e) {
+                clearTimeout(timer);
+            }
+            return false;
+        }
+
+        window.evnRefreshNow = async function (forceRefresh) {
+            if (state.busy) return;
+            state.busy = true;
+            const b = document.getElementById('evn-refresh-btn');
+            if (b) b.textContent = '⏳ Đang tải...';
+            renderAll();
+
+            // Nạp tức thì từ Firebase nếu chưa có dữ liệu trên màn hình
+            if (!state.data && !forceRefresh) {
+                await tryFirebaseLoad();
+            }
+
+            let ok = await tryWorkerSync(getWorker(), 'Cloudflare Worker', forceRefresh);
+            if (!ok && (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:')) {
+                ok = await tryWorkerSync(EVN_DIRECT_CONFIG.localUrl, 'Local Proxy', forceRefresh);
+            }
+            if (!ok) {
+                ok = await tryFirebaseLoad();
+            }
+            if (!ok && !state.data) {
+                state.connText = '⚠️ Chưa lấy được dữ liệu EVN';
+            }
+            state.busy = false;
+            if (b) b.textContent = (ok || state.data) ? '✅ Đã cập nhật' : '🔄 Cập nhật EVN';
+            renderAll();
+            if (ok || state.data) setTimeout(() => { if (b) b.textContent = '🔄 Cập nhật EVN'; }, 2200);
+        };
+
+        window.evnSetLiveGrid = function (isGridOn, vGrid) {
+            const changed = live.on !== isGridOn || Math.abs((live.vGrid || 0) - (vGrid || 0)) > 1;
+            live.on = isGridOn;
+            live.vGrid = vGrid;
+            live.hasRealSignal = true;
+            if (typeof latestDailyData !== 'undefined' && latestDailyData && Number.isFinite(Number(latestDailyData.Grid_Buy_Today))) {
+                live.buyToday = Number(latestDailyData.Grid_Buy_Today);
+            }
+            if (changed) renderAll();
+        };
+
+        window.evnApplyData = applyData;
+
+        window.toggleEvnModal = function (show) {
+            const m = document.getElementById('evn-modal');
+            if (!m) return;
+            m.classList.toggle('active', !!show);
+            if (show) {
+                document.getElementById('evn-set-user').value = getUser();
+                document.getElementById('evn-set-pass').value = getPass();
+                document.getElementById('evn-set-worker').value = getWorker();
+                renderAll();
+            }
+        };
+
+        window.evnSaveSettings = function () {
+            const u = document.getElementById('evn-set-user').value.trim();
+            const p = document.getElementById('evn-set-pass').value;
+            const w = document.getElementById('evn-set-worker').value.trim();
+            if (u) localStorage.setItem('evn_cskh_user', u);
+            if (p) localStorage.setItem('evn_cskh_pass', p);
+            if (w) localStorage.setItem('evn_cskh_worker', w);
+            document.getElementById('evn-settings').classList.remove('show');
+            window.evnRefreshNow(true);
+        };
+
+        // 1. Nạp nhanh từ cache trình duyệt nếu có
+        try {
+            const cached = JSON.parse(localStorage.getItem('evn_cskh_snapshot_v2') || 'null');
+            if (cached && cached.ok) applyData(cached, 'Bộ nhớ đệm');
+        } catch (e) {}
+
+        // 2. Lắng nghe realtime từ Firebase (nếu SDK Firebase đã khởi tạo trên trang)
+        try {
+            if (typeof database !== 'undefined' && database) {
+                database.ref(EVN_DIRECT_CONFIG.firebasePath).on('value', (snap) => {
+                    const val = snap && snap.val ? snap.val() : null;
+                    if (val && val.ok && val.customer) applyData(val, 'Firebase Realtime');
+                });
+            }
+        } catch (e) {}
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') window.toggleEvnModal(false); });
+        setInterval(renderAll, 30000);           // cập nhật đếm ngược lịch cắt điện mỗi 30 giây
+        setInterval(() => window.evnRefreshNow(false), 30 * 60 * 1000); // tự đồng bộ lại mỗi 30 phút
+        renderAll();
+        window.evnRefreshNow(false);
+    })();
+    </script>
 
 </body>
 </html>
