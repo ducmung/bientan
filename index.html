@@ -1146,7 +1146,6 @@
                 <div class="val" id="lbl-grid">0</div>
                 <div class="unit">W</div>
                 <div id="lbl-grid-mode" class="grid-live-mode idle" style="display:none"></div>
-                <div id="evn-grid-badge" class="evn-grid-badge">EVN: đang tải...</div>
             </div>
 
             <div class="node pos-batt corner-node">
@@ -1238,20 +1237,29 @@
                             </div>
                         </div>
                         <div class="bms-metric-grid">
-                            <div class="bms-metric"><span class="value" id="bm1-cell-high">--</span><span class="label">CELL CAO</span></div>
-                            <div class="bms-metric danger"><span class="value" id="bm1-cell-low">--</span><span class="label">CELL THẤP</span></div>
+                            <button type="button" class="bms-metric bms-click-toggle" onclick="toggleBmsCells('bm1')" title="Xem bảng điện áp Cell"><span class="value" id="bm1-cell-high">--</span><span class="label">CELL CAO</span></button>
+                            <button type="button" class="bms-metric danger bms-click-toggle" onclick="toggleBmsCells('bm1')" title="Xem bảng điện áp Cell"><span class="value" id="bm1-cell-low">--</span><span class="label">CELL THẤP</span></button>
                             <div class="bms-metric"><span class="value" id="bm1-cell-diff">--</span><span class="label">LỆCH CELL</span></div>
                             <div class="bms-metric"><span class="value" id="bm1-balance-current">--</span><span class="label">DÒNG CB</span></div>
                             <div class="bms-metric"><span class="value" id="bm1-capacity">--</span><span class="label">DUNG LƯỢNG</span></div>
                             <div class="bms-metric"><span class="value" id="bm1-remain">--</span><span class="label">CÒN LẠI</span></div>
                             <button type="button" class="bms-metric warn bms-temp-toggle" onclick="toggleBmsTemps('bm1')" title="Xem nhiệt độ T1-T4"><span class="value" id="bm1-mos-temp">--</span><span class="label">NHIỆT ĐỘ</span></button>
-                            <div class="bms-metric"><span class="value" id="bm1-health">--</span><span class="label">TUỔI THỌ</span></div>
+                            <button type="button" class="bms-metric bms-click-toggle" onclick="toggleBmsHealth('bm1')" title="Xem Chu kỳ, DL Chu kỳ & Sạc đỉnh"><span class="value" id="bm1-health">--</span><span class="label">TUỔI THỌ</span></button>
                         </div>
                         <div class="bms-temp-detail" id="bm1-temp-detail">
                             <div class="bms-temp-chip"><span class="value" id="bm1-t1">--</span><span class="label">T1 (°C)</span></div>
                             <div class="bms-temp-chip"><span class="value" id="bm1-t2">--</span><span class="label">T2 (°C)</span></div>
                             <div class="bms-temp-chip"><span class="value" id="bm1-t3">--</span><span class="label">T3 (°C)</span></div>
                             <div class="bms-temp-chip"><span class="value" id="bm1-t4">--</span><span class="label">T4 (°C)</span></div>
+                        </div>
+                        <div class="bms-cell-detail" id="bm1-cell-detail">
+                            <div class="bms-cell-title">Điện Áp Cell</div>
+                            <div class="bms-cell-grid" id="bm1-cell-grid"></div>
+                        </div>
+                        <div class="bms-health-detail" id="bm1-health-detail">
+                            <div class="bms-health-box"><span class="h-val" id="bm1-h-cycle">--</span><span class="h-lbl">CHU KỲ</span></div>
+                            <div class="bms-health-box"><span class="h-val" id="bm1-h-cyccap">--</span><span class="h-lbl">DL CHU KỲ (AH)</span></div>
+                            <div class="bms-health-box"><span class="h-val" id="bm1-h-peak">--</span><span class="h-lbl">SẠC ĐỈNH (AH)</span></div>
                         </div>
                         <div class="bms-power-row"><span class="bms-power-label">Công Suất:</span> <span class="power-val" id="bm1-power">--</span></div>
                         <div class="bms-power-bar"><div class="bms-power-fill" id="bm1-power-fill"></div></div>
@@ -1278,20 +1286,29 @@
                             </div>
                         </div>
                         <div class="bms-metric-grid">
-                            <div class="bms-metric"><span class="value" id="bm2-cell-high">--</span><span class="label">CELL CAO</span></div>
-                            <div class="bms-metric danger"><span class="value" id="bm2-cell-low">--</span><span class="label">CELL THẤP</span></div>
+                            <button type="button" class="bms-metric bms-click-toggle" onclick="toggleBmsCells('bm2')" title="Xem bảng điện áp Cell"><span class="value" id="bm2-cell-high">--</span><span class="label">CELL CAO</span></button>
+                            <button type="button" class="bms-metric danger bms-click-toggle" onclick="toggleBmsCells('bm2')" title="Xem bảng điện áp Cell"><span class="value" id="bm2-cell-low">--</span><span class="label">CELL THẤP</span></button>
                             <div class="bms-metric"><span class="value" id="bm2-cell-diff">--</span><span class="label">LỆCH CELL</span></div>
                             <div class="bms-metric"><span class="value" id="bm2-balance-current">--</span><span class="label">DÒNG CB</span></div>
                             <div class="bms-metric"><span class="value" id="bm2-capacity">--</span><span class="label">DUNG LƯỢNG</span></div>
                             <div class="bms-metric"><span class="value" id="bm2-remain">--</span><span class="label">CÒN LẠI</span></div>
                             <button type="button" class="bms-metric warn bms-temp-toggle" onclick="toggleBmsTemps('bm2')" title="Xem nhiệt độ T1-T4"><span class="value" id="bm2-mos-temp">--</span><span class="label">NHIỆT ĐỘ</span></button>
-                            <div class="bms-metric"><span class="value" id="bm2-health">--</span><span class="label">TUỔI THỌ</span></div>
+                            <button type="button" class="bms-metric bms-click-toggle" onclick="toggleBmsHealth('bm2')" title="Xem Chu kỳ, DL Chu kỳ & Sạc đỉnh"><span class="value" id="bm2-health">--</span><span class="label">TUỔI THỌ</span></button>
                         </div>
                         <div class="bms-temp-detail" id="bm2-temp-detail">
                             <div class="bms-temp-chip"><span class="value" id="bm2-t1">--</span><span class="label">T1 (°C)</span></div>
                             <div class="bms-temp-chip"><span class="value" id="bm2-t2">--</span><span class="label">T2 (°C)</span></div>
                             <div class="bms-temp-chip"><span class="value" id="bm2-t3">--</span><span class="label">T3 (°C)</span></div>
                             <div class="bms-temp-chip"><span class="value" id="bm2-t4">--</span><span class="label">T4 (°C)</span></div>
+                        </div>
+                        <div class="bms-cell-detail" id="bm2-cell-detail">
+                            <div class="bms-cell-title">Điện Áp Cell</div>
+                            <div class="bms-cell-grid" id="bm2-cell-grid"></div>
+                        </div>
+                        <div class="bms-health-detail" id="bm2-health-detail">
+                            <div class="bms-health-box"><span class="h-val" id="bm2-h-cycle">--</span><span class="h-lbl">CHU KỲ</span></div>
+                            <div class="bms-health-box"><span class="h-val" id="bm2-h-cyccap">--</span><span class="h-lbl">DL CHU KỲ (AH)</span></div>
+                            <div class="bms-health-box"><span class="h-val" id="bm2-h-peak">--</span><span class="h-lbl">SẠC ĐỈNH (AH)</span></div>
                         </div>
                         <div class="bms-power-row"><span class="bms-power-label">Công Suất:</span> <span class="power-val" id="bm2-power">--</span></div>
                         <div class="bms-power-bar"><div class="bms-power-fill" id="bm2-power-fill"></div></div>
@@ -1871,6 +1888,7 @@
                 if (powerRow) powerRow.classList.remove('charging', 'discharging');
                 const fill = document.getElementById(`${prefix}-power-fill`);
                 if (fill) { fill.style.width = '0%'; fill.classList.remove('discharging'); }
+                if (window.renderBmsExtraDetails) window.renderBmsExtraDetails(prefix, null);
                 return;
             }
 
@@ -1962,6 +1980,7 @@
             bmsSetFlag(`${prefix}-charge-state`, bmsRead(data, ['Charge', 'Charge_Enable', 'ChargeEnabled', 'Charging'], false));
             bmsSetFlag(`${prefix}-discharge-state`, bmsRead(data, ['Discharge', 'Discharge_Enable', 'DischargeEnabled', 'Discharging'], false));
             bmsSetFlag(`${prefix}-balance-state`, bmsRead(data, ['Balance', 'Balance_Enable', 'BalanceEnabled', 'Balancing'], false));
+            if (window.renderBmsExtraDetails) window.renderBmsExtraDetails(prefix, data);
         }
 
         let latestBmsCombined = { bm1: null, bm2: null };
@@ -2935,11 +2954,8 @@
                                 val = (buf[pos + 1] << 8) | buf[pos];
                                 if (val >= 0x8000) val -= 0xFFFF;
                             } else if ((type === "uint32" || type === "int32") && pos + 4 <= buf.length) {
-                                if (reg.endian === "big") {
-                                    val = (buf[pos + 3] << 24) | (buf[pos + 2] << 16) | (buf[pos + 1] << 8) | buf[pos];
-                                } else {
-                                    val = (buf[pos + 1] << 24) | (buf[pos] << 16) | (buf[pos + 3] << 8) | buf[pos + 2];
-                                }
+                                val = ((buf[pos + 3] << 24) | (buf[pos + 2] << 16) | (buf[pos + 1] << 8) | buf[pos]);
+                                if (type === "uint32" && reg.id !== "tbatc") val = val >>> 0;
                             }
 
                             if (val !== undefined) {
@@ -2959,12 +2975,14 @@
 
         function convertMikaToDashboardFormat(d, devInfo) {
             let minCell = Infinity, maxCell = -Infinity, validCells = 0;
+            const cellVoltages = [];
             for (let i = 1; i <= 24; i++) {
                 const cv = Number(d[`cellv${i}`]) / 1000;
                 if (Number.isFinite(cv) && cv > 1.0 && cv < 5.0) {
                     if (cv < minCell) minCell = cv;
                     if (cv > maxCell) maxCell = cv;
                     validCells++;
+                    cellVoltages.push(Number(cv.toFixed(3)));
                 }
             }
 
@@ -3016,7 +3034,10 @@
                 Signed_Power: Number((totalV * currA).toFixed(1)),
                 Max_Charge_Curr: Number(d.maxchargecur || 120),
                 Max_Discharge_Curr: Number(d.maxdischargecur || 120),
-                Cell_Count: validCells || 16
+                Cell_Count: validCells || 16,
+                Cell_Voltages: cellVoltages,
+                Cycle_Capacity: Number(((Number(d.soccyccap || 0)) / 1000).toFixed(1)),
+                Peak_Charge_Capacity: Number(fullCap.toFixed(1))
             };
         }
 
@@ -3166,17 +3187,17 @@
                     } else if (topic === MQTT_TOPIC_BMS) {
                         const packs = bmsResolvePacks(parsed);
                         let changed = false;
-                        if (packs.bm1 && packs.bm1.Online === true) { latestBmsCombined.bm1 = packs.bm1; changed = true; }
-                        if (packs.bm2 && packs.bm2.Online === true) { latestBmsCombined.bm2 = packs.bm2; changed = true; }
+                        if (packs.bm1 && packs.bm1.Online === true) { latestBmsCombined.bm1 = window.mergeBmsPack ? window.mergeBmsPack(latestBmsCombined.bm1, packs.bm1) : packs.bm1; changed = true; }
+                        if (packs.bm2 && packs.bm2.Online === true) { latestBmsCombined.bm2 = window.mergeBmsPack ? window.mergeBmsPack(latestBmsCombined.bm2, packs.bm2) : packs.bm2; changed = true; }
                         if (changed) refreshBmsPanels();
                     } else if (topic === MQTT_TOPIC_BMS1) {
                         if (parsed && parsed.Online === true) {
-                            latestBmsCombined.bm1 = parsed;
+                            latestBmsCombined.bm1 = window.mergeBmsPack ? window.mergeBmsPack(latestBmsCombined.bm1, parsed) : parsed;
                             refreshBmsPanels();
                         }
                     } else if (topic === MQTT_TOPIC_BMS2) {
                         if (parsed && parsed.Online === true) {
-                            latestBmsCombined.bm2 = parsed;
+                            latestBmsCombined.bm2 = window.mergeBmsPack ? window.mergeBmsPack(latestBmsCombined.bm2, parsed) : parsed;
                             refreshBmsPanels();
                         }
                     }
@@ -4481,6 +4502,23 @@
         .evn-settings { display: none; margin-top: 10px; gap: 6px; flex-direction: column; }
         .evn-settings.show { display: flex; }
         .evn-settings input { background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 7px; color: #fff; padding: 6px 8px; font-size: 11px; }
+        /* ===== BẢNG ĐIỆN ÁP CELL & CHI TIẾT TUỔI THỌ PIN (HÌNH 1 & HÌNH 2) ===== */
+        .bms-click-toggle { position: relative; cursor: pointer; }
+        .bms-click-toggle::after { content: "⋯"; position: absolute; right: 2px; top: 1px; color: rgba(255,255,255,0.7); font-size: 10px; line-height: 1; }
+        .bms-cell-detail { display: none; margin-top: 6px; padding: 8px 6px; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; background: rgba(14,18,24,0.94); }
+        .bms-board.cells-open .bms-cell-detail { display: block; }
+        .bms-cell-title { text-align: center; color: #ffffff; font-size: 11.5px; font-weight: 900; margin-bottom: 6px; letter-spacing: 0.2px; }
+        .bms-cell-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+        .bms-cell-pill { display: flex; align-items: center; justify-content: space-between; gap: 3px; padding: 4px 6px; border-radius: 999px; border: 1.2px solid rgba(255,255,255,0.22); background: rgba(26,30,38,0.92); box-shadow: inset 0 1px 2px rgba(0,0,0,0.6); }
+        .bms-cell-pill .c-idx { color: #d1d5db; font-size: 9px; font-weight: 800; line-height: 1; }
+        .bms-cell-pill .c-val { color: #00e640; font-size: 10.5px; font-weight: 900; line-height: 1; letter-spacing: -0.2px; }
+        .bms-cell-pill.is-max .c-val { color: #2962ff; text-shadow: 0 0 6px rgba(41,98,255,0.45); }
+        .bms-cell-pill.is-min .c-val { color: #ff1744; text-shadow: 0 0 6px rgba(255,23,68,0.45); }
+        .bms-health-detail { display: none; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 6px; }
+        .bms-board.health-open .bms-health-detail { display: grid; }
+        .bms-health-box { border: 1.2px solid rgba(0,230,64,0.55); border-radius: 10px; background: linear-gradient(180deg, rgba(16,92,38,0.62) 0%, rgba(10,24,16,0.92) 100%); padding: 7px 4px 6px; text-align: center; box-shadow: inset 0 1px 8px rgba(0,255,100,0.12); }
+        .bms-health-box .h-val { display: block; color: #00ff44; font-size: 14px; font-weight: 900; line-height: 1.1; letter-spacing: -0.3px; text-shadow: 0 0 8px rgba(0,255,68,0.35); }
+        .bms-health-box .h-lbl { display: block; margin-top: 4px; color: #cbd5e1; font-size: 7.5px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.2px; white-space: nowrap; }
     </style>
 
     <div id="evn-modal" class="ai-modal-overlay" onclick="if (event.target.id === 'evn-modal') toggleEvnModal(false)">
@@ -4584,9 +4622,6 @@
             }
             if (o.outage_scheduled && o.next) {
                 return { cls: 'plan', text: '📅 CÓ LỊCH CẮT ĐIỆN', sub: fmtDay(o.next.start) + ' ' + fmtHm(o.next.start) };
-            }
-            if (live.on === false && live.hasRealSignal) {
-                return { cls: 'off', text: '⚠️ MẤT ĐIỆN LƯỚI', sub: 'Inverter báo mất áp lưới' };
             }
             if (!d) {
                 return { cls: '', text: 'EVN: đang tải...', sub: '' };
@@ -4874,6 +4909,93 @@
         setInterval(() => window.evnRefreshNow(false), 30 * 60 * 1000); // tự đồng bộ lại mỗi 30 phút
         renderAll();
         window.evnRefreshNow(false);
+
+        // ================= HIỂN THỊ BẢNG ĐIỆN ÁP CELL (HÌNH 1) & TUỔI THỌ PIN (HÌNH 2) =================
+        window.toggleBmsCells = function (prefix) {
+            const card = document.getElementById(prefix + '-card');
+            if (card) card.classList.toggle('cells-open');
+        };
+        window.toggleBmsHealth = function (prefix) {
+            const card = document.getElementById(prefix + '-card');
+            if (card) card.classList.toggle('health-open');
+        };
+
+        window.mergeBmsPack = function (oldPack, newPack) {
+            if (!oldPack) return newPack;
+            if (!newPack) return oldPack;
+            const merged = Object.assign({}, oldPack, newPack);
+            if ((!Array.isArray(newPack.Cell_Voltages) || newPack.Cell_Voltages.length === 0) && Array.isArray(oldPack.Cell_Voltages) && oldPack.Cell_Voltages.length > 0) {
+                merged.Cell_Voltages = oldPack.Cell_Voltages;
+            }
+            if (!Number.isFinite(Number(newPack.Cycle_Capacity)) && Number.isFinite(Number(oldPack.Cycle_Capacity))) {
+                merged.Cycle_Capacity = oldPack.Cycle_Capacity;
+                merged.Peak_Charge_Capacity = oldPack.Peak_Charge_Capacity;
+                merged.Cycle_Count = oldPack.Cycle_Count;
+            }
+            return merged;
+        };
+
+        window.extractBmsCells = function (data) {
+            if (!data || typeof data !== 'object') return [];
+            if (Array.isArray(data.Cell_Voltages) && data.Cell_Voltages.length > 0) {
+                return data.Cell_Voltages.map(Number).filter(v => Number.isFinite(v) && v > 0.5 && v < 5.5);
+            }
+            const arr = [];
+            for (let i = 1; i <= 24; i++) {
+                const pad = String(i).padStart(2, '0');
+                const v = bmsNumber(data, ['Cell_' + pad, 'Cell' + pad, 'Cell_' + i, 'Cell' + i, 'cellv' + i], NaN);
+                if (Number.isFinite(v) && v > 0.5) {
+                    arr.push(v > 10 ? v / 1000 : v);
+                }
+            }
+            return arr;
+        };
+
+        window.renderBmsExtraDetails = function (prefix, data) {
+            const cellGrid = document.getElementById(prefix + '-cell-grid');
+            if (cellGrid) {
+                const cells = window.extractBmsCells(data);
+                const count = cells.length > 0 ? cells.length : 16;
+                let maxV = -Infinity, minV = Infinity, maxIdx = -1, minIdx = -1;
+                cells.forEach((v, idx) => {
+                    if (v > maxV) { maxV = v; maxIdx = idx; }
+                    if (v < minV) { minV = v; minIdx = idx; }
+                });
+                if (maxV === minV) { maxIdx = -1; minIdx = -1; }
+                let html = '';
+                for (let i = 0; i < count; i++) {
+                    const idxStr = String(i + 1).padStart(2, '0');
+                    const v = cells[i];
+                    let cls = 'bms-cell-pill';
+                    let valStr = '--';
+                    if (Number.isFinite(v)) {
+                        valStr = v.toFixed(3);
+                        if (i === maxIdx) cls += ' is-max';
+                        else if (i === minIdx) cls += ' is-min';
+                    }
+                    html += '<div class="' + cls + '"><span class="c-idx">' + idxStr + '</span><span class="c-val">' + valStr + '</span></div>';
+                }
+                if (cellGrid.innerHTML !== html) cellGrid.innerHTML = html;
+            }
+
+            const cyc = data ? bmsNumber(data, ['Cycle_Count', 'Cycles', 'Cycle'], NaN) : NaN;
+            const cycCap = data ? bmsNumber(data, ['Cycle_Capacity', 'Total_Charging_Capacity', 'Total_Cycle_Capacity', 'SOCCycleCapacity'], NaN) : NaN;
+            const peakCap = data ? bmsNumber(data, ['Peak_Charge_Capacity', 'Full_Charge_Capacity', 'Batt_Capacity', 'Battery_Capacity', 'Capacity'], NaN) : NaN;
+
+            updateDOMText(prefix + '-h-cycle', Number.isFinite(cyc) ? String(Math.round(cyc)) : '--');
+            updateDOMText(prefix + '-h-cyccap', Number.isFinite(cycCap) ? cycCap.toFixed(1) : '--');
+            updateDOMText(prefix + '-h-peak', Number.isFinite(peakCap) ? peakCap.toFixed(1) : '--');
+        };
+
+        // Khởi tạo lưới 16 cell mặc định và nạp từ cache nếu có
+        try {
+            const rawSnap = JSON.parse(localStorage.getItem('last_sosen_bms_snapshot') || 'null');
+            window.renderBmsExtraDetails('bm1', rawSnap && rawSnap.bm1 ? rawSnap.bm1 : null);
+            window.renderBmsExtraDetails('bm2', rawSnap && rawSnap.bm2 ? rawSnap.bm2 : null);
+        } catch (e) {
+            window.renderBmsExtraDetails('bm1', null);
+            window.renderBmsExtraDetails('bm2', null);
+        }
     })();
     </script>
 
