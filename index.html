@@ -4900,10 +4900,21 @@
             window.evnRefreshNow(true);
         };
 
-        // 1. Nạp nhanh từ cache trình duyệt nếu có
+        // 1. Nạp nhanh từ cache trình duyệt nếu có (chỉ dùng nếu cache < 2 giờ)
+        const CACHE_TTL_MS = 2 * 60 * 60 * 1000; // 2 tiếng
+        let cacheLoaded = false;
         try {
             const cached = JSON.parse(localStorage.getItem('evn_cskh_snapshot_v2') || 'null');
-            if (cached && cached.ok) applyData(cached, 'Bộ nhớ đệm');
+            if (cached && cached.ok) {
+                const age = Date.now() - (Date.parse(cached.fetched_at) || 0);
+                if (age < CACHE_TTL_MS) {
+                    applyData(cached, 'Bộ nhớ đệm');
+                    cacheLoaded = true;
+                } else {
+                    // Cache quá cũ (> 2h) → xóa luôn để Firebase được ưu tiên
+                    try { localStorage.removeItem('evn_cskh_snapshot_v2'); } catch (ee) {}
+                }
+            }
         } catch (e) {}
 
         // 2. Lắng nghe realtime từ Firebase (nếu SDK Firebase đã khởi tạo trên trang)
@@ -4916,11 +4927,20 @@
             }
         } catch (e) {}
 
+        // 3. Luôn tải Firebase ngay khi khởi động (không chờ người dùng bấm nút)
+        // Nếu cache đã cũ hoặc không có → tải Firebase trước khi refresh Worker
+        (async function initLoad() {
+            if (!cacheLoaded) {
+                await tryFirebaseLoad(); // tải ngay nếu không có cache hợp lệ
+            }
+            // Sau 1.5s, chạy refresh nhẹ (không forceRefresh) để kiểm tra Worker
+            setTimeout(() => window.evnRefreshNow(false), 1500);
+        })();
+
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') window.toggleEvnModal(false); });
         setInterval(renderAll, 30000);           // cập nhật đếm ngược lịch cắt điện mỗi 30 giây
         setInterval(() => window.evnRefreshNow(false), 30 * 60 * 1000); // tự đồng bộ lại mỗi 30 phút
         renderAll();
-        window.evnRefreshNow(false);
 
         // ================= HIỂN THỊ BẢNG ĐIỆN ÁP CELL (HÌNH 1) & TUỔI THỌ PIN (HÌNH 2) =================
         window.toggleBmsCells = function (prefix) {
